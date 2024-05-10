@@ -1,0 +1,29 @@
+@font-face {
+	font-family: 'spacemono';
+	src: url('/fonts/SpaceMono-Regular.ttf');
+}
+* {
+	font-family: 'spacemono';
+}
+
+body {
+	min-height: 100vh;
+	margin: 0;
+}
+
+section {
+	width: -webkit-fill-available;
+}
+
+.grid {
+	display: grid;
+	grid-template-areas: 'unit';
+}
+
+.unit {
+	grid-area: unit;
+}
+
+p {
+	margin: 0;
+}
