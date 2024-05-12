@@ -6,6 +6,10 @@
 	font-family: 'spacemono';
 }
 
+html {
+	min-width: fit-content;
+}
+
 body {
 	min-height: 100vh;
 	margin: 0;
