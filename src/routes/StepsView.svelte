@@ -1,27 +1,43 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { getTextWidth, wait } from '$lib/textwidth';
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import Stack from './Stack.svelte';
+	import SetsCard from './SetsCard.svelte';
+	import GrammarCard from './GrammarCard.svelte';
 
+	// ========== Components ====================
 	/**@type {Stack}*/
-	let istack;
+	let symbolStackElement;
+	/**@type {Stack}*/
+	let posStackElement;
+	/**@type {SetsCard}*/
+	let firstSet;
+	// ========== Components ====================
 
-	/**
-	 * @param {any} node
-	 * @param {{duration: number, delay: number}} params
-	 */
-	function firstIn(node, { duration, delay }) {
-		return {
-			delay,
-			duration,
-			/**
-			 * @param {number} t
-			 */
-			css: (t) => `opacity: ${t < 0.5 ? 0 : (t - 0.5) / 0.5};
-			width: ${charWidth * t}px;`
-		};
-	}
+	// ========= stores ================================================================================
+	/** @type {import('svelte/store').Writable<Array.<import('./typedefs').GrammarItem>>} */
+	let rules = writable([]);
+	/** @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>} */
+	let symbolStack = writable([]);
+	/** @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>} */
+	let posStack = writable([]);
+	/** @type {import('svelte/store').Writable<Array<import('./typedefs').SetRow>>}*/
+	let first = writable([]);
+	let nt = ['S', 'A', 'Bb'];
+	let firstIndexes = new Map();
+	// ========= stores ================================================================================
+
+	// ========= Style ======================================
+	const fontSize = 15;
+	const subFontSize = 10;
+	const lineHeight = 26;
+	let charWidth = 0;
+	let subCharWidth = 0;
+	// ========= Style ======================================
+
+	let hi = 'Hi';
+	setContext('StepsView', { selectLSymbol, selectRSymbol, hi });
 
 	/**
 	 * @param {string} card
@@ -55,245 +71,145 @@
 	/**
 	 * @param {number} currentRule
 	 */
-	async function addToSymbolStack(currentRule) {
-		await selectLSymbol('g', currentRule, 'blue', false);
+	async function nextProdSymbol(currentRule) {
+		await posStackElement.updateItem(
+			$posStack[$posStack.length - 1].data + 1,
+			`${$posStack[$posStack.length - 1].data + 1}`.toString(),
+			$posStack.length - 1
+		);
 
-		firstIndexes.set(rules[currentRule].left, first.length);
-		first = [
-			...first,
-			{
-				left: rules[currentRule].left,
-				right: [{ value: ' ', width: charWidth, opacity: 0 }],
-				showRight: false,
-				rightAnim: [{ value: ' ', width: charWidth, opacity: 0 }]
-			}
-		];
-
-		firstCard.style.height = `${lineHeight * first.length}px`;
-		await wait(0);
-
-		await selectLSymbol('f', currentRule, 'blue', false);
-
-		first[firstIndexes.get(rules[currentRule].left)].showRight = true;
-		await wait(0);
-	}
-
-	/**
-	 * @param {number} index
-	 * @param {string} symbol
-	 */
-	async function addSymbolToFirst(index, symbol) {
-		first[index].rightAnim = [...first[index].rightAnim, { value: symbol, width: 0, opacity: 0 }];
-		await wait(50);
-		first[index].rightAnim[first[index].rightAnim.length - 1] = {
-			value: symbol,
-			width: charWidth,
-			opacity: 1
-		};
-		await wait(500);
-	}
-
-	/**
-	 * @param {Array<SetItem>} symbols
-	 * @param {number} index
-	 */
-	async function addToFirst(symbols, index) {
-		if (first[index].right[0].value === ' ') {
-			first[index].right.pop();
-			first[index].rightAnim.pop();
-		}
-		for (let i = 0; i < symbols.length; i++) {
-			if (first[index].right.find((x) => x.value === symbols[i].value) === undefined) {
-				first[index].right = [...first[index].right, symbols[i]];
-				if (first[index].rightAnim.length > 0) {
-					await addSymbolToFirst(index, ',');
-				}
-				if (first[index].rightAnim.length === 0) {
-				}
-				await addSymbolToFirst(index, symbols[i].value);
-			}
-		}
-	}
-
-	/**
-	 * @param {number} index1
-	 * @param {number} index2
-	 */
-	function firstSpanId(index1, index2) {
-		return `fr${index1}-${index2}`;
-	}
-
-	/**
-	 * @param {number} currentRule
-	 * @param {Array<number>} prodStack
-	 */
-	async function nextProdSymbol(currentRule, prodStack) {
-		prodStack[prodStack.length - 1]++;
-		let prodPos = prodStack[prodStack.length - 1];
-		if (prodPos >= rules[currentRule].right.length) {
+		let prodPos = $posStack[$posStack.length - 1].data;
+		if (prodPos >= $rules[currentRule].right.length) {
 			return null;
 		}
 		await selectRSymbol('g', currentRule, prodPos, 'green', true);
-		return rules[currentRule].right[prodPos];
+		return $rules[currentRule].right[prodPos];
 	}
-
-	let grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
-	/**
-	 * @type {Array.<{left: string, right: Array.<string>}>}
-	 */
-	let rules = [];
-	let fontSize = 15;
-	let lineHeight = 26;
-	let charWidth = 0;
-
-	/**
-	 * @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>}
-	 */
-	let symbolStack = writable([]);
-	let prodStack = [-1];
-	let nt = ['S', 'A', 'Bb'];
-
-	let firstIndexes = new Map();
-	/** @type {HTMLElement}*/
-	let firstCard;
 
 	onMount(async () => {
 		charWidth = getTextWidth('P', fontSize);
+		subCharWidth = getTextWidth('P', subFontSize);
 
-		grammar.split('\n').forEach((r) => {
-			let s = r.split('->');
-
-			if (s.length > 1) {
-				rules.push({ left: s[0].replaceAll(' ', ''), right: s[1].trim().split(' ') });
+		let c = 0;
+		let currentSymbol = $rules[c].left;
+		let count = 0;
+		for (let i = 0; i < $rules.length; i++) {
+			if ($rules[i].left === currentSymbol) {
+				await symbolStackElement.addToStack(
+					i,
+					$rules[i].left,
+					$rules[i].index.toString(),
+					$rules[i].left.length * charWidth,
+					$rules[i].index.toString()
+				);
+				await posStackElement.addToStack(
+					-1,
+					'-1',
+					'',
+					$rules[i].left.length * charWidth,
+					$rules[i].index.toString()
+				);
 			}
-		});
+		}
 
-		let grammarCard = /**@type {HTMLElement}*/ (document.querySelector('#grammar'));
-		grammarCard.style.maxWidth = '0px';
-		rules = rules;
-		await istack.addToStack(symbolStack, 0, rules[0].left, rules[0].left.length * charWidth);
-
-		await wait(200);
-
-		grammarCard.style.height = `${lineHeight * rules.length}px`;
-		grammarCard.style.maxWidth = `${grammarCard.scrollWidth}px`;
-
-		firstCard = /**@type {HTMLElement}*/ (document.querySelector('.card.first-card'));
+		// await posStackElement.addToStack(-1, '-1', '', 2 * charWidth, $rules[0].left);
 
 		while ($symbolStack.length > 0) {
-			if (!firstIndexes.has(rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
-				await addToSymbolStack($symbolStack[$symbolStack.length - 1].data);
+			if ($posStack[$posStack.length - 1].data == -1) {
+				await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
+			}
+			if (!firstIndexes.has($rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
+				await firstSet.addSetRow(
+					$symbolStack[$symbolStack.length - 1].data,
+					$symbolStack[$symbolStack.length - 1].text
+				);
 			}
 
 			while (true) {
-				let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data, prodStack);
+				let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data);
 
 				if (symbol === null) {
-					prodStack.pop();
+					await posStackElement.removeFromStack($posStack.length - 1);
 
-					let topRule = rules[$symbolStack[$symbolStack.length - 1].data];
-					await istack.removeFromStack(symbolStack, $symbolStack.length - 1);
+					let topRule = $rules[$symbolStack[$symbolStack.length - 1].data];
+					await symbolStackElement.removeFromStack($symbolStack.length - 1);
 					await wait(1000);
 					if ($symbolStack.length > 0) {
-						let lastRule = rules[$symbolStack[$symbolStack.length - 1].data];
-						await addToFirst(
-							first[firstIndexes.get(topRule.left)].right,
+						let lastRule = $rules[$symbolStack[$symbolStack.length - 1].data];
+						await firstSet.joinSets(
+							$first[firstIndexes.get(topRule.left)].right,
 							firstIndexes.get(lastRule.left)
 						);
 					}
 					break;
 				}
 				if (nt.includes(symbol)) {
-					await wait(1000);
-					const ruleIndex = rules.findIndex((x) => x.left === symbol);
-					await istack.addToStack(
-						symbolStack,
-						ruleIndex,
-						rules[ruleIndex].left,
-						rules[ruleIndex].left.length * charWidth
-					);
-					prodStack.push(-1);
-					break;
+					if (firstIndexes.has(symbol)) {
+						await firstSet.joinSets(
+							$first[firstIndexes.get(symbol)].right,
+							firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left)
+						);
+					} else {
+						await wait(1000);
+						const ruleIndex = $rules.findIndex((x) => x.left === symbol);
+						await symbolStackElement.addToStack(
+							ruleIndex,
+							$rules[ruleIndex].left,
+							$rules[0].index.toString(),
+							$rules[ruleIndex].left.length * charWidth,
+							$rules[ruleIndex].left
+						);
+						await posStackElement.addToStack(-1, '-1', '', 2 * charWidth, $rules[ruleIndex].left);
+						break;
+					}
 				} else {
-					let index = firstIndexes.get(rules[$symbolStack[$symbolStack.length - 1].data].left);
-					await addToFirst([{ value: symbol, width: 0, opacity: 0 }], index);
-					continue;
+					let index = firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left);
+					await firstSet.joinSets([symbol], index);
 				}
 			}
 		}
 	});
-
-	/**
-	 * @typedef {{value: string, width: number, opacity: number}} SetItem
-	 * @type {Array.<{left: string, right: Array<SetItem>,showRight: boolean, rightAnim: Array<SetItem>}>}
-	 */
-	let first = [];
 </script>
 
 <div class="steps {$$props.class}" style="position: relative;">
-	<div class="card" id="grammar">
-		{#each rules as rule, i}
-			<p
-				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
-			>
-				<span id="gl{i}">{rule.left}</span>
-				<span>{'->'}</span>
-				{#each rule.right as symbol, si}
-					<span id="gr{i}-{si}">{symbol}</span>
-				{/each}
-			</p>
-		{/each}
+	<div class="card" style="font-size: 40px; font-weight: 500;height: 35px;">
+		{hi}
 	</div>
-	<div class="card first-card">
-		{#each first as f, index}
-			<p
-				id="fset{index}"
-				style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content"
-			>
-				<span id="fl{index}">{f.left}</span>
-				{#if f.showRight}
-					<span in:firstIn={{ duration: 500, delay: 0 }}>{':'}</span>
-					<span in:firstIn={{ duration: 500, delay: 100 }}>{'{'}</span>
+	<GrammarCard {fontSize} {lineHeight} {rules}></GrammarCard>
 
-					{#each f.rightAnim as text, ri (`${index}-${ri}`)}
-						<span style="width: {text.width}px;opacity:{text.opacity};" id={firstSpanId(index, ri)}>
-							{#if text.value != ' '}
-								{text.value}
-							{:else}
-								&nbsp;
-							{/if}</span
-						>
-					{/each}
+	<SetsCard set={first} {charWidth} {firstIndexes} {fontSize} {lineHeight} bind:this={firstSet}
+	></SetsCard>
 
-					<span in:firstIn={{ duration: 500, delay: 200 }}>{'}'}</span>
-				{/if}
-			</p>
-		{/each}
-	</div>
+	<Stack
+		{lineHeight}
+		{charWidth}
+		{subCharWidth}
+		{subFontSize}
+		stack={symbolStack}
+		{fontSize}
+		stackId="symbol"
+		label="symbol stack"
+		color="blue"
+		bind:this={symbolStackElement}
+	></Stack>
 
-	<Stack {lineHeight} {charWidth} {symbolStack} {fontSize} stackId="i" bind:this={istack}></Stack>
+	<Stack
+		{lineHeight}
+		{charWidth}
+		{subCharWidth}
+		{subFontSize}
+		stack={posStack}
+		{fontSize}
+		stackId="pos"
+		label="position stack"
+		color="green"
+		bind:this={posStackElement}
+	></Stack>
 </div>
 
 <style>
 	@import 'block.css';
-	.card {
-		height: 0px;
-		background: white;
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 10px;
-		padding: 5px 10px;
-		margin: 5px;
-		transition: width 0.3s;
-		overflow: hidden;
-		width: fit-content;
-
-		transition:
-			max-width 0.5s,
-			width 0.3s,
-			height 0.3s;
-		text-wrap: nowrap;
-	}
-
+	@import 'card.css';
 	.steps {
 		display: flex;
 		justify-content: center;
@@ -312,39 +228,5 @@
 			top 0.5s,
 			left 0.5s,
 			opacity 0.5s;
-	}
-
-	.card > p > span {
-		color: black;
-		transition: color 0.3s;
-	}
-
-	.first-card > p > span:nth-child(2) {
-		margin-left: 5px;
-	}
-
-	#grammar > p > span {
-		margin: 0px 4px;
-	}
-
-	#grammar > p > span:nth-child(2) {
-		margin: 0px;
-	}
-
-	#grammar > p > span:first-child {
-		padding: 0px;
-	}
-
-	.first-card > p {
-		padding: 0px;
-		display: flex;
-	}
-
-	.card > p > span {
-		transition:
-			width 0.5s,
-			opacity 0.5s;
-		z-index: 1;
-		position: relative;
 	}
 </style>

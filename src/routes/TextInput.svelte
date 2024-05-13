@@ -9,7 +9,7 @@
 			/**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight / lineHeight
 		);
 		numGap = lines.toString().length * charWidth + 15;
-		height = /**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight;
+		height = /**@type {HTMLElement}*/ (document.querySelector('textarea')).offsetHeight - 5;
 	}
 
 	/**
@@ -61,7 +61,7 @@
 		padding: 5px 10px 5px;
 		overflow: auto;
 		transition: padding 0.3s;
-		height: 100px;
+		height: 95px;
 	}
 
 	textarea:focus-within {
@@ -75,7 +75,7 @@
 
 	.textnumbers {
 		display: grid;
-		padding-top: 0px;
+		padding-top: 5px;
 		position: relative;
 		overflow: hidden;
 		letter-spacing: 0px;
