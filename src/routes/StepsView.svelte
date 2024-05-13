@@ -1,31 +1,58 @@
 <script>
+	import { writable } from 'svelte/store';
 	import { getTextWidth, wait } from '$lib/textwidth';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import Stack from './Stack.svelte';
 
+	/**@type {Stack}*/
+	let istack;
+	// /**
+	//  * @typedef {{opacity: number, height: number, width: number, top: number, value: number, transition: string}} stackItem
+	//  */
+
+	// const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
+	// const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
+	/**
+	 * @param {string} card
+	 * @param {number} index1
+	 * @param {string} color
+	 * @param {boolean} empty
+	 */
 	async function selectLSymbol(card, index1, color, empty) {
-		let symbol = document.querySelector(`#${card}l${index1}`);
+		let symbol = /** @type {HTMLElement} */ (document.querySelector(`#${card}l${index1}`));
 		symbol.classList.add(empty ? 'empty' : 'block');
-		symbol.classList.add(color);
-		await wait(500);
-	}
-
-	async function selectRSymbol(card, index1, index2, color, empty) {
-		let symbol = document.querySelector(`#${card}r${index1}-${index2}`);
-		symbol.classList.add(empty ? 'empty' : 'block');
-		symbol.classList.add(color);
+		symbol.classList.add(`${color}-after`);
 		await wait(500);
 	}
 
 	/**
-	 * @param {Array<number>} ruleStack
+	 * @param {string} card
+	 * @param {number} index1
+	 * @param {number} index2
+	 * @param {string} color
+	 * @param {boolean} empty
 	 */
-	async function addToSymbolStack(ruleStack) {
-		let currentRule = ruleStack[ruleStack.length - 1];
+	async function selectRSymbol(card, index1, index2, color, empty) {
+		let symbol = /** @type {HTMLElement} */ (
+			document.querySelector(`#${card}r${index1}-${index2}`)
+		);
+		symbol.classList.add(empty ? 'empty' : 'block');
+		symbol.classList.add(`${color}-after`);
+		await wait(500);
+	}
+
+	/**
+	 * @param {number} currentRule
+	 */
+	async function addToSymbolStack(currentRule) {
 		await selectLSymbol('g', currentRule, 'blue', false);
 
 		firstIndexes.set(rules[currentRule].left, first.length);
-		first = [...first, { left: rules[currentRule].left, right: [' '], showRight: false }];
+		first = [
+			...first,
+			{ left: rules[currentRule].left, right: [' '], showRight: false, whole: [] }
+		];
 
 		firstCard.style.height = `${lineHeight * first.length}px`;
 		firstCard.style.maxWidth = `${firstCard.scrollWidth}px`;
@@ -39,6 +66,10 @@
 		await wait(0);
 	}
 
+	/**
+	 * @param {Array<string>} symbols
+	 * @param {number} index
+	 */
 	async function addToFirst(symbols, index) {
 		if (first[index].right[0] === ' ') {
 			first[index].right = symbols;
@@ -47,7 +78,7 @@
 				if (!first[index].right.includes(symbols[i])) {
 					first[index].right = [...first[index].right, symbols[i]];
 					await wait(0);
-					console.log('added');
+
 					firstCard.style.maxWidth = `${firstCard.scrollWidth}px`;
 					await wait(1000);
 				}
@@ -55,17 +86,21 @@
 		}
 	}
 
-	export function firstSpanId(length, index1, index2) {
+	/**
+	 * @param {number} length
+	 * @param {number} index1
+	 * @param {number} index2
+	 */
+	function firstSpanId(length, index1, index2) {
 		return `fr${index1}-${index2}`;
 	}
 
 	/**
-	 * @param {Array<number>} ruleStack
+	 * @param {number} currentRule
 	 * @param {Array<number>} prodStack
 	 * @returns {Promise<string | null>} symbol
 	 */
-	async function nextProdSymbol(ruleStack, prodStack) {
-		let currentRule = ruleStack[ruleStack.length - 1];
+	async function nextProdSymbol(currentRule, prodStack) {
 		prodStack[prodStack.length - 1]++;
 		let prodPos = prodStack[prodStack.length - 1];
 		if (prodPos >= rules[currentRule].right.length) {
@@ -75,14 +110,73 @@
 		return rules[currentRule].right[prodPos];
 	}
 
+	// /**
+	//  * @param {import("svelte/store").Writable<Array<stackItem>>} stack
+	//  * @param {number} value
+	//  */
+	// async function addToStack(stack, value, width) {
+	// 	stack.update((x) => [
+	// 		...x,
+	// 		{
+	// 			opacity: 0,
+	// 			height: 0,
+	// 			width: 0,
+	// 			top: -lineHeight,
+	// 			value,
+	// 			transition: stackTransitionForward
+	// 		}
+	// 	]);
+	// 	await wait(0);
+
+	// 	stack.update((x) => {
+	// 		x[x.length - 1] = {
+	// 			opacity: 1,
+	// 			height: lineHeight,
+	// 			width,
+	// 			top: 0,
+	// 			value,
+	// 			transition: stackTransitionForward
+	// 		};
+	// 		return x;
+	// 	});
+	// 	await wait(1000);
+	// }
+
+	// /**
+	//  * @param {import("svelte/store").Writable<Array<stackItem>>} stack
+	//  */
+	// async function removeFromStack(stack, index) {
+	// 	stack.update((x) => {
+	// 		const value = x[index].value;
+	// 		x[index] = {
+	// 			opacity: 0,
+	// 			height: 0,
+	// 			width: 0,
+	// 			top: -lineHeight,
+	// 			value,
+	// 			transition: stackTransitionBackward
+	// 		};
+	// 		return x;
+	// 	});
+	// 	await wait(1000);
+	// 	stack.update((x) => x.splice(0, index));
+	// }
+
 	let grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
 	/**
 	 * @type {Array.<{left: string, right: Array.<string>}>}
 	 */
-	export let rules = [];
-	export let fontSize = 15;
-	export let lineHeight = 26;
-	export let charWidth = 0;
+	let rules = [];
+	let fontSize = 15;
+	let lineHeight = 26;
+	let charWidth = 0;
+	let ruleStack = [0];
+
+	/**
+	 * @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>}
+	 */
+	let symbolStack = writable([]);
+	let prodStack = [-1];
 	let nt = ['S', 'A', 'Bb'];
 
 	let firstIndexes = new Map();
@@ -90,7 +184,7 @@
 	let firstCard;
 
 	onMount(async () => {
-		charWidth = getTextWidth('0', fontSize);
+		charWidth = getTextWidth('P', fontSize);
 
 		grammar.split('\n').forEach((r) => {
 			let s = r.split('->');
@@ -100,32 +194,34 @@
 			}
 		});
 
-		let grammarCard = document.querySelector('#grammar');
+		let grammarCard = /**@type {HTMLElement}*/ (document.querySelector('#grammar'));
 		grammarCard.style.maxWidth = '0px';
 		rules = rules;
+		await istack.addToStack(symbolStack, 0, rules[0].left, rules[0].left.length * charWidth);
+
 		await wait(200);
 
 		grammarCard.style.height = `${lineHeight * rules.length}px`;
 		grammarCard.style.maxWidth = `${grammarCard.scrollWidth}px`;
 
-		firstCard = document.querySelector('.card.first-card');
+		firstCard = /**@type {HTMLElement}*/ (document.querySelector('.card.first-card'));
 
-		let ruleStack = [0];
-		let prodStack = [-1];
-
-		while (ruleStack.length > 0) {
-			if (!firstIndexes.has(rules[ruleStack[ruleStack.length - 1]]?.left)) {
-				await addToSymbolStack(ruleStack, firstIndexes);
+		while ($symbolStack.length > 0) {
+			if (!firstIndexes.has(rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
+				await addToSymbolStack($symbolStack[$symbolStack.length - 1].data);
 			}
 
 			while (true) {
-				let symbol = await nextProdSymbol(ruleStack, prodStack);
+				let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data, prodStack);
 
 				if (symbol === null) {
 					prodStack.pop();
-					let topRule = rules[ruleStack.pop()];
-					let lastRule = rules[ruleStack[ruleStack.length - 1]];
-					if (ruleStack.length > 0) {
+
+					let topRule = rules[$symbolStack[$symbolStack.length - 1].data];
+					await istack.removeFromStack(symbolStack, $symbolStack.length - 1);
+					await wait(1000);
+					if ($symbolStack.length > 0) {
+						let lastRule = rules[$symbolStack[$symbolStack.length - 1].data];
 						await addToFirst(
 							first[firstIndexes.get(topRule.left)].right,
 							firstIndexes.get(lastRule.left)
@@ -134,11 +230,18 @@
 					break;
 				}
 				if (nt.includes(symbol)) {
-					ruleStack.push(rules.findIndex((x) => x.left === symbol));
+					await wait(1000);
+					const ruleIndex = rules.findIndex((x) => x.left === symbol);
+					await istack.addToStack(
+						symbolStack,
+						ruleIndex,
+						rules[ruleIndex].left,
+						rules[ruleIndex].left.length * charWidth
+					);
 					prodStack.push(-1);
 					break;
 				} else {
-					let index = firstIndexes.get(rules[ruleStack[ruleStack.length - 1]].left);
+					let index = firstIndexes.get(rules[$symbolStack[$symbolStack.length - 1].data].left);
 					await addToFirst([symbol], index);
 					continue;
 				}
@@ -149,7 +252,7 @@
 	/**
 	 * @type {Array.<{left: string, right: Array.<string>,showRight: boolean, whole: Array.<string>}>}
 	 */
-	export let first = [];
+	let first = [];
 </script>
 
 <div class="steps {$$props.class}" style="position: relative;">
@@ -201,9 +304,12 @@
 			</p>
 		{/each}
 	</div>
+
+	<Stack {lineHeight} {charWidth} {symbolStack} {fontSize} stackId="i" bind:this={istack}></Stack>
 </div>
 
 <style>
+	@import 'block.css';
 	.card {
 		height: 0px;
 		background: white;
@@ -247,20 +353,19 @@
 	}
 
 	.first-card > p > span:nth-child(2) {
-		padding-left: 5px;
+		margin-left: 5px;
+	}
+
+	#grammar > p > span {
+		margin: 0px 4px;
 	}
 
 	#grammar > p > span:nth-child(2) {
-		padding: 0px;
-		padding-left: 5px;
+		margin: 0px;
 	}
 
 	#grammar > p > span:first-child {
 		padding: 0px;
-	}
-
-	#grammar > p > span {
-		padding: 0px 5px;
 	}
 
 	.first-card > p {
@@ -290,67 +395,5 @@
 		to {
 			transform: perspective(45px) rotateY(0deg);
 		}
-	}
-
-	.block {
-		position: relative;
-		z-index: 0;
-		color: white !important;
-	}
-
-	.block::after {
-		content: '';
-		position: absolute;
-		z-index: -1;
-		border-radius: 5px;
-		transform: perspective(45px);
-		--width: 100%;
-		width: calc(var(--width) + 10px);
-		--height: 23px;
-		height: var(--height);
-		top: 50%;
-		translate: calc(var(--width) / -2) calc(var(--height) / -2);
-		left: 50%;
-		animation: rotateAppear 0.5s;
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 6px;
-	}
-
-	.empty {
-		position: relative;
-		z-index: 0 !important;
-		color: white !important;
-	}
-
-	.empty::after {
-		content: '';
-		position: absolute;
-		z-index: -1;
-		border-radius: 5px;
-		transform: perspective(45px);
-		--width: 100%;
-		width: calc(var(--width) - 2px);
-		--height: 20px;
-		height: var(--height);
-		top: 50%;
-		translate: calc(var(--width) / -2) calc(var(--height) / -2);
-		left: 50%;
-		animation: rotateAppear 0.5s;
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 6px;
-	}
-
-	.blue::after {
-		background: hsl(200, 60%, 50%);
-
-		box-shadow: 0px 0px 5px 0px hsl(200, 60%, 55%, 90%);
-	}
-	.green::after {
-		background: hsl(100, 60%, 50%);
-
-		box-shadow: 0px 0px 5px 0px hsl(100, 60%, 55%, 70%);
-	}
-	.yellow::after {
-		background: hsl(60, 60%, 50%);
 	}
 </style>

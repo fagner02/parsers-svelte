@@ -2,19 +2,20 @@
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/textwidth';
 
-	function setResize(e) {
-		document.querySelector('.textnumbers').style.height =
-			`${parseFloat(document.querySelector('textarea').style.height) + 5}px`;
-
-		updateSize();
-	}
 	function updateSize() {
-		lines = Math.ceil(parseFloat(document.querySelector('textarea').scrollHeight) / lineHeight);
+		lines = Math.ceil(
+			/**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight / lineHeight
+		);
 		numGap = lines.toString().length * charWidth + 15;
 	}
 
+	/**
+	 * @param {Event} e
+	 */
 	function onScroll(e) {
-		document.querySelector('.textnumbers').scrollTop = e.target.scrollTop;
+		/**@type {Element}*/ (document.querySelector('.textnumbers')).scrollTop = /**@type {Element}*/ (
+			e.target
+		).scrollTop;
 		updateSize();
 	}
 
@@ -25,13 +26,15 @@
 	export let lines = 1;
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
-		let style = window.getComputedStyle(document.querySelector('textarea'));
-		document.querySelector('textarea').style.height = style.height;
+		let style = window.getComputedStyle(/**@type {Element}*/ (document.querySelector('textarea')));
+		/**@type {HTMLElement}*/ (document.querySelector('textarea')).style.height = style.height;
 
-		document.querySelector('.textnumbers').style.height =
-			document.querySelector('textarea').style.height;
-		parseInt(document.querySelector('textarea')?.style?.height);
-		new ResizeObserver(setResize).observe(document.querySelector('textarea'));
+		/**@type {HTMLElement}*/ (document.querySelector('.textnumbers')).style.height =
+			/**@type {HTMLElement}*/ (document.querySelector('textarea')).style.height;
+		parseInt(/**@type {HTMLElement}*/ (document.querySelector('textarea'))?.style?.height);
+		new ResizeObserver(updateSize).observe(
+			/**@type {HTMLElement}*/ (document.querySelector('textarea'))
+		);
 	});
 </script>
 
@@ -41,12 +44,10 @@
 		class="unit"
 		style="font-size: {fontSize}px; padding-left: {numGap + 5}px; line-height: {lineHeight}px;"
 	></textarea>
-	<!-- <div class="bor"></div> -->
 	<div class="unit textnumbers" style="width: {numGap}px;">
 		{#each { length: lines } as _, i}
 			<div class="grid">
 				<p style="font-size:{12}px;height: {lineHeight}px">{i + 1}.</p>
-				<!-- <p style="font-size:{fontSize}px;opacity:0;width: 0px">{i + 1}.</p> -->
 			</div>
 		{/each}
 	</div>
