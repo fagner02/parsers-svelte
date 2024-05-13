@@ -111,7 +111,6 @@
 	let fontSize = 15;
 	let lineHeight = 26;
 	let charWidth = 0;
-	let ruleStack = [0];
 
 	/**
 	 * @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>}

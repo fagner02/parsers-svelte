@@ -76,7 +76,7 @@
 
 <div class="stack-box">
 	<div class="stack" style="min-height: {lineHeight}px; min-width: {charWidth}px">
-		{#each $symbolStack.toReversed() as r, index (stackId + r.data)}
+		{#each [...$symbolStack].reverse() as r, index (stackId + r.data)}
 			<p
 				id="rl{index}"
 				class="block blue-after"
