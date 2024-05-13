@@ -7,12 +7,7 @@
 
 	/**@type {Stack}*/
 	let istack;
-	// /**
-	//  * @typedef {{opacity: number, height: number, width: number, top: number, value: number, transition: string}} stackItem
-	//  */
 
-	// const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
-	// const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 	/**
 	 * @param {string} card
 	 * @param {number} index1
@@ -87,18 +82,16 @@
 	}
 
 	/**
-	 * @param {number} length
 	 * @param {number} index1
 	 * @param {number} index2
 	 */
-	function firstSpanId(length, index1, index2) {
+	function firstSpanId(index1, index2) {
 		return `fr${index1}-${index2}`;
 	}
 
 	/**
 	 * @param {number} currentRule
 	 * @param {Array<number>} prodStack
-	 * @returns {Promise<string | null>} symbol
 	 */
 	async function nextProdSymbol(currentRule, prodStack) {
 		prodStack[prodStack.length - 1]++;
@@ -109,58 +102,6 @@
 		await selectRSymbol('g', currentRule, prodPos, 'green', true);
 		return rules[currentRule].right[prodPos];
 	}
-
-	// /**
-	//  * @param {import("svelte/store").Writable<Array<stackItem>>} stack
-	//  * @param {number} value
-	//  */
-	// async function addToStack(stack, value, width) {
-	// 	stack.update((x) => [
-	// 		...x,
-	// 		{
-	// 			opacity: 0,
-	// 			height: 0,
-	// 			width: 0,
-	// 			top: -lineHeight,
-	// 			value,
-	// 			transition: stackTransitionForward
-	// 		}
-	// 	]);
-	// 	await wait(0);
-
-	// 	stack.update((x) => {
-	// 		x[x.length - 1] = {
-	// 			opacity: 1,
-	// 			height: lineHeight,
-	// 			width,
-	// 			top: 0,
-	// 			value,
-	// 			transition: stackTransitionForward
-	// 		};
-	// 		return x;
-	// 	});
-	// 	await wait(1000);
-	// }
-
-	// /**
-	//  * @param {import("svelte/store").Writable<Array<stackItem>>} stack
-	//  */
-	// async function removeFromStack(stack, index) {
-	// 	stack.update((x) => {
-	// 		const value = x[index].value;
-	// 		x[index] = {
-	// 			opacity: 0,
-	// 			height: 0,
-	// 			width: 0,
-	// 			top: -lineHeight,
-	// 			value,
-	// 			transition: stackTransitionBackward
-	// 		};
-	// 		return x;
-	// 	});
-	// 	await wait(1000);
-	// 	stack.update((x) => x.splice(0, index));
-	// }
 
 	let grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
 	/**
@@ -283,7 +224,7 @@
 					{#each f.right as text, ri}
 						{#key text}
 							{#await wait(100) then}
-								<span id={firstSpanId(f.right.length, index, ri)}>
+								<span id={firstSpanId(index, ri)}>
 									{#if text != ' '}
 										{text}
 									{:else}

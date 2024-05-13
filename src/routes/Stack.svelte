@@ -1,6 +1,5 @@
 <script>
 	import { wait } from '$lib/textwidth';
-	// import './typedefs';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 	/**
@@ -78,7 +77,6 @@
 <div class="stack-box">
 	<div class="stack" style="min-height: {lineHeight}px; min-width: {charWidth}px">
 		{#each [...$symbolStack].reverse() as r, index (stackId + r.data)}
-			<!-- {#if r.data < rules.length && r. > -1} -->
 			<p
 				id="rl{index}"
 				class="block blue-after"
@@ -86,13 +84,10 @@
 			>
 				{r.text}
 			</p>
-			<!-- {/if} -->
 		{/each}
 	</div>
 	<div class="stack-label">symbol stack</div>
 </div>
-
-<!-- export types; -->
 
 <style>
 	@import 'block.css';
@@ -108,18 +103,13 @@
 		padding: 5px 10px;
 		margin: 5px;
 		color: white;
-		/* writing-mode: vertical-rl;
-		text-orientation: upright;
-		letter-spacing: -5px; */
 	}
 	.stack {
-		/* height: 0px; */
 		background: white;
 		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
 		border-radius: 10px;
 		padding: 5px 10px;
 		margin: 5px;
-		/* width: 0px; */
 	}
 	.stack > p {
 		position: relative;
