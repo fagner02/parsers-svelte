@@ -2,11 +2,14 @@
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/textwidth';
 
+	/**@type {number}*/
+	let height;
 	function updateSize() {
 		lines = Math.ceil(
 			/**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight / lineHeight
 		);
 		numGap = lines.toString().length * charWidth + 15;
+		height = /**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight;
 	}
 
 	/**
@@ -26,12 +29,7 @@
 	export let lines = 1;
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
-		let style = window.getComputedStyle(/**@type {Element}*/ (document.querySelector('textarea')));
-		/**@type {HTMLElement}*/ (document.querySelector('textarea')).style.height = style.height;
-
-		/**@type {HTMLElement}*/ (document.querySelector('.textnumbers')).style.height =
-			/**@type {HTMLElement}*/ (document.querySelector('textarea')).style.height;
-		parseInt(/**@type {HTMLElement}*/ (document.querySelector('textarea'))?.style?.height);
+		updateSize();
 		new ResizeObserver(updateSize).observe(
 			/**@type {HTMLElement}*/ (document.querySelector('textarea'))
 		);
@@ -44,7 +42,7 @@
 		class="unit"
 		style="font-size: {fontSize}px; padding-left: {numGap + 5}px; line-height: {lineHeight}px;"
 	></textarea>
-	<div class="unit textnumbers" style="width: {numGap}px;">
+	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px">
 		{#each { length: lines } as _, i}
 			<div class="grid">
 				<p style="font-size:{12}px;height: {lineHeight}px">{i + 1}.</p>
@@ -77,9 +75,8 @@
 
 	.textnumbers {
 		display: grid;
-		padding-top: 5px;
+		padding-top: 0px;
 		position: relative;
-		/* height: 10px; */
 		overflow: hidden;
 		letter-spacing: 0px;
 		background: hsl(0, 0%, 90%);
