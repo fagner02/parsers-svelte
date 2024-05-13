@@ -1,3 +1,12 @@
+@keyframes rotateAppear {
+	from {
+		transform: perspective(45px) rotateY(90deg);
+	}
+	to {
+		transform: perspective(45px) rotateY(0deg);
+	}
+}
+
 .block {
 	position: relative;
 	z-index: 0;

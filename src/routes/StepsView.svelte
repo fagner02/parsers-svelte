@@ -2,11 +2,26 @@
 	import { writable } from 'svelte/store';
 	import { getTextWidth, wait } from '$lib/textwidth';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import Stack from './Stack.svelte';
 
 	/**@type {Stack}*/
 	let istack;
+
+	/**
+	 * @param {any} node
+	 * @param {{duration: number, delay: number}} params
+	 */
+	function firstIn(node, { duration, delay }) {
+		return {
+			delay,
+			duration,
+			/**
+			 * @param {number} t
+			 */
+			css: (t) => `opacity: ${t < 0.5 ? 0 : (t - 0.5) / 0.5};
+			width: ${charWidth * t}px;`
+		};
+	}
 
 	/**
 	 * @param {string} card
@@ -46,37 +61,56 @@
 		firstIndexes.set(rules[currentRule].left, first.length);
 		first = [
 			...first,
-			{ left: rules[currentRule].left, right: [' '], showRight: false, whole: [] }
+			{
+				left: rules[currentRule].left,
+				right: [{ value: ' ', width: charWidth, opacity: 0 }],
+				showRight: false,
+				rightAnim: [{ value: ' ', width: charWidth, opacity: 0 }]
+			}
 		];
 
 		firstCard.style.height = `${lineHeight * first.length}px`;
-		firstCard.style.maxWidth = `${firstCard.scrollWidth}px`;
 		await wait(0);
 
 		await selectLSymbol('f', currentRule, 'blue', false);
 
 		first[firstIndexes.get(rules[currentRule].left)].showRight = true;
 		await wait(0);
-		firstCard.style.maxWidth = `${firstCard.scrollWidth}px`;
-		await wait(0);
 	}
 
 	/**
-	 * @param {Array<string>} symbols
+	 * @param {number} index
+	 * @param {string} symbol
+	 */
+	async function addSymbolToFirst(index, symbol) {
+		first[index].rightAnim = [...first[index].rightAnim, { value: symbol, width: 0, opacity: 0 }];
+		await wait(50);
+		first[index].rightAnim[first[index].rightAnim.length - 1] = {
+			value: symbol,
+			width: charWidth,
+			opacity: 1
+		};
+		await wait(500);
+	}
+
+	/**
+	 * @param {Array<SetItem>} symbols
 	 * @param {number} index
 	 */
 	async function addToFirst(symbols, index) {
-		if (first[index].right[0] === ' ') {
-			first[index].right = symbols;
-		} else {
-			for (let i = 0; i < symbols.length; i++) {
-				if (!first[index].right.includes(symbols[i])) {
-					first[index].right = [...first[index].right, symbols[i]];
-					await wait(0);
-
-					firstCard.style.maxWidth = `${firstCard.scrollWidth}px`;
-					await wait(1000);
+		if (first[index].right[0].value === ' ') {
+			first[index].right.pop();
+			first[index].rightAnim.pop();
+		}
+		for (let i = 0; i < symbols.length; i++) {
+			if (first[index].right.find((x) => x.value === symbols[i].value) === undefined) {
+				first[index].right = [...first[index].right, symbols[i]];
+				if (first[index].rightAnim.length > 0) {
+					await addSymbolToFirst(index, ',');
 				}
+				if (first[index].rightAnim.length === 0) {
+				}
+				await addSymbolToFirst(index, symbols[i].value);
 			}
 		}
 	}
@@ -182,7 +216,7 @@
 					break;
 				} else {
 					let index = firstIndexes.get(rules[$symbolStack[$symbolStack.length - 1].data].left);
-					await addToFirst([symbol], index);
+					await addToFirst([{ value: symbol, width: 0, opacity: 0 }], index);
 					continue;
 				}
 			}
@@ -190,7 +224,8 @@
 	});
 
 	/**
-	 * @type {Array.<{left: string, right: Array.<string>,showRight: boolean, whole: Array.<string>}>}
+	 * @typedef {{value: string, width: number, opacity: number}} SetItem
+	 * @type {Array.<{left: string, right: Array<SetItem>,showRight: boolean, rightAnim: Array<SetItem>}>}
 	 */
 	let first = [];
 </script>
@@ -217,29 +252,20 @@
 			>
 				<span id="fl{index}">{f.left}</span>
 				{#if f.showRight}
-					<span in:fade={{ delay: 0 }}>{':'}</span>
-					<span in:fade={{ delay: 100 }}>{'{'}</span>
+					<span in:firstIn={{ duration: 500, delay: 0 }}>{':'}</span>
+					<span in:firstIn={{ duration: 500, delay: 100 }}>{'{'}</span>
 
-					{#each f.right as text, ri}
-						{#key text}
-							{#await wait(100) then}
-								<span id={firstSpanId(index, ri)}>
-									{#if text != ' '}
-										{text}
-									{:else}
-										&nbsp;
-									{/if}</span
-								>
-							{/await}
-							{#await wait(100) then}
-								{#if ri < f.right.length - 1}
-									<span>,</span>
-								{/if}
-							{/await}
-						{/key}
+					{#each f.rightAnim as text, ri (`${index}-${ri}`)}
+						<span style="width: {text.width}px;opacity:{text.opacity};" id={firstSpanId(index, ri)}>
+							{#if text.value != ' '}
+								{text.value}
+							{:else}
+								&nbsp;
+							{/if}</span
+						>
 					{/each}
 
-					<span in:fade={{ delay: 300 }}>{'}'}</span>
+					<span in:firstIn={{ duration: 500, delay: 200 }}>{'}'}</span>
 				{/if}
 			</p>
 		{/each}
@@ -260,7 +286,7 @@
 		transition: width 0.3s;
 		overflow: hidden;
 		width: fit-content;
-		max-width: 0px;
+
 		transition:
 			max-width 0.5s,
 			width 0.3s,
@@ -272,6 +298,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: start;
+		flex-wrap: wrap;
 	}
 
 	.floating {
@@ -313,27 +340,11 @@
 		display: flex;
 	}
 
-	@keyframes appear {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
 	.card > p > span {
-		animation: appear 1s;
+		transition:
+			width 0.5s,
+			opacity 0.5s;
 		z-index: 1;
 		position: relative;
-	}
-
-	@keyframes rotateAppear {
-		from {
-			transform: perspective(45px) rotateY(90deg);
-		}
-		to {
-			transform: perspective(45px) rotateY(0deg);
-		}
 	}
 </style>
