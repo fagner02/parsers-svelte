@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { getTextWidth } from '$lib/textwidth';
+	import { getTextWidth } from '$lib/utils';
 
 	/**@type {number}*/
 	let height;
