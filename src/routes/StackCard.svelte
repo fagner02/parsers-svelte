@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/textwidth';
+	import { wait } from '$lib/utils';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 	/**
@@ -44,7 +44,7 @@
 				showBlock: true
 			}
 		]);
-		await wait(0);
+		await wait(50);
 
 		stack.update((x) => {
 			Object.assign(x[x.length - 1], {
