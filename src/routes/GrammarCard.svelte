@@ -1,6 +1,6 @@
 <script>
-	import { wait } from '$lib/textwidth';
-	import { getContext, onMount, setContext } from 'svelte';
+	import { wait } from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	/** @type {import("svelte/store").Writable<Array.<import('./typedefs').GrammarItem>>} */
 	export let rules;
