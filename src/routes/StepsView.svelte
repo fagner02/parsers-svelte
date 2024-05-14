@@ -1,11 +1,14 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { getTextWidth, wait } from '$lib/textwidth';
+	import { getTextWidth, wait, pause, killPause, jumpWaitTrue, jumpWaitFalse } from '$lib/utils';
 	import { onMount, setContext } from 'svelte';
-	import Stack from './Stack.svelte';
+	import PlaySkipBack from './Icons/PlaySkipBack.svelte';
+	import PlaySkipForward from './Icons/PlaySkipForward.svelte';
+	import Stack from './StackCard.svelte';
 	import SetsCard from './SetsCard.svelte';
 	import GrammarCard from './GrammarCard.svelte';
 
+	// jumpWaitTrue();
 	// ========== Components ====================
 	/**@type {Stack}*/
 	let symbolStackElement;
@@ -34,10 +37,10 @@
 	const lineHeight = 26;
 	let charWidth = 0;
 	let subCharWidth = 0;
+	let animating = false;
 	// ========= Style ======================================
 
-	let hi = 'Hi';
-	setContext('StepsView', { selectLSymbol, selectRSymbol, hi });
+	setContext('StepsView', { selectLSymbol, selectRSymbol });
 
 	/**
 	 * @param {string} card
@@ -86,13 +89,28 @@
 		return $rules[currentRule].right[prodPos];
 	}
 
+	function reset() {
+		symbolStack.update(() => []);
+		posStack.update(() => []);
+		first.update(() => []);
+		firstIndexes = new Map();
+	}
+
+	async function addPause() {
+		animating = false;
+		try {
+			await pause();
+		} catch {}
+		animating = true;
+	}
+
 	onMount(async () => {
 		charWidth = getTextWidth('P', fontSize);
 		subCharWidth = getTextWidth('P', subFontSize);
 
-		let c = 0;
-		let currentSymbol = $rules[c].left;
-		let count = 0;
+		let currentSymbol = $rules[0].left;
+
+		animating = true;
 		for (let i = 0; i < $rules.length; i++) {
 			if ($rules[i].left === currentSymbol) {
 				await symbolStackElement.addToStack(
@@ -102,6 +120,9 @@
 					$rules[i].left.length * charWidth,
 					$rules[i].index.toString()
 				);
+
+				await addPause();
+
 				await posStackElement.addToStack(
 					-1,
 					'-1',
@@ -111,8 +132,6 @@
 				);
 			}
 		}
-
-		// await posStackElement.addToStack(-1, '-1', '', 2 * charWidth, $rules[0].left);
 
 		while ($symbolStack.length > 0) {
 			if ($posStack[$posStack.length - 1].data == -1) {
@@ -169,42 +188,63 @@
 			}
 		}
 	});
+
+	function forward() {
+		killPause();
+	}
 </script>
 
 <div class="steps {$$props.class}" style="position: relative;">
-	<div class="card" style="font-size: 40px; font-weight: 500;height: 35px;">
-		{hi}
+	<div class="controls">
+		<button>
+			<PlaySkipBack color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+		</button>
+		<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+			<PlaySkipForward color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+		</button>
 	</div>
-	<GrammarCard {fontSize} {lineHeight} {rules}></GrammarCard>
+	<div class="cards-box">
+		<div class="card" style="font-size: 40px; font-weight: 500;height: 35px;">hi</div>
 
-	<SetsCard set={first} {charWidth} {firstIndexes} {fontSize} {lineHeight} bind:this={firstSet}
-	></SetsCard>
+		<GrammarCard {fontSize} {lineHeight} {rules}></GrammarCard>
 
-	<Stack
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{subFontSize}
-		stack={symbolStack}
-		{fontSize}
-		stackId="symbol"
-		label="symbol stack"
-		color="blue"
-		bind:this={symbolStackElement}
-	></Stack>
+		<SetsCard
+			set={first}
+			{charWidth}
+			{firstIndexes}
+			{fontSize}
+			{lineHeight}
+			color={'blue'}
+			label={'first set'}
+			bind:this={firstSet}
+		></SetsCard>
 
-	<Stack
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{subFontSize}
-		stack={posStack}
-		{fontSize}
-		stackId="pos"
-		label="position stack"
-		color="green"
-		bind:this={posStackElement}
-	></Stack>
+		<Stack
+			{lineHeight}
+			{charWidth}
+			{subCharWidth}
+			{subFontSize}
+			stack={symbolStack}
+			{fontSize}
+			stackId="symbol"
+			label="symbol stack"
+			color="blue"
+			bind:this={symbolStackElement}
+		></Stack>
+
+		<Stack
+			{lineHeight}
+			{charWidth}
+			{subCharWidth}
+			{subFontSize}
+			stack={posStack}
+			{fontSize}
+			stackId="pos"
+			label="position stack"
+			color="green"
+			bind:this={posStackElement}
+		></Stack>
+	</div>
 </div>
 
 <style>
@@ -213,10 +253,16 @@
 	.steps {
 		display: flex;
 		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		flex-direction: column;
+	}
+	.cards-box {
+		display: flex;
+		justify-content: center;
 		align-items: start;
 		flex-wrap: wrap;
 	}
-
 	.floating {
 		position: absolute;
 		width: fit-content;
@@ -228,5 +274,16 @@
 			top 0.5s,
 			left 0.5s,
 			opacity 0.5s;
+	}
+	.controls {
+		display: flex;
+		gap: 10px;
+		margin: 5px;
+	}
+
+	button {
+		box-shadow: 0px 0px 5px 0px hsl(200, 100%, 40%, 30%);
+		border: 1px solid hsl(200, 60%, 60%);
+		background: hsl(200, 100%, 95%);
 	}
 </style>
