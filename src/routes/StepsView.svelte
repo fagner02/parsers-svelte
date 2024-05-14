@@ -1,12 +1,23 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { getTextWidth, wait, pause, killPause, jumpWaitTrue, jumpWaitFalse } from '$lib/utils';
+	import {
+		getTextWidth,
+		wait,
+		pause,
+		killPause,
+		jumpWaitTrue,
+		jumpWaitFalse,
+		killAllWaits
+	} from '$lib/utils';
 	import { onMount, setContext } from 'svelte';
 	import PlaySkipBack from './Icons/PlaySkipBack.svelte';
 	import PlaySkipForward from './Icons/PlaySkipForward.svelte';
+	import Reload from './Icons/Reload.svelte';
+	import Restore from './Icons/Restore.svelte';
 	import Stack from './StackCard.svelte';
 	import SetsCard from './SetsCard.svelte';
 	import GrammarCard from './GrammarCard.svelte';
+	import Restart from './Icons/Restart.svelte';
 
 	// jumpWaitTrue();
 	// ========== Components ====================
@@ -16,6 +27,8 @@
 	let posStackElement;
 	/**@type {SetsCard}*/
 	let firstSet;
+	/**@type {(() => Promise<void>)} */
+	let loadGrammar;
 	// ========== Components ====================
 
 	// ========= stores ================================================================================
@@ -82,7 +95,7 @@
 		);
 
 		let prodPos = $posStack[$posStack.length - 1].data;
-		if (prodPos >= $rules[currentRule].right.length) {
+		if (prodPos >= 1) {
 			return null;
 		}
 		await selectRSymbol('g', currentRule, prodPos, 'green', true);
@@ -90,10 +103,17 @@
 	}
 
 	function reset() {
+		killAllWaits();
+
+		rules.update(() => []);
 		symbolStack.update(() => []);
 		posStack.update(() => []);
 		first.update(() => []);
 		firstIndexes = new Map();
+
+		try {
+			firstAlg();
+		} catch (e) {}
 	}
 
 	async function addPause() {
@@ -104,13 +124,10 @@
 		animating = true;
 	}
 
-	onMount(async () => {
-		charWidth = getTextWidth('P', fontSize);
-		subCharWidth = getTextWidth('P', subFontSize);
-
-		let currentSymbol = $rules[0].left;
-
-		animating = true;
+	/**
+	 * @param {string} currentSymbol
+	 */
+	async function addProdToStacks(currentSymbol) {
 		for (let i = 0; i < $rules.length; i++) {
 			if ($rules[i].left === currentSymbol) {
 				await symbolStackElement.addToStack(
@@ -132,61 +149,85 @@
 				);
 			}
 		}
+	}
 
-		while ($symbolStack.length > 0) {
-			if ($posStack[$posStack.length - 1].data == -1) {
-				await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
-			}
-			if (!firstIndexes.has($rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
-				await firstSet.addSetRow(
-					$symbolStack[$symbolStack.length - 1].data,
-					$symbolStack[$symbolStack.length - 1].text
-				);
-			}
+	/**@type {(reason?: any) => void}*/
+	let reje;
+	async function firstAlg() {
+		try {
+			new Promise((resolve, reject) => {
+				reje = reject;
+			});
+			await wait(1000);
+			await loadGrammar();
 
-			while (true) {
-				let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data);
+			animating = true;
+			await addProdToStacks($rules[0].left);
 
-				if (symbol === null) {
-					await posStackElement.removeFromStack($posStack.length - 1);
-
-					let topRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-					await wait(1000);
-					if ($symbolStack.length > 0) {
-						let lastRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-						await firstSet.joinSets(
-							$first[firstIndexes.get(topRule.left)].right,
-							firstIndexes.get(lastRule.left)
-						);
-					}
-					break;
+			while ($symbolStack.length > 0) {
+				if ($posStack[$posStack.length - 1].data == -1) {
+					await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
 				}
-				if (nt.includes(symbol)) {
-					if (firstIndexes.has(symbol)) {
-						await firstSet.joinSets(
-							$first[firstIndexes.get(symbol)].right,
-							firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left)
-						);
-					} else {
+				if (!firstIndexes.has($rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
+					await firstSet.addSetRow(
+						$symbolStack[$symbolStack.length - 1].data,
+						$symbolStack[$symbolStack.length - 1].text
+					);
+				}
+
+				while (true) {
+					let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data);
+
+					if (symbol === null) {
+						await posStackElement.removeFromStack($posStack.length - 1);
+
+						let topRule = $rules[$symbolStack[$symbolStack.length - 1].data];
+						await symbolStackElement.removeFromStack($symbolStack.length - 1);
 						await wait(1000);
-						const ruleIndex = $rules.findIndex((x) => x.left === symbol);
-						await symbolStackElement.addToStack(
-							ruleIndex,
-							$rules[ruleIndex].left,
-							$rules[0].index.toString(),
-							$rules[ruleIndex].left.length * charWidth,
-							$rules[ruleIndex].left
-						);
-						await posStackElement.addToStack(-1, '-1', '', 2 * charWidth, $rules[ruleIndex].left);
+						if ($symbolStack.length > 0) {
+							let lastRule = $rules[$symbolStack[$symbolStack.length - 1].data];
+							await firstSet.joinSets(
+								$first[firstIndexes.get(topRule.left)].right,
+								firstIndexes.get(lastRule.left)
+							);
+						}
+						if ($symbolStack.length == 0) {
+							for (let i = 0; i < nt.length; i++) {
+								if (!firstIndexes.has(nt[i])) {
+									await addProdToStacks(nt[i]);
+								}
+							}
+						}
 						break;
 					}
-				} else {
-					let index = firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left);
-					await firstSet.joinSets([symbol], index);
+					if (nt.includes(symbol)) {
+						if (firstIndexes.has(symbol)) {
+							await firstSet.joinSets(
+								$first[firstIndexes.get(symbol)].right,
+								firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left)
+							);
+						} else {
+							await wait(1000);
+							await addProdToStacks(symbol);
+							break;
+						}
+					} else {
+						let index = firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left);
+						await firstSet.joinSets([symbol], index);
+					}
 				}
 			}
-		}
+			animating = false;
+		} catch (e) {}
+	}
+
+	onMount(async () => {
+		charWidth = getTextWidth('P', fontSize);
+		subCharWidth = getTextWidth('P', subFontSize);
+
+		try {
+			firstAlg();
+		} catch (e) {}
 	});
 
 	function forward() {
@@ -196,8 +237,11 @@
 
 <div class="steps {$$props.class}" style="position: relative;">
 	<div class="controls">
-		<button>
+		<button style="filter: brightness({animating ? 80 : 100}%);">
 			<PlaySkipBack color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+		</button>
+		<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+			<Restart color="hsl(200,60%,50%)" size={15} strokeWidth={3}></Restart>
 		</button>
 		<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
 			<PlaySkipForward color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
@@ -206,7 +250,7 @@
 	<div class="cards-box">
 		<div class="card" style="font-size: 40px; font-weight: 500;height: 35px;">hi</div>
 
-		<GrammarCard {fontSize} {lineHeight} {rules}></GrammarCard>
+		<GrammarCard {fontSize} {lineHeight} {charWidth} {rules} bind:loadGrammar></GrammarCard>
 
 		<SetsCard
 			set={first}
@@ -252,7 +296,7 @@
 	@import 'card.css';
 	.steps {
 		display: flex;
-		justify-content: center;
+		justify-content: start;
 		align-items: center;
 		flex-wrap: wrap;
 		flex-direction: column;
@@ -285,5 +329,8 @@
 		box-shadow: 0px 0px 5px 0px hsl(200, 100%, 40%, 30%);
 		border: 1px solid hsl(200, 60%, 60%);
 		background: hsl(200, 100%, 95%);
+		transition:
+			filter 0.5s,
+			scale 0.1s;
 	}
 </style>

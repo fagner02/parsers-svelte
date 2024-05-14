@@ -11,8 +11,7 @@
 
 	transition:
 		max-width 0.5s,
-		width 0.3s,
-		height 0.3s;
+		max-height 0.5s;
 	text-wrap: nowrap;
 }
 

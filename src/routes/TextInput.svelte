@@ -54,6 +54,7 @@
 <style>
 	textarea {
 		width: -webkit-fill-available;
+		width: -moz-available;
 		border-radius: 10px;
 		outline: hsl(0, 0%, 50%) solid 2px;
 		border: none;

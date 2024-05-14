@@ -3,7 +3,7 @@
 
 <header>
 	<nav>
-		<h1 class="corner">Visualizador <br />de Parsers</h1>
+		<h1>Visualizador <br />de Parsers</h1>
 	</nav>
 </header>
 
@@ -14,7 +14,7 @@
 	}
 
 	nav {
-		width: -webkit-fill-available;
+		width: 100%;
 		display: flex;
 		justify-content: start;
 		padding: 0px 20px;
@@ -25,7 +25,8 @@
 		font-size: 18pt;
 		line-height: 20pt;
 		margin: 8px 0px;
-		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-			sans-serif;
+		font-family: 'Trebuchet MS';
+		font-weight: normal;
+		font-variant: small-caps;
 	}
 </style>

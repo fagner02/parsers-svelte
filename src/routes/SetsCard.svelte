@@ -101,7 +101,7 @@
 			}
 		]);
 
-		firstCard.style.height = `${lineHeight * $set.length}px`;
+		firstCard.style.maxHeight = `${lineHeight * $set.length}px`;
 		await wait(0);
 
 		await selectLSymbol('f', /**@type {number}*/ (firstIndexes.get(symbol)), 'blue', false);
@@ -158,6 +158,9 @@
 <style>
 	@import './block.css';
 	@import 'card.css';
+	.set-card {
+		height: fit-content;
+	}
 	.set-card > p > span:nth-child(2) {
 		margin-left: 5px;
 	}

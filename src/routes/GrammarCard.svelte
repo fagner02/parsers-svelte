@@ -1,76 +1,84 @@
 <script>
 	import { wait } from '$lib/utils';
-	import { onMount } from 'svelte';
 
 	/** @type {import("svelte/store").Writable<Array.<import('./typedefs').GrammarItem>>} */
 	export let rules;
-	const grammar = 'S -> A Bb\nA -> a a\nBb -> b m\nS -> Bb';
+	const grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
 	/**@type {number}*/
 	export let lineHeight;
+	export let charWidth;
 	/**@type {number}*/
 	export let fontSize;
-
-	function loadGrammar() {
+	let opacity = 0;
+	export async function loadGrammar() {
 		rules.update(() => []);
+		opacity = 0;
+
+		let grammarCard = /**@type {HTMLElement}*/ (document.querySelector('#grammar'));
+		grammarCard.style.maxWidth = '0px';
+		grammarCard.style.maxHeight = '0px';
+		await wait(1000);
 		grammar.split('\n').forEach((r) => {
 			let s = r.split('->');
 
 			if (s.length > 1) {
-				$rules.push({
-					left: s[0].replaceAll(' ', ''),
-					right: s[1].trim().split(' '),
-					index: $rules.length
-				});
+				rules.update((x) => [
+					...x,
+					{
+						left: s[0].replaceAll(' ', ''),
+						right: s[1].trim().split(' '),
+						index: $rules.length
+					}
+				]);
 			}
 		});
-	}
 
-	/**
-	 * @param {HTMLElement} grammarCard
-	 */
-	async function setGrammarCard(grammarCard) {
-		loadGrammar();
+		await wait(500);
 
-		grammarCard.style.maxWidth = '0px';
-		rules.update((x) => x);
-		await wait(50);
-		grammarCard.style.height = `${lineHeight * $rules.length}px`;
+		grammarCard.style.maxHeight = `${lineHeight * $rules.length}px`;
 		grammarCard.style.maxWidth = `${grammarCard.scrollWidth}px`;
+		opacity = 1;
+		await wait(1000);
 	}
-
-	onMount(async () => {
-		await setGrammarCard(/**@type {HTMLElement}*/ (document.querySelector('#grammar')));
-	});
 </script>
 
-<div class="card" id="grammar">
-	{#each $rules as rule, i}
-		<p
-			style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
-		>
-			<span id="gl{i}"
-				>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
-					>{rule.index}</span
-				></span
+<div class="card" id="grammar" style="min-height: {lineHeight}px; min-width:{charWidth}px">
+	<div style="opacity: {opacity}; transition: opacity 0.5s 0.2s;">
+		{#each $rules as rule, i}
+			<p
+				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
 			>
-			<span>{'->'}</span>
-			{#each rule.right as symbol, si}
-				<span id="gr{i}-{si}">{symbol}</span>
-			{/each}
-		</p>
-	{/each}
+				<span id="gl{i}"
+					>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
+						>{rule.index}</span
+					></span
+				>
+				<span>{'->'}</span>
+				{#each rule.right as symbol, si}
+					<span id="gr{i}-{si}">{symbol}</span>
+				{/each}
+			</p>
+		{/each}
+	</div>
 </div>
 
 <style>
-	#grammar > p > span {
+	#grammar {
+		height: fit-content;
+		transition:
+			max-width 0.5s,
+			max-height 0.5s;
+		overflow: hidden;
+	}
+	#grammar > div > p > span {
 		margin: 0px 4px;
 	}
 
-	#grammar > p > span:nth-child(2) {
+	#grammar > div > p > span:nth-child(2) {
 		margin: 0px;
 	}
 
-	#grammar > p > span:first-child {
+	#grammar > div > p > span:first-child {
 		padding-right: 5px;
 	}
 </style>
