@@ -70,17 +70,17 @@
 		if ($set[index].rightAnim[0].value === ' ') {
 			$set[index].rightAnim.pop();
 		}
-		for (let i = 0; i < symbols.length; i++) {
-			if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
+		for (let i3 = 0; i3 < symbols.length; i3++) {
+			if ($set[index].right.find((x) => x === symbols[i3]) === undefined) {
 				set.update((x) => {
-					x[index].right = [...x[index].right, symbols[i]];
+					x[index].right = [...x[index].right, symbols[i3]];
 					return x;
 				});
 				if ($set[index].rightAnim.length > 0) {
 					await addSetItem(index, ',');
 				}
 
-				await addSetItem(index, symbols[i], $set[index].rightAnim.length === 0);
+				await addSetItem(index, symbols[i3], $set[index].rightAnim.length === 0);
 			}
 		}
 	}

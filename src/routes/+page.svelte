@@ -3,6 +3,8 @@
 	import TextInput from './TextInput.svelte';
 	import StepsView from './StepsView.svelte';
 	import TauriTitlebar from '../TauriTitlebar.svelte';
+	import FirstAnimation from './FirstAnimation.svelte';
+	import Tabs from './Tabs.svelte';
 </script>
 
 <svelte:head>
@@ -13,14 +15,13 @@
 	id="app"
 	style="border-radius:{/**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined
 		? 0
-		: 10}px"
+		: 0}px"
 >
-	<TauriTitlebar></TauriTitlebar>
+	<!-- <TauriTitlebar></TauriTitlebar> -->
 	<Header></Header>
 
 	<section class="grid">
-		<TextInput class="unit"></TextInput>
-		<StepsView class="unit"></StepsView>
+		<Tabs></Tabs>
 	</section>
 </div>
 

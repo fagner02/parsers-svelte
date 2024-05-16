@@ -6,10 +6,10 @@
 	let height;
 	function updateSize() {
 		lines = Math.ceil(
-			/**@type {HTMLElement}*/ (document.querySelector('textarea')).scrollHeight / lineHeight
+			/**@type {HTMLElement}*/ (document.querySelector('textarea'))?.scrollHeight / lineHeight
 		);
 		numGap = lines.toString().length * charWidth + 15;
-		height = /**@type {HTMLElement}*/ (document.querySelector('textarea')).offsetHeight - 5;
+		height = /**@type {HTMLElement}*/ (document.querySelector('textarea'))?.offsetHeight - 5;
 	}
 
 	/**
@@ -43,9 +43,9 @@
 		style="font-size: {fontSize}px; padding-left: {numGap + 5}px; line-height: {lineHeight}px;"
 	></textarea>
 	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px">
-		{#each { length: lines } as _, i}
+		{#each { length: lines } as _, textInputIndex}
 			<div class="grid">
-				<p style="font-size:{12}px;height: {lineHeight}px">{i + 1}.</p>
+				<p style="font-size:{12}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
 			</div>
 		{/each}
 	</div>

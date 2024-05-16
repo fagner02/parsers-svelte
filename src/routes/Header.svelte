@@ -3,7 +3,7 @@
 
 <header>
 	<nav>
-		<h1>Visualizador <br />de Parsers</h1>
+		<h1>Visualizador de Parsers</h1>
 	</nav>
 </header>
 

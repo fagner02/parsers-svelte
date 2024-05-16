@@ -22,13 +22,20 @@
 	export let stackId;
 
 	/**
+	 * @param {string} text
+	 * @param {string} note
+	 */
+	function textWidth(text, note) {
+		return text.length * charWidth + note.length * subCharWidth;
+	}
+
+	/**
 	 * @param {any} data
 	 * @param {string} text
 	 * @param {string} note
-	 * @param {number} width
 	 * @param {string} id
 	 */
-	export async function addToStack(data, text, note, width, id) {
+	export async function addToStack(data, text, note, id) {
 		stack.update((x) => [
 			...x,
 			{
@@ -50,7 +57,7 @@
 			Object.assign(x[x.length - 1], {
 				opacity: 1,
 				height: lineHeight,
-				width: text.length * charWidth + note.length * subCharWidth,
+				width: textWidth(text, note),
 				top: 0
 			});
 			return x;
@@ -65,13 +72,23 @@
 	 */
 	export async function updateItem(data, text, index) {
 		stack.update((x) => {
-			Object.assign(x[index], { data, text, width: text.length * charWidth, showBlock: false });
+			Object.assign(x[index], {
+				data,
+				text,
+				width: textWidth(text, x[index].note),
+				showBlock: false
+			});
 			return x;
 		});
 		await wait(50);
 
 		stack.update((x) => {
-			Object.assign(x[index], { data, text, width: text.length * charWidth, showBlock: true });
+			Object.assign(x[index], {
+				data,
+				text,
+				width: textWidth(text, x[index].note),
+				showBlock: true
+			});
 			return x;
 		});
 		await wait(500);
@@ -98,14 +115,15 @@
 
 <div class="stack-box">
 	<div class="stack" style="min-height: {lineHeight}px; min-width: {charWidth}px">
-		{#each [...$stack].reverse() as r, index (stackId + r.id)}
+		{#each [...$stack].reverse() as stackItem, index (stackId + stackItem.id)}
 			<p
 				id="s-{stackId}-{index}"
-				class="{r.showBlock ? 'block' : ''} {color}-after"
-				style="transition: {r.transition};height: {r.height}px;width: {r.width}px;opacity: {r.opacity}; top: {r.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
+				class="{stackItem.showBlock ? 'block' : ''} {color}-after"
+				style="transition: {stackItem.transition};height: {stackItem.height}px;width: {stackItem.width}px;opacity: {stackItem.opacity}; top: {stackItem.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
 			>
-				{r.text}<span style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
-					>{r.note}</span
+				{stackItem.text}<span
+					style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
+					>{stackItem.note}</span
 				>
 			</p>
 		{/each}

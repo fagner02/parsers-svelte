@@ -71,7 +71,7 @@
 				"resizable": true,
 				"title": "Parsers",
 				"width": 800,
-				"decorations": false,
+				"decorations": true,
 				"transparent": true
 			}
 		]
