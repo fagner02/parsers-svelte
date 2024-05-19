@@ -1,10 +1,13 @@
 <script>
 	import Header from './Header.svelte';
-	import TextInput from './TextInput.svelte';
-	import StepsView from './StepsView.svelte';
-	import TauriTitlebar from '../TauriTitlebar.svelte';
-	import FirstAnimation from './FirstAnimation.svelte';
 	import Tabs from './Tabs.svelte';
+
+	const getLtik = () => {
+		const searchParams = new URLSearchParams(window.location.search);
+		const ltik = searchParams.get('ltik');
+		if (!ltik) throw new Error('Missing lti key.');
+		return ltik;
+	};
 </script>
 
 <svelte:head>
