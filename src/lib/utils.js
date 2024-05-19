@@ -30,17 +30,25 @@ let pauseCount = 0;
 let jumpWait = false;
 let jumpPause = false;
 
-export function jumpWaitTrue() {
-	jumpWait = true;
+/**
+ * @param {boolean} value
+ */
+export function setJumpWait(value) {
+	jumpWait = value;
 }
-export function jumpWaitFalse() {
-	jumpWait = false;
+/**
+ * @param {boolean} value
+ */
+export function setJumpPause(value) {
+	jumpPause = value;
 }
-export function jumpPauseTrue() {
-	jumpPause = true;
+
+export function getJumpPause() {
+	return jumpPause;
 }
-export function jumpPauseFalse() {
-	jumpPause = false;
+
+export function getJumpWait() {
+	return jumpWait;
 }
 
 /**
@@ -84,19 +92,22 @@ export function pause() {
 }
 
 export function resolvePause() {
-	if (pauseResolves.length > 0) {
-		pauseResolves[0]();
-		pauseResolves.splice(0, 1);
-		pauseRejects.splice(0, 1);
+	for (let i = 0; i < pauseResolves.length; i++) {
+		pauseResolves[i]();
 	}
+	clearPauses();
 }
 
 export function killPause() {
-	if (pauseRejects.length > 0) {
-		pauseRejects[0]();
-		pauseRejects.splice(0, 1);
-		pauseResolves.splice(0, 1);
+	for (let i = 0; i < pauseRejects.length; i++) {
+		pauseRejects[i]();
 	}
+	clearPauses();
+}
+
+function clearPauses() {
+	pauseResolves.splice(0, pauseResolves.length);
+	pauseRejects.splice(0, pauseRejects.length);
 }
 
 export function killAllWaits() {
