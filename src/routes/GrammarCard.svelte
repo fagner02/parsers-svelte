@@ -19,14 +19,14 @@
 	let show = true;
 	let sizeForward = `max-width 0.5s,
 			max-height 0.5s`;
-	let sizeBack = `none`;
-	let transition = sizeForward;
 	let opacityForward = `opacity 0.5s`;
+	let transitionBack = `none`;
+	let transition = sizeForward;
 	let opacityTransition = opacityForward;
 
 	export async function loadGrammar() {
-		transition = sizeBack;
-		opacityTransition = sizeBack;
+		transition = transitionBack;
+		opacityTransition = transitionBack;
 		await wait(50);
 		opacity = 0;
 		maxWidth = 0;
@@ -65,7 +65,6 @@
 		maxHeight = lineHeight * aux.length;
 		await wait(200);
 		opacity = 1;
-		// await wait(500);
 	}
 </script>
 
