@@ -1,11 +1,14 @@
 <script>
+	import { Capacitor } from '@capacitor/core';
 </script>
 
-<header>
-	<nav>
-		<h1>Visualizador de Parsers</h1>
-	</nav>
-</header>
+{#if Capacitor.getPlatform() === 'web' && /**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined}
+	<header>
+		<nav>
+			<h1>Visualizador de Parsers</h1>
+		</nav>
+	</header>
+{/if}
 
 <style>
 	header {
@@ -22,11 +25,12 @@
 	}
 	nav > h1 {
 		color: white;
-		font-size: 18pt;
+		font-size: 12pt;
 		line-height: 20pt;
 		margin: 8px 0px;
-		font-family: 'Trebuchet MS';
+		/* font-family: 'Trebuchet MS'; */
 		font-weight: normal;
-		font-variant: small-caps;
+		text-transform: uppercase;
+		/* font-variant: all-caps; */
 	}
 </style>
