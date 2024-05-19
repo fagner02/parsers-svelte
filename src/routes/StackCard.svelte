@@ -1,5 +1,6 @@
 <script>
 	import { wait } from '$lib/utils';
+	import CardBox from './CardBox.svelte';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 	/**
@@ -113,46 +114,25 @@
 	}
 </script>
 
-<div class="stack-box">
-	<div class="stack" style="min-height: {lineHeight}px; min-width: {charWidth}px">
-		{#each [...$stack].reverse() as stackItem, index (stackId + stackItem.id)}
-			<p
-				id="s-{stackId}-{index}"
-				class="{stackItem.showBlock ? 'block' : ''} {color}-after"
-				style="transition: {stackItem.transition};height: {stackItem.height}px;width: {stackItem.width}px;opacity: {stackItem.opacity}; top: {stackItem.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
+<CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label}>
+	{#each [...$stack].reverse() as stackItem, index (stackId + stackItem.id)}
+		<p
+			id="s-{stackId}-{index}"
+			class="{stackItem.showBlock ? 'block' : ''} {color}-after"
+			style="transition: {stackItem.transition};height: {stackItem.height}px;width: {stackItem.width}px;opacity: {stackItem.opacity}; top: {stackItem.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
+		>
+			{stackItem.text}<span
+				style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
+				>{stackItem.note}</span
 			>
-				{stackItem.text}<span
-					style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
-					>{stackItem.note}</span
-				>
-			</p>
-		{/each}
-	</div>
-	<div class="stack-label {color}">{label}</div>
-</div>
+		</p>
+	{/each}
+</CardBox>
 
 <style>
 	@import 'block.css';
-	.stack-box {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
-	}
-	.stack-label {
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 10px;
-		padding: 5px 10px;
-		margin: 5px;
-		color: white;
-	}
-	.stack {
-		background: white;
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 10px;
-		padding: 5px 10px;
-		margin: 5px;
-	}
-	.stack > p {
+
+	p {
 		position: relative;
 		transition:
 			top 0.5s 0.5s,

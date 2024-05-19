@@ -1,5 +1,6 @@
 <script>
 	import { wait } from '$lib/utils';
+	import CardBox from './CardBox.svelte';
 
 	/** @type {import("svelte/store").Writable<Array.<import('./typedefs').GrammarItem>>} */
 	export let rules;
@@ -15,14 +16,25 @@
 	let opacity = 0;
 	let maxWidth = 0;
 	let maxHeight = 0;
+	let show = true;
+	let sizeForward = `max-width 0.5s,
+			max-height 0.5s`;
+	let sizeBack = `none`;
+	let transition = sizeForward;
+	let opacityForward = `opacity 0.5s`;
+	let opacityTransition = opacityForward;
 
 	export async function loadGrammar() {
-		rules.update(() => []);
-
+		transition = sizeBack;
+		opacityTransition = sizeBack;
+		await wait(50);
 		opacity = 0;
 		maxWidth = 0;
 		maxHeight = 0;
-		await wait(100);
+		await wait(50);
+		transition = sizeForward;
+		opacityTransition = opacityForward;
+		await wait(50);
 		/**
 		 * @type {{ left: string; right: string[]; index: number; }[]}
 		 */
@@ -38,12 +50,7 @@
 				});
 			}
 		});
-
-		await wait(50);
-		rules.update(() => [...aux]);
-		await wait(50);
-		maxHeight = lineHeight * $rules.length;
-		let max = $rules
+		let max = aux
 			.map(
 				(x) =>
 					x.index.toString().length * subCharWidth +
@@ -53,39 +60,46 @@
 			)
 			.toSorted();
 
+		rules.update(() => [...aux]);
 		maxWidth = max[max.length - 1];
+		maxHeight = lineHeight * aux.length;
+		await wait(200);
 		opacity = 1;
+		// await wait(500);
 	}
 </script>
 
-<div class="grammar-box">
-	<div
+{#if show}
+	<CardBox
 		class="card"
-		id="grammar"
-		style="min-height: {lineHeight}px; min-width:{charWidth}px;max-width: {maxWidth}px; max-height: {maxHeight}px;"
+		id={'grammar'}
+		minHeight={lineHeight}
+		minWidth={charWidth}
+		{maxWidth}
+		{maxHeight}
+		label={'grammar'}
+		color={'blue'}
+		{transition}
 	>
-		{#if $rules.length > 0}
-			<div style="opacity: {opacity}; transition: opacity 0.5s 0.2s;">
-				{#each $rules as rule, rulesIndex}
-					<p
-						style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+		<div style="opacity: {opacity}; transition: {opacityTransition};">
+			{#each $rules as rule, rulesIndex}
+				<p
+					style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+				>
+					<span id="gl{rulesIndex}"
+						>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
+							>{rule.index}</span
+						></span
 					>
-						<span id="gl{rulesIndex}"
-							>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
-								>{rule.index}</span
-							></span
-						>
-						<span>{'->'}</span>
-						{#each rule.right as symbol, si}
-							<span id="gr{rulesIndex}-{si}">{symbol}</span>
-						{/each}
-					</p>
-				{/each}
-			</div>
-		{/if}
-	</div>
-	<div class="grammar-label blue">grammar</div>
-</div>
+					<span>{'->'}</span>
+					{#each rule.right as symbol, si}
+						<span id="gr{rulesIndex}-{si}">{symbol}</span>
+					{/each}
+				</p>
+			{/each}
+		</div>
+	</CardBox>
+{/if}
 
 <style>
 	#grammar {
@@ -95,29 +109,15 @@
 			max-height 0.5s;
 		overflow: hidden;
 	}
-	#grammar > div > p > span {
+	div > p > span {
 		margin: 0px 4px;
 	}
 
-	#grammar > div > p > span:nth-child(2) {
+	div > p > span:nth-child(2) {
 		margin: 0px;
 	}
 
-	#grammar > div > p > span:first-child {
+	div > p > span:first-child {
 		padding-right: 5px;
-	}
-
-	.grammar-label {
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 10px;
-		padding: 5px 10px;
-		margin: 5px;
-		color: white;
-	}
-
-	.grammar-box {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
 	}
 </style>

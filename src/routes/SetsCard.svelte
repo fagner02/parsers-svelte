@@ -1,6 +1,8 @@
 <script>
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { wait } from '../lib/utils';
+	import CardBox from './CardBox.svelte';
+	import { fade } from 'svelte/transition';
 
 	const { selectLSymbol } = getContext('StepsView');
 
@@ -13,6 +15,7 @@
 	export let charWidth;
 	/**@type {number}*/
 	export let lineHeight;
+	let maxHeight = lineHeight;
 	export let fontSize;
 	export let color;
 
@@ -101,7 +104,7 @@
 			}
 		]);
 
-		firstCard.style.maxHeight = `${lineHeight * $set.length}px`;
+		maxHeight = lineHeight * $set.length;
 		await wait(0);
 
 		await selectLSymbol('f', /**@type {number}*/ (firstIndexes.get(symbol)), 'blue', false);
@@ -116,70 +119,49 @@
 	/**
 	 * @param {HTMLElement} node
 	 */
-	function setCard(node) {
-		firstCard = node;
-	}
+	onMount(() => {
+		// firstCard = getel;
+	});
 </script>
 
-<div class="set-box">
-	<div
-		class="card set-card"
-		style="min-width: {charWidth}px; min-height: {lineHeight}px"
-		use:setCard
-	>
-		{#each $set as f, index}
-			<p
-				id="fset{index}"
-				style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content"
-			>
-				<span id="fl{index}">{f.left}</span>
-				{#if f.showRight}
-					<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
-					<span in:setItemIn={{ duration: 500, delay: 100 }}>{'{'}</span>
+<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label}>
+	{#each $set as f, index}
+		<p
+			id="fset{index}"
+			style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content"
+		>
+			<span id="fl{index}">{f.left}</span>
+			{#if f.showRight}
+				<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
+				<span in:setItemIn={{ duration: 500, delay: 100 }}>{'{'}</span>
 
-					{#each f.rightAnim as text, ri (`${index}-${ri}`)}
-						<span style="width: {text.width}px;opacity:{text.opacity};" id="fr{index}-{ri}">
-							{#if text.value != ' '}
-								{text.value}
-							{:else}
-								&nbsp;
-							{/if}</span
-						>
-					{/each}
+				{#each f.rightAnim as text, ri (`${index}-${ri}`)}
+					<span
+						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {text.width}px;opacity:{text.opacity};"
+						id="fr{index}-{ri}"
+					>
+						{#if text.value != ' '}
+							{text.value}
+						{:else}
+							&nbsp;
+						{/if}</span
+					>
+				{/each}
 
-					<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>
-				{/if}
-			</p>
-		{/each}
-	</div>
-	<div class="set-label {color}">{label}</div>
-</div>
+				<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>
+			{/if}
+		</p>
+	{/each}
+</CardBox>
 
 <style>
 	@import './block.css';
-	@import 'card.css';
-	.set-card {
-		height: fit-content;
-	}
-	.set-card > p > span:nth-child(2) {
+
+	p > span:nth-child(2) {
 		margin-left: 5px;
 	}
-	.set-card > p {
+	p {
 		padding: 0px;
 		display: flex;
-	}
-
-	.set-label {
-		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
-		border-radius: 10px;
-		padding: 5px 10px;
-		margin: 5px;
-		color: white;
-	}
-
-	.set-box {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
 	}
 </style>
