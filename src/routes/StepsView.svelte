@@ -1,10 +1,8 @@
 <script>
 	import {
 		getPauseResolvesLength,
-		jumpPauseFalse,
-		jumpPauseTrue,
-		jumpWaitFalse,
-		jumpWaitTrue,
+		setJumpPause,
+		setJumpWait,
 		killAllWaits,
 		killPause,
 		pause,
@@ -23,6 +21,7 @@
 	let limit = false;
 
 	export function limitHit() {
+		goForward = false;
 		animating = false;
 		limit = true;
 	}
@@ -32,15 +31,17 @@
 		if (goBack && stepCount === targetStep) {
 			goBack = false;
 			targetStep = -1;
-			jumpPauseFalse();
-			jumpWaitFalse();
+			setJumpPause(false);
+			setJumpWait(false);
 		} else if (goForward) {
 			goForward = false;
-			jumpWaitFalse();
+			setJumpWait(false);
 		}
 
 		animating = false;
-		await pause();
+		try {
+			await pause();
+		} catch {}
 		animating = true;
 	}
 
@@ -53,7 +54,7 @@
 			return;
 		}
 
-		jumpWaitTrue();
+		setJumpWait(true);
 		resolveAllWaits();
 	}
 
@@ -61,8 +62,8 @@
 		if (stepCount <= 1) return;
 		goBack = true;
 		targetStep = stepCount - 1;
-		jumpWaitTrue();
-		jumpPauseTrue();
+		setJumpWait(true);
+		setJumpPause(true);
 		reset();
 	}
 
@@ -81,18 +82,25 @@
 
 <div class="steps {$$props.class}" style="position: relative;">
 	{stepCount}
-	<div class="controls">
-		<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-			<PlaySkipBack color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-		</button>
-		<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-			<Restart color="hsl(200,60%,50%)" size={15} strokeWidth={3}></Restart>
-		</button>
-		<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-			<PlaySkipForward color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-		</button>
+	<div>
+		<div class="controls-box">
+			<div class="controls">
+				<button>ni</button>
+			</div>
+			<div class="controls">
+				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
+					<PlaySkipBack color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				</button>
+				<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+					<Restart color="hsl(200,60%,50%)" size={15} strokeWidth={3}></Restart>
+				</button>
+				<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+					<PlaySkipForward color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				</button>
+			</div>
+		</div>
+		<slot></slot>
 	</div>
-	<slot></slot>
 </div>
 
 <style>
@@ -104,10 +112,17 @@
 		flex-direction: column;
 	}
 
-	.controls {
+	.controls-box {
 		display: flex;
 		gap: 10px;
 		margin: 5px;
+		justify-content: space-between;
+	}
+
+	.controls {
+		display: flex;
+		gap: 10px;
+		height: fit-content;
 	}
 
 	button {
@@ -117,5 +132,8 @@
 		transition:
 			filter 0.5s,
 			scale 0.1s;
+	}
+	button:active {
+		scale: 1.2;
 	}
 </style>

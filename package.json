@@ -21,6 +21,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tauri-apps/cli": "^1.5.14",
 		"@types/eslint": "^8.56.0",
+		"@types/ltijs": "^4.0.11",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
@@ -35,6 +36,7 @@
 	"dependencies": {
 		"@capacitor/android": "^6.0.0",
 		"@capacitor/core": "^6.0.0",
-		"@tauri-apps/api": "^1.5.5"
+		"@tauri-apps/api": "^1.5.5",
+		"ltijs": "^5.9.5"
 	}
 }

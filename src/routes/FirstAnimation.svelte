@@ -115,7 +115,6 @@
 					$rules[i1].index.toString()
 				);
 
-				console.log(i1, $rules[i1].index, 'in', $symbolStack);
 				await addPause();
 
 				await posStackElement.addToStack(
@@ -124,7 +123,6 @@
 					$rules[i1].index.toString(),
 					$rules[i1].index.toString()
 				);
-				console.log(i1, $rules[i1].index, 'out', $posStack);
 			}
 		}
 	}
@@ -191,6 +189,7 @@
 				}
 			}
 			limitHit();
+			addPause();
 		} catch {}
 	}
 
@@ -248,7 +247,6 @@
 
 <style>
 	@import 'block.css';
-	@import 'card.css';
 
 	.cards-box {
 		display: flex;

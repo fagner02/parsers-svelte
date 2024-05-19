@@ -43,17 +43,17 @@
 		border-radius: 0px 0px 10px 10px;
 		padding: 5px 10px;
 		color: white;
-		scale: 1;
+		/* font-family: 'Trebuchet MS'; */
 		transition:
-			background 0.5s,
-			padding 0.5s;
+			background 0.2s,
+			padding 0.2s;
 	}
 
 	.tab-item-list {
 		height: 35px;
 		border-top: 1px solid hsl(200, 50%, 100%);
 		display: flex;
-		gap: 10px;
+		gap: 0px;
 		width: fit-content;
 		align-items: flex-start;
 	}
