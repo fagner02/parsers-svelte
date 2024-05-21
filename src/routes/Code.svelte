@@ -14,8 +14,7 @@
 		await wait(250);
 		const elem = /**@type {HTMLElement}*/ (document.querySelector('.popup'));
 
-		maxWidth = /**@type {number}*/ (elem.scrollWidth) - 40;
-		console.log(maxWidth);
+		maxWidth = /**@type {number}*/ (elem.scrollWidth);
 		elem.scrollWidth;
 		await wait(250);
 		opacity = 1;

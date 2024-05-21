@@ -72,9 +72,7 @@
 		resetCall();
 	}
 
-	export let resetCall = () => {
-		console.log('not set');
-	};
+	export let resetCall = () => {};
 </script>
 
 <div class="steps {$$props.class}" style="position: relative;">

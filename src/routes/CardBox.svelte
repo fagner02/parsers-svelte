@@ -1,6 +1,4 @@
 <script>
-	export let animation;
-	console.log(animation, $$props.id);
 </script>
 
 <div class="card-box" style="animation: rotA 0.5s;">
