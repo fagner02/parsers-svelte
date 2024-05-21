@@ -29,29 +29,10 @@
 </div>
 
 <style>
-	@keyframes back {
-		from {
-			background-position: 100% 0;
-		}
-		to {
-			background-position: 0% 0;
-		}
-	}
 	:global(#code) {
 		display: grid;
 		place-content: left top;
-		background: linear-gradient(
-			127deg,
-			hsl(155, 39%, 10%),
-			hsl(200, 50%, 17%),
-			hsl(230, 50%, 17%),
-			hsl(200, 50%, 17%),
-			hsl(155, 39%, 10%),
-			hsl(200, 50%, 17%),
-			hsl(230, 50%, 17%)
-		);
-		background-size: 700%;
-		animation: back 15s ease-in-out alternate infinite;
+		background: linear-gradient(127deg, hsl(215, 30%, 10%), hsl(215, 30%, 15%));
 		border: 1px solid hsl(200, 50%, 50%);
 		color: #abb2bf;
 		border-radius: 10px;
