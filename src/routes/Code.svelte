@@ -19,11 +19,11 @@
 </script>
 
 <div id="code" class="maxHeight" style="max-width: {maxWidth}px;place-self: center;">
-	<pre class="fill" id="pre-code" style="opacity: {opacity}; translate: {pos}px 0px"><code>
-					{@html hljs.highlight(code, {
+	<pre class="fill" id="pre-code" style="opacity: {opacity}; translate: {pos}px 0px"><code
+			>{@html hljs.highlight(code, {
 				language: 'javascript'
-			}).value}
-			</code></pre>
+			}).value}</code
+		></pre>
 </div>
 
 <style>
