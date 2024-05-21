@@ -15,9 +15,7 @@
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
 	let animation = animIn;
-	/**
-	 * @type {any}
-	 */
+	/** @type {any}*/
 	let forward;
 	/**
 	 * @type {any}

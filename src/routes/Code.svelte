@@ -2,9 +2,7 @@
 	import { wait } from '$lib/utils';
 	import hljs from 'highlight.js';
 	import 'highlight.js/styles/atom-one-dark.min.css';
-	import { onMount, onDestroy } from 'svelte';
-	import FillHeightWrapper from './FillHeightWrapper.svelte';
-
+	import { onMount } from 'svelte';
 	export let code;
 	let maxWidth = 50;
 	let opacity = 0;
@@ -12,23 +10,17 @@
 
 	onMount(async () => {
 		await wait(250);
-		const elem = /**@type {HTMLElement}*/ (document.querySelector('.popup'));
+		maxWidth = /**@type {number}*/ (document.querySelector('.popup')?.scrollWidth);
 
-		maxWidth = /**@type {number}*/ (elem.scrollWidth);
-		elem.scrollWidth;
 		await wait(250);
 		opacity = 1;
 		pos = 0;
-	});
-
-	onDestroy(() => {
-		maxWidth = 50;
 	});
 </script>
 
 <div id="code" class="maxHeight" style="max-width: {maxWidth}px;place-self: center;">
 	<pre class="fill" id="pre-code" style="opacity: {opacity}; translate: {pos}px 0px"><code
-			>{#each code.split('\n') as line, index}<span
+			>{#each code.split('\n') as line}<span
 					>{@html hljs.highlight(line + '\n', {
 						language: 'javascript'
 					}).value}</span
@@ -37,10 +29,29 @@
 </div>
 
 <style>
+	@keyframes back {
+		from {
+			background-position: 100% 0;
+		}
+		to {
+			background-position: 0% 0;
+		}
+	}
 	:global(#code) {
 		display: grid;
 		place-content: left top;
-		background: hsl(215, 20%, 20%);
+		background: linear-gradient(
+			127deg,
+			hsl(155, 39%, 10%),
+			hsl(200, 50%, 17%),
+			hsl(230, 50%, 17%),
+			hsl(200, 50%, 17%),
+			hsl(155, 39%, 10%),
+			hsl(200, 50%, 17%),
+			hsl(230, 50%, 17%)
+		);
+		background-size: 700%;
+		animation: back 15s ease-in-out alternate infinite;
 		border: 1px solid hsl(200, 50%, 50%);
 		color: #abb2bf;
 		border-radius: 10px;
