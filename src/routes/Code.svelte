@@ -9,23 +9,21 @@
 	let pos = -50;
 
 	onMount(async () => {
-		await wait(250);
+		await wait(400);
 		maxWidth = /**@type {number}*/ (document.querySelector('.popup')?.scrollWidth);
 
-		await wait(250);
+		await wait(50);
 		opacity = 1;
 		pos = 0;
 	});
 </script>
 
 <div id="code" class="maxHeight" style="max-width: {maxWidth}px;place-self: center;">
-	<pre class="fill" id="pre-code" style="opacity: {opacity}; translate: {pos}px 0px"><code
-			>{#each code.split('\n') as line}<span
-					>{@html hljs.highlight(line + '\n', {
-						language: 'javascript'
-					}).value}</span
-				>{/each}</code
-		></pre>
+	<pre class="fill" id="pre-code" style="opacity: {opacity}; translate: {pos}px 0px"><code>
+					{@html hljs.highlight(code, {
+				language: 'javascript'
+			}).value}
+			</code></pre>
 </div>
 
 <style>
