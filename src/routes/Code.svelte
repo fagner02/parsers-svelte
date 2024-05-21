@@ -46,7 +46,7 @@
 		transition: all 0.9s 0.2s;
 	}
 
-	:global(code > span, code > span > span) {
+	:global(code, code > span, code > span > span) {
 		position: relative;
 		animation: rotA 0.5s;
 		font-family: monospace !important;
