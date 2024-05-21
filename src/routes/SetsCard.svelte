@@ -122,9 +122,10 @@
 	onMount(() => {
 		// firstCard = getel;
 	});
+	export let animation;
 </script>
 
-<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label}>
+<CardBox {animation} minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label}>
 	{#each $set as f, index}
 		<p
 			id="fset{index}"

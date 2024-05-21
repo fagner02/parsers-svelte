@@ -16,7 +16,6 @@
 	let opacity = 0;
 	let maxWidth = 0;
 	let maxHeight = 0;
-	let show = true;
 	let sizeForward = `max-width 0.5s,
 			max-height 0.5s`;
 	let opacityForward = `opacity 0.5s`;
@@ -66,39 +65,40 @@
 		await wait(200);
 		opacity = 1;
 	}
+	/**@type {string}*/
+	export let animation;
 </script>
 
-{#if show}
-	<CardBox
-		class="card"
-		id={'grammar'}
-		minHeight={lineHeight}
-		minWidth={charWidth}
-		{maxWidth}
-		{maxHeight}
-		label={'grammar'}
-		color={'blue'}
-		{transition}
-	>
-		<div style="opacity: {opacity}; transition: {opacityTransition};">
-			{#each $rules as rule, rulesIndex}
-				<p
-					style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+<CardBox
+	class="card"
+	id={'grammar'}
+	minHeight={lineHeight}
+	minWidth={charWidth}
+	{maxWidth}
+	{maxHeight}
+	label={'grammar'}
+	color={'blue'}
+	{transition}
+	{animation}
+>
+	<div style="opacity: {opacity}; transition: {opacityTransition};">
+		{#each $rules as rule, rulesIndex}
+			<p
+				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+			>
+				<span id="gl{rulesIndex}"
+					>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
+						>{rule.index}</span
+					></span
 				>
-					<span id="gl{rulesIndex}"
-						>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
-							>{rule.index}</span
-						></span
-					>
-					<span>{'->'}</span>
-					{#each rule.right as symbol, si}
-						<span id="gr{rulesIndex}-{si}">{symbol}</span>
-					{/each}
-				</p>
-			{/each}
-		</div>
-	</CardBox>
-{/if}
+				<span>{'->'}</span>
+				{#each rule.right as symbol, si}
+					<span id="gr{rulesIndex}-{si}">{symbol}</span>
+				{/each}
+			</p>
+		{/each}
+	</div>
+</CardBox>
 
 <style>
 	#grammar {

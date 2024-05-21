@@ -15,12 +15,30 @@ body {
 	margin: 0;
 }
 
+tbody.hljs {
+	border-radius: 10px;
+	display: block;
+	overflow: hidden;
+	font-size: 10pt;
+}
+
 #app {
 	background: white;
 	border-radius: 10px;
 	overflow: hidden;
-	display: block;
-	min-height: 100vh;
+	display: flex;
+}
+
+.fill {
+	min-height: -webkit-fill-available;
+	height: 0;
+}
+
+.maxHeight {
+	height: -webkit-fill-available;
+}
+.maxWidth {
+	width: -webkit-fill-available;
 }
 
 a,
@@ -43,6 +61,11 @@ section {
 	width: -webkit-fill-available;
 }
 
+.column {
+	display: flex;
+	flex-direction: column;
+	width: -webkit-fill-available;
+}
 .grid {
 	display: grid;
 	grid-template-areas: 'unit';
@@ -54,4 +77,33 @@ section {
 
 p {
 	margin: 0;
+}
+
+@keyframes rotA {
+	from {
+		scale: 0.5;
+		translate: -300px 0px;
+		rotate: 0deg;
+		opacity: 0;
+	}
+	to {
+		translate: 0% 0px;
+		rotate: 0deg;
+		scale: 1;
+		opacity: 1;
+	}
+}
+@keyframes rotD {
+	from {
+		scale: 1;
+		rotate: 0deg;
+		translate: 0% 0px;
+		opacity: 1;
+	}
+	to {
+		scale: 1;
+		rotate: -5deg;
+		translate: 50% 0px;
+		opacity: 0;
+	}
 }

@@ -9,11 +9,8 @@
 		resolveAllWaits,
 		resolvePause
 	} from '$lib/utils';
-	import PlaySkipBack from './Icons/PlaySkipBack.svelte';
-	import Restart from './Icons/Restart.svelte';
-	import PlaySkipForward from './Icons/PlaySkipForward.svelte';
 
-	let animating = false;
+	export let animating = false;
 	let targetStep = -1;
 	let stepCount = 0;
 	let goForward = false;
@@ -45,7 +42,7 @@
 		animating = true;
 	}
 
-	async function forward() {
+	export async function forward() {
 		if (limit) return;
 		goForward = true;
 
@@ -58,7 +55,7 @@
 		resolveAllWaits();
 	}
 
-	function back() {
+	export function back() {
 		if (stepCount <= 1) return;
 		goBack = true;
 		targetStep = stepCount - 1;
@@ -67,7 +64,7 @@
 		reset();
 	}
 
-	function reset() {
+	export function reset() {
 		limit = false;
 		stepCount = 0;
 		killAllWaits();
@@ -81,26 +78,7 @@
 </script>
 
 <div class="steps {$$props.class}" style="position: relative;">
-	{stepCount}
-	<div>
-		<div class="controls-box">
-			<div class="controls">
-				<button>ni</button>
-			</div>
-			<div class="controls">
-				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-					<PlaySkipBack color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-				<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-					<Restart color="hsl(200,60%,50%)" size={15} strokeWidth={3}></Restart>
-				</button>
-				<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-					<PlaySkipForward color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-			</div>
-		</div>
-		<slot></slot>
-	</div>
+	<slot></slot>
 </div>
 
 <style>
@@ -110,30 +88,5 @@
 		align-items: center;
 		flex-wrap: wrap;
 		flex-direction: column;
-	}
-
-	.controls-box {
-		display: flex;
-		gap: 10px;
-		margin: 5px;
-		justify-content: space-between;
-	}
-
-	.controls {
-		display: flex;
-		gap: 10px;
-		height: fit-content;
-	}
-
-	button {
-		box-shadow: 0px 0px 5px 0px hsl(200, 100%, 40%, 30%);
-		border: 1px solid hsl(200, 60%, 60%);
-		background: hsl(200, 100%, 95%);
-		transition:
-			filter 0.5s,
-			scale 0.1s;
-	}
-	button:active {
-		scale: 1.2;
 	}
 </style>

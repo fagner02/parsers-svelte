@@ -112,9 +112,10 @@
 		await wait(1000);
 		stack.update((x) => x.splice(0, index));
 	}
+	export let animation;
 </script>
 
-<CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label}>
+<CardBox {animation} minHeight={lineHeight} minWidth={charWidth} {color} {label}>
 	{#each [...$stack].reverse() as stackItem, index (stackId + stackItem.id)}
 		<p
 			id="s-{stackId}-{index}"

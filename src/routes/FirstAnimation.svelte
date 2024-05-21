@@ -6,6 +6,7 @@
 	import SetsCard from './SetsCard.svelte';
 	import GrammarCard from './GrammarCard.svelte';
 	import StepsView from './StepsView.svelte';
+	import AlgorithmTab from './AlgorithmTab.svelte';
 
 	// ========== Components ====================
 	/**@type {Stack}*/
@@ -199,11 +200,22 @@
 
 		firstAlg();
 	});
+	let code = '';
+	onMount(async () => {
+		code = await (await fetch('first.js')).text();
+	});
 </script>
 
-<StepsView class={$$props.class} resetCall={reset} bind:addPause bind:limitHit>
+<AlgorithmTab resetCall={reset} bind:addPause bind:limitHit {code} let:animation>
 	<div class="cards-box">
-		<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
+		<GrammarCard
+			{fontSize}
+			{lineHeight}
+			{charWidth}
+			{subCharWidth}
+			{rules}
+			bind:loadGrammar
+			{animation}
 		></GrammarCard>
 
 		<SetsCard
@@ -215,6 +227,7 @@
 			color={'blue'}
 			label={'first set'}
 			bind:this={firstSet}
+			{animation}
 		></SetsCard>
 
 		<Stack
@@ -228,6 +241,7 @@
 			label="symbol stack"
 			color="blue"
 			bind:this={symbolStackElement}
+			{animation}
 		></Stack>
 
 		<Stack
@@ -241,9 +255,10 @@
 			label="position stack"
 			color="green"
 			bind:this={posStackElement}
+			{animation}
 		></Stack>
 	</div>
-</StepsView>
+</AlgorithmTab>
 
 <style>
 	@import 'block.css';

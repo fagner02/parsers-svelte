@@ -1,4 +1,5 @@
 <script>
+	import FillHeightWrapper from './FillHeightWrapper.svelte';
 	import FirstAnimation from './FirstAnimation.svelte';
 	import TextInput from './TextInput.svelte';
 	import { fade } from 'svelte/transition';
@@ -11,7 +12,7 @@
 	let selected = items[0];
 </script>
 
-<div class="tab">
+<FillHeightWrapper class="tab">
 	<div class="tab-item-list">
 		{#each items as item}
 			<button
@@ -26,31 +27,29 @@
 			>
 		{/each}
 	</div>
-	<div class="tab-content" in:fade={{ duration: 1000 }} out:fade={{ duration: 1000 }}>
+	<FillHeightWrapper class="tab-content">
 		<svelte:component this={selected.comp}></svelte:component>
-	</div>
-</div>
+	</FillHeightWrapper>
+</FillHeightWrapper>
 
 <style>
-	.tab {
+	:global(.tab) {
 		margin: 0px 10px;
+		width: -webkit-fill-available;
 	}
-	.tab-content {
-		/* box-shadow: inset 0px 10px 10px -10px hsl(200, 50%, 50%); */
-	}
+
 	.tab-item {
 		background: hsl(200, 50%, 50%);
 		border-radius: 0px 0px 10px 10px;
 		padding: 5px 10px;
 		color: white;
-		/* font-family: 'Trebuchet MS'; */
 		transition:
 			background 0.2s,
 			padding 0.2s;
 	}
 
 	.tab-item-list {
-		height: 35px;
+		height: 38px;
 		border-top: 1px solid hsl(200, 50%, 100%);
 		display: flex;
 		gap: 0px;
