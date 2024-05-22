@@ -52,7 +52,7 @@
 	$: isAnim = selected === 'anim';
 </script>
 
-<div class="contents fill">
+<div class="contents maxHeight">
 	<div class="controls-box">
 		<div class="controls">
 			<button on:click={() => updateSelected('code')}><CodeIcon></CodeIcon></button>
@@ -119,7 +119,7 @@
 		}
 	}
 
-	#wrapper {
+	:global(#wrapper) {
 		transition:
 			max-width 0.5s,
 			width 0.5s,

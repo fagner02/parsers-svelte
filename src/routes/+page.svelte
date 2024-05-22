@@ -15,7 +15,7 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 <div
-	class="fill"
+	class="maxHeight"
 	id="app"
 	style="border-radius:{/**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined
 		? 0

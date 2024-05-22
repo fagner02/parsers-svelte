@@ -24,7 +24,8 @@
 		width: -moz-available;
 		height: -webkit-fill-available;
 	}
-	@-moz-document url-prefix() {
+
+	@supports not (height: -webkit-fill-available) {
 		.row,
 		.column {
 			height: 100%;

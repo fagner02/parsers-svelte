@@ -12,11 +12,9 @@ body,
 }
 html {
 	min-width: fit-content;
-	min-height: 100vh;
 }
 
 body {
-	min-height: 100vh;
 	margin: 0;
 }
 
@@ -40,28 +38,20 @@ tbody.hljs {
 	}
 }
 
-.fill {
-	min-height: -webkit-fill-available;
-	height: 0;
-}
-@-moz-document url-prefix() {
-	.fill {
-		height: 100%;
-	}
-}
 .maxHeight {
 	height: -webkit-fill-available;
 }
-@-moz-document url-prefix() {
-	.maxHeight {
-		height: 100%;
-	}
-}
+
 .maxWidth {
 	width: -webkit-fill-available;
 	width: -moz-available;
 }
 
+@supports not (height: -webkit-fill-available) {
+	.maxHeight {
+		height: 100%;
+	}
+}
 a,
 button {
 	-webkit-tap-highlight-color: transparent;

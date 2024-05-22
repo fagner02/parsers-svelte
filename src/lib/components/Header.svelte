@@ -6,8 +6,6 @@
 	<header>
 		<nav>
 			<h1>Visualizador de Parsers</h1>
-			<a href="/about">About</a>
-			<a href="/">Home</a>
 		</nav>
 	</header>
 {/if}

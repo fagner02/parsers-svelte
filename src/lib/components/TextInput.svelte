@@ -92,4 +92,10 @@
 		position: relative;
 		top: -1px;
 	}
+
+	@supports (width: -moz-available) {
+		.textnumbers {
+			top: 1px;
+		}
+	}
 </style>
