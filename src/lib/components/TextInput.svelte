@@ -4,22 +4,15 @@
 
 	/**@type {number}*/
 	let height;
-	function updateSize() {
-		lines = Math.ceil(
-			/**@type {HTMLElement}*/ (document.querySelector('textarea'))?.scrollHeight / lineHeight
-		);
-		numGap = lines.toString().length * charWidth + 15;
-		height = /**@type {HTMLElement}*/ (document.querySelector('textarea'))?.offsetHeight - 5;
-	}
+	/** @type {HTMLElement} */
+	let input;
+	/** @type {HTMLElement} */
+	let text;
 
-	/**
-	 * @param {Event} e
-	 */
-	function onScroll(e) {
-		/**@type {Element}*/ (document.querySelector('.textnumbers')).scrollTop = /**@type {Element}*/ (
-			e.target
-		).scrollTop;
-		updateSize();
+	function updateSize() {
+		lines = Math.max(text.childElementCount + 1, Math.ceil(input.clientHeight / lineHeight));
+		height = input.scrollHeight;
+		numGap = lines.toString().length * charWidth + 15;
 	}
 
 	let charWidth = 0;
@@ -30,59 +23,73 @@
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
 		updateSize();
-		new ResizeObserver(updateSize).observe(
-			/**@type {HTMLElement}*/ (document.querySelector('textarea'))
-		);
 	});
+
+	/** @param {HTMLElement} comp */
+	function setInput(comp) {
+		input = comp;
+		new ResizeObserver(updateSize).observe(input);
+	}
+
+	/** @param {HTMLElement} comp */
+	function setText(comp) {
+		text = comp;
+		new MutationObserver(updateSize).observe(text, {
+			childList: true
+		});
+	}
 </script>
 
-<div class="grid input {$$props.class}">
-	<textarea
-		on:scroll={onScroll}
-		class="unit"
-		style="font-size: {fontSize}px; padding-left: {numGap + 5}px; line-height: {lineHeight}px;"
-	></textarea>
-	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px">
+<div class="input {$$props.class}" use:setInput>
+	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
 		{#each { length: lines } as _, textInputIndex}
 			<div class="grid">
 				<p style="font-size:{12}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
 			</div>
 		{/each}
 	</div>
+	<div
+		use:setText
+		contenteditable="true"
+		class="text"
+		style="font-size: {fontSize}px;line-height: {lineHeight}px;"
+	></div>
 </div>
 
 <style>
-	textarea {
+	.text {
+		resize: none;
+		overflow: visible;
 		width: 100%;
-		width: -webkit-fill-available;
-		border-radius: 10px;
-		outline: hsl(0, 0%, 50%) solid 2px;
+		outline: none;
 		border: none;
-		resize: vertical;
-		padding: 5px 10px 5px;
-		overflow: auto;
-		transition: padding 0.3s;
-		height: 95px;
 	}
 
-	textarea:focus-within {
+	.input:focus-within {
 		outline: hsl(200, 80%, 60%) solid 2px;
 	}
 
 	.input {
-		overflow: hidden;
-		padding: 20px;
+		width: -webkit-fill-available;
+		width: -moz-available;
+		border-radius: 10px;
+		outline: hsl(0, 0%, 50%) solid 2px;
+		resize: vertical;
+		overflow: auto;
+		transition: padding 0.3s;
+		height: 100px;
+		display: flex;
+		margin: 20px;
 	}
 
 	.textnumbers {
 		display: grid;
-		padding-top: 5px;
-		position: relative;
 		overflow: hidden;
 		letter-spacing: 0px;
 		background: hsl(0, 0%, 90%);
 		border-radius: 10px 0px 0px 10px;
 		transition: width 0.3s;
+		place-content: start end;
 	}
 
 	.textnumbers > .grid > p {

@@ -142,6 +142,7 @@
 		justify-content: space-between;
 		width: 100%;
 		width: -webkit-fill-available;
+		width: -moz-available;
 	}
 
 	.controls {
