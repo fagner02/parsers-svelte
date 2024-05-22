@@ -12,10 +12,11 @@
 	function setSize() {
 		const parent = /**@type {HTMLElement}*/ (component.parentElement);
 		if (parent === null) return;
-		const height = /**@type {number}*/ (parent.clientHeight - 1);
+		const height = /**@type {number}*/ (parent.clientHeight);
 		let deduct = 0;
-		const display = /**@type {any}*/ (parent.computedStyleMap().get('display')).value;
-		const direction = /**@type {any}*/ (parent.computedStyleMap().get('flex-direction')).value;
+		const map = window.getComputedStyle(parent);
+		const display = map.display;
+		const direction = map.flexDirection;
 		if (
 			(display !== 'flex' || direction === 'column') &&
 			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))

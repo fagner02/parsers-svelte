@@ -46,8 +46,8 @@ tbody.hljs {
 }
 
 .maxWidth {
+	width: 100%;
 	width: -webkit-fill-available;
-	width: -moz-available;
 }
 
 a,
@@ -67,15 +67,15 @@ button {
 }
 
 section {
+	width: 100%;
 	width: -webkit-fill-available;
-	width: -moz-available;
 }
 
 .column {
 	display: flex;
 	flex-direction: column;
+	width: 100%;
 	width: -webkit-fill-available;
-	width: -moz-available;
 }
 .grid {
 	display: grid !important;

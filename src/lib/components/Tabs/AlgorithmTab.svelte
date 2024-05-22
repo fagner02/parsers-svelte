@@ -119,8 +119,7 @@
 		}
 	}
 
-	#wrapper {
-		overflow: auto;
+	:global(#wrapper) {
 		transition:
 			max-width 0.5s,
 			width 0.5s,
@@ -141,8 +140,8 @@
 		gap: 10px;
 		margin: 5px;
 		justify-content: space-between;
+		width: 100%;
 		width: -webkit-fill-available;
-		width: -moz-available;
 	}
 
 	.controls {
