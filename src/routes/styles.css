@@ -8,8 +8,10 @@
 html,
 body,
 #app {
-	height: 100%;
+	height: 100vh;
+	width: 100vw;
 }
+
 html {
 	min-width: fit-content;
 }
@@ -32,14 +34,15 @@ tbody.hljs {
 	display: flex;
 }
 
+#app-content {
+	width: 100%;
+	overflow: hidden;
+}
+
 @media (max-width: 700px) {
 	#app {
 		flex-direction: column;
 	}
-}
-
-.maxHeight {
-	height: -webkit-fill-available;
 }
 
 .maxWidth {
@@ -47,11 +50,6 @@ tbody.hljs {
 	width: -moz-available;
 }
 
-@supports not (height: -webkit-fill-available) {
-	.maxHeight {
-		height: 100%;
-	}
-}
 a,
 button {
 	-webkit-tap-highlight-color: transparent;

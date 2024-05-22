@@ -1,14 +1,21 @@
 <script>
 	import { wait } from '$lib/utils';
 	import { onMount } from 'svelte';
+	import FillHeightWrapper from './FillHeightWrapper.svelte';
 
-	export let maxWidth = 50;
+	export let maxWidth = 0.1;
+	/**
+	 * @type {number | undefined }
+	 */
+	let height = undefined;
 	export let opacity = 0;
 	export let pos = -50;
-
+	let elem;
 	onMount(async () => {
-		await wait(400);
-		maxWidth = /**@type {number}*/ (document.querySelector('.popup')?.scrollWidth);
+		elem = document.querySelector('.popup');
+		height = elem?.scrollHeight;
+		await wait(500);
+		maxWidth = 1;
 
 		await wait(50);
 		opacity = 1;
@@ -16,19 +23,17 @@
 	});
 </script>
 
-<div
-	id={$$props.id}
-	class="popup-box maxHeight maxWidth"
-	style="max-width: {maxWidth}px;place-self: center;"
->
-	<slot
-		{maxWidth}
-		{opacity}
-		{pos}
-		contentClass="popup-content"
-		style="opacity: {opacity}; translate: {pos}px 0px"
-	></slot>
-</div>
+<FillHeightWrapper style="display: flex;overflow:hidden;justify-content: center;">
+	<div id={$$props.id} class="popup-box maxWidth" style="flex: {maxWidth};">
+		<slot
+			{maxWidth}
+			{opacity}
+			{pos}
+			contentClass="popup-content"
+			style="opacity: {opacity}; translate: 0px {pos}px"
+		></slot>
+	</div>
+</FillHeightWrapper>
 
 <style>
 	.popup-box {
@@ -38,6 +43,12 @@
 		padding: 10px;
 		margin: 10px;
 		overflow: hidden;
+	}
+
+	@supports not (height: -webkit-fill-available) {
+		.popup-box {
+			height: calc(100% - 40px);
+		}
 	}
 
 	:global(.popup-content) {

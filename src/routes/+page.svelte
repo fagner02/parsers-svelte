@@ -15,7 +15,6 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 <div
-	class="maxHeight"
 	id="app"
 	style="border-radius:{/**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined
 		? 0
@@ -23,7 +22,7 @@
 >
 	<Header></Header>
 
-	<FillHeightWrapper class="maxWidth">
+	<FillHeightWrapper id="app-content">
 		<Tabs></Tabs>
 	</FillHeightWrapper>
 </div>

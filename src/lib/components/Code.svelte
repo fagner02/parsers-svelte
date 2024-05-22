@@ -6,7 +6,7 @@
 </script>
 
 <Popup let:style let:contentClass id="code">
-	<pre id="pre-code" class="maxHeight {contentClass}" {style}><code
+	<pre id="pre-code" class={contentClass} {style}><code
 			>{@html hljs.highlight(code, {
 				language: 'javascript'
 			}).value}</code

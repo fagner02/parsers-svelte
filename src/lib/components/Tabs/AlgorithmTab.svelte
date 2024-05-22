@@ -52,7 +52,7 @@
 	$: isAnim = selected === 'anim';
 </script>
 
-<div class="contents maxHeight">
+<FillHeightWrapper class="contents">
 	<div class="controls-box">
 		<div class="controls">
 			<button on:click={() => updateSelected('code')}><CodeIcon></CodeIcon></button>
@@ -69,7 +69,7 @@
 			>
 		</div>
 	</div>
-	<FillHeightWrapper id="wrapper" class="grid maxHeight maxWidth">
+	<FillHeightWrapper id="wrapper" class="grid maxWidth">
 		<div class="unit">
 			<div class="flow-controls controls">
 				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
@@ -107,7 +107,7 @@
 			{/if}
 		</FillHeightWrapper>
 	</FillHeightWrapper>
-</div>
+</FillHeightWrapper>
 
 <style>
 	@keyframes rit {
@@ -119,7 +119,8 @@
 		}
 	}
 
-	:global(#wrapper) {
+	#wrapper {
+		overflow: auto;
 		transition:
 			max-width 0.5s,
 			width 0.5s,
