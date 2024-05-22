@@ -1,0 +1,58 @@
+<script>
+	import FillHeightWrapper from '../FillHeightWrapper.svelte';
+	import FirstAnimation from '../FirstAnimation.svelte';
+	import TextInput from '../TextInput.svelte';
+
+	/**@type {Array<import('../typedefs').TabItem>} */
+	let items = [
+		{ comp: TextInput, name: 'Entrada' },
+		{ comp: FirstAnimation, name: 'First' }
+	];
+	let selected = items[0];
+</script>
+
+<FillHeightWrapper class="tab">
+	<div class="tab-item-list">
+		{#each items as item}
+			<button
+				class="tab-item"
+				style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
+				item.name
+					? 'hsl(200,50%,50%)'
+					: 'hsl(200,50%,70%)'};"
+				on:click={() => {
+					selected = item;
+				}}>{item.name}</button
+			>
+		{/each}
+	</div>
+	<FillHeightWrapper class="tab-content">
+		<svelte:component this={selected.comp}></svelte:component>
+	</FillHeightWrapper>
+</FillHeightWrapper>
+
+<style>
+	:global(.tab) {
+		margin: 0px 10px;
+		width: -webkit-fill-available;
+	}
+
+	.tab-item {
+		background: hsl(200, 50%, 50%);
+		border-radius: 0px 0px 10px 10px;
+		padding: 5px 10px;
+		color: white;
+		transition:
+			background 0.2s,
+			padding 0.2s;
+	}
+
+	.tab-item-list {
+		height: 38px;
+		border-top: 1px solid hsl(200, 50%, 100%);
+		display: flex;
+		gap: 0px;
+		width: fit-content;
+		align-items: flex-start;
+	}
+</style>

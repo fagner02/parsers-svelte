@@ -38,6 +38,7 @@
 		"@capacitor/android": "^6.0.0",
 		"@capacitor/core": "^6.0.0",
 		"@tauri-apps/api": "^1.5.5",
+		"glob": "^10.3.16",
 		"highlight.js": "^11.9.0",
 		"ltijs": "^5.9.5",
 		"svelte-highlight": "^7.6.1"

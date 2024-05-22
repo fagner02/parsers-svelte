@@ -1,7 +1,6 @@
 <script>
-	import FillHeightWrapper from './FillHeightWrapper.svelte';
-	import Header from './Header.svelte';
-	import Tabs from './Tabs.svelte';
+	import Header from '@/Header.svelte';
+	import Tabs from '@/Tabs/Tabs.svelte';
 	const getLtik = () => {
 		const searchParams = new URLSearchParams(window.location.search);
 		const ltik = searchParams.get('ltik');
@@ -21,8 +20,6 @@
 		? 0
 		: 0}px;"
 >
-	<!-- <TauriTitlebar></TauriTitlebar> -->
-
 	<Header></Header>
 
 	<div class="grid fill maxWidth">
@@ -31,6 +28,5 @@
 </div>
 
 <style>
-	/* @import 'github.css'; */
 	@import './styles.css';
 </style>
