@@ -1,4 +1,5 @@
 <script>
+	import FillHeightWrapper from '@/FillHeightWrapper.svelte';
 	import Header from '@/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
 	const getLtik = () => {
@@ -22,9 +23,9 @@
 >
 	<Header></Header>
 
-	<div class="grid fill maxWidth">
+	<FillHeightWrapper class="maxWidth">
 		<Tabs></Tabs>
-	</div>
+	</FillHeightWrapper>
 </div>
 
 <style>

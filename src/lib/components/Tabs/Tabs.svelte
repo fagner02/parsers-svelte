@@ -35,6 +35,7 @@
 	:global(.tab) {
 		margin: 0px 10px;
 		width: -webkit-fill-available;
+		width: -moz-available;
 	}
 
 	.tab-item {

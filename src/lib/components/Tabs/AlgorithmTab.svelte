@@ -69,7 +69,7 @@
 			>
 		</div>
 	</div>
-	<div id="wrapper" class="grid maxHeight maxWidth">
+	<FillHeightWrapper id="wrapper" class="grid maxHeight maxWidth">
 		<div class="unit">
 			<div class="flow-controls controls">
 				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
@@ -106,7 +106,7 @@
 				<Info></Info>
 			{/if}
 		</FillHeightWrapper>
-	</div>
+	</FillHeightWrapper>
 </div>
 
 <style>

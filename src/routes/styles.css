@@ -5,9 +5,14 @@
 * {
 	font-family: 'spacemono', monospace;
 }
-
+html,
+body,
+#app {
+	height: 100%;
+}
 html {
 	min-width: fit-content;
+	min-height: 100vh;
 }
 
 body {
@@ -29,16 +34,32 @@ tbody.hljs {
 	display: flex;
 }
 
+@media (max-width: 700px) {
+	#app {
+		flex-direction: column;
+	}
+}
+
 .fill {
 	min-height: -webkit-fill-available;
 	height: 0;
 }
-
+@-moz-document url-prefix() {
+	.fill {
+		height: 100%;
+	}
+}
 .maxHeight {
 	height: -webkit-fill-available;
 }
+@-moz-document url-prefix() {
+	.maxHeight {
+		height: 100%;
+	}
+}
 .maxWidth {
 	width: -webkit-fill-available;
+	width: -moz-available;
 }
 
 a,
@@ -59,15 +80,17 @@ button {
 
 section {
 	width: -webkit-fill-available;
+	width: -moz-available;
 }
 
 .column {
 	display: flex;
 	flex-direction: column;
 	width: -webkit-fill-available;
+	width: -moz-available;
 }
 .grid {
-	display: grid;
+	display: grid !important;
 	grid-template-areas: 'unit';
 }
 

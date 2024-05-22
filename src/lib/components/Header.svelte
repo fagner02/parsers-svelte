@@ -2,14 +2,15 @@
 	import { Capacitor } from '@capacitor/core';
 </script>
 
-{#if Capacitor.getPlatform() === 'web' && /**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined}{/if}
-<header>
-	<nav>
-		<h1>Visualizador de Parsers</h1>
-		<a href="/about">about</a>
-		<a href="/">home</a>
-	</nav>
-</header>
+{#if Capacitor.getPlatform() === 'web' && /**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined}
+	<header>
+		<nav>
+			<h1>Visualizador de Parsers</h1>
+			<a href="/about">About</a>
+			<a href="/">Home</a>
+		</nav>
+	</header>
+{/if}
 
 <style>
 	header {
@@ -23,15 +24,31 @@
 		justify-content: start;
 		padding: 0px 20px;
 		background: hsl(200, 50%, 50%);
+		flex-direction: column;
 	}
+
 	nav > h1 {
 		color: white;
-		font-size: 12pt;
-		line-height: 20pt;
+		font-size: 14pt;
+		line-height: 18pt;
 		margin: 8px 0px;
-		/* font-family: 'Trebuchet MS'; */
 		font-weight: normal;
 		text-transform: uppercase;
-		/* font-variant: all-caps; */
+	}
+
+	nav > * {
+		height: fit-content;
+	}
+
+	nav > a {
+		text-decoration: none;
+		color: white;
+		text-transform: uppercase;
+	}
+
+	@media (max-width: 700px) {
+		nav {
+			flex-direction: row;
+		}
 	}
 </style>
