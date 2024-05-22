@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import FillHeightWrapper from './FillHeightWrapper.svelte';
+	import FillHeight from './FillHeight.svelte';
 
 	export let maxWidth = 0.1;
 	/**
@@ -23,7 +23,7 @@
 	});
 </script>
 
-<FillHeightWrapper style="display: flex;overflow:hidden;justify-content: center;">
+<FillHeight style="display: flex;overflow:hidden;justify-content: center;">
 	<div id={$$props.id} class="popup-box maxWidth" style="flex: {maxWidth};">
 		<slot
 			{maxWidth}
@@ -33,7 +33,7 @@
 			style="opacity: {opacity}; translate: 0px {pos}px"
 		></slot>
 	</div>
-</FillHeightWrapper>
+</FillHeight>
 
 <style>
 	.popup-box {

@@ -1,5 +1,5 @@
 <script>
-	import FillHeightWrapper from '@/FillHeightWrapper.svelte';
+	import FillHeight from '@/FillHeight.svelte';
 	import Header from '@/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
 	const getLtik = () => {
@@ -22,9 +22,9 @@
 >
 	<Header></Header>
 
-	<FillHeightWrapper id="app-content">
+	<FillHeight id="app-content">
 		<Tabs></Tabs>
-	</FillHeightWrapper>
+	</FillHeight>
 </div>
 
 <style>

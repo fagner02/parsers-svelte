@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/utils';
 	import Code from '../Code.svelte';
-	import FillHeightWrapper from '../FillHeightWrapper.svelte';
+	import FillHeight from '../FillHeight.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
 	import CodeIcon from '@icons/CodeIcon.svelte';
 	import DocIcon from '@icons/DocIcon.svelte';
@@ -52,7 +52,7 @@
 	$: isAnim = selected === 'anim';
 </script>
 
-<FillHeightWrapper class="contents">
+<FillHeight class="contents">
 	<div class="controls-box">
 		<div class="controls">
 			<button on:click={() => updateSelected('code')}><CodeIcon></CodeIcon></button>
@@ -69,7 +69,7 @@
 			>
 		</div>
 	</div>
-	<FillHeightWrapper id="wrapper" class="grid maxWidth">
+	<FillHeight id="wrapper" class="grid maxWidth">
 		<div class="unit">
 			<div class="flow-controls controls">
 				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
@@ -94,7 +94,7 @@
 				<slot></slot>
 			</StepsView>
 		</div>
-		<FillHeightWrapper
+		<FillHeight
 			class="popup unit"
 			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'}"
 		>
@@ -105,9 +105,9 @@
 			{:else if selected === 'info'}
 				<Info></Info>
 			{/if}
-		</FillHeightWrapper>
-	</FillHeightWrapper>
-</FillHeightWrapper>
+		</FillHeight>
+	</FillHeight>
+</FillHeight>
 
 <style>
 	@keyframes rit {

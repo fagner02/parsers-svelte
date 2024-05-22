@@ -1,5 +1,5 @@
 <script>
-	import FillHeightWrapper from '../FillHeightWrapper.svelte';
+	import FillHeight from '../FillHeight.svelte';
 	import FirstAnimation from '../FirstAnimation.svelte';
 	import TextInput from '../TextInput.svelte';
 
@@ -11,7 +11,7 @@
 	let selected = items[0];
 </script>
 
-<FillHeightWrapper class="tab">
+<FillHeight class="tab">
 	<div class="tab-item-list">
 		{#each items as item}
 			<button
@@ -26,10 +26,10 @@
 			>
 		{/each}
 	</div>
-	<FillHeightWrapper class="tab-content">
+	<FillHeight class="tab-content">
 		<svelte:component this={selected.comp}></svelte:component>
-	</FillHeightWrapper>
-</FillHeightWrapper>
+	</FillHeight>
+</FillHeight>
 
 <style>
 	:global(.tab) {
