@@ -1,8 +1,8 @@
 <script>
-	import { Capacitor } from '@capacitor/core';
+	import { getPlatform, platforms } from '$lib/utils';
 </script>
 
-{#if Capacitor.getPlatform() === 'web' && /**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ === undefined}
+{#if getPlatform() === platforms.web}
 	<header>
 		<nav>
 			<h1>Visualizador de Parsers</h1>

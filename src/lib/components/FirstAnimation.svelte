@@ -6,6 +6,7 @@
 	import SetsCard from './Cards/SetsCard.svelte';
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
+	import anime from 'animejs';
 
 	// ========== Components ====================
 	/**@type {Stack}*/
@@ -108,11 +109,22 @@
 	async function addProdToStacks(currentSymbol) {
 		for (let i1 = 0; i1 < $rules.length; i1++) {
 			if ($rules[i1].left === currentSymbol) {
+				let elemRect = /**@type {DOMRect}*/ (
+					document.querySelector(`#gl${i1}`)?.getBoundingClientRect()
+				);
+				let parentRect = /**@type {DOMRect}*/ (
+					document.querySelector('.cards-box')?.getBoundingClientRect()
+				);
+				let pos = {
+					x: elemRect.x - parentRect.x + elemRect.height,
+					y: elemRect.y - parentRect.y + elemRect.height
+				};
 				await symbolStackElement.addToStack(
 					i1,
 					$rules[i1].left,
 					$rules[i1].index.toString(),
-					$rules[i1].index.toString()
+					$rules[i1].index.toString(),
+					pos
 				);
 
 				await addPause();
@@ -192,66 +204,93 @@
 			addPause();
 		} catch {}
 	}
-
+	let code = '';
 	onMount(async () => {
+		code = await (await fetch('first.js')).text();
 		charWidth = getTextWidth('P', fontSize);
 		subCharWidth = getTextWidth('P', subFontSize);
 
 		firstAlg();
 	});
-	let code = '';
-	onMount(async () => {
-		code = await (await fetch('first.js')).text();
-	});
 </script>
 
 <AlgorithmTab resetCall={reset} bind:addPause bind:limitHit {code}>
-	<div class="cards-box">
-		<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
-		></GrammarCard>
+	<div class="grid">
+		<svg xmlns="http://www.w3.org/2000/svg" class="unit" overflow="visible">
+			<defs>
+				<path
+					stroke-dasharray="6,10"
+					id="line"
+					d="M 0 0 C 20 20, 50 0, 60 10"
+					stroke-linecap="round"
+					fill="none"
+				/>
 
-		<SetsCard
-			set={first}
-			{charWidth}
-			{firstIndexes}
-			{fontSize}
-			{lineHeight}
-			color={'blue'}
-			label={'first set'}
-			bind:this={firstSet}
-		></SetsCard>
-
-		<Stack
-			{lineHeight}
-			{charWidth}
-			{subCharWidth}
-			{subFontSize}
-			stack={symbolStack}
-			{fontSize}
-			stackId="symbol"
-			label="symbol stack"
-			color="blue"
-			bind:this={symbolStackElement}
-		></Stack>
-
-		<Stack
-			{lineHeight}
-			{charWidth}
-			{subCharWidth}
-			{subFontSize}
-			stack={posStack}
-			{fontSize}
-			stackId="pos"
-			label="position stack"
-			color="green"
-			bind:this={posStackElement}
-		></Stack>
+				<path
+					id="arrow"
+					d="M 1 13 L 16 15 L 14.5 1"
+					stroke-linejoin="round"
+					stroke-linecap="round"
+					fill="none"
+				/>
+			</defs>
+			<g opacity="0" id="lines" style="transition: all 0.2s;">
+				<use xlink:href="#line" stroke-width="12" stroke="white" />
+				<use xlink:href="#line" stroke="black" stroke-width="4" />
+				<use xlink:href="#arrow" stroke-width="12" stroke="white" />
+				<use xlink:href="#arrow" stroke="black" stroke-width="4"></use>
+			</g>
+		</svg>
+		<div class="cards-box unit">
+			<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
+			></GrammarCard>
+			<SetsCard
+				set={first}
+				{charWidth}
+				{firstIndexes}
+				{fontSize}
+				{lineHeight}
+				color={'blue'}
+				label={'first set'}
+				bind:this={firstSet}
+			></SetsCard>
+			<Stack
+				{lineHeight}
+				{charWidth}
+				{subCharWidth}
+				{subFontSize}
+				stack={symbolStack}
+				{fontSize}
+				stackId="symbol"
+				label="symbol stack"
+				color="blue"
+				bind:this={symbolStackElement}
+			></Stack>
+			<Stack
+				{lineHeight}
+				{charWidth}
+				{subCharWidth}
+				{subFontSize}
+				stack={posStack}
+				{fontSize}
+				stackId="pos"
+				label="position stack"
+				color="green"
+				bind:this={posStackElement}
+			></Stack>
+		</div>
 	</div>
 </AlgorithmTab>
 
 <style>
 	@import '@/block.css';
-
+	svg {
+		filter: drop-shadow(0px 3px 2px hsl(0, 0%, 0%, 30%));
+		width: -webkit-fill-available;
+		height: -webkit-fill-available;
+		pointer-events: none;
+		z-index: 1;
+	}
 	.cards-box {
 		display: flex;
 		justify-content: center;

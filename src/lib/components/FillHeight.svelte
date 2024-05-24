@@ -15,10 +15,9 @@
 		const height = /**@type {number}*/ (parent.clientHeight);
 		let deduct = 0;
 		const map = window.getComputedStyle(parent);
-		const display = map.display;
-		const direction = map.flexDirection;
+		const compMap = window.getComputedStyle(component);
 		if (
-			(display !== 'flex' || direction === 'column') &&
+			(map.display !== 'flex' || map.direction === 'column') &&
 			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))
 		) {
 			for (let i = 0; i < parent.childElementCount; i++) {
@@ -28,9 +27,14 @@
 				deduct += parent.children[i].clientHeight;
 			}
 		}
+		const compInsets =
+			parseFloat(compMap.paddingTop) +
+			parseFloat(compMap.paddingBottom) +
+			parseFloat(compMap.marginBottom) +
+			parseFloat(compMap.marginTop);
 
-		if (component.style.height === `${height - deduct}px`) return;
-		component.style.height = `${height - deduct}px`;
+		if (component.style.height === `${height - deduct - compInsets}px`) return;
+		component.style.height = `${height - deduct - compInsets}px`;
 	}
 
 	/**
@@ -45,7 +49,7 @@
 	}
 </script>
 
-<div use:setup class="filled {$$props.class}" style={$$props.style} id={$$props.id}>
+<div use:setup class="filled {$$props.class ?? ''}" style={$$props.style} id={$$props.id}>
 	<slot></slot>
 </div>
 

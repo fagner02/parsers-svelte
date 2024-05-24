@@ -9,9 +9,8 @@
 	 */
 	export let opacity = 0;
 	export let pos = -50;
-	let elem;
+
 	onMount(async () => {
-		elem = document.querySelector('.popup');
 		await wait(500);
 		flex = 1;
 

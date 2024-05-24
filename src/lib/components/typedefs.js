@@ -27,4 +27,4 @@
 
 /**@typedef {{comp: ConstructorOfATypedSvelteComponent, name: string}} TabItem*/
 
-exports.unused = {};
+export const unused = {};

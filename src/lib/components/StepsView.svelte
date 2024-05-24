@@ -75,7 +75,7 @@
 	export let resetCall = () => {};
 </script>
 
-<div class="steps {$$props.class}" style="position: relative;">
+<div class="steps {$$props.class ?? ''}" style="position: relative;">
 	<slot></slot>
 </div>
 

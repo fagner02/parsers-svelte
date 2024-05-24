@@ -20,22 +20,13 @@ body {
 	margin: 0;
 }
 
-tbody.hljs {
-	border-radius: 10px;
-	display: block;
-	overflow: hidden;
-	font-size: 10pt;
-}
-
 #app {
 	background: white;
-	border-radius: 10px;
 	overflow: hidden;
 	display: flex;
 }
 
 #app-content {
-	width: 100%;
 	overflow: hidden;
 }
 

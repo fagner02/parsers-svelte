@@ -11,7 +11,7 @@
 	let selected = items[0];
 </script>
 
-<FillHeight class="tab">
+<FillHeight class="tab {$$props.class ?? ''}">
 	<div class="tab-item-list">
 		{#each items as item}
 			<button
@@ -33,7 +33,7 @@
 
 <style>
 	:global(.tab) {
-		margin: 0px 10px;
+		margin: 0px 10px 10px 10px;
 		width: 100%;
 		width: -webkit-fill-available;
 		width: -moz-available;
@@ -51,10 +51,11 @@
 
 	.tab-item-list {
 		height: 38px;
-		border-top: 1px solid hsl(200, 50%, 100%);
+		/* border-top: 1px solid hsl(200, 50%, 100%); */
 		display: flex;
 		gap: 0px;
 		width: fit-content;
 		align-items: flex-start;
+		z-index: -1;
 	}
 </style>

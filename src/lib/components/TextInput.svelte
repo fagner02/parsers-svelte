@@ -40,7 +40,7 @@
 	}
 </script>
 
-<div class="input {$$props.class}" use:setInput>
+<div class="input {$$props.class ?? ''}" use:setInput>
 	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
 		{#each { length: lines } as _, textInputIndex}
 			<div class="grid">

@@ -12,7 +12,7 @@
 	import StepsView from '../StepsView.svelte';
 	import ResultText from '../ResultText.svelte';
 	import Info from '../Info.svelte';
-
+	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
 	let animation = animIn;
@@ -55,11 +55,16 @@
 <FillHeight class="contents">
 	<div class="controls-box">
 		<div class="controls">
-			<button on:click={() => updateSelected('code')}><CodeIcon></CodeIcon></button>
-			<button on:click={() => updateSelected('text')}
+			<button on:click={() => updateSelected('code')} disabled={selected == 'code'}
+				><CodeIcon></CodeIcon></button
+			>
+			<button on:click={() => updateSelected('text')} disabled={selected == 'text'}
 				><ClipboardTextIcon></ClipboardTextIcon></button
 			>
-			<button on:click={() => updateSelected('info')}><DocIcon></DocIcon></button>
+			<button on:click={() => updateSelected('info')} disabled={selected == 'info'}
+				><DocIcon></DocIcon></button
+			>
+			<button><InputStringIcon></InputStringIcon></button>
 			<button
 				on:click={async () => {
 					animation = animOut;
@@ -68,20 +73,20 @@
 				}}><PlayIcon></PlayIcon></button
 			>
 		</div>
+		<div class="flow-controls controls">
+			<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
+				<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+			</button>
+			<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+				<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
+			</button>
+			<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+				<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+			</button>
+		</div>
 	</div>
 	<FillHeight id="wrapper" class="grid maxWidth">
 		<div class="unit">
-			<div class="flow-controls controls">
-				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-					<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-				<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-					<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
-				</button>
-				<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-					<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-			</div>
 			<StepsView
 				{resetCall}
 				bind:back
@@ -106,19 +111,14 @@
 				<Info></Info>
 			{/if}
 		</FillHeight>
+		<FillHeight class="unit instruction-box">
+			<!-- <In -->
+			<div class="instruction">Since this thing is like that we have add to the stack</div>
+		</FillHeight>
 	</FillHeight>
 </FillHeight>
 
 <style>
-	@keyframes rit {
-		from {
-			rotate: 50deg;
-		}
-		to {
-			rotate: 0deg;
-		}
-	}
-
 	:global(#wrapper) {
 		transition:
 			max-width 0.5s,
@@ -133,6 +133,18 @@
 		justify-content: start;
 		align-items: start;
 		flex-direction: column;
+	}
+
+	:global(.instruction-box) {
+		display: grid;
+		place-content: end center;
+	}
+
+	.instruction {
+		background: white;
+		border-radius: 10px;
+		box-shadow: 0px 0px 10px 0px hsl(0, 0%, 0%, 20%);
+		padding: 5px 10px;
 	}
 
 	.controls-box {
@@ -153,7 +165,6 @@
 
 	.flow-controls {
 		justify-content: center;
-		padding: 5px 0px;
 	}
 
 	button {
@@ -166,5 +177,9 @@
 	}
 	button:active {
 		scale: 1.2;
+	}
+	button:disabled {
+		scale: 1;
+		filter: brightness(80%);
 	}
 </style>
