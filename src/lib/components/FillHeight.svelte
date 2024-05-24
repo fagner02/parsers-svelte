@@ -16,15 +16,23 @@
 		let deduct = 0;
 		const map = window.getComputedStyle(parent);
 		const compMap = window.getComputedStyle(component);
+
 		if (
-			(map.display !== 'flex' || map.direction === 'column') &&
+			(map.display !== 'flex' || map.flexDirection.includes('column')) &&
 			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))
 		) {
 			for (let i = 0; i < parent.childElementCount; i++) {
-				if (parent.children[i] === component) {
+				if (parent.children[i].isSameNode(component)) {
 					break;
 				}
-				deduct += parent.children[i].clientHeight;
+				const child = /**@type {HTMLElement}*/ (parent.children[i]);
+				const childMap = window.getComputedStyle(child);
+				deduct +=
+					child.clientHeight +
+					parseFloat(childMap.marginBottom) +
+					parseFloat(childMap.marginTop) +
+					parseFloat(childMap.paddingTop) +
+					parseFloat(childMap.paddingBottom);
 			}
 		}
 		const compInsets =

@@ -13,6 +13,7 @@
 	import ResultText from '../ResultText.svelte';
 	import Info from '../Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
+	import InfoIcon from '@icons/InfoIcon.svelte';
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
 	let animation = animIn;
@@ -37,15 +38,46 @@
 	/** @type {string} */
 	export let code;
 
-	/**
-	 * @param {string} name
-	 */
+	/** @param {string} name */
 	async function updateSelected(name) {
 		animation = '';
 		await wait(10);
 
 		animation = animIn;
 		selected = name;
+	}
+
+	let scale = 0.5;
+	let opacity = 0;
+	let pos = 50;
+	let contentPos = -50;
+	let contentOpacity = 0;
+	let instructionText = '';
+
+	/**
+	 * @param {string} instruction
+	 */
+	export async function openInstruction(instruction) {
+		instructionText = instruction;
+		scale = 1;
+		opacity = 1;
+		pos = 0;
+		await wait(500);
+
+		contentOpacity = 1;
+		contentPos = 0;
+		await wait(500);
+	}
+
+	export async function closeInstruction() {
+		contentOpacity = 0;
+		contentPos = -50;
+		await wait(500);
+
+		scale = 0.5;
+		opacity = 0;
+		pos = 50;
+		await wait(500);
 	}
 
 	let selected = 'anim';
@@ -112,8 +144,20 @@
 			{/if}
 		</FillHeight>
 		<FillHeight class="unit instruction-box">
-			<!-- <In -->
-			<div class="instruction">Since this thing is like that we have add to the stack</div>
+			<div class="instruction" style="opacity: {opacity};translate: 0 {pos}px;scale: {scale}">
+				<div
+					class="instruction-content"
+					style="translate: 0 {contentPos}px;opacity: {contentOpacity}"
+				>
+					<InfoIcon
+						color="hsl(200, 70%,40%)"
+						strokeWidth={3}
+						size={18}
+						style="top: 4px;position: relative;"
+					></InfoIcon>
+					<span style="height: 18px;">{instructionText}</span>
+				</div>
+			</div>
 		</FillHeight>
 	</FillHeight>
 </FillHeight>
@@ -136,8 +180,9 @@
 	}
 
 	:global(.instruction-box) {
-		display: grid;
-		place-content: end center;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
 	}
 
 	.instruction {
@@ -145,6 +190,17 @@
 		border-radius: 10px;
 		box-shadow: 0px 0px 10px 0px hsl(0, 0%, 0%, 20%);
 		padding: 5px 10px;
+		z-index: 1;
+		overflow: hidden;
+		transition: all 0.5s;
+		font-size: 12px;
+		/* border: 1px solid hsl(200, 60%, 60%); */
+	}
+
+	.instruction-content {
+		transition: all 0.5s;
+		position: relative;
+		top: -3px;
 	}
 
 	.controls-box {

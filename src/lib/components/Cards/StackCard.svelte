@@ -4,17 +4,14 @@
 	import CardBox from './CardBox.svelte';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
-	/**
-	 * @type {number}
-	 */
+	/**@type {number}*/
 	export let lineHeight;
 	/**@type {number}*/
 	export let charWidth;
 	/**@type {number}*/
 	export let subCharWidth;
 
-	/**
-	 * @type {import("svelte/store").Writable<Array<import('@/typedefs').StackItem<any>>>}*/
+	/**@type {import("svelte/store").Writable<Array<import('@/typedefs').StackItem<any>>>}*/
 	export let stack;
 	export let fontSize;
 	export let subFontSize;
@@ -22,6 +19,12 @@
 	export let color;
 	/** @type {string} */
 	export let stackId;
+	// /**@type {(srcId:string,destId:string) => Promise<void>} */
+	// export let showLine;
+	// /**@type {() => Promise<void>}*/
+	// export let hideLine;
+	/**@type {import('@/SvgLines.svelte').default}*/
+	export let svgLines;
 
 	/**
 	 * @param {string} text
@@ -36,9 +39,9 @@
 	 * @param {string} text
 	 * @param {string} note
 	 * @param {string} id
-	 * @param {any} pos
+	 * @param {string|null} srcId
 	 */
-	export async function addToStack(data, text, note, id, pos = null) {
+	export async function addToStack(data, text, note, id, srcId = null) {
 		stack.update((x) => [
 			...x,
 			{
@@ -56,61 +59,8 @@
 		]);
 		await wait(50);
 
-		/**
-		 * @type {string[]}
-		 */
-		let values = [];
-		/**
-		 * @type {string[]}
-		 */
-		let arro = [];
-
-		if (pos) {
-			/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '1';
-
-			const elemRect = /**@type {DOMRect}*/ (
-				document.querySelector(`#s-${stackId}-0`)?.getBoundingClientRect()
-			);
-			const parentRect = /**@type {DOMRect}*/ (
-				document.querySelector('.cards-box')?.getBoundingClientRect()
-			);
-			const targetPos = {
-				x: elemRect.x - parentRect.x + elemRect.width / 2 - 12,
-				y: elemRect.y - parentRect.y + lineHeight + elemRect.height - 5
-			};
-			values = [
-				`M ${pos.x} ${pos.y} C ${pos.x} ${pos.y}, ${pos.x} ${pos.y}, ${pos.x} ${pos.y}`,
-				`M ${pos.x} ${pos.y} C  ${pos.x + 30} ${pos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
-			];
-
-			arro = [
-				`M ${pos.x + 1} ${pos.y + 5} L ${pos.x + 5} ${pos.y + 5} L ${pos.x + 5} ${pos.y + 1}`,
-				`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
-			];
-			let easing = 'spring(1, 50, 10, 1)';
-			let morph = anime({
-				targets: document.querySelector('#line'),
-				d: values,
-				duration: 2000,
-				direction: 'forward',
-				delay: 0,
-				autoplay: true,
-				easing: easing
-			});
-
-			let arrow = anime({
-				targets: document.querySelector('#arrow'),
-				d: arro,
-				delay: 0,
-				duration: 2000,
-				direction: 'forward',
-				autoplay: true,
-				easing: easing
-			});
-			await new Promise((resolve) => {
-				resolve('hollow');
-			});
-			await wait(500);
+		if (srcId) {
+			await svgLines.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
 		}
 
 		stack.update((x) => {
@@ -123,27 +73,9 @@
 			return x;
 		});
 
-		if (pos) {
-			await wait(2000);
-
-			anime({
-				targets: document.querySelector('#line'),
-				d: values,
-				duration: 1000,
-				direction: 'reverse',
-				autoplay: true,
-				easing: 'easeInQuad'
-			});
-			anime({
-				targets: document.querySelector('#arrow'),
-				d: arro,
-				duration: 1000,
-				direction: 'reverse',
-				autoplay: true,
-				easing: 'easeInQuad'
-			});
+		if (srcId) {
+			await svgLines.hideLine();
 		}
-		await wait(800);
 
 		/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '0';
 	}
