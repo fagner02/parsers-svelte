@@ -32,28 +32,4 @@
 		animation: rotA 0.5s;
 		font-family: monospace !important;
 	}
-
-	::-webkit-scrollbar {
-		width: 15px;
-		height: 15px;
-		border-radius: 10px;
-	}
-
-	::-webkit-scrollbar-track {
-		border-radius: 10px;
-	}
-
-	::-webkit-scrollbar-corner {
-		border-radius: 10px;
-		background: transparent;
-	}
-
-	::-webkit-scrollbar-thumb {
-		background: hsl(215, 15%, 25%);
-		border-radius: 10px;
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background: hsl(215, 15%, 30%);
-	}
 </style>

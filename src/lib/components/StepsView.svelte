@@ -11,6 +11,10 @@
 	} from '$lib/utils';
 
 	export let animating = false;
+	/** @type {() => Promise<void>} */
+	export let closeInstruction;
+	/** @type {() => Promise<void>} */
+	export let openInstruction;
 	let targetStep = -1;
 	let stepCount = 0;
 	let goForward = false;
@@ -46,8 +50,10 @@
 		if (limit) return;
 		goForward = true;
 
+		await closeInstruction();
 		if (getPauseResolvesLength() > 0) {
 			resolvePause();
+			openInstruction();
 			return;
 		}
 
@@ -67,6 +73,9 @@
 	export function reset() {
 		limit = false;
 		stepCount = 0;
+		setJumpWait(true);
+		closeInstruction();
+		setJumpWait(false);
 		killAllWaits();
 		killPause();
 		resetCall();

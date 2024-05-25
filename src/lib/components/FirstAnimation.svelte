@@ -24,10 +24,8 @@
 	let addPause;
 	/**@type {() => void}*/
 	let limitHit;
-	/**@type {(instruction:string) => Promise<void>} */
-	let openInstruction;
-	/**@type {() => Promise<void>} */
-	let closeInstruction;
+	/**@type {string}*/
+	let instruction;
 	// ========== Components ====================
 
 	// ========= stores ================================================================================
@@ -106,7 +104,6 @@
 		posStack.update(() => []);
 		first.update(() => []);
 		firstIndexes = new Map();
-		closeInstruction();
 		svgLines.setHideOpacity();
 
 		firstAlg();
@@ -143,7 +140,7 @@
 			await wait(100);
 			await loadGrammar();
 			await addPause();
-			await openInstruction('Since this thing is like that we have add to the stack');
+			instruction = 'Since this thing is like that we have add to the stack';
 			await addProdToStacks($rules[0].left);
 
 			while ($symbolStack.length > 0) {
@@ -213,14 +210,7 @@
 	});
 </script>
 
-<AlgorithmTab
-	resetCall={reset}
-	bind:addPause
-	bind:limitHit
-	{code}
-	bind:openInstruction
-	bind:closeInstruction
->
+<AlgorithmTab resetCall={reset} bind:addPause bind:limitHit bind:instruction {code}>
 	<div class="grid">
 		<SvgLines {lineHeight} bind:this={svgLines}></SvgLines>
 		<div class="cards-box unit">
@@ -241,8 +231,8 @@
 				{charWidth}
 				{subCharWidth}
 				{subFontSize}
-				stack={symbolStack}
 				{fontSize}
+				stack={symbolStack}
 				stackId="symbol"
 				label="symbol stack"
 				color="blue"
@@ -254,8 +244,8 @@
 				{charWidth}
 				{subCharWidth}
 				{subFontSize}
-				stack={posStack}
 				{fontSize}
+				stack={posStack}
 				stackId="pos"
 				label="position stack"
 				color="green"

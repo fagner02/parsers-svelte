@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/utils';
+	import ExpandIcon from '@icons/ExpandIcon.svelte';
 
 	/**@type {number}*/
 	let height;
@@ -40,20 +41,25 @@
 	}
 </script>
 
-<div class="input {$$props.class ?? ''}" use:setInput>
-	<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
-		{#each { length: lines } as _, textInputIndex}
-			<div class="grid">
-				<p style="font-size:{12}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
-			</div>
-		{/each}
+<div class="grid input-box">
+	<div class="input unit {$$props.class ?? ''}" use:setInput>
+		<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
+			{#each { length: lines } as _, textInputIndex}
+				<div class="grid">
+					<p style="font-size:{12}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
+				</div>
+			{/each}
+		</div>
+		<div
+			use:setText
+			contenteditable="true"
+			class="text"
+			style="font-size: {fontSize}px;line-height: {lineHeight}px;"
+		></div>
 	</div>
-	<div
-		use:setText
-		contenteditable="true"
-		class="text"
-		style="font-size: {fontSize}px;line-height: {lineHeight}px;"
-	></div>
+	{#if !navigator.userAgent.toLowerCase().includes('firefox')}
+		<ExpandIcon class="unit expand-icon"></ExpandIcon>
+	{/if}
 </div>
 
 <style>
@@ -65,8 +71,17 @@
 		border: none;
 	}
 
+	:global(.expand-icon) {
+		place-self: end;
+		pointer-events: none;
+	}
+
 	.input:focus-within {
 		outline: hsl(200, 80%, 60%) solid 2px;
+	}
+
+	.input-box {
+		margin: 20px;
 	}
 
 	.input {
@@ -76,10 +91,8 @@
 		outline: hsl(0, 0%, 50%) solid 2px;
 		resize: vertical;
 		overflow: auto;
-		transition: padding 0.3s;
 		height: 100px;
 		display: flex;
-		margin: 20px;
 	}
 
 	.textnumbers {
@@ -98,6 +111,15 @@
 		place-content: end end;
 		position: relative;
 		top: -1px;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: hsl(215, 15%, 95%);
+		border-radius: 10px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: hsl(215, 15%, 80%);
 	}
 
 	@supports (width: -moz-available) {

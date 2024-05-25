@@ -1,101 +1,101 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { getJumpWait, wait } from '$lib/utils';
 	import anime from 'animejs';
+	import { onMount } from 'svelte';
 
 	/** @type {number} */
 	export let lineHeight;
 
+	let opacity = 0;
 	/** @type {string[]} */
-	let values;
+	let linePath;
 	/** @type {string[]} */
+	let arrowPath;
+	/** @type {Element | null} */
+	let line;
+	/** @type {Element | null} */
 	let arrow;
+
+	/**
+	 * @param {string} id
+	 * @param {boolean} src
+	 */
+	function calcPos(id, src) {
+		let elemRect = /**@type {DOMRect}*/ (document.querySelector(id)?.getBoundingClientRect());
+		let parentRect = /**@type {DOMRect}*/ (
+			document.querySelector('.cards-box')?.getBoundingClientRect()
+		);
+		if (src) {
+			return {
+				x: elemRect.x - parentRect.x + elemRect.height,
+				y: elemRect.y - parentRect.y + elemRect.height
+			};
+		}
+		return {
+			x: elemRect.x - parentRect.x + elemRect.width / 2 - 12,
+			y: elemRect.y - parentRect.y + lineHeight + elemRect.height - 5
+		};
+	}
 
 	/**
 	 * @param {string} srcId
 	 * @param {string} destId
 	 */
 	export async function showLine(srcId, destId) {
-		/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '1';
+		opacity = 1;
 
-		let elemRect = /**@type {DOMRect}*/ (document.querySelector(destId)?.getBoundingClientRect());
-		let parentRect = /**@type {DOMRect}*/ (
-			document.querySelector('.cards-box')?.getBoundingClientRect()
-		);
-		const targetPos = {
-			x: elemRect.x - parentRect.x + elemRect.width / 2 - 12,
-			y: elemRect.y - parentRect.y + lineHeight + elemRect.height - 5
-		};
+		const targetPos = calcPos(destId, false);
+		const srcPos = calcPos(srcId, true);
 
-		elemRect = /**@type {DOMRect}*/ (document.querySelector(srcId)?.getBoundingClientRect());
-		parentRect = /**@type {DOMRect}*/ (
-			document.querySelector('.cards-box')?.getBoundingClientRect()
-		);
-		const srcPos = {
-			x: elemRect.x - parentRect.x + elemRect.height,
-			y: elemRect.y - parentRect.y + elemRect.height
-		};
-
-		values = [
+		linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
 			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
 		];
-		arrow = [
+		arrowPath = [
 			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
 			`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
 		];
 
-		let easing = 'spring(1, 50, 10, 1)';
-		anime({
-			targets: document.querySelector('#line'),
-			d: values,
+		let animeParams = {
+			targets: line,
+			d: linePath,
 			duration: 2000,
 			direction: 'forward',
 			delay: 0,
 			autoplay: true,
-			easing: easing
-		});
-
-		anime({
-			targets: document.querySelector('#arrow'),
-			d: arrow,
-			delay: 0,
-			duration: 2000,
-			direction: 'forward',
-			autoplay: true,
-			easing: easing
-		});
+			easing: 'spring(1, 50, 10, 1)'
+		};
+		anime(animeParams);
+		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
 		await wait(500);
 	}
 
 	export async function hideLine() {
 		await wait(2000);
-		anime({
-			targets: document.querySelector('#line'),
-			d: values,
+		let animeParams = {
+			targets: line,
+			d: linePath,
 			duration: 1000,
 			direction: 'reverse',
 			autoplay: true,
 			easing: 'easeInQuad'
-		});
-		anime({
-			targets: document.querySelector('#arrow'),
-			d: arrow,
-			duration: 1000,
-			direction: 'reverse',
-			autoplay: true,
-			easing: 'easeInQuad'
-		});
-		await wait(1000);
-	}
+		};
+		anime(animeParams);
+		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-	export async function setShowOpacity() {
-		/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '1';
+		await wait(800);
+		opacity = 0;
 	}
 
 	export async function setHideOpacity() {
-		/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '0';
+		opacity = 0;
 	}
+
+	onMount(() => {
+		line = document.querySelector('#line');
+		arrow = document.querySelector('#arrow');
+	});
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" class="unit" overflow="visible">
@@ -116,7 +116,7 @@
 			fill="none"
 		/>
 	</defs>
-	<g opacity="0" id="lines" style="transition: all 0.2s;">
+	<g id="lines" style="transition: all 0.2s;opacity:{opacity}">
 		<use xlink:href="#line" stroke-width="12" stroke="white" />
 		<use xlink:href="#line" stroke="black" stroke-width="4" />
 		<use xlink:href="#arrow" stroke-width="12" stroke="white" />

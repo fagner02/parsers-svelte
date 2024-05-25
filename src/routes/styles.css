@@ -84,6 +84,39 @@ p {
 	margin: 0;
 }
 
+::-webkit-scrollbar {
+	width: 15px;
+	height: 15px;
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner {
+	border-radius: 10px;
+	background: transparent;
+	border: none;
+	outline: none;
+}
+
+::-webkit-scrollbar-thumb {
+	background: hsl(215, 15%, 25%);
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: hsl(215, 15%, 30%);
+}
+
+::-webkit-resizer {
+	border: none;
+}
+
+::-moz-resizer {
+	background: hsl(215, 15%, 25%);
+}
 @keyframes rotA {
 	from {
 		scale: 0.5;

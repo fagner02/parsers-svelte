@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/utils';
-	import Code from '../Code.svelte';
-	import FillHeight from '../FillHeight.svelte';
+	import Code from '@/Code.svelte';
+	import FillHeight from '@/FillHeight.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
 	import CodeIcon from '@icons/CodeIcon.svelte';
 	import DocIcon from '@icons/DocIcon.svelte';
@@ -9,11 +9,12 @@
 	import PlaySkipBackIcon from '@icons/PlaySkipBackIcon.svelte';
 	import PlaySkipForwardIcon from '@icons/PlaySkipForwardIcon.svelte';
 	import RestartIcon from '@icons/RestartIcon.svelte';
-	import StepsView from '../StepsView.svelte';
-	import ResultText from '../ResultText.svelte';
-	import Info from '../Info.svelte';
+	import StepsView from '@/StepsView.svelte';
+	import ResultText from '@/ResultText.svelte';
+	import Info from '@/Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	import InfoIcon from '@icons/InfoIcon.svelte';
+	import SyntaxTree from '@/SyntaxTree.svelte';
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
 	let animation = animIn;
@@ -29,12 +30,13 @@
 	let animating;
 	/** @type {() => void} */
 	export let limitHit;
-	/** @type {() => Promise<void>} */
+	/** @type {() => any} */
 	export let addPause;
 	/** @type {() => void}*/
 	export let resetCall;
 	// ============== flow control ==================================
 
+	let parseOn = false;
 	/** @type {string} */
 	export let code;
 
@@ -52,17 +54,14 @@
 	let pos = 50;
 	let contentPos = -50;
 	let contentOpacity = 0;
-	let instructionText = '';
+	export let instruction = '';
 
-	/**
-	 * @param {string} instruction
-	 */
-	export async function openInstruction(instruction) {
-		instructionText = instruction;
+	export async function openInstruction() {
 		scale = 1;
 		opacity = 1;
 		pos = 0;
-		await wait(500);
+		console.log('open');
+		await wait(400);
 
 		contentOpacity = 1;
 		contentPos = 0;
@@ -71,12 +70,14 @@
 
 	export async function closeInstruction() {
 		contentOpacity = 0;
-		contentPos = -50;
-		await wait(500);
+		contentPos = 50;
+
+		await wait(200);
 
 		scale = 0.5;
 		opacity = 0;
 		pos = 50;
+		console.log('close');
 		await wait(500);
 	}
 
@@ -87,53 +88,65 @@
 <FillHeight class="contents">
 	<div class="controls-box">
 		<div class="controls">
-			<button on:click={() => updateSelected('code')} disabled={selected == 'code'}
-				><CodeIcon></CodeIcon></button
-			>
-			<button on:click={() => updateSelected('text')} disabled={selected == 'text'}
-				><ClipboardTextIcon></ClipboardTextIcon></button
-			>
-			<button on:click={() => updateSelected('info')} disabled={selected == 'info'}
-				><DocIcon></DocIcon></button
-			>
-			<button><InputStringIcon></InputStringIcon></button>
+			<button on:click={() => updateSelected('code')} disabled={selected == 'code'}>
+				<CodeIcon></CodeIcon>
+			</button>
+			<button on:click={() => updateSelected('text')} disabled={selected == 'text'}>
+				<ClipboardTextIcon></ClipboardTextIcon>
+			</button>
+			<button on:click={() => updateSelected('info')} disabled={selected == 'info'}>
+				<DocIcon></DocIcon>
+			</button>
+			<button on:click={() => (parseOn = true)} disabled={parseOn}>
+				<InputStringIcon></InputStringIcon>
+			</button>
 			<button
+				disabled={!parseOn}
 				on:click={async () => {
 					animation = animOut;
+					parseOn = false;
 					await wait(500);
 					selected = 'anim';
 				}}><PlayIcon></PlayIcon></button
 			>
 		</div>
-		<div class="flow-controls controls">
-			<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-				<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-			</button>
-			<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-				<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
-			</button>
-			<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-				<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-			</button>
-		</div>
+		{#if !parseOn}
+			<div class="flow-controls controls">
+				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
+					<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				</button>
+				<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+					<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
+				</button>
+				<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+					<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				</button>
+			</div>
+		{/if}
 	</div>
 	<FillHeight id="wrapper" class="grid maxWidth">
-		<div class="unit">
-			<StepsView
-				{resetCall}
-				bind:back
-				bind:forward
-				bind:reset
-				bind:addPause
-				bind:limitHit
-				bind:animating
-			>
-				<slot></slot>
-			</StepsView>
+		<div class="unit" style="height: inherit">
+			{#if parseOn}
+				<SyntaxTree></SyntaxTree>
+			{:else}
+				<StepsView
+					bind:back
+					bind:forward
+					bind:reset
+					bind:addPause
+					bind:limitHit
+					bind:animating
+					{resetCall}
+					{closeInstruction}
+					{openInstruction}
+				>
+					<slot></slot>
+				</StepsView>
+			{/if}
 		</div>
-		<FillHeight
+		<div
 			class="popup unit"
-			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'}"
+			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
 		>
 			{#if selected === 'code'}
 				<Code {code}></Code>
@@ -142,8 +155,8 @@
 			{:else if selected === 'info'}
 				<Info></Info>
 			{/if}
-		</FillHeight>
-		<FillHeight class="unit instruction-box">
+		</div>
+		<div class="unit instruction-box">
 			<div class="instruction" style="opacity: {opacity};translate: 0 {pos}px;scale: {scale}">
 				<div
 					class="instruction-content"
@@ -155,10 +168,10 @@
 						size={18}
 						style="top: 4px;position: relative;"
 					></InfoIcon>
-					<span style="height: 18px;">{instructionText}</span>
+					<span style="height: 18px;">{instruction}</span>
 				</div>
 			</div>
-		</FillHeight>
+		</div>
 	</FillHeight>
 </FillHeight>
 
@@ -183,6 +196,8 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
+		pointer-events: none;
+		height: inherit;
 	}
 
 	.instruction {
@@ -194,7 +209,8 @@
 		overflow: hidden;
 		transition: all 0.5s;
 		font-size: 12px;
-		/* border: 1px solid hsl(200, 60%, 60%); */
+		border: 1px solid hsl(200, 60%, 60%);
+		pointer-events: visible;
 	}
 
 	.instruction-content {
