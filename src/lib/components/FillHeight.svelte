@@ -1,22 +1,23 @@
 <script>
 	const config = { attributes: true, childList: true, subtree: true };
 
-	/**
-	 * @type {HTMLDivElement}
-	 */
+	/** @type {HTMLDivElement} */
 	let component;
+	/** @type {Element} */
+	let parent;
 
 	const observer = new MutationObserver(setSize);
 	const resize = new ResizeObserver(setSize);
 
-	function setSize() {
-		const parent = /**@type {HTMLElement}*/ (component.parentElement);
+	async function setSize() {
+		parent = /**@type {HTMLElement}*/ (component.parentElement);
 		if (parent === null) return;
-		const height = /**@type {number}*/ (parent.clientHeight);
-		let deduct = 0;
+
 		const map = window.getComputedStyle(parent);
 		const compMap = window.getComputedStyle(component);
 
+		const height = /**@type {number}*/ (parent.clientHeight);
+		let deduct = 0;
 		if (
 			(map.display !== 'flex' || map.flexDirection.includes('column')) &&
 			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))
@@ -49,7 +50,7 @@
 	 * @param {HTMLDivElement} comp
 	 */
 	function setup(comp) {
-		observer.observe(/**@type {Node}*/ (comp.parentNode), config);
+		observer.observe(/**@type {HTMLElement}*/ (comp.parentElement), config);
 		resize.observe(/**@type {HTMLElement}*/ (comp.parentElement));
 
 		component = comp;

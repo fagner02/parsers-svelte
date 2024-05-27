@@ -1,8 +1,10 @@
 <script>
 	import Popup from './Popup.svelte';
+
+	export let onClose;
 </script>
 
-<Popup let:style let:contentClass id="result-text">
+<Popup let:style let:contentClass id="result-text" {onClose}>
 	<div class="result-text-content {contentClass}" {style}>Text</div>
 </Popup>
 

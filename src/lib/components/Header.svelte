@@ -21,14 +21,15 @@
 		display: flex;
 		justify-content: start;
 		padding: 0px 20px;
-		background: hsl(200, 50%, 50%);
+		background: hsl(200, 0%, 100%);
 		flex-direction: column;
 	}
 
 	nav > h1 {
-		color: white;
+		color: hsl(200, 50%, 50%);
 		font-size: 14pt;
 		line-height: 18pt;
+		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 		margin: 8px 0px;
 		font-weight: normal;
 		text-transform: uppercase;

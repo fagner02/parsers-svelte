@@ -60,7 +60,6 @@
 		scale = 1;
 		opacity = 1;
 		pos = 0;
-		console.log('open');
 		await wait(400);
 
 		contentOpacity = 1;
@@ -77,7 +76,6 @@
 		scale = 0.5;
 		opacity = 0;
 		pos = 50;
-		console.log('close');
 		await wait(500);
 	}
 
@@ -149,11 +147,33 @@
 			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
 		>
 			{#if selected === 'code'}
-				<Code {code}></Code>
+				<Code
+					{code}
+					onClose={async () => {
+						animation = animOut;
+						parseOn = false;
+						await wait(500);
+						selected = 'anim';
+					}}
+				></Code>
 			{:else if selected === 'text'}
-				<ResultText></ResultText>
+				<ResultText
+					onClose={async () => {
+						animation = animOut;
+						parseOn = false;
+						await wait(500);
+						selected = 'anim';
+					}}
+				></ResultText>
 			{:else if selected === 'info'}
-				<Info></Info>
+				<Info
+					onClose={async () => {
+						animation = animOut;
+						parseOn = false;
+						await wait(500);
+						selected = 'anim';
+					}}
+				></Info>
 			{/if}
 		</div>
 		<div class="unit instruction-box">

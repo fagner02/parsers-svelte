@@ -17,6 +17,14 @@
 			{
 				nodes: [
 					{
+						nodes: [{ nodes: [{ nodes: [], data: 'second' }], data: 'second' }],
+						data: 'second'
+					},
+					{
+						nodes: [{ nodes: [{ nodes: [], data: 'second' }], data: 'second' }],
+						data: 'second'
+					},
+					{
 						nodes: [
 							{
 								nodes: [
@@ -49,30 +57,29 @@
 		parent = /**@type {SVGSVGElement}*/ (document.querySelector('.svg-box')).parentElement;
 		boxWidth = /**@type {number}*/ (parent?.clientWidth);
 		boxHeight = /**@type {number}*/ (parent?.clientHeight);
-		width = boxWidth;
-		let vGap = 100;
+		width = boxWidth * 0.3;
+		let vGap = 50;
 		/**@typedef {{
 			node: node;
-			length: number;
-			index: number;
-			order: number;
-			height: number;
 			pos: {
 				x: number;
 				y: number;
 			}
 		}} nodeItem*/
 		/**@type {Array<nodeItem>}*/
-		let items = [
-			{ node: root, length: 1, index: 0, order: 1, height: 0, pos: { x: width / 2, y: 0 } }
-		];
-		while (items.length > 0) {
+		let items = [{ node: root, pos: { x: width / 2, y: 0 } }];
+		/**@type {Array<nodeItem>}*/
+		let level = [{ node: root, pos: { x: width / 2, y: 0 } }];
+		while (level.length > 0) {
 			/**
 			 * @type {nodeItem[]}
 			 */
 			let newItems = [];
-			while (items.length > 0) {
-				let current = /**@type {nodeItem}*/ (items.shift());
+			/**@type {Array<nodeItem>}*/
+			let nextLevel = [];
+
+			for (let i = 0; i < level.length; i++) {
+				let current = level[i];
 
 				let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 				let item = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -84,58 +91,73 @@
 				item.textContent = current.node.data;
 				let bbox = item.getBBox();
 				let pos = {
-					x: current.order * (width / (current.length + 1)),
-					y: vGap + current.height
+					x: (i + 1) * (width / (level.length + 1)),
+					y: vGap + current.pos.y
 				};
 				item.setAttribute('dominant-baseline', 'middle');
 				item.setAttribute('text-anchor', 'middle');
 				item.setAttribute('x', `${pos.x}`);
 				item.setAttribute('y', `${pos.y}`);
+				item.style.opacity = '0';
+				item.style.translate = '0 -10px';
+				await wait(10);
+				item.style.transition = 'all 0.5s';
+
 				let boxPos = {
 					x: pos.x - bbox.width / 2,
 					y: pos.y - bbox.height / 2 - 2
 				};
-				box.style.filter = 'drop-shadow(0 0 3px hsl(0,0%,0%,20%))';
+				// box.style.filter = 'drop-shadow(0 0 3px hsl(0,0%,0%,20%))';
 				box.setAttribute('width', `${bbox.width + 8}`);
 				box.setAttribute('height', `${bbox.height + 4}`);
 				box.setAttribute('fill', 'white');
-				// box.setAttribute('stroke', 'black');
+				box.setAttribute('stroke', 'hsl(0,0%,80%)');
 				box.setAttribute('rx', '10');
 				box.setAttribute('x', `${boxPos.x - 4}`);
 				box.setAttribute('y', `${boxPos.y - 2}`);
 
-				boxPos.x += bbox.width / 2;
-				boxPos.y += bbox.height / 2;
-				path.style.transition = 'all 0.6s';
-				path.setAttribute(
-					'd',
-					`M ${current.pos.x} ${current.pos.y} C ${current.pos.x} ${current.pos.y}, ${current.pos.x} ${current.pos.y},${current.pos.x} ${current.pos.y}`
-				);
+				box.style.translate = '0 -10px';
+				box.style.opacity = '0';
+				await wait(10);
+				box.style.transition = 'all 0.5s';
+				box.style.translate = '0 0px';
+				box.style.opacity = '1';
+
+				// await wait(500);
+				item.style.translate = '0 0px';
+				item.style.opacity = '1';
 				height = svg.getBBox().height + 100;
-				await wait(1000);
+
+				pos.y -= bbox.height / 2 + 4;
 				path.setAttribute(
 					'd',
-					`M ${current.pos.x} ${current.pos.y} C ${current.pos.x} ${current.pos.y + (vGap - 20)}, ${pos.x} ${pos.y - (vGap - 20)}, ${pos.x} ${pos.y}`
+					`M ${current.pos.x} ${current.pos.y} C ${current.pos.x} ${current.pos.y + vGap / 2}, ${pos.x} ${pos.y - vGap / 2}, ${pos.x} ${pos.y}`
 				);
 				path.setAttribute('stroke', 'black');
 				path.setAttribute('stroke-width', '2');
 				path.setAttribute('fill', 'none');
+				path.setAttribute('stroke-dasharray', '100');
+				path.setAttribute('stroke-dashoffset', '100');
+				path.setAttribute('pathLength', '100');
+				await wait(10);
+				path.style.transition = 'all 0.6s';
 				height = svg.getBBox().height + 100;
+				await wait(10);
+				path.setAttribute('stroke-dashoffset', '0');
 				await wait(1000);
 
+				pos.y += bbox.height + 4;
 				for (let i = 0; i < current.node.nodes.length; i++) {
-					newItems.push({
+					nextLevel.push({
 						node: current.node.nodes[i],
-						length: current.node.nodes.length,
-						index: i,
-						order: i + 1,
-						height: pos.y + bbox.height / 2,
 						pos: pos
 					});
 				}
 			}
 			items = newItems;
+			level = nextLevel;
 		}
+
 		height = svg.getBBox().height + 100;
 	}
 </script>
@@ -151,9 +173,16 @@
 		overflow: visible;
 	}
 
+	:global(svg *) {
+		transform-box: fill-box;
+	}
+
 	.svg-box {
 		overflow: auto;
 		z-index: 30;
 		height: inherit;
+		border: 1px solid hsl(0, 0%, 80%);
+		border-radius: 10px;
+		/* box-shadow: 0 0 5px hsl(0, 0%, 0%, 20%); */
 	}
 </style>

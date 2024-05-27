@@ -2,26 +2,27 @@
 	import { wait } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import FillHeight from './FillHeight.svelte';
+	import CloseButton from './CloseButton.svelte';
 
 	export let flex = 0.1;
-	/**
-	 * @type {number | undefined }
-	 */
 	export let opacity = 0;
 	export let pos = -50;
+	export let onClose;
 
 	onMount(async () => {
-		await wait(500);
+		await wait(200);
 		flex = 1;
-
-		await wait(50);
 		opacity = 1;
 		pos = 0;
 	});
 </script>
 
-<FillHeight style="display: flex;justify-content: center" class="maxWidth">
-	<div id={$$props.id} class="popup-box maxWidth" style="flex: {flex};">
+<FillHeight
+	style="display: flex;flex-direction: column;justify-content: center;padding-top: 20px"
+	class="maxWidth"
+>
+	<CloseButton {onClose}></CloseButton>
+	<div id={$$props.id} class="popup-box maxWidth" style="scale: {flex} 1;height: inherit">
 		<slot
 			maxWidth={flex}
 			{opacity}

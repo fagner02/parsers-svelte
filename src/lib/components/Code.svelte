@@ -3,9 +3,10 @@
 	import 'highlight.js/styles/atom-one-dark.min.css';
 	import Popup from './Popup.svelte';
 	export let code;
+	export let onClose;
 </script>
 
-<Popup let:style let:contentClass id="code">
+<Popup let:style let:contentClass id="code" {onClose}>
 	<pre id="pre-code" class={contentClass} {style}><code
 			>{@html hljs.highlight(code, {
 				language: 'javascript'
