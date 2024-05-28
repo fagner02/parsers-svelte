@@ -23,7 +23,7 @@
 	let transition = sizeForward;
 	let opacityTransition = opacityForward;
 
-	export async function loadGrammar() {
+	export const loadGrammar = async function () {
 		transition = transitionBack;
 		opacityTransition = transitionBack;
 		await wait(50);
@@ -64,7 +64,7 @@
 		maxHeight = lineHeight * aux.length;
 		await wait(200);
 		opacity = 1;
-	}
+	};
 </script>
 
 <CardBox

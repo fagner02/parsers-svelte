@@ -57,26 +57,30 @@
 	export let instruction = '';
 
 	export async function openInstruction() {
-		scale = 1;
-		opacity = 1;
-		pos = 0;
-		await wait(400);
+		try {
+			scale = 1;
+			opacity = 1;
+			pos = 0;
+			await wait(400);
 
-		contentOpacity = 1;
-		contentPos = 0;
-		await wait(500);
+			contentOpacity = 1;
+			contentPos = 0;
+			await wait(500);
+		} catch {}
 	}
 
 	export async function closeInstruction() {
-		contentOpacity = 0;
-		contentPos = 50;
+		try {
+			contentOpacity = 0;
+			contentPos = 50;
 
-		await wait(200);
+			await wait(200);
 
-		scale = 0.5;
-		opacity = 0;
-		pos = 50;
-		await wait(500);
+			scale = 0.5;
+			opacity = 0;
+			pos = 50;
+			await wait(500);
+		} catch {}
 	}
 
 	let selected = 'anim';

@@ -6,7 +6,6 @@
 	import SetsCard from './Cards/SetsCard.svelte';
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
-	import anime from 'animejs';
 	import SvgLines from './SvgLines.svelte';
 
 	// ========== Components ====================
