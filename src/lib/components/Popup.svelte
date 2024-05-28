@@ -12,6 +12,7 @@
 	onMount(async () => {
 		await wait(200);
 		flex = 1;
+		await wait(200);
 		opacity = 1;
 		pos = 0;
 	});
