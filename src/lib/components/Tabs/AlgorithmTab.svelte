@@ -16,6 +16,7 @@
 	import InfoIcon from '@icons/InfoIcon.svelte';
 	import SyntaxTree from '@/SyntaxTree.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
+	import ParseView from '@/ParseView.svelte';
 
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
@@ -62,7 +63,7 @@
 
 	async function closePopup() {
 		animation = animOut;
-		// parseOn = false;
+
 		await wait(500);
 		selected = 'noPopup';
 	}
@@ -110,10 +111,22 @@
 			<button on:click={() => updateSelected('info')} disabled={selected == 'info'}>
 				<DocIcon></DocIcon>
 			</button>
-			<button on:click={() => (parseOn = true)} disabled={parseOn}>
+			<button
+				on:click={() => {
+					parseOn = true;
+					closePopup();
+				}}
+				disabled={parseOn}
+			>
 				<InputStringIcon></InputStringIcon>
 			</button>
-			<button disabled={!parseOn} on:click={closePopup}>
+			<button
+				on:click={() => {
+					parseOn = false;
+					closePopup();
+				}}
+				disabled={!parseOn}
+			>
 				<PlayIcon></PlayIcon>
 			</button>
 		</div>
@@ -134,15 +147,9 @@
 	<FillHeight id="wrapper" class="grid maxWidth">
 		<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
 			{#if parseOn}
-				<div class="parse-tab">
-					<SyntaxTree style="flex: 1.5"></SyntaxTree>
-					<FillHeight style="flex: 1.5" class="parse">
-						<input type="text" bind:value={inputString} placeholder="Digite a entrada aqui" />
-						<FillHeight class="parse-view">
-							<slot name="parse"></slot>
-						</FillHeight>
-					</FillHeight>
-				</div>
+				<ParseView bind:inputString>
+					<slot name="parse"></slot>
+				</ParseView>
 			{:else}
 				<StepsView
 					bind:back
@@ -191,11 +198,6 @@
 </FillHeight>
 
 <style>
-	.parse-tab {
-		height: inherit;
-		display: flex;
-	}
-
 	:global(.popup) {
 		z-index: 2;
 	}
@@ -267,26 +269,5 @@
 	button:disabled {
 		scale: 1;
 		filter: brightness(80%);
-	}
-
-	:global(.parse) {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
-
-	:global(.parse) > input {
-		border-radius: 5px;
-	}
-
-	:global(.parse-view) {
-		border: 1px solid hsl(0, 0%, 80%);
-		border-radius: 10px;
-		padding: 10px;
-		overflow: auto;
-	}
-
-	.parse-tab {
-		gap: 10px;
 	}
 </style>
