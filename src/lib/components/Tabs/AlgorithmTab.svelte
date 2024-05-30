@@ -60,6 +60,13 @@
 	let contentOpacity = 0;
 	export let instruction = '';
 
+	async function closePopup() {
+		animation = animOut;
+		// parseOn = false;
+		await wait(500);
+		selected = 'noPopup';
+	}
+
 	export async function openInstruction() {
 		try {
 			scale = 1;
@@ -87,8 +94,8 @@
 		} catch {}
 	}
 
-	let selected = 'anim';
-	$: isAnim = selected === 'anim';
+	let selected = 'noPopup';
+	$: isAnim = selected === 'noPopup';
 </script>
 
 <FillHeight class="contents">
@@ -106,15 +113,7 @@
 			<button on:click={() => (parseOn = true)} disabled={parseOn}>
 				<InputStringIcon></InputStringIcon>
 			</button>
-			<button
-				disabled={!parseOn}
-				on:click={async () => {
-					animation = animOut;
-					parseOn = false;
-					await wait(500);
-					selected = 'anim';
-				}}
-			>
+			<button disabled={!parseOn} on:click={closePopup}>
 				<PlayIcon></PlayIcon>
 			</button>
 		</div>
@@ -165,33 +164,11 @@
 			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
 		>
 			{#if selected === 'code'}
-				<Code
-					{code}
-					onClose={async () => {
-						animation = animOut;
-						parseOn = false;
-						await wait(500);
-						selected = 'anim';
-					}}
-				></Code>
+				<Code {code} onClose={closePopup}></Code>
 			{:else if selected === 'text'}
-				<ResultText
-					onClose={async () => {
-						animation = animOut;
-						parseOn = false;
-						await wait(500);
-						selected = 'anim';
-					}}
-				></ResultText>
+				<ResultText onClose={closePopup}></ResultText>
 			{:else if selected === 'info'}
-				<Info
-					onClose={async () => {
-						animation = animOut;
-						parseOn = false;
-						await wait(500);
-						selected = 'anim';
-					}}
-				></Info>
+				<Info onClose={closePopup}></Info>
 			{/if}
 		</div>
 		<div class="unit instruction-box">

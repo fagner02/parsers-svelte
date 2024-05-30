@@ -9,6 +9,7 @@
 	let width = 0;
 	let height = 0;
 	let boxWidth = 0;
+	let updating = false;
 	const vGap = 30;
 	const vGapPoint = vGap / 1.9;
 
@@ -66,7 +67,6 @@
 			item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 		}
 		levels = levels;
-		await wait(100);
 	}
 
 	/**
@@ -125,14 +125,17 @@
 		await wait(500);
 	}
 
-	function updateSize() {
-		console.log('qwefg');
+	async function updateSize() {
 		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
 		width = boxWidth;
+
+		updating = true;
 
 		for (let i = 0; i < levels.length; i++) {
 			updateLevel(i);
 		}
+		await wait(10);
+		updating = false;
 	}
 
 	/**
@@ -207,7 +210,9 @@
 						stroke-dasharray="100"
 						stroke-dashoffset={item.dashOffset}
 						pathLength="100"
-						style="filter: drop-shadow(0 0 2px hsl(0,0%,0%,40%));"
+						style="filter: drop-shadow(0 0 2px hsl(0,0%,0%,40%));{updating
+							? 'transition: none'
+							: ''}"
 					></path>{/each}
 			{/each}
 			{#each levels as level}
@@ -220,7 +225,7 @@
 						rx="8"
 						style="translate: {item.x - item.width / 2 - 6}px {item.y -
 							item.height / 2 -
-							4}px; opacity: {item.opacity}"
+							4}px; opacity: {item.opacity};{updating ? 'transition: none' : ''}"
 					></rect>
 					<text
 						id="parse-text-{item.level}-{item.index}"
@@ -228,7 +233,9 @@
 						fill="hsl(0,0%,100%)"
 						dominant-baseline="middle"
 						text-anchor="middle"
-						style="opacity: {item.opacity};translate: {item.x}px {item.y}px"
+						style="opacity: {item.opacity};translate: {item.x}px {item.y}px;{updating
+							? 'transition: none'
+							: ''}"
 					>
 						{item.data}
 					</text>
@@ -243,7 +250,9 @@
 		overflow: visible;
 	}
 
-	svg * {
+	svg rect,
+	svg path,
+	svg text {
 		transform-box: fill-box;
 		transition: all 0.5s;
 	}
