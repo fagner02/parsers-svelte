@@ -14,6 +14,4 @@
 		border: 1px solid hsl(200, 60%, 50%);
 		box-shadow: 0px 0px 10px 0px hsl(0, 0%, 0%, 20%);
 	}
-	.result-text-content {
-	}
 </style>

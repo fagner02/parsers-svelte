@@ -3,33 +3,6 @@
 	import CloseIcon from '@icons/CloseIcon.svelte';
 	import { onMount } from 'svelte';
 
-	// let a = `M0.014,0.004 C0.035,0.001,0.088,-0.004,0.124,0.005 C0.248,0.033,0.316,0.252,0.441,0.269 C0.465,0.272,0.479,0.271,0.504,0.269 C0.65,0.254,0.73,0.03,0.876,0.005 C0.912,-0.002,0.965,0.002,0.986,0.004 C0.991,0.004,0.996,0.049,0.997,0.12 C0.999,0.205,1,0.333,1,0.5 C1,0.667,0.999,0.795,0.997,0.88 C0.996,0.951,0.991,0.996,0.986,0.996 C0.965,0.998,0.912,1,0.876,0.995 C0.73,0.97,0.65,0.746,0.504,0.731 C0.479,0.729,0.465,0.728,0.441,0.731 C0.316,0.748,0.248,0.967,0.124,0.995 C0.088,1,0.035,0.999,0.014,0.996 C0.009,0.996,0.004,0.951,0.003,0.88 C0.001,0.796,0,0.667,0,0.5 C0,0.333,0.001,0.204,0.003,0.12 C0.004,0.049,0.009,0.004,0.014,0.004`;
-	// let values = new Map([
-	// 	['M', 1],
-	// 	['C', 3],
-	// 	['V', 0],
-	// 	['Z', 0]
-	// ]);
-	// let res = '';
-	// while (a.length > 0) {
-	// 	res += a[0];
-	// 	let count = /**@type {number}*/ (values.get(a[0]));
-	// 	if (count === undefined) {
-	// 		throw 'lost';
-	// 	}
-	// 	a = a.substring(1);
-	// 	let search = /[A-Z]/.exec(a);
-	// 	let sub = search?.index === 0 ? [] : a.substring(0, search?.index).split(',');
-	// 	for (let i = 0; i < sub.length; i++) {
-	// 		res += ' ';
-	// 		if (sub[i] === '') continue;
-	// 		if (i % 2 == 0 && count > 0) res += '0';
-	// 		else res += '0';
-	// 		if (i < sub.length - 1) res += ',';
-	// 	}
-	// 	a = a.substring(search?.index ? /**@type {number}*/ (search?.index) : a.length);
-	// }
-	// console.log(res);
 	export let onClose;
 	let initialWidth = 500;
 	let initialHeight = 40;
@@ -87,11 +60,6 @@
 	}
 	button {
 		background: transparent;
-	}
-
-	.svg-box {
-		/* padding: 0;
-		place-content: start; */
 	}
 
 	:global(.xicon) {

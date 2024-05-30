@@ -7,6 +7,8 @@
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
 	import SvgLines from './SvgLines.svelte';
+	import TableCard from './Cards/TableCard.svelte';
+	import FillHeight from './FillHeight.svelte';
 
 	// ========== Components ====================
 	/**@type {Stack}*/
@@ -28,16 +30,15 @@
 	// ========== Components ====================
 
 	// ========= stores ================================================================================
-	/** @type {import('svelte/store').Writable<Array.<import('./typedefs').GrammarItem>>} */
+	/** @type {import('svelte/store').Writable<Array.<import('@/types').GrammarItem>>} */
 	let rules = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>} */
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let symbolStack = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('./typedefs').StackItem<number>>>} */
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let posStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('./typedefs').SetRow>>}*/
+	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	let first = writable([]);
-	let nt = ['S', 'A', 'Bb'];
-	let firstIndexes = new Map();
+
 	// ========= stores ================================================================================
 
 	// ========= Style ======================================
@@ -47,6 +48,11 @@
 	let charWidth = 0;
 	let subCharWidth = 0;
 	// ========= Style ======================================
+
+	let nt = ['S', 'A', 'Bb'];
+	let firstIndexes = new Map();
+	/**@type {string}*/
+	let inputString;
 
 	setContext('StepsView', { selectLSymbol, selectRSymbol });
 
@@ -200,20 +206,37 @@
 		} catch {}
 	}
 	let code = '';
+
 	onMount(async () => {
 		code = await (await fetch('first.js')).text();
 		charWidth = getTextWidth('P', fontSize);
 		subCharWidth = getTextWidth('P', subFontSize);
 
-		firstAlg();
+		// firstAlg();
 	});
 </script>
 
-<AlgorithmTab resetCall={reset} bind:addPause bind:limitHit bind:instruction {code}>
-	<div class="grid">
+<AlgorithmTab
+	resetCall={reset}
+	bind:addPause
+	bind:limitHit
+	bind:instruction
+	bind:inputString
+	{code}
+>
+	<div class="grid" slot="steps">
 		<SvgLines {lineHeight} bind:this={svgLines}></SvgLines>
 		<div class="cards-box unit">
-			<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
+			<TableCard
+				label="LL(1) tabela"
+				color="blue"
+				tableId="t"
+				{lineHeight}
+				{svgLines}
+				{charWidth}
+				{subCharWidth}
+			></TableCard>
+			<!-- <GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
 			></GrammarCard>
 			<SetsCard
 				set={first}
@@ -247,6 +270,45 @@
 				stack={posStack}
 				stackId="pos"
 				label="position stack"
+				color="green"
+				bind:this={posStackElement}
+				bind:svgLines
+			></Stack> -->
+		</div>
+	</div>
+	<div slot="parse">
+		<div class="cards-box unit">
+			<TableCard
+				label="LL(1) tabela"
+				color="blue"
+				tableId="t"
+				{lineHeight}
+				{svgLines}
+				{charWidth}
+				{subCharWidth}
+			></TableCard>
+			<Stack
+				{lineHeight}
+				{charWidth}
+				{subCharWidth}
+				{subFontSize}
+				{fontSize}
+				stack={posStack}
+				stackId="pilha"
+				label="pilha"
+				color="blue"
+				bind:this={posStackElement}
+				bind:svgLines
+			></Stack>
+			<Stack
+				{lineHeight}
+				{charWidth}
+				{subCharWidth}
+				{subFontSize}
+				{fontSize}
+				stack={posStack}
+				stackId="input"
+				label="entrada"
 				color="green"
 				bind:this={posStackElement}
 				bind:svgLines

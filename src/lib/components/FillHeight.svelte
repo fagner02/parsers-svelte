@@ -5,17 +5,20 @@
 	let component;
 	/** @type {Element} */
 	let parent;
+	let fillHeight = true;
+	let fillWidth = true;
 
 	const observer = new MutationObserver(setSize);
 	const resize = new ResizeObserver(setSize);
 
-	async function setSize() {
+	function setHeight() {
 		parent = /**@type {HTMLElement}*/ (component.parentElement);
 		if (parent === null) return;
 
 		const map = window.getComputedStyle(parent);
 		const compMap = window.getComputedStyle(component);
-
+		let gap = parseFloat(map.gap);
+		gap = isNaN(gap) ? 0 : gap;
 		const height = /**@type {number}*/ (parent.clientHeight);
 		let deduct = 0;
 		if (
@@ -28,12 +31,14 @@
 				}
 				const child = /**@type {HTMLElement}*/ (parent.children[i]);
 				const childMap = window.getComputedStyle(child);
+
 				deduct +=
 					child.clientHeight +
 					parseFloat(childMap.marginBottom) +
 					parseFloat(childMap.marginTop) +
 					parseFloat(childMap.paddingTop) +
-					parseFloat(childMap.paddingBottom);
+					parseFloat(childMap.paddingBottom) +
+					gap;
 			}
 		}
 		const compInsets =
@@ -41,9 +46,51 @@
 			parseFloat(compMap.paddingBottom) +
 			parseFloat(compMap.marginBottom) +
 			parseFloat(compMap.marginTop);
-
 		if (component.style.height === `${height - deduct - compInsets}px`) return;
 		component.style.height = `${height - deduct - compInsets}px`;
+	}
+	function setWidth() {
+		parent = /**@type {HTMLElement}*/ (component.parentElement);
+		if (parent === null) return;
+
+		const map = window.getComputedStyle(parent);
+		const compMap = window.getComputedStyle(component);
+
+		const width = /**@type {number}*/ (parent.clientWidth);
+		let deduct = 0;
+		if (
+			map.display === 'flex' &&
+			map.flexDirection.includes('row') &&
+			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))
+		) {
+			for (let i = 0; i < parent.childElementCount; i++) {
+				if (parent.children[i].isSameNode(component)) {
+					break;
+				}
+				const child = /**@type {HTMLElement}*/ (parent.children[i]);
+				const childMap = window.getComputedStyle(child);
+				deduct +=
+					child.clientWidth +
+					parseFloat(childMap.marginLeft) +
+					parseFloat(childMap.marginRight) +
+					parseFloat(childMap.paddingRight) +
+					parseFloat(childMap.paddingLeft);
+			}
+		}
+
+		const compInsets =
+			parseFloat(compMap.paddingRight) +
+			parseFloat(compMap.paddingLeft) +
+			parseFloat(compMap.marginLeft) +
+			parseFloat(compMap.marginRight);
+
+		if (component.style.maxWidth === `${width - deduct - compInsets}px`) return;
+		component.style.maxWidth = `${width - deduct - compInsets}px`;
+	}
+
+	function setSize() {
+		if (fillWidth) setWidth();
+		if (fillHeight) setHeight();
 	}
 
 	/**

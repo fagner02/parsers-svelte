@@ -6,7 +6,7 @@
 
 	const { selectLSymbol } = getContext('StepsView');
 
-	/** @type {import('svelte/store').Writable<Array<import('@/typedefs').SetRow>>}*/
+	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
 	/**@type {Map<string, number>}*/
 	export let firstIndexes;

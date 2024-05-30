@@ -38,12 +38,4 @@
 
 		box-shadow: inset 0px 0px 10px 0px hsl(0, 0%, 0%, 10%);
 	}
-	.shadow {
-		margin: 10px;
-		border-radius: 10px;
-		overflow: hidden;
-		box-shadow: inset 0px 0px 10px 0px hsl(0, 0%, 0%, 10%);
-		height: -webkit-fill-available;
-		pointer-events: none;
-	}
 </style>

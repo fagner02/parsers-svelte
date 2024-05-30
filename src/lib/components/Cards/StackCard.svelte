@@ -1,6 +1,5 @@
 <script>
 	import { wait } from '$lib/utils';
-	import anime from 'animejs';
 	import CardBox from './CardBox.svelte';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
@@ -11,7 +10,7 @@
 	/**@type {number}*/
 	export let subCharWidth;
 
-	/**@type {import("svelte/store").Writable<Array<import('@/typedefs').StackItem<any>>>}*/
+	/**@type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>}*/
 	export let stack;
 	export let fontSize;
 	export let subFontSize;
@@ -19,10 +18,6 @@
 	export let color;
 	/** @type {string} */
 	export let stackId;
-	// /**@type {(srcId:string,destId:string) => Promise<void>} */
-	// export let showLine;
-	// /**@type {() => Promise<void>}*/
-	// export let hideLine;
 	/**@type {import('@/SvgLines.svelte').default}*/
 	export let svgLines;
 

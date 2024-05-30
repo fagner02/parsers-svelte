@@ -3,7 +3,7 @@
 	import FirstAnimation from '../FirstAnimation.svelte';
 	import TextInput from '../TextInput.svelte';
 
-	/**@type {Array<import('../typedefs').TabItem>} */
+	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
 		{ comp: TextInput, name: 'Entrada' },
 		{ comp: FirstAnimation, name: 'First' }

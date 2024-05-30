@@ -2,7 +2,7 @@
 	import { wait } from '$lib/utils';
 	import CardBox from './CardBox.svelte';
 
-	/** @type {import("svelte/store").Writable<Array.<import('@/typedefs').GrammarItem>>} */
+	/** @type {import("svelte/store").Writable<Array.<import('@/types').GrammarItem>>} */
 	export let rules;
 	const grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
 	/**@type {number}*/
@@ -16,8 +16,7 @@
 	let opacity = 0;
 	let maxWidth = 0;
 	let maxHeight = 0;
-	let sizeForward = `max-width 0.5s,
-			max-height 0.5s`;
+	let sizeForward = `max-width 0.5s, max-height 0.5s`;
 	let opacityForward = `opacity 0.5s`;
 	let transitionBack = `none`;
 	let transition = sizeForward;

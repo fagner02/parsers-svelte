@@ -9,7 +9,8 @@ html,
 body,
 #app {
 	height: 100%;
-	width: 100%;
+	width: 100vw;
+	overflow: hidden;
 }
 
 html {
@@ -27,6 +28,7 @@ body {
 }
 
 #app-content {
+	flex: 1;
 	overflow: hidden;
 }
 
@@ -82,6 +84,18 @@ section {
 
 p {
 	margin: 0;
+}
+
+textarea,
+.input,
+input {
+	outline: hsl(0, 0%, 50%) solid 2px;
+	border: none;
+}
+
+.input:focus-within,
+input:focus-within {
+	outline: hsl(200, 80%, 60%) solid 2px;
 }
 
 ::-webkit-scrollbar {

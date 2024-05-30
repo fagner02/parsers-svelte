@@ -12,17 +12,18 @@
 
 <style>
 	header {
+		flex: 0;
 		display: flex;
 		justify-content: space-between;
 	}
 
 	nav {
-		width: 100%;
 		display: flex;
 		justify-content: start;
 		padding: 0px 20px;
 		background: hsl(200, 0%, 100%);
 		flex-direction: column;
+		min-width: 200px;
 	}
 
 	nav > h1 {
@@ -37,12 +38,6 @@
 
 	nav > * {
 		height: fit-content;
-	}
-
-	nav > a {
-		text-decoration: none;
-		color: white;
-		text-transform: uppercase;
 	}
 
 	@media (max-width: 700px) {

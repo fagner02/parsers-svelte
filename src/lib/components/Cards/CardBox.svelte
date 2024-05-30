@@ -6,8 +6,8 @@
 		class="card"
 		id={$$props.id}
 		style="min-height: {$$props.minHeight}px; min-width:{$$props.minWidth}px;max-width: {$$props.maxWidth}px; max-height: {$$props.maxHeight}px;{$$props.transition
-			? `transition: ${$$props.transition};`
-			: ''}"
+			? `transition: ${$$props.transition}`
+			: ''};{$$props.style}"
 	>
 		<slot></slot>
 	</div>
@@ -28,7 +28,7 @@
 		flex-direction: column;
 		align-items: start;
 		border: 1px solid hsl(200, 50%, 50%);
-		border-radius: 13px;
+		border-radius: 15px;
 		margin: 5px;
 		padding: 5px;
 	}

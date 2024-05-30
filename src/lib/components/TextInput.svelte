@@ -76,10 +76,6 @@
 		pointer-events: none;
 	}
 
-	.input:focus-within {
-		outline: hsl(200, 80%, 60%) solid 2px;
-	}
-
 	.input-box {
 		margin: 20px;
 	}
@@ -88,7 +84,6 @@
 		width: -webkit-fill-available;
 		width: -moz-available;
 		border-radius: 10px;
-		outline: hsl(0, 0%, 50%) solid 2px;
 		resize: vertical;
 		overflow: auto;
 		height: 100px;

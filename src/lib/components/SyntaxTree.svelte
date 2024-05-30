@@ -2,169 +2,239 @@
 	import { wait } from '$lib/utils';
 	import { onMount } from 'svelte';
 
+	/** @type {SVGGElement} */
 	let svg;
-	let parent;
+	/** @type {Element} */
+	let parentElement;
 	let width = 0;
 	let height = 0;
 	let boxWidth = 0;
-	let boxHeight = 0;
+	const vGap = 30;
+	const vGapPoint = vGap / 1.9;
 
-	/**@typedef {{nodes: Array<node>, data: string}} node*/
+	/**@type {import('@/types').node[][]}*/
+	let levels = [[]];
 
-	/**@type {node}*/
-	let root = {
-		nodes: [
-			{
-				nodes: [
-					{
-						nodes: [{ nodes: [{ nodes: [], data: 'second' }], data: 'second' }],
-						data: 'second'
-					},
-					{
-						nodes: [{ nodes: [{ nodes: [], data: 'second' }], data: 'second' }],
-						data: 'second'
-					},
-					{
-						nodes: [
-							{
-								nodes: [
-									{
-										nodes: [{ nodes: [{ nodes: [], data: 'second' }], data: 'second' }],
-										data: 'second'
-									}
-								],
-								data: 'second'
-							}
-						],
-						data: 'second'
-					}
-				],
-				data: 'second'
-			},
-			{ nodes: [], data: 'third' }
-		],
-		data: 'first'
-	};
+	/**
+	 * @param {string} data
+	 */
+	async function findNode(data) {
+		/**@type {import('@/types').nodeId[]}*/
+		let nodes = [{ level: 0, index: 0 }];
+
+		while (nodes.length > 0) {
+			const nodeId = /**@type {import('@/types').nodeId}*/ (nodes.pop());
+			const node = levels[nodeId.level][nodeId.index];
+			if (node.data === data && !node.done) {
+				return node;
+			}
+
+			if (levels.length <= nodeId.level + 1) continue;
+
+			for (let i = levels[nodeId.level + 1].length - 1; i > -1; i--) {
+				if (levels[nodeId.level + 1][i].parent === nodeId.index) {
+					nodes.push({ level: nodeId.level + 1, index: levels[nodeId.level + 1][i].index });
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param {number} level
+	 * @param {number | null} newItemIndex
+	 */
+	async function updateLevel(level, newItemIndex = null) {
+		for (let i = 0; i < levels[level].length; i++) {
+			let item = levels[level][i];
+
+			let parent =
+				level === 0 ? { x: width / 2, y: -vGap / 2, height: vGap } : levels[level - 1][item.parent];
+
+			const newIndex = newItemIndex === null ? i : i < newItemIndex ? i : i + 1;
+
+			item.x = (newIndex + 1) * (width / (levels[level].length + (newItemIndex ? 2 : 1)));
+			item.y = vGap + parent.y + parent.height / 2;
+			const pos = {
+				x: item.x,
+				y: item.y - item.height / 2 - 4
+			};
+			const parentPos = {
+				x: parent.x,
+				y: parent.y + parent.height / 2
+			};
+			item.index = newIndex;
+			item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+		}
+		levels = levels;
+		await wait(100);
+	}
+
+	/**
+	 * @param {{level: number, index: number, height: number, y: number, x: number}} parent
+	 * @param {string} data
+	 * @param {number} newItemIndex
+	 * @param {number} id
+	 */
+	async function addToSvg(parent, data, newItemIndex, id) {
+		await updateLevel(parent.level + 1, newItemIndex);
+
+		levels[parent.level + 1].splice(newItemIndex, 0, {
+			data: data,
+			done: false,
+			level: parent.level + 1,
+			index: newItemIndex,
+			parent: parent.index,
+			id: id,
+			opacity: 0,
+			x: (newItemIndex + 1) * (width / (levels[parent.level + 1].length + 2)),
+			y: vGap + parent.y + parent.height / 2,
+			width: 0,
+			height: 0,
+			d: '',
+			dashOffset: 100,
+			pos: -10
+		});
+		levels = levels;
+		await wait(100);
+
+		let newNode = levels[parent.level + 1][newItemIndex];
+		let bbox = /**@type {SVGTextElement}*/ (
+			document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
+		)?.getBBox();
+		if (!bbox) return;
+		newNode.opacity = 1;
+		newNode.width = bbox.width;
+		newNode.height = bbox.height;
+		newNode.pos = 0;
+
+		const pos = {
+			y: newNode.y - newNode.height / 2 - 4,
+			x: newNode.x
+		};
+
+		const parentPos = {
+			x: parent.x,
+			y: parent.y + parent.height / 2
+		};
+
+		newNode.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+
+		newNode.dashOffset = 0;
+		levels = levels;
+		height = svg.getBBox().height + 100;
+		await wait(500);
+	}
+
+	function updateSize() {
+		console.log('qwefg');
+		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
+		width = boxWidth;
+
+		for (let i = 0; i < levels.length; i++) {
+			updateLevel(i);
+		}
+	}
+
+	/**
+	 * @param {string[]} data
+	 * @param {string} parentData
+	 */
+	async function addToTree(data, parentData) {
+		const parent = /**@type {import('@/types').node}*/ (await findNode(parentData));
+		if (parent === undefined) return;
+
+		parent.done = true;
+		if (levels.length <= parent.level + 1) levels.push([]);
+		let levelIndex = levels[parent.level + 1].findIndex((x) => x.parent === parent.index + 1);
+
+		levelIndex = levelIndex === -1 ? levels[parent.level + 1].length : levelIndex;
+
+		for (let i = 0; i < data.length; i++) {
+			await addToSvg(parent, data[i], levelIndex + i, i);
+		}
+	}
 
 	onMount(async () => {
+		new ResizeObserver(updateSize).observe(
+			/**@type {Element}*/ (document.querySelector('.svg-box'))
+		);
 		await setSvg(/**@type {SVGGElement}*/ (document.querySelector('#parse-svg')));
 	});
+
 	/**
 	 * @param {SVGGElement} comp
 	 */
 	async function setSvg(comp) {
 		svg = comp;
-		parent = /**@type {SVGSVGElement}*/ (document.querySelector('.svg-box')).parentElement;
-		boxWidth = /**@type {number}*/ (parent?.clientWidth);
-		boxHeight = /**@type {number}*/ (parent?.clientHeight);
-		width = boxWidth * 0.3;
-		let vGap = 50;
-		/**@typedef {{
-			node: node;
-			pos: {
-				x: number;
-				y: number;
-			}
-		}} nodeItem*/
-		/**@type {Array<nodeItem>}*/
-		let items = [{ node: root, pos: { x: width / 2, y: 0 } }];
-		/**@type {Array<nodeItem>}*/
-		let level = [{ node: root, pos: { x: width / 2, y: 0 } }];
-		while (level.length > 0) {
-			/**
-			 * @type {nodeItem[]}
-			 */
-			let newItems = [];
-			/**@type {Array<nodeItem>}*/
-			let nextLevel = [];
+		parentElement = /**@type {Element}*/ (document.querySelector('.svg-box'));
+		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
+		width = boxWidth;
 
-			for (let i = 0; i < level.length; i++) {
-				let current = level[i];
+		await addToSvg(
+			{
+				level: -1,
+				index: 0,
+				x: width / 2,
+				y: -vGap / 2,
+				height: vGap
+			},
+			'S',
+			0,
+			0
+		);
 
-				let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-				let item = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-				let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-				svg.prepend(path);
-				svg.appendChild(box);
-				svg.appendChild(item);
+		await wait(500);
 
-				item.textContent = current.node.data;
-				let bbox = item.getBBox();
-				let pos = {
-					x: (i + 1) * (width / (level.length + 1)),
-					y: vGap + current.pos.y
-				};
-				item.setAttribute('dominant-baseline', 'middle');
-				item.setAttribute('text-anchor', 'middle');
-				item.setAttribute('x', `${pos.x}`);
-				item.setAttribute('y', `${pos.y}`);
-				item.style.opacity = '0';
-				item.style.translate = '0 -10px';
-				await wait(10);
-				item.style.transition = 'all 0.5s';
-
-				let boxPos = {
-					x: pos.x - bbox.width / 2,
-					y: pos.y - bbox.height / 2 - 2
-				};
-				// box.style.filter = 'drop-shadow(0 0 3px hsl(0,0%,0%,20%))';
-				box.setAttribute('width', `${bbox.width + 8}`);
-				box.setAttribute('height', `${bbox.height + 4}`);
-				box.setAttribute('fill', 'white');
-				box.setAttribute('stroke', 'hsl(0,0%,80%)');
-				box.setAttribute('rx', '10');
-				box.setAttribute('x', `${boxPos.x - 4}`);
-				box.setAttribute('y', `${boxPos.y - 2}`);
-
-				box.style.translate = '0 -10px';
-				box.style.opacity = '0';
-				await wait(10);
-				box.style.transition = 'all 0.5s';
-				box.style.translate = '0 0px';
-				box.style.opacity = '1';
-
-				// await wait(500);
-				item.style.translate = '0 0px';
-				item.style.opacity = '1';
-				height = svg.getBBox().height + 100;
-
-				pos.y -= bbox.height / 2 + 4;
-				path.setAttribute(
-					'd',
-					`M ${current.pos.x} ${current.pos.y} C ${current.pos.x} ${current.pos.y + vGap / 2}, ${pos.x} ${pos.y - vGap / 2}, ${pos.x} ${pos.y}`
-				);
-				path.setAttribute('stroke', 'black');
-				path.setAttribute('stroke-width', '2');
-				path.setAttribute('fill', 'none');
-				path.setAttribute('stroke-dasharray', '100');
-				path.setAttribute('stroke-dashoffset', '100');
-				path.setAttribute('pathLength', '100');
-				await wait(10);
-				path.style.transition = 'all 0.6s';
-				height = svg.getBBox().height + 100;
-				await wait(10);
-				path.setAttribute('stroke-dashoffset', '0');
-				await wait(1000);
-
-				pos.y += bbox.height + 4;
-				for (let i = 0; i < current.node.nodes.length; i++) {
-					nextLevel.push({
-						node: current.node.nodes[i],
-						pos: pos
-					});
-				}
-			}
-			items = newItems;
-			level = nextLevel;
-		}
+		await addToTree(['haa', 'ç', 'hii'], 'S');
+		await addToTree(['h', 'k'], 'haa');
+		await addToTree(['o', 'p'], 'hii');
+		await addToTree(['o', 'p'], 'ç');
 
 		height = svg.getBBox().height + 100;
 	}
 </script>
 
-<div class="svg-box" style="width: {width}px;">
-	<svg {height}>
-		<g id="parse-svg"></g>
+<div class="svg-box" style={$$props.style}>
+	<svg {height} {width}>
+		<g id="parse-svg">
+			{#each levels as level}
+				{#each level as item (`${item.level}-${item.id}-${item.parent}`)}
+					<path
+						d={item.d}
+						stroke="white"
+						stroke-width="4"
+						fill="none"
+						stroke-dasharray="100"
+						stroke-dashoffset={item.dashOffset}
+						pathLength="100"
+						style="filter: drop-shadow(0 0 2px hsl(0,0%,0%,40%));"
+					></path>{/each}
+			{/each}
+			{#each levels as level}
+				{#each level as item (`${item.level}-${item.id}-${item.parent}`)}
+					<rect
+						width={item.width + 12}
+						height={item.height + 4}
+						fill="hsl(20, 60%, 60%)"
+						stroke="hsl(0,0%,80%,0%)"
+						rx="8"
+						style="translate: {item.x - item.width / 2 - 6}px {item.y -
+							item.height / 2 -
+							4}px; opacity: {item.opacity}"
+					></rect>
+					<text
+						id="parse-text-{item.level}-{item.index}"
+						class="par-{item.parent}"
+						fill="hsl(0,0%,100%)"
+						dominant-baseline="middle"
+						text-anchor="middle"
+						style="opacity: {item.opacity};translate: {item.x}px {item.y}px"
+					>
+						{item.data}
+					</text>
+				{/each}
+			{/each}
+		</g>
 	</svg>
 </div>
 
@@ -173,13 +243,16 @@
 		overflow: visible;
 	}
 
-	:global(svg *) {
+	svg * {
 		transform-box: fill-box;
+		transition: all 0.5s;
 	}
 
+	svg rect {
+		filter: drop-shadow(0 0 3px hsl(20, 60%, 60%, 70%));
+	}
 	.svg-box {
 		overflow: auto;
-		z-index: 30;
 		height: inherit;
 		border: 1px solid hsl(0, 0%, 80%);
 		border-radius: 10px;
