@@ -1,5 +1,5 @@
 <script>
-	import { getJumpWait, wait } from '$lib/utils';
+	import { wait } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 
@@ -15,6 +15,8 @@
 	let line;
 	/** @type {Element | null} */
 	let arrow;
+
+	export let svgId;
 
 	/**
 	 * @param {string} id
@@ -61,7 +63,6 @@
 			d: linePath,
 			duration: 2000,
 			direction: 'forward',
-			delay: 0,
 			autoplay: true,
 			easing: 'spring(1, 50, 10, 1)'
 		};
@@ -76,7 +77,7 @@
 		let animeParams = {
 			targets: line,
 			d: linePath,
-			duration: 1000,
+			duration: 500,
 			direction: 'reverse',
 			autoplay: true,
 			easing: 'easeInQuad'
@@ -84,8 +85,9 @@
 		anime(animeParams);
 		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-		await wait(800);
+		await wait(400);
 		opacity = 0;
+		await wait(300);
 	}
 
 	export async function setHideOpacity() {
@@ -93,34 +95,34 @@
 	}
 
 	onMount(() => {
-		line = document.querySelector('#line');
-		arrow = document.querySelector('#arrow');
+		line = document.querySelector(`#${svgId}-line`);
+		arrow = document.querySelector(`#${svgId}-arrow`);
 	});
 </script>
 
-<svg xmlns="http://www.w3.org/2000/svg" class="unit" overflow="visible">
+<svg id={svgId} xmlns="http://www.w3.org/2000/svg" class="unit" overflow="visible">
 	<defs>
 		<path
 			stroke-dasharray="6,10"
-			id="line"
+			id="{svgId}-line"
 			d="M 0 0 C 20 20, 50 0, 60 10"
 			stroke-linecap="round"
 			fill="none"
 		/>
 
 		<path
-			id="arrow"
+			id="{svgId}-arrow"
 			d="M 1 13 L 16 15 L 14.5 1"
 			stroke-linejoin="round"
 			stroke-linecap="round"
 			fill="none"
 		/>
 	</defs>
-	<g id="lines" style="transition: all 0.2s;opacity:{opacity}">
-		<use xlink:href="#line" stroke-width="12" stroke="white" />
-		<use xlink:href="#line" stroke="black" stroke-width="4" />
-		<use xlink:href="#arrow" stroke-width="12" stroke="white" />
-		<use xlink:href="#arrow" stroke="black" stroke-width="4"></use>
+	<g id="{svgId}-lines" style="transition: all 0.2s;opacity:{opacity}">
+		<use xlink:href="#{svgId}-line" stroke-width="12" stroke="white" />
+		<use xlink:href="#{svgId}-line" stroke="black" stroke-width="4" />
+		<use xlink:href="#{svgId}-arrow" stroke-width="12" stroke="white" />
+		<use xlink:href="#{svgId}-arrow" stroke="black" stroke-width="4"></use>
 	</g>
 </svg>
 

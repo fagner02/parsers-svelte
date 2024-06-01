@@ -2,44 +2,27 @@
 	import { writable } from 'svelte/store';
 	import { getTextWidth, wait } from '$lib/utils';
 	import { onMount, setContext } from 'svelte';
-	import Stack from './Cards/StackCard.svelte';
+	import StackCard from './Cards/StackCard.svelte';
 	import SetsCard from './Cards/SetsCard.svelte';
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
 	import SvgLines from './SvgLines.svelte';
 	import TableCard from './Cards/TableCard.svelte';
-	import FillHeight from './FillHeight.svelte';
+	import FirstAlgorithm from './FirstAlgorithm.svelte';
+	import FollowAlgorithm from './FollowAlgorithm.svelte';
 
 	// ========== Components ====================
-	/**@type {Stack}*/
-	let symbolStackElement;
-	/**@type {Stack}*/
-	let posStackElement;
-	/**@type {SetsCard}*/
-	let firstSet;
-	/**@type {SvgLines}*/
-	let svgLines;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
 	/**@type {() => Promise<void>}*/
 	let addPause;
 	/**@type {() => void}*/
 	let limitHit;
 	/**@type {string}*/
 	let instruction;
+	/**@type {string}*/
+	let selectedAlgorithm = 'first';
+	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
+	let firstSet;
 	// ========== Components ====================
-
-	// ========= stores ================================================================================
-	/** @type {import('svelte/store').Writable<Array.<import('@/types').GrammarItem>>} */
-	let rules = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let symbolStack = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let posStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
-	let first = writable([]);
-
-	// ========= stores ================================================================================
 
 	// ========= Style ======================================
 	const fontSize = 15;
@@ -49,170 +32,18 @@
 	let subCharWidth = 0;
 	// ========= Style ======================================
 
-	let nt = ['S', 'A', 'Bb'];
-	let firstIndexes = new Map();
 	/**@type {string}*/
 	let inputString;
 
-	setContext('StepsView', { selectLSymbol, selectRSymbol });
+	/**@type {() => void}*/
+	export let reset;
 
-	/**
-	 * @param {string} card
-	 * @param {number} index1
-	 * @param {string} color
-	 * @param {boolean} empty
-	 */
-	async function selectLSymbol(card, index1, color, empty) {
-		let symbol = /** @type {HTMLElement} */ (document.querySelector(`#${card}l${index1}`));
-		symbol.classList.add(empty ? 'empty' : 'block');
-		symbol.classList.add(`${color}-after`);
-		await wait(500);
-	}
-
-	/**
-	 * @param {string} card
-	 * @param {number} index1
-	 * @param {number} index2
-	 * @param {string} color
-	 * @param {boolean} empty
-	 */
-	async function selectRSymbol(card, index1, index2, color, empty) {
-		let symbol = /** @type {HTMLElement} */ (
-			document.querySelector(`#${card}r${index1}-${index2}`)
-		);
-		symbol.classList.add(empty ? 'empty' : 'block');
-		symbol.classList.add(`${color}-after`);
-		await wait(500);
-	}
-
-	/**
-	 * @param {number} currentRule
-	 */
-	async function nextProdSymbol(currentRule) {
-		await posStackElement.updateItem(
-			$posStack[$posStack.length - 1].data + 1,
-			`${$posStack[$posStack.length - 1].data + 1}`.toString(),
-			$posStack.length - 1
-		);
-
-		let prodPos = $posStack[$posStack.length - 1].data;
-		if (prodPos >= 1) {
-			return null;
-		}
-		await selectRSymbol('g', currentRule, prodPos, 'green', true);
-		return $rules[currentRule].right[prodPos];
-	}
-
-	export function reset() {
-		rules.update(() => []);
-		symbolStack.update(() => []);
-		posStack.update(() => []);
-		first.update(() => []);
-		firstIndexes = new Map();
-		svgLines.setHideOpacity();
-
-		firstAlg();
-	}
-
-	/**
-	 * @param {string} currentSymbol
-	 */
-	async function addProdToStacks(currentSymbol) {
-		for (let i1 = 0; i1 < $rules.length; i1++) {
-			if ($rules[i1].left === currentSymbol) {
-				await symbolStackElement.addToStack(
-					i1,
-					$rules[i1].left,
-					$rules[i1].index.toString(),
-					$rules[i1].index.toString(),
-					`#gl${i1}`
-				);
-
-				await addPause();
-
-				await posStackElement.addToStack(
-					-1,
-					'-1',
-					$rules[i1].index.toString(),
-					$rules[i1].index.toString()
-				);
-			}
-		}
-	}
-
-	async function firstAlg() {
-		try {
-			await wait(100);
-			await loadGrammar();
-			await addPause();
-			instruction = 'Since this thing is like that we have add to the stack';
-			await addProdToStacks($rules[0].left);
-
-			while ($symbolStack.length > 0) {
-				if ($posStack[$posStack.length - 1].data == -1) {
-					await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
-				}
-				if (!firstIndexes.has($rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
-					await firstSet.addSetRow(
-						$symbolStack[$symbolStack.length - 1].data,
-						$symbolStack[$symbolStack.length - 1].text
-					);
-				}
-
-				while (true) {
-					let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data);
-
-					if (symbol === null) {
-						await posStackElement.removeFromStack($posStack.length - 1);
-
-						let topRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-						await symbolStackElement.removeFromStack($symbolStack.length - 1);
-						await wait(1000);
-						if ($symbolStack.length > 0) {
-							let lastRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-							await firstSet.joinSets(
-								$first[firstIndexes.get(topRule.left)].right,
-								firstIndexes.get(lastRule.left)
-							);
-						}
-						if ($symbolStack.length == 0) {
-							for (let i0 = 0; i0 < nt.length; i0++) {
-								if (!firstIndexes.has(nt[i0])) {
-									await addProdToStacks(nt[i0]);
-								}
-							}
-						}
-						break;
-					}
-					if (nt.includes(symbol)) {
-						if (firstIndexes.has(symbol)) {
-							await firstSet.joinSets(
-								$first[firstIndexes.get(symbol)].right,
-								firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left)
-							);
-						} else {
-							await wait(1000);
-							await addProdToStacks(symbol);
-							break;
-						}
-					} else {
-						let index = firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left);
-						await firstSet.joinSets([symbol], index);
-					}
-				}
-			}
-			limitHit();
-			addPause();
-		} catch {}
-	}
 	let code = '';
 
 	onMount(async () => {
 		code = await (await fetch('first.js')).text();
 		charWidth = getTextWidth('P', fontSize);
 		subCharWidth = getTextWidth('P', subFontSize);
-
-		// firstAlg();
 	});
 </script>
 
@@ -222,62 +53,56 @@
 	bind:limitHit
 	bind:instruction
 	bind:inputString
+	bind:selectedAlgorithm
 	{code}
 >
-	<div class="grid" slot="steps">
-		<SvgLines {lineHeight} bind:this={svgLines}></SvgLines>
-		<div class="cards-box unit">
-			<TableCard
-				label="LL(1) tabela"
-				color="blue"
-				tableId="t"
-				{lineHeight}
-				{svgLines}
-				{charWidth}
-				{subCharWidth}
-			></TableCard>
-			<!-- <GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
-			></GrammarCard>
-			<SetsCard
-				set={first}
-				{charWidth}
-				{firstIndexes}
-				{fontSize}
-				{lineHeight}
-				color={'blue'}
-				label={'first set'}
-				bind:this={firstSet}
-			></SetsCard>
-			<Stack
-				{lineHeight}
-				{charWidth}
-				{subCharWidth}
-				{subFontSize}
-				{fontSize}
-				stack={symbolStack}
-				stackId="symbol"
-				label="symbol stack"
-				color="blue"
-				bind:this={symbolStackElement}
-				bind:svgLines
-			></Stack>
-			<Stack
-				{lineHeight}
-				{charWidth}
-				{subCharWidth}
-				{subFontSize}
-				{fontSize}
-				stack={posStack}
-				stackId="pos"
-				label="position stack"
-				color="green"
-				bind:this={posStackElement}
-				bind:svgLines
-			></Stack> -->
+	<div slot="steps">
+		<div class="algo-buttons">
+			<button on:click={() => (selectedAlgorithm = 'first')}>{'<'}first</button>
+			<button on:click={() => (selectedAlgorithm = 'follow')}>follow{'>'}</button>
+		</div>
+		<div class="grid">
+			{#if selectedAlgorithm === 'first'}
+				<FirstAlgorithm
+					{charWidth}
+					{fontSize}
+					{lineHeight}
+					{subCharWidth}
+					{subFontSize}
+					{limitHit}
+					{addPause}
+					bind:instruction
+					bind:reset
+					bind:firstSet
+				></FirstAlgorithm>
+			{:else if selectedAlgorithm === 'follow'}
+				<FollowAlgorithm
+					{charWidth}
+					{fontSize}
+					{lineHeight}
+					{subCharWidth}
+					{subFontSize}
+					{limitHit}
+					{addPause}
+					{firstSet}
+					bind:instruction
+					bind:reset
+				></FollowAlgorithm>
+			{:else}
+				<!-- <TableCard
+					label="LL(1) tabela"
+					color="blue"
+					tableId="t"
+					{lineHeight}
+					{svgLines}
+					{charWidth}
+					{subCharWidth}
+				></TableCard> -->
+			{/if}
 		</div>
 	</div>
 	<div slot="parse">
-		<div class="cards-box unit">
+		<!-- <div class="cards-box unit">
 			<TableCard
 				label="LL(1) tabela"
 				color="blue"
@@ -313,17 +138,15 @@
 				bind:this={posStackElement}
 				bind:svgLines
 			></Stack>
-		</div>
+		</div> -->
 	</div>
 </AlgorithmTab>
 
 <style>
 	@import '@/block.css';
 
-	.cards-box {
+	.algo-buttons {
 		display: flex;
-		justify-content: center;
-		align-items: start;
-		flex-wrap: wrap;
+		justify-content: space-between;
 	}
 </style>

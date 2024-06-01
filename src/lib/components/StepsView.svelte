@@ -50,7 +50,7 @@
 		if (limit) return;
 		goForward = true;
 
-		await closeInstruction();
+		if (stepCount > 1) await closeInstruction();
 		if (getPauseResolvesLength() > 0) {
 			resolvePause();
 			openInstruction();

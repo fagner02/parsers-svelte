@@ -52,7 +52,7 @@
 				showBlock: true
 			}
 		]);
-		await wait(50);
+		await wait(10);
 
 		if (srcId) {
 			await svgLines.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
@@ -72,7 +72,7 @@
 			await svgLines.hideLine();
 		}
 
-		/**@type {HTMLElement}*/ (document.querySelector('#lines')).style.opacity = '0';
+		svgLines.setHideOpacity();
 	}
 
 	/**
@@ -124,7 +124,7 @@
 </script>
 
 <CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label}>
-	{#each [...$stack].reverse() as stackItem, index (stackId + stackItem.id)}
+	{#each $stack.toReversed() as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="s-{stackId}-{index}"
 			class="{stackItem.showBlock ? 'block' : ''} {color}-after"

@@ -14,8 +14,6 @@
 	import Info from '@/Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	import InfoIcon from '@icons/InfoIcon.svelte';
-	import SyntaxTree from '@/SyntaxTree.svelte';
-	import StackCard from '@/Cards/StackCard.svelte';
 	import ParseView from '@/ParseView.svelte';
 
 	let animIn = 'rotA 0.5s';
@@ -44,6 +42,8 @@
 	export let code;
 	/**@type {string}*/
 	export let inputString;
+	/**@type {string}*/
+	export let selectedAlgorithm;
 
 	/** @param {string} name */
 	async function updateSelected(name) {

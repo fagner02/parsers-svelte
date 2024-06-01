@@ -4,7 +4,7 @@
 
 	/** @type {import("svelte/store").Writable<Array.<import('@/types').GrammarItem>>} */
 	export let rules;
-	const grammar = 'S -> A Bb\nA -> a a\nBb -> b m';
+	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m';
 	/**@type {number}*/
 	export let lineHeight;
 	/**@type {number}*/
@@ -33,9 +33,7 @@
 		transition = sizeForward;
 		opacityTransition = opacityForward;
 		await wait(50);
-		/**
-		 * @type {{ left: string; right: string[]; index: number; }[]}
-		 */
+		/** @type {{ left: string; right: string[]; index: number; }[]} */
 		let aux = [];
 		grammar.split('\n').forEach((r) => {
 			let s = r.split('->');
@@ -88,9 +86,17 @@
 					></span
 				>
 				<span>{'->'}</span>
-				{#each rule.right as symbol, si}
-					<span id="gr{rulesIndex}-{si}">{symbol}</span>
-				{/each}
+				{#if rule.right[0] === ''}
+					<span
+						id="gr{rulesIndex}-{0}"
+						style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
+						>&#x03B5;</span
+					>
+				{:else}
+					{#each rule.right as symbol, si}
+						<span id="gr{rulesIndex}-{si}">{symbol}</span>
+					{/each}
+				{/if}
 			</p>
 		{/each}
 	</div>
