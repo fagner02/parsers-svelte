@@ -10,39 +10,41 @@
 	export let charWidth;
 	/**@type {number}*/
 	export let subCharWidth;
+	export let fontSize;
 
 	export let label;
 	export let color;
 
 	/**@type {Array<string>}*/
-	export let columns = ['$', 'a', 'b'];
+	export let columns;
 	/**@type {Array<string>}*/
-	export let rows = ['S', 'A', 'B'];
+	export let rows;
 
-	/**@typedef {{data: string,opacity: number,width:number, pos: number }} tableItem
-	 * @typedef {Map<string, tableItem>} tableCol
-	 */
-	/**@type {import('svelte/store').Writable<Map<string, tableCol>>} */
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	export let table = writable(new Map());
-	table.update((x) => {
-		for (let i = 0; i < rows.length; i++) {
-			x.set(
-				rows[i],
-				new Map(
-					columns.map((x) => [
-						x,
-						{
-							data: '',
-							opacity: 0,
-							pos: -40,
-							width: charWidth
-						}
-					])
-				)
-			);
-		}
-		return x;
-	});
+
+	export function resetTable() {
+		table.update((x) => {
+			for (let i = 0; i < rows.length; i++) {
+				x.set(
+					rows[i],
+					new Map(
+						columns.map((x) => [
+							x,
+							{
+								data: '',
+								opacity: 0,
+								pos: -40,
+								width: charWidth
+							}
+						])
+					)
+				);
+			}
+			return x;
+		});
+	}
+	resetTable();
 	/** @type {string} */
 	export let tableId;
 	/**@type {import('@/SvgLines.svelte').default}*/
@@ -58,13 +60,13 @@
 
 	/**
 	 * @param {string} data
-	 * @param {string | null} srcId
 	 * @param {string} row
 	 * @param {string} column
+	 * @param {string | null} srcId
 	 */
 	export async function addToTable(data, row, column, srcId = null) {
 		table.update((x) => {
-			/**@type {tableCol}*/ (x.get(row)).set(column, {
+			/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
 				data: data,
 				opacity: 0,
 				pos: -40,
@@ -75,7 +77,7 @@
 		await wait(50);
 
 		table.update((x) => {
-			/**@type {tableCol}*/ (x.get(row)).set(column, {
+			/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
 				data: data,
 				opacity: 1,
 				pos: 0,
@@ -87,17 +89,10 @@
 			await svgLines.hideLine();
 		}
 	}
-
-	onMount(async () => {
-		await wait(1000);
-
-		addToTable('hi', 'S', '$');
-		await wait(1000);
-	});
 </script>
 
 <CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label} style="padding: 5px;">
-	<table>
+	<table style="font-size: {fontSize}px;">
 		<thead>
 			<tr>
 				<th style="background: hsl(200, 40%, 70%)"></th>

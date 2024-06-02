@@ -7,7 +7,8 @@
 		killPause,
 		pause,
 		resolveAllWaits,
-		resolvePause
+		resolvePause,
+		wait
 	} from '$lib/utils';
 
 	export let animating = false;
@@ -15,10 +16,15 @@
 	export let closeInstruction;
 	/** @type {() => Promise<void>} */
 	export let openInstruction;
+	/**
+	 * @type {() => void}
+	 */
+	let swapCallback;
 	let targetStep = -1;
 	let stepCount = 0;
 	let goForward = false;
 	let goBack = false;
+	let swapping = false;
 	let limit = false;
 
 	export function limitHit() {
@@ -29,6 +35,15 @@
 
 	export async function addPause() {
 		stepCount += 1;
+		if (swapping && limit) {
+			setJumpPause(false);
+			setJumpWait(false);
+			targetStep = -1;
+			goBack = false;
+			goForward = false;
+			swapping = false;
+			swapCallback();
+		}
 		if (goBack && stepCount === targetStep) {
 			goBack = false;
 			targetStep = -1;
@@ -79,6 +94,25 @@
 		killAllWaits();
 		killPause();
 		resetCall();
+	}
+
+	/**
+	 * @param {() => any} callback
+	 */
+	export function swapAlgorithm(callback) {
+		swapCallback = callback;
+		swapping = true;
+		limit = false;
+		stepCount = 0;
+		goForward = false;
+		goBack = false;
+
+		setJumpWait(true);
+		setJumpPause(true);
+		resolveAllWaits();
+		resolvePause();
+
+		closeInstruction();
 	}
 
 	export let resetCall = () => {};

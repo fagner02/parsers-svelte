@@ -1,15 +1,10 @@
 <script>
-	import { writable } from 'svelte/store';
-	import { getTextWidth, wait } from '$lib/utils';
-	import { onMount, setContext } from 'svelte';
-	import StackCard from './Cards/StackCard.svelte';
-	import SetsCard from './Cards/SetsCard.svelte';
-	import GrammarCard from './Cards/GrammarCard.svelte';
+	import { getTextWidth } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
-	import SvgLines from './SvgLines.svelte';
-	import TableCard from './Cards/TableCard.svelte';
 	import FirstAlgorithm from './FirstAlgorithm.svelte';
 	import FollowAlgorithm from './FollowAlgorithm.svelte';
+	import LlAlgorithm from './LLAlgorithm.svelte';
 
 	// ========== Components ====================
 	/**@type {() => Promise<void>}*/
@@ -22,12 +17,16 @@
 	let selectedAlgorithm = 'first';
 	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
 	let firstSet;
+	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
+	let followSet;
+	/**@type {any}*/
+	let swapAlgorithm;
 	// ========== Components ====================
 
 	// ========= Style ======================================
-	const fontSize = 15;
-	const subFontSize = 10;
-	const lineHeight = 26;
+	const fontSize = 10;
+	const subFontSize = 7;
+	const lineHeight = 1.7 * fontSize;
 	let charWidth = 0;
 	let subCharWidth = 0;
 	// ========= Style ======================================
@@ -54,12 +53,26 @@
 	bind:instruction
 	bind:inputString
 	bind:selectedAlgorithm
+	bind:swapAlgorithm
 	{code}
 >
-	<div slot="steps">
+	<div slot="steps" style="--height: {1.5 * fontSize}px">
 		<div class="algo-buttons">
-			<button on:click={() => (selectedAlgorithm = 'first')}>{'<'}first</button>
-			<button on:click={() => (selectedAlgorithm = 'follow')}>follow{'>'}</button>
+			<button
+				on:click={() => {
+					swapAlgorithm(() => (selectedAlgorithm = 'first'));
+				}}>{'<'}first</button
+			>
+			<button
+				on:click={async () => {
+					swapAlgorithm(() => (selectedAlgorithm = 'follow'));
+				}}>follow{'>'}</button
+			>
+			<button
+				on:click={() => {
+					swapAlgorithm(() => (selectedAlgorithm = 'll'));
+				}}>ll{'>'}</button
+			>
 		</div>
 		<div class="grid">
 			{#if selectedAlgorithm === 'first'}
@@ -87,59 +100,26 @@
 					{firstSet}
 					bind:instruction
 					bind:reset
+					bind:followSet
 				></FollowAlgorithm>
 			{:else}
-				<!-- <TableCard
-					label="LL(1) tabela"
-					color="blue"
-					tableId="t"
-					{lineHeight}
-					{svgLines}
+				<LlAlgorithm
 					{charWidth}
+					{fontSize}
+					{lineHeight}
 					{subCharWidth}
-				></TableCard> -->
+					{subFontSize}
+					{limitHit}
+					{addPause}
+					{firstSet}
+					{followSet}
+					bind:instruction
+					bind:reset
+				></LlAlgorithm>
 			{/if}
 		</div>
 	</div>
-	<div slot="parse">
-		<!-- <div class="cards-box unit">
-			<TableCard
-				label="LL(1) tabela"
-				color="blue"
-				tableId="t"
-				{lineHeight}
-				{svgLines}
-				{charWidth}
-				{subCharWidth}
-			></TableCard>
-			<Stack
-				{lineHeight}
-				{charWidth}
-				{subCharWidth}
-				{subFontSize}
-				{fontSize}
-				stack={posStack}
-				stackId="pilha"
-				label="pilha"
-				color="blue"
-				bind:this={posStackElement}
-				bind:svgLines
-			></Stack>
-			<Stack
-				{lineHeight}
-				{charWidth}
-				{subCharWidth}
-				{subFontSize}
-				{fontSize}
-				stack={posStack}
-				stackId="input"
-				label="entrada"
-				color="green"
-				bind:this={posStackElement}
-				bind:svgLines
-			></Stack>
-		</div> -->
-	</div>
+	<div slot="parse"></div>
 </AlgorithmTab>
 
 <style>

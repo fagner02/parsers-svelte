@@ -48,4 +48,8 @@
 
 /**@typedef {{level: number,index: number}} nodeId*/
 
+/** @typedef {{data: string,opacity: number,width:number, pos: number }} tableItem*/
+
+/** @typedef {Map<string, tableItem>} tableCol*/
+
 export const unused = {};

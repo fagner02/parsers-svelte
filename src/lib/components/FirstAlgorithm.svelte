@@ -150,7 +150,14 @@
 
 <SvgLines svgId="first-svg" {lineHeight} bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
+	<GrammarCard
+		{fontSize}
+		{subFontSize}
+		{lineHeight}
+		{charWidth}
+		{subCharWidth}
+		{rules}
+		bind:loadGrammar
 	></GrammarCard>
 	<SetsCard
 		setId="first"

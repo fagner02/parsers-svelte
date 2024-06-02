@@ -31,10 +31,12 @@
 	let animating;
 	/** @type {() => void} */
 	export let limitHit;
-	/** @type {() => any} */
+	/** @type {() => Promise<void>}*/
 	export let addPause;
 	/** @type {() => void}*/
 	export let resetCall;
+	/** @type {any}*/
+	export let swapAlgorithm;
 	// ============== flow control ==================================
 
 	let parseOn = false;
@@ -158,6 +160,7 @@
 					bind:addPause
 					bind:limitHit
 					bind:animating
+					bind:swapAlgorithm
 					{resetCall}
 					{closeInstruction}
 					{openInstruction}

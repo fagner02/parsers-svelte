@@ -42,6 +42,7 @@
 		padding: 10px;
 		margin: 10px;
 		overflow: hidden;
+		border: 1px solid hsl(200, 50%, 50%);
 	}
 
 	:global(.popup-content) {

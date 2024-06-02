@@ -4,7 +4,7 @@
 
 	/** @type {import("svelte/store").Writable<Array.<import('@/types').GrammarItem>>} */
 	export let rules;
-	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m';
+	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m';
 	/**@type {number}*/
 	export let lineHeight;
 	/**@type {number}*/
@@ -13,6 +13,7 @@
 	export let subCharWidth;
 	/**@type {number}*/
 	export let fontSize;
+	export let subFontSize;
 	let opacity = 0;
 	let maxWidth = 0;
 	let maxHeight = 0;
@@ -81,7 +82,8 @@
 				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
 			>
 				<span id="gl{rulesIndex}"
-					>{rule.left}<span style="font-size: 10px; position: absolute;translate: 0px 5px"
+					>{rule.left}<span
+						style="font-size: {subFontSize}px; position: absolute;translate: 0px {0.3 * fontSize}px"
 						>{rule.index}</span
 					></span
 				>

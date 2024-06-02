@@ -7,7 +7,7 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
 	/**@type {Map<any, number>}*/
-	export let setIndexes;
+	export let setIndexes = new Map();
 	/**@type {number}*/
 	export let charWidth;
 	export let subCharWidth;
@@ -132,7 +132,8 @@
 			<span
 				id="{setId}l{index}"
 				style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}px"
-				>{item.left}<span style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
+				>{item.left}<span
+					style="font-size: {subFontSize}px; position: absolute;translate: 0px {0.3 * fontSize}px"
 					>{item.note ?? ''}</span
 				></span
 			>

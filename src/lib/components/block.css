@@ -21,7 +21,6 @@
 	transform: perspective(45px);
 	--width: 100%;
 	width: calc(var(--width) + 10px);
-	--height: 23px;
 	height: var(--height);
 	top: 50%;
 	translate: calc(var(--width) / -2) calc(var(--height) / -2);

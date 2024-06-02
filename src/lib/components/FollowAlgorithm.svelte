@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { wait } from '$lib/utils';
+	import { setJumpPause, wait } from '$lib/utils';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
@@ -32,7 +32,7 @@
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let posStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
-	let followSet = writable([]);
+	export let followSet = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	let joinSet = writable([]);
 	/**@type {Map<string, number>}*/
@@ -102,21 +102,24 @@
 					} else if (nt.includes(symbol)) {
 						await followSetElement.addSetRow(symbol, symbol);
 						if (followingSymbol === null) {
-							addToJoinSet(symbol, $rules[i].right);
+							await addToJoinSet(symbol, [$rules[i].left]);
 						} else {
-							selectRSymbol('g', i, j + 1, 'yellow', true);
+							await selectRSymbol('g', i, j + 1, 'yellow', true);
 							if (nt.includes(followingSymbol)) {
 								let empty = false;
 								for (let item of $firstSet) {
 									if (item.left === followingSymbol) {
-										if (item.right.includes('')) empty = true;
+										if (item.right.includes('')) {
+											empty = true;
+											continue;
+										}
 										const followIndex = /**@type {number}*/ (followIndexes.get(symbol));
 										await followSetElement.joinSets(item.right, followIndex);
 									}
 								}
 
 								if (empty) {
-									addToJoinSet(symbol, [$rules[i].left]);
+									await addToJoinSet(symbol, [$rules[i].right[j]]);
 								}
 							} else {
 								let followIndex = /**@type {number}*/ (followIndexes.get(symbol));
@@ -127,13 +130,13 @@
 								await followSetElement.joinSets([followingSymbol], followIndex);
 							}
 						}
-						await addPause();
+						// await addPause();
 					}
 				}
 			}
 
 			await joinStackElement.addToStack($joinSet[0].left, $joinSet[0].left, '', $joinSet[0].left);
-			await addPause();
+			// await addPause();
 			while ($joinStack.length > 0) {
 				const top =
 					$joinSet[/**@type {number}*/ (joinIndexes.get($joinStack[$joinStack.length - 1].data))];
@@ -159,14 +162,25 @@
 		}
 	}
 
+	async function setup() {
+		reset();
+	}
+
 	onMount(() => {
-		follow();
+		setup();
 	});
 </script>
 
 <SvgLines svgId="follow-svg" {lineHeight} bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard {fontSize} {lineHeight} {charWidth} {subCharWidth} {rules} bind:loadGrammar
+	<GrammarCard
+		{fontSize}
+		{subFontSize}
+		{lineHeight}
+		{charWidth}
+		{subCharWidth}
+		{rules}
+		bind:loadGrammar
 	></GrammarCard>
 	<SetsCard
 		setId="follow"
