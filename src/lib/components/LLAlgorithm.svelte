@@ -3,9 +3,10 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { wait } from '$lib/utils';
+	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import TableCard from './Cards/TableCard.svelte';
+	import { lineHeight } from '$lib/globalStyle';
 
 	/**@type {SvgLines}*/
 	let svgLines;
@@ -15,21 +16,12 @@
 	let table;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
-	/**@type {() => Promise<void>}*/
-	export let addPause;
-	/**@type {() => void}*/
-	export let limitHit;
 	/**@type {string}*/
 	export let instruction;
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').GrammarItem>>} */
 	let rules = writable([]);
 
-	export let fontSize;
-	export let subFontSize;
-	export let lineHeight;
-	export let charWidth;
-	export let subCharWidth;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
@@ -43,6 +35,7 @@
 		svgLines.setHideOpacity();
 		follow();
 	}
+	setResetCall(reset);
 
 	async function follow() {
 		try {
@@ -85,22 +78,10 @@
 	});
 </script>
 
-<SvgLines svgId="follow-svg" {lineHeight} bind:this={svgLines}></SvgLines>
+<SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{rules}
-		bind:loadGrammar
-	></GrammarCard>
+	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
 	<TableCard
-		{charWidth}
-		{lineHeight}
-		{subCharWidth}
-		{fontSize}
 		rows={nt}
 		columns={t}
 		bind:table
@@ -110,28 +91,8 @@
 		label="tabela ll(1)"
 		color="blue"
 	></TableCard>
-	<SetsCard
-		setId="follow"
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
-		useNote={false}
-		set={followSet}
-		color={'blue'}
-		label={'follow set'}
+	<SetsCard setId="follow" useNote={false} set={followSet} color={'blue'} label={'follow set'}
 	></SetsCard>
-	<SetsCard
-		setId="first"
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
-		useNote={false}
-		set={firstSet}
-		color={'blue'}
-		label={'first set'}
+	<SetsCard setId="first" useNote={false} set={firstSet} color={'blue'} label={'first set'}
 	></SetsCard>
 </div>

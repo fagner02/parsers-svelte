@@ -1,10 +1,8 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
+	import { lineHeight } from '$lib/globalStyle';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
-
-	/** @type {number} */
-	export let lineHeight;
 
 	let opacity = 0;
 	/** @type {string[]} */

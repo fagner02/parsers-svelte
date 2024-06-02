@@ -1,19 +1,20 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
+	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 	import CardBox from './CardBox.svelte';
 
 	/** @type {import("svelte/store").Writable<Array.<import('@/types').GrammarItem>>} */
 	export let rules;
 	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m';
-	/**@type {number}*/
-	export let lineHeight;
-	/**@type {number}*/
-	export let charWidth;
-	/**@type {number}*/
-	export let subCharWidth;
-	/**@type {number}*/
-	export let fontSize;
-	export let subFontSize;
+	// /**@type {number}*/
+	// export let lineHeight;
+	// /**@type {number}*/
+	// export let charWidth;
+	// /**@type {number}*/
+	// export let subCharWidth;
+	// /**@type {number}*/
+	// export let fontSize;
+	// export let subFontSize;
 	let opacity = 0;
 	let maxWidth = 0;
 	let maxHeight = 0;
@@ -70,7 +71,6 @@
 	id={'grammar'}
 	minHeight={lineHeight}
 	minWidth={charWidth}
-	{maxWidth}
 	{maxHeight}
 	label={'grammar'}
 	color={'blue'}

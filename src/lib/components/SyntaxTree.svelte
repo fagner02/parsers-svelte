@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 
 	/** @type {SVGGElement} */

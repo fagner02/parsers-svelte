@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { getTextWidth } from '$lib/utils';
+	import { getTextWidth } from '$lib/globalStyle';
 	import ExpandIcon from '@icons/ExpandIcon.svelte';
 
 	/**@type {number}*/

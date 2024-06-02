@@ -1,5 +1,13 @@
 <script>
-	import { wait } from '$lib/utils';
+	import {
+		wait,
+		reset,
+		forward,
+		back,
+		setCloseInstruction,
+		setOpenInstruction,
+		setResetCall
+	} from '$lib/flowControl';
 	import Code from '@/Code.svelte';
 	import FillHeight from '@/FillHeight.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
@@ -9,7 +17,6 @@
 	import PlaySkipBackIcon from '@icons/PlaySkipBackIcon.svelte';
 	import PlaySkipForwardIcon from '@icons/PlaySkipForwardIcon.svelte';
 	import RestartIcon from '@icons/RestartIcon.svelte';
-	import StepsView from '@/StepsView.svelte';
 	import ResultText from '@/ResultText.svelte';
 	import Info from '@/Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
@@ -21,22 +28,12 @@
 	let animation = animIn;
 
 	// ============== flow control ==================================
-	/** @type {() => Promise<void>} */
-	let forward;
-	/** @type {() => void} */
-	let back;
-	/** @type {() => void} */
-	let reset;
 	/** @type {boolean} */
 	let animating;
-	/** @type {() => void} */
-	export let limitHit;
-	/** @type {() => Promise<void>}*/
-	export let addPause;
 	/** @type {() => void}*/
 	export let resetCall;
-	/** @type {any}*/
-	export let swapAlgorithm;
+	// /** @type {any}*/
+	// export let swapAlgorithm;
 	// ============== flow control ==================================
 
 	let parseOn = false;
@@ -45,7 +42,7 @@
 	/**@type {string}*/
 	export let inputString;
 	/**@type {string}*/
-	export let selectedAlgorithm;
+	//export let selectedAlgorithm;
 
 	/** @param {string} name */
 	async function updateSelected(name) {
@@ -96,6 +93,10 @@
 			await wait(500);
 		} catch {}
 	}
+
+	setCloseInstruction(closeInstruction);
+	setOpenInstruction(openInstruction);
+	setResetCall(resetCall);
 
 	let selected = 'noPopup';
 	$: isAnim = selected === 'noPopup';
@@ -153,20 +154,9 @@
 					<slot name="parse"></slot>
 				</ParseView>
 			{:else}
-				<StepsView
-					bind:back
-					bind:forward
-					bind:reset
-					bind:addPause
-					bind:limitHit
-					bind:animating
-					bind:swapAlgorithm
-					{resetCall}
-					{closeInstruction}
-					{openInstruction}
-				>
+				<div class="steps {$$props.class ?? ''}" style="position: relative;">
 					<slot name="steps"></slot>
-				</StepsView>
+				</div>
 			{/if}
 		</div>
 		<div
@@ -256,6 +246,14 @@
 
 	.flow-controls {
 		justify-content: center;
+	}
+
+	.steps {
+		display: flex;
+		justify-content: start;
+		align-items: center;
+		flex-wrap: wrap;
+		flex-direction: column;
 	}
 
 	button {

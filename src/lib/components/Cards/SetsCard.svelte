@@ -1,24 +1,18 @@
 <script>
 	import { selectLSymbol } from '$lib/selectSymbol';
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import CardBox from './CardBox.svelte';
+	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
 	/**@type {Map<any, number>}*/
 	export let setIndexes = new Map();
-	/**@type {number}*/
-	export let charWidth;
-	export let subCharWidth;
-	/**@type {number}*/
-	export let lineHeight;
 	/**@type {string}*/
 	export let setId;
 	export let useNote = true;
 
-	export let fontSize;
-	export let subFontSize;
 	export let color;
 	export let label;
 

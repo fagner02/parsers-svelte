@@ -1,16 +1,8 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
 	import { writable } from 'svelte/store';
 	import CardBox from './CardBox.svelte';
-	import { onMount } from 'svelte';
-
-	/**@type {number}*/
-	export let lineHeight;
-	/**@type {number}*/
-	export let charWidth;
-	/**@type {number}*/
-	export let subCharWidth;
-	export let fontSize;
+	import { charWidth, fontSize, lineHeight, subCharWidth } from '$lib/globalStyle';
 
 	export let label;
 	export let color;
@@ -49,14 +41,6 @@
 	export let tableId;
 	/**@type {import('@/SvgLines.svelte').default}*/
 	export let svgLines;
-
-	/**
-	 * @param {string} text
-	 * @param {string} note
-	 */
-	function textWidth(text, note) {
-		return text.length * charWidth + note.length * subCharWidth;
-	}
 
 	/**
 	 * @param {string} data
@@ -142,6 +126,10 @@
 		border-radius: 5px;
 		padding: 0px 5px;
 		overflow: hidden;
+		text-align: center;
+		text-align: -webkit-center;
+		text-align: -moz-center;
+		vertical-align: center;
 	}
 	span {
 		display: block;

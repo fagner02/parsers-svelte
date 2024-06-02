@@ -4,9 +4,10 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { setJumpPause, wait } from '$lib/utils';
+	import { setJumpPause, wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
+	import { lineHeight } from '$lib/globalStyle';
 
 	/**@type {SetsCard}*/
 	let followSetElement;
@@ -18,10 +19,6 @@
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
-	/**@type {() => Promise<void>}*/
-	export let addPause;
-	/**@type {() => void}*/
-	export let limitHit;
 	/**@type {string}*/
 	export let instruction;
 
@@ -40,11 +37,6 @@
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let joinStack = writable([]);
 
-	export let fontSize;
-	export let subFontSize;
-	export let lineHeight;
-	export let charWidth;
-	export let subCharWidth;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 
@@ -63,6 +55,7 @@
 		svgLines.setHideOpacity();
 		follow();
 	}
+	setResetCall(reset);
 
 	/**
 	 * @param {string} symbol
@@ -171,24 +164,11 @@
 	});
 </script>
 
-<SvgLines svgId="follow-svg" {lineHeight} bind:this={svgLines}></SvgLines>
+<SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{rules}
-		bind:loadGrammar
-	></GrammarCard>
+	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="follow"
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
 		useNote={false}
 		set={followSet}
 		setIndexes={followIndexes}
@@ -198,11 +178,6 @@
 	></SetsCard>
 	<SetsCard
 		setId="first"
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
 		useNote={false}
 		set={firstSet}
 		setIndexes={followIndexes}
@@ -211,11 +186,6 @@
 	></SetsCard>
 	<SetsCard
 		setId="join"
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
 		useNote={false}
 		set={joinSet}
 		setIndexes={joinIndexes}
@@ -224,11 +194,6 @@
 		bind:this={joinSetElement}
 	></SetsCard>
 	<StackCard
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{subFontSize}
-		{fontSize}
 		stack={joinStack}
 		stackId="join"
 		label="join stack"

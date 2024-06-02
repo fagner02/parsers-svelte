@@ -1,4 +1,5 @@
 <script>
+	import { fontSize } from '$lib/globalStyle';
 </script>
 
 <div class="card-box" style="animation: rotA 0.5s;">
@@ -11,7 +12,7 @@
 	>
 		<slot></slot>
 	</div>
-	<div class="card-label {$$props.color}">{$$props.label}</div>
+	<div class="card-label {$$props.color}" style="font-size: {fontSize}px;">{$$props.label}</div>
 </div>
 
 <style>

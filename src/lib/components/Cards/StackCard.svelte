@@ -1,19 +1,12 @@
 <script>
-	import { wait } from '$lib/utils';
+	import { wait } from '$lib/flowControl';
+	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 	import CardBox from './CardBox.svelte';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
-	/**@type {number}*/
-	export let lineHeight;
-	/**@type {number}*/
-	export let charWidth;
-	/**@type {number}*/
-	export let subCharWidth;
 
 	/**@type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>}*/
 	export let stack;
-	export let fontSize;
-	export let subFontSize;
 	export let label;
 	export let color;
 	/** @type {string} */

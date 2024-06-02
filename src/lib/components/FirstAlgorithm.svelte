@@ -4,24 +4,19 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
-	import { wait } from '$lib/utils';
+	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
 	/**@type {StackCard}*/
 	let symbolStackElement;
-	/**@type {StackCard}*/
-	let posStackElement;
 	/**@type {SetsCard}*/
 	let firstSetElement;
 	/**@type {SvgLines}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
-	/**@type {() => Promise<void>}*/
-	export let addPause;
-	/**@type {() => void}*/
-	export let limitHit;
+
 	/**@type {string}*/
 	export let instruction;
 
@@ -31,12 +26,6 @@
 	let symbolStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
 	export let firstSet = writable([]);
-
-	export let fontSize;
-	export let subFontSize;
-	export let lineHeight;
-	export let charWidth;
-	export let subCharWidth;
 
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
@@ -58,6 +47,8 @@
 		firstIndexes.clear();
 		first();
 	};
+
+	setResetCall(reset);
 
 	/**
 	 * @param {string} currentSymbol
@@ -148,36 +139,18 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" {lineHeight} bind:this={svgLines}></SvgLines>
+<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{rules}
-		bind:loadGrammar
-	></GrammarCard>
+	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="first"
 		set={firstSet}
-		{charWidth}
-		{subCharWidth}
-		{fontSize}
-		{subFontSize}
-		{lineHeight}
 		setIndexes={firstIndexes}
 		color={'blue'}
 		label={'first set'}
 		bind:this={firstSetElement}
 	></SetsCard>
 	<StackCard
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{subFontSize}
-		{fontSize}
 		stack={symbolStack}
 		stackId="symbol"
 		label="symbol stack"
@@ -185,17 +158,4 @@
 		bind:this={symbolStackElement}
 		bind:svgLines
 	></StackCard>
-	<!-- <StackCard
-		{lineHeight}
-		{charWidth}
-		{subCharWidth}
-		{subFontSize}
-		{fontSize}
-		stack={posStack}
-		stackId="pos"
-		label="position stack"
-		color="green"
-		bind:this={posStackElement}
-		bind:svgLines
-	></StackCard> -->
 </div>
