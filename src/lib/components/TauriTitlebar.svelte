@@ -54,7 +54,7 @@
 		transition: none;
 	}
 	.titlebar-button {
-		scale: 1;
+		transform: scale(1);
 		background: none;
 		box-shadow: none;
 	}

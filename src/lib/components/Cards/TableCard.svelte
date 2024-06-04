@@ -13,7 +13,7 @@
 	export let rows;
 
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
-	export let table = writable(new Map());
+	export let table;
 
 	export function resetTable() {
 		table.update((x) => {
@@ -24,7 +24,8 @@
 						columns.map((x) => [
 							x,
 							{
-								data: '',
+								data: null,
+								text: '',
 								opacity: 0,
 								pos: -40,
 								width: charWidth
@@ -36,42 +37,46 @@
 			return x;
 		});
 	}
-	resetTable();
 	/** @type {string} */
 	export let tableId;
 	/**@type {import('@/SvgLines.svelte').default}*/
 	export let svgLines;
 
 	/**
-	 * @param {string} data
+	 * @param {any} data
+	 * @param {string} text
 	 * @param {string} row
 	 * @param {string} column
 	 * @param {string | null} srcId
 	 */
-	export async function addToTable(data, row, column, srcId = null) {
-		table.update((x) => {
-			/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
-				data: data,
-				opacity: 0,
-				pos: -40,
-				width: charWidth
+	export async function addToTable(data, text, row, column, srcId = null) {
+		try {
+			table.update((x) => {
+				/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+					data: data,
+					text: text,
+					opacity: 0,
+					pos: -40,
+					width: charWidth
+				});
+				return x;
 			});
-			return x;
-		});
-		await wait(50);
+			await wait(50);
 
-		table.update((x) => {
-			/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
-				data: data,
-				opacity: 1,
-				pos: 0,
-				width: data.length * charWidth
+			table.update((x) => {
+				/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+					data: data,
+					text: text,
+					opacity: 1,
+					pos: 0,
+					width: text.length * charWidth
+				});
+				return x;
 			});
-			return x;
-		});
-		if (srcId) {
-			await svgLines.hideLine();
-		}
+			if (srcId) {
+				await svgLines.hideLine();
+			}
+		} catch {}
 	}
 </script>
 
@@ -95,7 +100,7 @@
 								id="t-{tableId}-{rowKey}-{colKey}"
 								style="width: {col.width}px;opacity: {col.opacity};top: {col.pos}px;"
 							>
-								{col.data}
+								{col.text}
 							</span>
 						</td>
 					{/each}
@@ -106,8 +111,6 @@
 </CardBox>
 
 <style>
-	@import '@/block.css';
-
 	table {
 		border-spacing: 2px;
 	}

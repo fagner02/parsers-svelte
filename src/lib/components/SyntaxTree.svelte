@@ -142,7 +142,7 @@
 	 * @param {string[]} data
 	 * @param {string} parentData
 	 */
-	async function addToTree(data, parentData) {
+	export async function addToTree(data, parentData) {
 		const parent = /**@type {import('@/types').node}*/ (await findNode(parentData));
 		if (parent === undefined) return;
 
@@ -161,7 +161,9 @@
 		new ResizeObserver(updateSize).observe(
 			/**@type {Element}*/ (document.querySelector('.svg-box'))
 		);
-		await setSvg(/**@type {SVGGElement}*/ (document.querySelector('#parse-svg')));
+		try {
+			await setSvg(/**@type {SVGGElement}*/ (document.querySelector('#parse-svg')));
+		} catch {}
 	});
 
 	/**
@@ -223,9 +225,9 @@
 						fill="hsl(20, 60%, 60%)"
 						stroke="hsl(0,0%,80%,0%)"
 						rx="8"
-						style="translate: {item.x - item.width / 2 - 6}px {item.y -
+						style="transform: translate({item.x - item.width / 2 - 6}px, {item.y -
 							item.height / 2 -
-							4}px; opacity: {item.opacity};{updating ? 'transition: none' : ''}"
+							4}px); opacity: {item.opacity};{updating ? 'transition: none' : ''}"
 					></rect>
 					<text
 						id="parse-text-{item.level}-{item.index}"
@@ -233,7 +235,7 @@
 						fill="hsl(0,0%,100%)"
 						dominant-baseline="middle"
 						text-anchor="middle"
-						style="opacity: {item.opacity};translate: {item.x}px {item.y}px;{updating
+						style="opacity: {item.opacity};transform: translate({item.x}px, {item.y}px);{updating
 							? 'transition: none'
 							: ''}"
 					>

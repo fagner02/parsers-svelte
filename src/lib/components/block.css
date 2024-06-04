@@ -1,9 +1,11 @@
 @keyframes rotateAppear {
 	from {
-		transform: perspective(45px) rotateY(90deg);
+		transform: perspective(45px) rotateY(90deg)
+			translate(calc(var(--width) / -2), calc(var(--height) / -2));
 	}
 	to {
-		transform: perspective(45px) rotateY(0deg);
+		transform: perspective(45px) rotateY(0deg)
+			translate(calc(var(--width) / -2), calc(var(--height) / -2));
 	}
 }
 
@@ -18,12 +20,11 @@
 	position: absolute;
 	z-index: -1;
 	border-radius: 5px;
-	transform: perspective(45px);
 	--width: 100%;
 	width: calc(var(--width) + 10px);
 	height: var(--height);
+	transform: perspective(45px) translate(calc(var(--width) / -2), calc(var(--height) / -2));
 	top: 50%;
-	translate: calc(var(--width) / -2) calc(var(--height) / -2);
 	left: 50%;
 	animation: rotateAppear 0.5s;
 	box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
@@ -41,13 +42,11 @@
 	position: absolute;
 	z-index: -1;
 	border-radius: 5px;
-	transform: perspective(45px);
 	--width: 100%;
 	width: calc(var(--width) + 5px);
-	--height: 20px;
 	height: var(--height);
+	transform: perspective(45px) translate(calc(var(--width) / -2), calc(var(--height) / -2));
 	top: 50%;
-	translate: calc(var(--width) / -2) calc(var(--height) / -2);
 	left: 50%;
 	animation: rotateAppear 0.5s;
 	box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);

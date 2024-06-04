@@ -36,7 +36,10 @@
 	});
 </script>
 
-<div class="svg-box grid maxWidth" style="scale:{scale} 1;opacity: {opacity};transition: all 0.5s;">
+<div
+	class="svg-box grid maxWidth"
+	style="transform: scale({scale}, 1);opacity: {opacity};transition: all 0.5s;"
+>
 	<svg
 		class="unit"
 		id="close-svg"

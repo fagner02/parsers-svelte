@@ -37,19 +37,21 @@
 	 * @param {string} symbol
 	 */
 	export async function addSetItem(index, symbol) {
-		set.update((x) => {
-			x[index].rightProps = [...x[index].rightProps, { value: symbol, opacity: 0 }];
-			return x;
-		});
-		await wait(50);
-		set.update((x) => {
-			x[index].rightProps[x[index].rightProps.length - 1] = {
-				value: symbol,
-				opacity: 1
-			};
-			return x;
-		});
-		await wait(500);
+		try {
+			set.update((x) => {
+				x[index].rightProps = [...x[index].rightProps, { value: symbol, opacity: 0 }];
+				return x;
+			});
+			await wait(50);
+			set.update((x) => {
+				x[index].rightProps[x[index].rightProps.length - 1] = {
+					value: symbol,
+					opacity: 1
+				};
+				return x;
+			});
+			await wait(500);
+		} catch {}
 	}
 
 	/**
@@ -57,22 +59,24 @@
 	 * @param {number} index
 	 */
 	export async function joinSets(symbols, index) {
-		if ($set[index].rightProps[0].value === ' ') {
-			$set[index].rightProps.pop();
-		}
-		for (let i3 = 0; i3 < symbols.length; i3++) {
-			if ($set[index].right.find((x) => x === symbols[i3]) === undefined) {
-				set.update((x) => {
-					x[index].right = [...x[index].right, symbols[i3]];
-					return x;
-				});
-				if ($set[index].rightProps.length > 0) {
-					await addSetItem(index, ',');
-				}
-
-				await addSetItem(index, symbols[i3]);
+		try {
+			if ($set[index].rightProps[0].value === ' ') {
+				$set[index].rightProps.pop();
 			}
-		}
+			for (let i3 = 0; i3 < symbols.length; i3++) {
+				if ($set[index].right.find((x) => x === symbols[i3]) === undefined) {
+					set.update((x) => {
+						x[index].right = [...x[index].right, symbols[i3]];
+						return x;
+					});
+					if ($set[index].rightProps.length > 0) {
+						await addSetItem(index, ',');
+					}
+
+					await addSetItem(index, symbols[i3]);
+				}
+			}
+		} catch {}
 	}
 
 	/**
@@ -80,32 +84,34 @@
 	 * @param {any} indexMapIdentifier
 	 */
 	export async function addSetRow(symbol, indexMapIdentifier) {
-		setIndexes.set(indexMapIdentifier, $set.length);
-		set.update((x) => [
-			...x,
-			{
-				left: symbol,
-				right: [],
-				showRight: false,
-				rightProps: [{ value: ' ', opacity: 0 }],
-				note: useNote ? indexMapIdentifier.toString() : ''
-			}
-		]);
+		try {
+			setIndexes.set(indexMapIdentifier, $set.length);
+			set.update((x) => [
+				...x,
+				{
+					left: symbol,
+					right: [],
+					showRight: false,
+					rightProps: [{ value: ' ', opacity: 0 }],
+					note: useNote ? indexMapIdentifier.toString() : ''
+				}
+			]);
 
-		await wait(0);
+			await wait(0);
 
-		await selectLSymbol(
-			setId,
-			/**@type {number}*/ (setIndexes.get(indexMapIdentifier)),
-			'blue',
-			false
-		);
+			await selectLSymbol(
+				setId,
+				/**@type {number}*/ (setIndexes.get(indexMapIdentifier)),
+				'blue',
+				false
+			);
 
-		set.update((x) => {
-			x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
-			return x;
-		});
-		await wait(0);
+			set.update((x) => {
+				x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
+				return x;
+			});
+			await wait(0);
+		} catch {}
 	}
 
 	onMount(async () => {
@@ -127,8 +133,8 @@
 				id="{setId}l{index}"
 				style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}px"
 				>{item.left}<span
-					style="font-size: {subFontSize}px; position: absolute;translate: 0px {0.3 * fontSize}px"
-					>{item.note ?? ''}</span
+					style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, {0.3 *
+						fontSize}px)">{item.note ?? ''}</span
 				></span
 			>
 			{#if item.showRight}
@@ -161,8 +167,6 @@
 </CardBox>
 
 <style>
-	@import '@/block.css';
-
 	p > span:nth-child(2) {
 		margin-left: 5px;
 	}

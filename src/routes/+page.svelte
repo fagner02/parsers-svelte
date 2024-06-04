@@ -29,6 +29,7 @@
 
 <style>
 	@import './styles.css';
+	@import '@/block.css';
 
 	:global(.borders) {
 		margin: 10px;

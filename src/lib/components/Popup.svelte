@@ -23,13 +23,17 @@
 	class="maxWidth"
 >
 	<CloseButton {onClose}></CloseButton>
-	<div id={$$props.id} class="popup-box maxWidth" style="scale: {flex} 1;height: inherit">
+	<div
+		id={$$props.id}
+		class="popup-box maxWidth"
+		style="transform: scale({flex}, 1);height: inherit"
+	>
 		<slot
 			maxWidth={flex}
 			{opacity}
 			{pos}
 			contentClass="popup-content"
-			style="opacity: {opacity}; translate: 0px {pos}px"
+			style="opacity: {opacity};transform: translate(0px, {pos}px)"
 		></slot>
 	</div>
 </FillHeight>

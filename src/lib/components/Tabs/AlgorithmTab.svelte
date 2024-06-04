@@ -6,7 +6,10 @@
 		back,
 		setCloseInstruction,
 		setOpenInstruction,
-		setResetCall
+		setResetCall,
+		swapAlgorithm,
+		killAllWaits,
+		killPause
 	} from '$lib/flowControl';
 	import Code from '@/Code.svelte';
 	import FillHeight from '@/FillHeight.svelte';
@@ -30,10 +33,6 @@
 	// ============== flow control ==================================
 	/** @type {boolean} */
 	let animating;
-	/** @type {() => void}*/
-	export let resetCall;
-	// /** @type {any}*/
-	// export let swapAlgorithm;
 	// ============== flow control ==================================
 
 	let parseOn = false;
@@ -41,8 +40,6 @@
 	export let code;
 	/**@type {string}*/
 	export let inputString;
-	/**@type {string}*/
-	//export let selectedAlgorithm;
 
 	/** @param {string} name */
 	async function updateSelected(name) {
@@ -72,11 +69,11 @@
 			scale = 1;
 			opacity = 1;
 			pos = 0;
-			await wait(400);
+			await wait(200);
 
 			contentOpacity = 1;
 			contentPos = 0;
-			await wait(500);
+			await wait(300);
 		} catch {}
 	}
 
@@ -85,18 +82,17 @@
 			contentOpacity = 0;
 			contentPos = 50;
 
-			await wait(200);
+			await wait(100);
 
 			scale = 0.5;
 			opacity = 0;
 			pos = 50;
-			await wait(500);
+			await wait(300);
 		} catch {}
 	}
 
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
-	setResetCall(resetCall);
 
 	let selected = 'noPopup';
 	$: isAnim = selected === 'noPopup';
@@ -116,6 +112,7 @@
 			</button>
 			<button
 				on:click={() => {
+					reset();
 					parseOn = true;
 					closePopup();
 				}}
@@ -125,6 +122,7 @@
 			</button>
 			<button
 				on:click={() => {
+					reset();
 					parseOn = false;
 					closePopup();
 				}}
@@ -133,19 +131,18 @@
 				<PlayIcon></PlayIcon>
 			</button>
 		</div>
-		{#if !parseOn}
-			<div class="flow-controls controls">
-				<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-					<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-				<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-					<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
-				</button>
-				<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-					<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
-				</button>
-			</div>
-		{/if}
+
+		<div class="flow-controls controls">
+			<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
+				<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+			</button>
+			<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+				<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
+			</button>
+			<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+				<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+			</button>
+		</div>
 	</div>
 	<FillHeight id="wrapper" class="grid maxWidth">
 		<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
@@ -172,10 +169,13 @@
 			{/if}
 		</div>
 		<div class="unit instruction-box">
-			<div class="instruction" style="opacity: {opacity};translate: 0 {pos}px;scale: {scale}">
+			<div
+				class="instruction"
+				style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
+			>
 				<div
 					class="instruction-content"
-					style="translate: 0 {contentPos}px;opacity: {contentOpacity}"
+					style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
 				>
 					<InfoIcon
 						color="hsl(200, 70%,40%)"
@@ -216,14 +216,14 @@
 		padding: 5px 10px;
 		z-index: 1;
 		overflow: hidden;
-		transition: all 0.5s;
+		transition: all 0.3s;
 		font-size: 12px;
 		border: 1px solid hsl(200, 60%, 60%);
 		pointer-events: visible;
 	}
 
 	.instruction-content {
-		transition: all 0.5s;
+		transition: all 0.1s;
 		position: relative;
 		top: -3px;
 	}
@@ -265,10 +265,10 @@
 			scale 0.1s;
 	}
 	button:active {
-		scale: 1.2;
+		transform: scale(1.2);
 	}
 	button:disabled {
-		scale: 1;
+		transform: scale(1);
 		filter: brightness(80%);
 	}
 </style>

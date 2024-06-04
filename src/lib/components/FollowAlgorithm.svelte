@@ -4,10 +4,9 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { setJumpPause, wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
+	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
-	import { lineHeight } from '$lib/globalStyle';
 
 	/**@type {SetsCard}*/
 	let followSetElement;
@@ -22,8 +21,8 @@
 	/**@type {string}*/
 	export let instruction;
 
-	/** @type {import('svelte/store').Writable<Array<import('@/types').GrammarItem>>} */
-	let rules = writable([]);
+	/** @type {Array<import('@/types').GrammarItem>} */
+	export let rules;
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let symbolStack = writable([]);
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
@@ -45,7 +44,6 @@
 	let followIndexes = new Map();
 
 	export function reset() {
-		rules.update(() => []);
 		symbolStack.update(() => []);
 		posStack.update(() => []);
 		followSet.update(() => []);
@@ -56,7 +54,14 @@
 		follow();
 	}
 	setResetCall(reset);
+	/**
+	 * @type {(() => void) | null}
+	 */
+	export let callback = null;
 
+	if (callback !== null) {
+		swapAlgorithm(() => {});
+	}
 	/**
 	 * @param {string} symbol
 	 * @param {string[]} values
@@ -78,24 +83,23 @@
 			await loadGrammar();
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
-			await followSetElement.addSetRow($rules[0].left, $rules[0].left);
+			await followSetElement.addSetRow(rules[0].left, rules[0].left);
 			await followSetElement.joinSets(
 				['$'],
-				/**@type {number}*/ (followIndexes.get($rules[0].left))
+				/**@type {number}*/ (followIndexes.get(rules[0].left))
 			);
 
-			for (let i = 0; i < $rules.length; i++) {
-				for (let j = 0; j < $rules[i].right.length; j++) {
+			for (let i = 0; i < rules.length; i++) {
+				for (let j = 0; j < rules[i].right.length; j++) {
 					await selectRSymbol('g', i, j, 'green', true);
 
-					const symbol = $rules[i].right[j];
-					const followingSymbol = j + 1 == $rules[i].right.length ? null : $rules[i].right[j + 1];
+					const symbol = rules[i].right[j];
+					const followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
-					if (symbol === null) {
-					} else if (nt.includes(symbol)) {
+					if (nt.includes(symbol)) {
 						await followSetElement.addSetRow(symbol, symbol);
 						if (followingSymbol === null) {
-							await addToJoinSet(symbol, [$rules[i].left]);
+							await addToJoinSet(symbol, [rules[i].left]);
 						} else {
 							await selectRSymbol('g', i, j + 1, 'yellow', true);
 							if (nt.includes(followingSymbol)) {
@@ -112,7 +116,7 @@
 								}
 
 								if (empty) {
-									await addToJoinSet(symbol, [$rules[i].right[j]]);
+									await addToJoinSet(symbol, [rules[i].right[j]]);
 								}
 							} else {
 								let followIndex = /**@type {number}*/ (followIndexes.get(symbol));
@@ -147,7 +151,9 @@
 					await joinStackElement.removeFromStack($joinStack.length - 1);
 				}
 			}
-
+			if (callback !== null) {
+				callback();
+			}
 			limitHit();
 			addPause();
 		} catch (e) {

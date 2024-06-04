@@ -16,3 +16,5 @@ export const subFontSize = 9;
 export const lineHeight = 1.7 * fontSize;
 export let subCharWidth = getTextWidth('P', subFontSize);
 export let charWidth = getTextWidth('P', fontSize);
+const style = /**@type {HTMLElement}*/ (document.querySelector(':root'));
+style.style.setProperty('--height', `${1.5 * fontSize}px`);

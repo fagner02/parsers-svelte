@@ -3,20 +3,9 @@
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 	import CardBox from './CardBox.svelte';
 
-	/** @type {import("svelte/store").Writable<Array.<import('@/types').GrammarItem>>} */
+	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
-	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m';
-	// /**@type {number}*/
-	// export let lineHeight;
-	// /**@type {number}*/
-	// export let charWidth;
-	// /**@type {number}*/
-	// export let subCharWidth;
-	// /**@type {number}*/
-	// export let fontSize;
-	// export let subFontSize;
 	let opacity = 0;
-	let maxWidth = 0;
 	let maxHeight = 0;
 	let sizeForward = `max-width 0.5s, max-height 0.5s`;
 	let opacityForward = `opacity 0.5s`;
@@ -25,44 +14,26 @@
 	let opacityTransition = opacityForward;
 
 	export const loadGrammar = async function () {
-		transition = transitionBack;
-		opacityTransition = transitionBack;
-		await wait(50);
-		opacity = 0;
-		maxWidth = 0;
-		maxHeight = 0;
-		await wait(50);
-		transition = sizeForward;
-		opacityTransition = opacityForward;
-		await wait(50);
-		/** @type {{ left: string; right: string[]; index: number; }[]} */
-		let aux = [];
-		grammar.split('\n').forEach((r) => {
-			let s = r.split('->');
-
-			if (s.length > 1) {
-				aux.push({
-					left: s[0].replaceAll(' ', ''),
-					right: s[1].trim().split(' '),
-					index: aux.length
-				});
+		try {
+			for (let p of document.querySelector('#rules')?.children ?? []) {
+				for (let s of p.children) {
+					s.classList.remove('block', 'empty');
+				}
 			}
-		});
-		let max = aux
-			.map(
-				(x) =>
-					x.index.toString().length * subCharWidth +
-					x.left.length * charWidth +
-					x.right.length * (charWidth + 10) +
-					3 * charWidth
-			)
-			.toSorted();
+			transition = transitionBack;
+			opacityTransition = transitionBack;
+			await wait(0);
+			opacity = 0;
+			maxHeight = 0;
+			await wait(0);
+			transition = sizeForward;
+			opacityTransition = opacityForward;
+			await wait(0);
 
-		rules.update(() => [...aux]);
-		maxWidth = max[max.length - 1];
-		maxHeight = lineHeight * aux.length;
-		await wait(200);
-		opacity = 1;
+			maxHeight = lineHeight * rules.length;
+			await wait(200);
+			opacity = 1;
+		} catch {}
 	};
 </script>
 
@@ -76,24 +47,20 @@
 	color={'blue'}
 	{transition}
 >
-	<div style="opacity: {opacity}; transition: {opacityTransition};">
-		{#each $rules as rule, rulesIndex}
+	<div style="opacity: {opacity}; transition: {opacityTransition};" id="rules">
+		{#each rules as rule, rulesIndex}
 			<p
 				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
 			>
 				<span id="gl{rulesIndex}"
 					>{rule.left}<span
-						style="font-size: {subFontSize}px; position: absolute;translate: 0px {0.3 * fontSize}px"
-						>{rule.index}</span
+						style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, {0.3 *
+							fontSize}px)">{rule.index}</span
 					></span
 				>
 				<span>{'->'}</span>
 				{#if rule.right[0] === ''}
-					<span
-						id="gr{rulesIndex}-{0}"
-						style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
-						>&#x03B5;</span
-					>
+					<span id="gr{rulesIndex}-{0}">&#x03B5;</span>
 				{:else}
 					{#each rule.right as symbol, si}
 						<span id="gr{rulesIndex}-{si}">{symbol}</span>

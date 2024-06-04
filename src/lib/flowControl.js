@@ -3,10 +3,8 @@ let pauseResolves = [];
 /** @type {Array<(reason?: any) => void>} */
 let pauseRejects = [];
 
-export let getPauseResolvesLength = () => pauseResolves.length;
 /** @type {Array<{id:number, value: (reason?: any) => void}>} */
 let waitRejects = [];
-export let getWaitRejectsLength = () => waitRejects.length;
 /** @type {Array<{id:number, value: (reason?: any) => void}>} */
 let waitResolves = [];
 
@@ -22,6 +20,7 @@ let jumpPause = false;
 export function setJumpWait(value) {
 	jumpWait = value;
 }
+
 /**
  * @param {boolean} value
  */
@@ -65,16 +64,13 @@ export async function wait(ms) {
 
 export function pause() {
 	if (jumpPause) return;
-	try {
-		return new Promise((resolve, reject) => {
-			/** @type {number} */
-			pauseResolves.push(resolve);
-			pauseRejects.push(reject);
-			pauseCount++;
-		});
-	} catch (e) {
-		return;
-	}
+
+	return new Promise((resolve, reject) => {
+		/** @type {number} */
+		pauseResolves.push(resolve);
+		pauseRejects.push(reject);
+		pauseCount++;
+	});
 }
 
 export function resolvePause() {
@@ -122,10 +118,9 @@ let closeInstruction;
 let openInstruction;
 /** @type {() => void}*/
 let swapCallback;
-/**
- * @type {() => void}
- */
+/** @type {() => void}*/
 let resetCall;
+
 /**
  * @param {() => Promise<void>} _closeInstruction
  */
@@ -144,6 +139,7 @@ export function setOpenInstruction(_openInstruction) {
  * @param {() => void} _resetCall
  */
 export function setResetCall(_resetCall) {
+	limit = false;
 	resetCall = _resetCall;
 }
 
@@ -155,24 +151,23 @@ let swapping = false;
 let limit = false;
 
 export function limitHit() {
-	console.log('limit');
 	goForward = false;
 	animating = false;
 	limit = true;
+
+	targetStep = -1;
+	stepCount = 0;
 }
 
 export async function addPause() {
 	stepCount += 1;
-	console.log('pause', limit, stepCount, targetStep, swapping, goBack, goForward);
 	if (swapping && limit) {
 		setJumpPause(false);
 		setJumpWait(false);
 		targetStep = -1;
 		swapping = false;
-		limit = false;
-		stepCount = 0;
 		swapCallback();
-	} else if (goBack && stepCount === targetStep) {
+	} else if (goBack && (stepCount === targetStep || limit)) {
 		goBack = false;
 		targetStep = -1;
 		setJumpPause(false);
@@ -190,14 +185,16 @@ export async function addPause() {
 }
 
 export async function forward() {
-	console.log(limit);
 	if (limit) return;
 	goForward = true;
 
-	if (stepCount > 1) await closeInstruction();
-	if (getPauseResolvesLength() > 0) {
+	if (stepCount > 1) {
+		closeInstruction?.();
+		await wait(200);
+	}
+	if (pauseResolves.length > 0) {
 		resolvePause();
-		openInstruction();
+		openInstruction?.();
 		return;
 	}
 
@@ -217,12 +214,12 @@ export function back() {
 export function reset() {
 	limit = false;
 	stepCount = 0;
-	console.log('reset', limit, targetStep);
-	setJumpWait(true);
-	closeInstruction();
-	//setJumpWait(false);
 	killAllWaits();
 	killPause();
+	setJumpWait(true);
+	closeInstruction?.();
+	setJumpWait(false);
+
 	resetCall();
 }
 
@@ -230,6 +227,11 @@ export function reset() {
  * @param {() => any} callback
  */
 export function swapAlgorithm(callback) {
+	if (limit) {
+		callback();
+		swapping = false;
+		return;
+	}
 	swapCallback = callback;
 	swapping = true;
 	goForward = false;
@@ -241,5 +243,5 @@ export function swapAlgorithm(callback) {
 	resolveAllWaits();
 	resolvePause();
 
-	closeInstruction();
+	closeInstruction?.();
 }

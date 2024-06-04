@@ -3,7 +3,7 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
+	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import TableCard from './Cards/TableCard.svelte';
 	import { lineHeight } from '$lib/globalStyle';
@@ -13,14 +13,14 @@
 	/**@type {TableCard}*/
 	let tableElement;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
-	let table;
+	export let table = writable(new Map());
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
 	/**@type {string}*/
 	export let instruction;
 
-	/** @type {import('svelte/store').Writable<Array<import('@/types').GrammarItem>>} */
-	let rules = writable([]);
+	/** @type {Array<import('@/types').GrammarItem>} */
+	export let rules;
 
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
@@ -30,13 +30,20 @@
 	let t = ['$', 'a', 'b', 'm'];
 
 	export function reset() {
-		rules.update(() => []);
 		tableElement.resetTable();
+
 		svgLines.setHideOpacity();
 		follow();
 	}
 	setResetCall(reset);
+	/**
+	 * @type {(() => void) | null}
+	 */
+	export let callback = null;
 
+	if (callback !== null) {
+		swapAlgorithm(() => {});
+	}
 	async function follow() {
 		try {
 			await wait(100);
@@ -53,18 +60,27 @@
 							$followSet.find((x) => x.left === item.left)
 						);
 						for (let f = 0; f < follow.right.length; f++) {
-							await tableElement.addToTable(`${item.left} -> ε`, item.left, follow.right[f]);
+							await tableElement.addToTable(
+								parseFloat(/**@type {string}*/ (item.note)),
+								`${item.left} -> ε`,
+								item.left,
+								follow.right[f]
+							);
 							await addPause();
 						}
 						continue;
 					}
 					await tableElement.addToTable(
-						`${item.left} -> ${$rules[ruleIndex].right.join(' ')}`,
+						parseFloat(/**@type {string}*/ (item.note)),
+						`${item.left} -> ${rules[ruleIndex].right.join(' ')}`,
 						item.left,
 						item.right[j]
 					);
 					await addPause();
 				}
+			}
+			if (callback !== null) {
+				callback();
 			}
 			limitHit();
 			addPause();
@@ -74,6 +90,7 @@
 	}
 
 	onMount(() => {
+		tableElement?.resetTable();
 		follow();
 	});
 </script>

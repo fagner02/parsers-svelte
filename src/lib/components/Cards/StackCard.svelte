@@ -30,42 +30,45 @@
 	 * @param {string|null} srcId
 	 */
 	export async function addToStack(data, text, note, id, srcId = null) {
-		stack.update((x) => [
-			...x,
-			{
-				opacity: 0,
-				height: 0,
-				width: 0,
-				top: -lineHeight,
-				text,
-				note,
-				data: data,
-				transition: stackTransitionForward,
-				id,
-				showBlock: true
+		try {
+			stack.update((x) => [
+				...x,
+				{
+					opacity: 0,
+					height: 0,
+					width: 0,
+					top: -lineHeight,
+					text,
+					note,
+					data: data,
+					transition: stackTransitionForward,
+					id,
+					showBlock: true
+				}
+			]);
+			await wait(10);
+
+			if (srcId) {
+				await svgLines.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
 			}
-		]);
-		await wait(10);
 
-		if (srcId) {
-			await svgLines.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
-		}
-
-		stack.update((x) => {
-			Object.assign(x[x.length - 1], {
-				opacity: 1,
-				height: lineHeight,
-				width: textWidth(text, note),
-				top: 0
+			stack.update((x) => {
+				Object.assign(x[x.length - 1], {
+					opacity: 1,
+					height: lineHeight,
+					width: textWidth(text, note),
+					top: 0
+				});
+				return x;
 			});
-			return x;
-		});
 
-		if (srcId) {
-			await svgLines.hideLine();
-		}
+			if (srcId) {
+				await svgLines.hideLine();
+			}
 
-		svgLines.setHideOpacity();
+			svgLines.setHideOpacity();
+			await wait(500);
+		} catch (e) {}
 	}
 
 	/**
@@ -74,57 +77,61 @@
 	 * @param {number} index
 	 */
 	export async function updateItem(data, text, index) {
-		stack.update((x) => {
-			Object.assign(x[index], {
-				data,
-				text,
-				width: textWidth(text, x[index].note),
-				showBlock: false
+		try {
+			stack.update((x) => {
+				Object.assign(x[index], {
+					data,
+					text,
+					width: textWidth(text, x[index].note),
+					showBlock: false
+				});
+				return x;
 			});
-			return x;
-		});
-		await wait(50);
+			await wait(50);
 
-		stack.update((x) => {
-			Object.assign(x[index], {
-				data,
-				text,
-				width: textWidth(text, x[index].note),
-				showBlock: true
+			stack.update((x) => {
+				Object.assign(x[index], {
+					data,
+					text,
+					width: textWidth(text, x[index].note),
+					showBlock: true
+				});
+				return x;
 			});
-			return x;
-		});
-		await wait(500);
+			await wait(500);
+		} catch (e) {}
 	}
 
 	/**
 	 * @param {number} index
 	 */
 	export async function removeFromStack(index) {
-		stack.update((x) => {
-			Object.assign(x[index], {
-				opacity: 0,
-				height: 0,
-				width: 0,
-				top: -lineHeight,
-				transition: stackTransitionBackward
+		try {
+			stack.update((x) => {
+				Object.assign(x[index], {
+					opacity: 0,
+					height: 0,
+					width: 0,
+					top: -lineHeight,
+					transition: stackTransitionBackward
+				});
+				return x;
 			});
-			return x;
-		});
-		await wait(1000);
-		stack.update((x) => x.splice(0, index));
+			await wait(1000);
+			stack.update((x) => x.splice(0, index));
+		} catch (e) {}
 	}
 </script>
 
 <CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label}>
-	{#each $stack.toReversed() as stackItem, index (`${stackId}-${stackItem.id}`)}
+	{#each [...$stack].reverse() as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="s-{stackId}-{index}"
 			class="{stackItem.showBlock ? 'block' : ''} {color}-after"
 			style="transition: {stackItem.transition};height: {stackItem.height}px;width: {stackItem.width}px;opacity: {stackItem.opacity}; top: {stackItem.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
 		>
 			{stackItem.text}<span
-				style="font-size: {subFontSize}px; position: absolute;translate: 0px 5px"
+				style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, 5px)"
 				>{stackItem.note}</span
 			>
 		</p>
@@ -132,8 +139,6 @@
 </CardBox>
 
 <style>
-	@import '@/block.css';
-
 	p {
 		position: relative;
 		transition:

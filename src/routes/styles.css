@@ -134,36 +134,28 @@ input:focus-within {
 
 .cards-box {
 	display: flex;
-	justify-content: center;
+	justify-content: start;
 	align-items: start;
 	flex-wrap: wrap;
 }
 
 @keyframes rotA {
 	from {
-		scale: 0.5;
-		translate: -300px 0px;
-		rotate: 0deg;
+		transform: scale(0.5) translate(-300px, 0px) rotate(0deg);
 		opacity: 0;
 	}
 	to {
-		translate: 0% 0px;
-		rotate: 0deg;
-		scale: 1;
+		transform: scale(1) translate(0px, 0px) rotate(0deg);
 		opacity: 1;
 	}
 }
 @keyframes rotD {
 	from {
-		scale: 1;
-		rotate: 0deg;
-		translate: 0% 0px;
+		transform: scale(1) translate(0px, 0px) rotate(0deg);
 		opacity: 1;
 	}
 	to {
-		scale: 1;
-		rotate: -5deg;
-		translate: 50% 0px;
+		transform: scale(1) translate(50%, 0px) rotate(-5deg);
 		opacity: 0;
 	}
 }
