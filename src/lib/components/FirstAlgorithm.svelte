@@ -33,9 +33,9 @@
 	export let callback = null;
 	let count = 0;
 	/**
-	 * @type {number[]}
+	 * @type {number|null}
 	 */
-	let running = [];
+	let running = null;
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
 	let nt = ['S', 'A', 'Bb'];
@@ -77,23 +77,35 @@
 			}
 		}
 	}
+	function nullable(
+		/** @type {Array<import('@/types').GrammarItem>} */ rules,
+		/**@type {string}*/ symbol
+	) {
+		const matchingRules = rules.filter((x) => x.left === symbol);
+		for (let rule of matchingRules) {
+			if (rule.right[0] === '') {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	async function first() {
 		if (count > 100) count = 0;
 		const id = count;
+		running = count;
 		count++;
-		running.splice(0, running.length);
-		running.push(id);
+
 		try {
-			if (running[running.length - 1] !== id) return;
+			if (running !== id) return;
 			await wait(0);
-			if (running[running.length - 1] !== id) return;
+			if (running !== id) return;
 			await loadGrammar();
-			if (running[running.length - 1] !== id) return;
+			if (running !== id) return;
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				await symbolStackElement.addToStack(
 					i,
 					rules[i].left,
@@ -104,17 +116,17 @@
 			}
 
 			while ($symbolStack.length > 0) {
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
 
 				if (!firstIndexes.has($symbolStack[$symbolStack.length - 1].data)) {
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					await firstSetElement.addSetRow(
 						$symbolStack[$symbolStack.length - 1].text,
 						$symbolStack[$symbolStack.length - 1].data
 					);
 				}
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				let symbol = await getProdSymbol($symbolStack[$symbolStack.length - 1].data);
 
 				if (nt.includes(symbol)) {
@@ -124,29 +136,46 @@
 					for (let rule of matchingRules) {
 						const firstIndex = firstIndexes.get(rule.index);
 						if (firstIndex !== undefined) {
-							if (running[running.length - 1] !== id) return;
+							if (rule.right[0] === '') {
+								let isNullable = true;
+								for (let s of rules[/**@type {number}*/ ($symbolStack.at(-1)?.data)].right) {
+									if (!nullable(rules, s)) {
+										isNullable = false;
+										break;
+									}
+								}
+								if (isNullable) {
+									const currentIndex = /**@type {number}*/ (
+										firstIndexes.get($symbolStack[$symbolStack.length - 1].data)
+									);
+									if (running !== id) return;
+									if (!$firstSet[currentIndex].right.includes(''))
+										await firstSetElement.joinSets([''], currentIndex);
+								}
+							}
+							if (running !== id) return;
 							await firstSetElement.joinSets(
 								$firstSet[firstIndex].right.filter((x) => x !== ''),
 								/**@type {number}*/ (firstIndexes.get($symbolStack[$symbolStack.length - 1].data))
 							);
 						} else {
 							await wait(1000);
-							if (running[running.length - 1] !== id) return;
+							if (running !== id) return;
 							await addProdToStacks(symbol);
 							complete = false;
 						}
 					}
 					if (complete) {
-						if (running[running.length - 1] !== id) return;
+						if (running !== id) return;
 						await symbolStackElement.removeFromStack($symbolStack.length - 1);
 					}
 				} else {
 					let index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);
 
 					while (index !== undefined) {
-						if (running[running.length - 1] !== id) return;
+						if (running !== id) return;
 						await firstSetElement.joinSets([symbol], index);
-						if (running[running.length - 1] !== id) return;
+						if (running !== id) return;
 						await symbolStackElement.removeFromStack($symbolStack.length - 1);
 						if (symbol === '') break;
 						index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);

@@ -23,10 +23,6 @@
 
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let symbolStack = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let posStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let followSet = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
@@ -44,8 +40,6 @@
 	let followIndexes = new Map();
 
 	export function reset() {
-		symbolStack.update(() => []);
-		posStack.update(() => []);
 		followSet.update(() => []);
 		followIndexes = new Map();
 		joinSet.update(() => []);
@@ -97,7 +91,9 @@
 					const followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 					if (nt.includes(symbol)) {
-						await followSetElement.addSetRow(symbol, symbol);
+						if (!followIndexes.has(symbol)) {
+							await followSetElement.addSetRow(symbol, symbol);
+						}
 						if (followingSymbol === null) {
 							await addToJoinSet(symbol, [rules[i].left]);
 						} else {
@@ -131,8 +127,11 @@
 					}
 				}
 			}
-
-			await joinStackElement.addToStack($joinSet[0].left, $joinSet[0].left, '', $joinSet[0].left);
+			for (let item of joinIndexes.keys()) {
+				await joinStackElement.addToStack(item, item, '', item);
+				// await addPause();
+			}
+			// await joinStackElement.addToStack($joinSet[0].left, $joinSet[0].left, '', $joinSet[0].left);
 			// await addPause();
 			while ($joinStack.length > 0) {
 				const top =
@@ -147,6 +146,13 @@
 				await followSetElement.joinSets($followSet[joinIndex].right, followIndex);
 
 				top.right.splice(0, 1);
+				joinSet.update((x) => {
+					x[
+						/**@type {number}*/ (joinIndexes.get($joinStack[$joinStack.length - 1].data))
+					].rightProps.splice(0, 1);
+					return x;
+				});
+
 				if (top.right.length === 0) {
 					await joinStackElement.removeFromStack($joinStack.length - 1);
 				}

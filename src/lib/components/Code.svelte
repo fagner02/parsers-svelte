@@ -1,6 +1,6 @@
 <script>
 	import hljs from 'highlight.js';
-	import 'highlight.js/styles/atom-one-dark.min.css';
+	import 'highlight.js/styles/atom-one-light.min.css';
 	import Popup from './Popup.svelte';
 	export let code;
 	export let onClose;
@@ -16,9 +16,9 @@
 
 <style>
 	:global(#code) {
-		background: linear-gradient(127deg, hsl(215, 30%, 10%), hsl(215, 30%, 15%));
+		background: white;
+		/* background: linear-gradient(127deg, hsl(215, 30%, 10%), hsl(215, 30%, 15%)); */
 		border: 1px solid hsl(200, 50%, 50%);
-		color: #abb2bf;
 	}
 
 	pre {

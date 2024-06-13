@@ -1,12 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { fontSize } from '$lib/globalStyle';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
 	import FirstAlgorithm from './FirstAlgorithm.svelte';
 	import FollowAlgorithm from './FollowAlgorithm.svelte';
 	import LlAlgorithm from './LLAlgorithm.svelte';
 	import LlParse from './LLParse.svelte';
+	import { first } from '$lib/first';
+	import { follow } from '$lib/follow';
+	import { lltable } from '$lib/lltable';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -23,7 +25,7 @@
 	let rules = [];
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m';
+	const grammar = 'S -> A Bb\nS -> A\nA -> a a\nA -> \nBb -> b m\nBb -> m';
 	let loaded = false;
 	const loadGrammar = function () {
 		/** @type {{ left: string; right: string[]; index: number; }[]} */
@@ -57,7 +59,13 @@
 	let currentStep = 0;
 	onMount(async () => {
 		code = await (await fetch('first.js')).text();
+		loadGrammar();
+		const nt = ['S', 'A', 'Bb'];
 
+		const t = ['$', 'a', 'b', 'm'];
+		const f = first(rules, nt);
+		const ff = follow(rules, nt, f);
+		console.log(lltable(rules, nt, t, f, ff));
 		steps = [
 			{
 				comp: FirstAlgorithm,
@@ -93,12 +101,11 @@
 			}
 		];
 	});
-	onMount(() => loadGrammar());
 </script>
 
 {#if loaded}
 	{#if steps.length > 0 && currentStep > -1}
-		{currentStep}
+		{'currentStep' + currentStep}
 		<div style="display: none;">
 			<svelte:component
 				this={steps[currentStep].comp}
