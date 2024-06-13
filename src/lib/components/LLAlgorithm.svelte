@@ -3,10 +3,9 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
+	import TableCard from './Cards/TableCard.svelte';
 	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
 	import { onMount } from 'svelte';
-	import TableCard from './Cards/TableCard.svelte';
-	import { lineHeight } from '$lib/globalStyle';
 
 	/**@type {SvgLines}*/
 	let svgLines;
