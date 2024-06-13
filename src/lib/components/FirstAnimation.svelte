@@ -9,6 +9,7 @@
 	import { first } from '$lib/first';
 	import { follow } from '$lib/follow';
 	import { lltable } from '$lib/lltable';
+	import { writable } from 'svelte/store';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -16,11 +17,11 @@
 	/**@type {string}*/
 	let selectedAlgorithm = 'first';
 	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
-	let firstSet;
+	let firstSet = writable();
 	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
-	let followSet;
+	let followSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
-	let table;
+	let table = writable();
 	/** @type {Array.<import('@/types').GrammarItem>} */
 	let rules = [];
 	// ========== Components ====================
@@ -52,11 +53,6 @@
 	export let reset;
 
 	let code = '';
-	/**
-	 * @type {{ comp: any; args: any}[]}
-	 */
-	let steps = [];
-	let currentStep = 0;
 	onMount(async () => {
 		code = await (await fetch('first.js')).text();
 		loadGrammar();
@@ -65,95 +61,117 @@
 		const t = ['$', 'a', 'b', 'm'];
 		const f = first(rules, nt);
 		const ff = follow(rules, nt, f);
-		console.log(lltable(rules, nt, t, f, ff));
-		steps = [
-			{
-				comp: FirstAlgorithm,
-				args: {
-					instruction: instruction,
-					firstSet: firstSet,
-					callback: () => {
-						currentStep = 1;
+		const tt = lltable(rules, nt, t, f, ff);
+		if (f !== null) {
+			firstSet.set(
+				/**@type {import('@/types').SetRow[]}*/ (
+					[...f.entries()].map((x) => {
+						let values = [];
+						for (let value of x[1].values()) {
+							values.push(value);
+							if (values.length < x[1].size * 2 - 1) {
+								values.push(',');
+							}
+						}
+
+						return {
+							left: rules[x[0]].left,
+							right: values,
+							showRight: true,
+							rightProps: values.map((s) => {
+								return { value: s, opacity: 1 };
+							}),
+							note: x[0].toString()
+						};
+					})
+				)
+			);
+		}
+
+		followSet.set(
+			/**@type {import('@/types').SetRow[]}*/ (
+				[...ff.entries()].map((x) => {
+					let values = [];
+					for (let value of x[1].values()) {
+						values.push(value);
+						if (values.length < x[1].size * 2 - 1) {
+							values.push(',');
+						}
 					}
-				}
-			},
-			{
-				comp: FollowAlgorithm,
-				args: {
-					instruction: instruction,
-					firstSet: firstSet,
-					followSet: followSet,
-					callback: () => {
-						currentStep = 2;
-					}
-				}
-			},
-			{
-				comp: LlAlgorithm,
-				args: {
-					instruction: instruction,
-					firstSet: firstSet,
-					followSet: followSet,
-					callback: () => {
-						currentStep = -1;
-					}
-				}
-			}
-		];
+
+					return {
+						left: x[0],
+						right: values,
+						showRight: true,
+						rightProps: values.map((s) => {
+							return { value: s, opacity: 1 };
+						}),
+						note: ''
+					};
+				})
+			)
+		);
+
+		table.set(
+			/**@type {Map<string, import('./types').tableCol>}*/ (
+				new Map(
+					[...tt].map(([rowKey, cols]) => [
+						rowKey,
+						new Map(
+							[...cols].map(([colKey, cell]) => [
+								colKey,
+								/**@type {import('./types').tableItem}*/ ({
+									data: cell,
+									opacity: 1,
+									pos: 0,
+									text: cell > -1 ? rules[cell].left : '',
+									width: 1
+								})
+							])
+						)
+					])
+				)
+			)
+		);
 	});
 </script>
 
 {#if loaded}
-	{#if steps.length > 0 && currentStep > -1}
-		{'currentStep' + currentStep}
-		<div style="display: none;">
-			<svelte:component
-				this={steps[currentStep].comp}
-				bind:followSet
-				bind:firstSet
-				bind:table
-				{rules}
-				{...steps[currentStep].args}
-			></svelte:component>
+	<AlgorithmTab resetCall={reset} bind:instruction bind:inputString {code}>
+		<div slot="steps">
+			<div class="algo-buttons">
+				<button
+					on:click={() => {
+						swapAlgorithm(() => (selectedAlgorithm = 'first'));
+					}}>{'<'}first</button
+				>
+				<button
+					on:click={async () => {
+						swapAlgorithm(() => {
+							selectedAlgorithm = 'follow';
+						});
+					}}>follow{'>'}</button
+				>
+				<button
+					on:click={() => {
+						swapAlgorithm(() => (selectedAlgorithm = 'll'));
+					}}>ll{'>'}</button
+				>
+			</div>
+			<div class="grid">
+				{#if selectedAlgorithm === 'first'}
+					<FirstAlgorithm {rules} bind:instruction bind:reset></FirstAlgorithm>
+				{:else if selectedAlgorithm === 'follow'}
+					<FollowAlgorithm {rules} {firstSet} bind:instruction bind:reset></FollowAlgorithm>
+				{:else}
+					<LlAlgorithm {rules} {firstSet} {followSet} bind:instruction bind:reset></LlAlgorithm>
+				{/if}
+			</div>
 		</div>
-	{/if}
-	{#if currentStep === -1}
-		<AlgorithmTab resetCall={reset} bind:instruction bind:inputString {code}>
-			<div slot="steps">
-				<div class="algo-buttons">
-					<button
-						on:click={() => {
-							swapAlgorithm(() => (selectedAlgorithm = 'first'));
-						}}>{'<'}first</button
-					>
-					<button
-						on:click={async () => {
-							swapAlgorithm(() => {
-								selectedAlgorithm = 'follow';
-							});
-						}}>follow{'>'}</button
-					>
-					<button
-						on:click={() => {
-							swapAlgorithm(() => (selectedAlgorithm = 'll'));
-						}}>ll{'>'}</button
-					>
-				</div>
-				<div class="grid">
-					{#if selectedAlgorithm === 'first'}
-						<FirstAlgorithm {rules} bind:instruction bind:reset></FirstAlgorithm>
-					{:else if selectedAlgorithm === 'follow'}
-						<FollowAlgorithm {rules} {firstSet} bind:instruction bind:reset></FollowAlgorithm>
-					{:else}
-						<LlAlgorithm {rules} {firstSet} {followSet} bind:instruction bind:reset></LlAlgorithm>
-					{/if}
-				</div>
-			</div>
-			<div slot="parse" class="grid" style="place-items: center;">
-				<LlParse bind:input={inputString} {table} {rules}></LlParse>
-			</div>
-		</AlgorithmTab>
-	{/if}
+		<div slot="parse" class="grid" style="place-items: center;">
+			<LlParse bind:input={inputString} {table} {rules}></LlParse>
+		</div>
+	</AlgorithmTab>
 {/if}
 
 <style>

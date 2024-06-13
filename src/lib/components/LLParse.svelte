@@ -32,14 +32,11 @@
 	let nt = ['S', 'A', 'Bb'];
 	let t = ['$', 'a', 'b', 'm'];
 	let count = 0;
+
 	/**
-	 * @type {((reason?: any) => void)[]}
+	 * @type {number | null}
 	 */
-	let rejects = [];
-	/**
-	 * @type {number[]}
-	 */
-	let running = [];
+	let running = null;
 
 	export function reset() {
 		symbolStack.update(() => []);
@@ -55,23 +52,21 @@
 	async function parsing() {
 		if (count > 100) count = 0;
 		const id = count;
+		running = count;
 		count++;
-		running.splice(0, running.length);
-		running.push(id);
 
 		try {
-			console.log('start');
 			for (let i of ['$', startingSymbol]) {
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				await symbolStackElement.addToStack(i, i, '', $symbolStack.length.toString());
 			}
 			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				await inputStackElement.addToStack(i, i, '', $inputStack.length.toString());
 			}
 
 			while ($inputStack.length > 0) {
-				if (running[running.length - 1] !== id) return;
+				if (running !== id) return;
 				const topSymbol = $symbolStack[$symbolStack.length - 1].data;
 				const topInput = $inputStack[$inputStack.length - 1].data;
 				if (nt.includes(topSymbol)) {
@@ -80,41 +75,34 @@
 						context.setAccept(false);
 						return;
 					}
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					await symbolStackElement.removeFromStack($symbolStack.length - 1);
 					const prod = [...rules[prodIndex].right].reverse();
 					for (let p of prod) {
-						if (running[running.length - 1] !== id) return;
+						if (running !== id) return;
 						await symbolStackElement.addToStack(p, p, '', $symbolStack.length.toString());
 					}
 				} else {
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					if (topSymbol !== topInput) {
 						context.setAccept(false);
 						return;
 					}
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					symbolStackElement.removeFromStack($symbolStack.length - 1);
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					await inputStackElement.removeFromStack($inputStack.length - 1);
-					if (running[running.length - 1] !== id) return;
+					if (running !== id) return;
 					if ($inputStack.length === 0) {
-						console.log('não');
 						context.setAccept(true);
 					}
 				}
 
 				await addPause();
 			}
-			if (running[running.length - 1] !== id) return;
-			running.splice(
-				0,
-				running.findIndex((x) => x === id)
-			);
-			console.log('fim');
+			if (running !== id) return;
 			limitHit();
 			addPause();
-			if (running[running.length - 1] !== id) return;
 		} catch (e) {}
 	}
 

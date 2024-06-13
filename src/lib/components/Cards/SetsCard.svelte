@@ -24,9 +24,7 @@
 		return {
 			delay,
 			duration,
-			/**
-			 * @param {number} t
-			 */
+			/** @param {number} t */
 			css: (t) => `opacity: ${t < 0.5 ? 0 : (t - 0.5) / 0.5};
 			width: ${charWidth * t}px;`
 		};

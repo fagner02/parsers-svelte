@@ -19,7 +19,6 @@
 
 	/**@type {string}*/
 	export let instruction;
-
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
@@ -27,25 +26,17 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
 	export let firstSet = writable([]);
 
-	/**
-	 * @type {(() => void) | null}
-	 */
+	/** @type {(() => void) | null} */
 	export let callback = null;
 	let count = 0;
-	/**
-	 * @type {number|null}
-	 */
+	/** @type {number|null}*/
 	let running = null;
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
+
 	let nt = ['S', 'A', 'Bb'];
 
-	if (callback !== null) {
-		swapAlgorithm(() => {});
-	}
-	/**
-	 * @param {number} currentRule
-	 */
+	/** @param {number} currentRule */
 	async function getProdSymbol(currentRule) {
 		await selectRSymbol('g', currentRule, 0, 'green', true);
 		return rules[currentRule].right[0];
@@ -58,7 +49,6 @@
 		firstIndexes.clear();
 		first();
 	};
-
 	setResetCall(reset);
 
 	/**
@@ -77,9 +67,10 @@
 			}
 		}
 	}
+
 	function nullable(
 		/** @type {Array<import('@/types').GrammarItem>} */ rules,
-		/**@type {string}*/ symbol
+		/** @type {string} */ symbol
 	) {
 		const matchingRules = rules.filter((x) => x.left === symbol);
 		for (let rule of matchingRules) {

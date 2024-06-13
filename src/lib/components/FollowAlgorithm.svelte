@@ -53,9 +53,6 @@
 	 */
 	export let callback = null;
 
-	if (callback !== null) {
-		swapAlgorithm(() => {});
-	}
 	/**
 	 * @param {string} symbol
 	 * @param {string[]} values

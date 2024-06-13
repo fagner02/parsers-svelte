@@ -33,7 +33,7 @@
 		tableElement.resetTable();
 
 		svgLines.setHideOpacity();
-		follow();
+		lltable();
 	}
 	setResetCall(reset);
 	/**
@@ -44,7 +44,7 @@
 	if (callback !== null) {
 		swapAlgorithm(() => {});
 	}
-	async function follow() {
+	async function lltable() {
 		try {
 			await wait(100);
 			await loadGrammar();
@@ -91,7 +91,7 @@
 
 	onMount(() => {
 		tableElement?.resetTable();
-		follow();
+		lltable();
 	});
 </script>
 
