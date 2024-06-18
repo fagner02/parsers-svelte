@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
+	import { wait, addPause, limitHit, setResetCall, newRunningCall } from '$lib/flowControl';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
@@ -69,6 +69,7 @@
 	}
 
 	async function follow() {
+		const id = newRunningCall();
 		try {
 			await wait(100);
 			await loadGrammar();

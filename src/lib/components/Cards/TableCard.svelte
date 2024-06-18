@@ -28,7 +28,7 @@
 								text: '',
 								opacity: 0,
 								pos: -40,
-								width: charWidth
+								width: 0
 							}
 						])
 					)
@@ -57,7 +57,7 @@
 					text: text,
 					opacity: 0,
 					pos: -40,
-					width: charWidth
+					width: 0
 				});
 				return x;
 			});
@@ -69,7 +69,7 @@
 					text: text,
 					opacity: 1,
 					pos: 0,
-					width: text.length * charWidth
+					width: 1
 				});
 				return x;
 			});
@@ -98,7 +98,9 @@
 						<td>
 							<span
 								id="t-{tableId}-{rowKey}-{colKey}"
-								style="width: {col.width}px;opacity: {col.opacity};top: {col.pos}px;"
+								style="width: {col.text.length *
+									charWidth *
+									col.width}px;opacity: {col.opacity};top: {col.pos}px;"
 							>
 								{col.text}
 							</span>

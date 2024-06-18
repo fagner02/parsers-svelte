@@ -5,11 +5,7 @@
 		forward,
 		back,
 		setCloseInstruction,
-		setOpenInstruction,
-		setResetCall,
-		swapAlgorithm,
-		killAllWaits,
-		killPause
+		setOpenInstruction
 	} from '$lib/flowControl';
 	import Code from '@/Code.svelte';
 	import FillHeight from '@/FillHeight.svelte';
@@ -101,16 +97,29 @@
 <FillHeight class="contents">
 	<div class="controls-box">
 		<div class="controls">
-			<button on:click={() => updateSelected('code')} disabled={selected == 'code'}>
-				<CodeIcon></CodeIcon>
-			</button>
-			<button on:click={() => updateSelected('text')} disabled={selected == 'text'}>
-				<ClipboardTextIcon></ClipboardTextIcon>
-			</button>
-			<button on:click={() => updateSelected('info')} disabled={selected == 'info'}>
-				<DocIcon></DocIcon>
+			<button
+				class="popup-button"
+				on:click={() => updateSelected('code')}
+				disabled={selected == 'code'}
+			>
+				<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 			</button>
 			<button
+				class="popup-button"
+				on:click={() => updateSelected('text')}
+				disabled={selected == 'text'}
+			>
+				<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
+			</button>
+			<button
+				class="popup-button"
+				on:click={() => updateSelected('info')}
+				disabled={selected == 'info'}
+			>
+				<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
+			</button>
+			<button
+				class="view-button"
 				on:click={() => {
 					reset();
 					parseOn = true;
@@ -118,9 +127,10 @@
 				}}
 				disabled={parseOn}
 			>
-				<InputStringIcon></InputStringIcon>
+				<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
 			</button>
 			<button
+				class="view-button"
 				on:click={() => {
 					reset();
 					parseOn = false;
@@ -128,19 +138,19 @@
 				}}
 				disabled={!parseOn}
 			>
-				<PlayIcon></PlayIcon>
+				<PlayIcon color="hsl(100,50%,100%)" strokeWidth={3}></PlayIcon>
 			</button>
 		</div>
 
 		<div class="flow-controls controls">
 			<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
-				<PlaySkipBackIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
 			<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
-				<RestartIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3}></RestartIcon>
+				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 			</button>
 			<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
-				<PlaySkipForwardIcon color="hsl(200,60%,50%)" size={15} strokeWidth={3} />
+				<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
 		</div>
 	</div>
@@ -254,21 +264,33 @@
 		align-items: center;
 		flex-wrap: wrap;
 		flex-direction: column;
+		max-width: inherit;
 	}
 
 	button {
 		box-shadow: 0px 0px 5px 0px hsl(200, 100%, 40%, 30%);
-		border: 1px solid hsl(200, 60%, 60%);
-		background: hsl(200, 100%, 95%);
+		border: 1px solid hsl(200, 60%, 40%);
+		background: hsl(200, 100%, 45%);
 		transition:
 			filter 0.5s,
-			scale 0.1s;
+			scale 0.1s,
+			background 0.5s;
+		scale: 1;
+	}
+
+	.view-button {
+		box-shadow: 0px 0px 5px 0px hsl(100, 100%, 40%, 30%);
+		border: 1px solid hsl(100, 60%, 40%);
+		background: hsl(100, 60%, 45%);
 	}
 	button:active {
 		transform: scale(1.2);
 	}
 	button:disabled {
 		transform: scale(1);
-		filter: brightness(80%);
+		background: hsl(200, 50%, 70%);
+	}
+	.view-button:disabled {
+		background: hsl(100, 50%, 70%);
 	}
 </style>

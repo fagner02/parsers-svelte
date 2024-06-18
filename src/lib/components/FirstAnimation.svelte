@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { swapAlgorithm } from '$lib/flowControl';
 	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
 	import FirstAlgorithm from './FirstAlgorithm.svelte';
 	import FollowAlgorithm from './FollowAlgorithm.svelte';
@@ -76,7 +75,7 @@
 
 						return {
 							left: rules[x[0]].left,
-							right: values,
+							right: [...x[1]],
 							showRight: true,
 							rightProps: values.map((s) => {
 								return { value: s, opacity: 1 };
@@ -101,7 +100,7 @@
 
 					return {
 						left: x[0],
-						right: values,
+						right: [...x[1]],
 						showRight: true,
 						rightProps: values.map((s) => {
 							return { value: s, opacity: 1 };
@@ -124,7 +123,10 @@
 									data: cell,
 									opacity: 1,
 									pos: 0,
-									text: cell > -1 ? rules[cell].left : '',
+									text:
+										cell > -1
+											? `${rules[cell].left} -> ${rules[cell].right[0] === '' ? 'ε' : rules[cell].right.join(' ')}`
+											: '',
 									width: 1
 								})
 							])
@@ -138,24 +140,22 @@
 
 {#if loaded}
 	<AlgorithmTab resetCall={reset} bind:instruction bind:inputString {code}>
-		<div slot="steps">
+		<div slot="steps" style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
 				<button
 					on:click={() => {
-						swapAlgorithm(() => (selectedAlgorithm = 'first'));
-					}}>{'<'}first</button
+						selectedAlgorithm = 'first';
+					}}>first</button
 				>
 				<button
 					on:click={async () => {
-						swapAlgorithm(() => {
-							selectedAlgorithm = 'follow';
-						});
-					}}>follow{'>'}</button
+						selectedAlgorithm = 'follow';
+					}}>follow</button
 				>
 				<button
 					on:click={() => {
-						swapAlgorithm(() => (selectedAlgorithm = 'll'));
-					}}>ll{'>'}</button
+						selectedAlgorithm = 'table';
+					}}>table</button
 				>
 			</div>
 			<div class="grid">
@@ -177,6 +177,15 @@
 <style>
 	.algo-buttons {
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
+		gap: 5px;
+	}
+
+	button {
+		background: hsl(200, 60%, 50%);
+		color: white;
+		padding: 5px 10px;
+		border-radius: 10px;
+		width: fit-content;
 	}
 </style>

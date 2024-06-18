@@ -1,6 +1,6 @@
 function nullable(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-	/**@type {string} symbol*/ symbol
+	/** @type {string}*/ symbol
 ) {
 	const matchingRules = rules.filter((x) => x.left === symbol);
 	for (let rule of matchingRules) {
@@ -13,7 +13,7 @@ function nullable(
 
 export function first(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-	/**@type {string[]} */ nt
+	/** @type {string[]} */ nt
 ) {
 	/** @type {Array<number>} */
 	let symbolStack = [];

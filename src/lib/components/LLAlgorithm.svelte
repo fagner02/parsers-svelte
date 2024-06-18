@@ -4,7 +4,14 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
 	import TableCard from './Cards/TableCard.svelte';
-	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
+	import {
+		wait,
+		addPause,
+		limitHit,
+		setResetCall,
+		newRunningCall,
+		currentlyRunning
+	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 
 	/**@type {SvgLines}*/
@@ -32,18 +39,13 @@
 		tableElement.resetTable();
 
 		svgLines.setHideOpacity();
+		console.log($table);
 		lltable();
 	}
 	setResetCall(reset);
-	/**
-	 * @type {(() => void) | null}
-	 */
-	export let callback = null;
 
-	if (callback !== null) {
-		swapAlgorithm(() => {});
-	}
 	async function lltable() {
+		const id = newRunningCall();
 		try {
 			await wait(100);
 			await loadGrammar();
@@ -59,6 +61,10 @@
 							$followSet.find((x) => x.left === item.left)
 						);
 						for (let f = 0; f < follow.right.length; f++) {
+							if (currentlyRunning != id) {
+								console.log(currentlyRunning, id);
+								return;
+							}
 							await tableElement.addToTable(
 								parseFloat(/**@type {string}*/ (item.note)),
 								`${item.left} -> ε`,
@@ -69,6 +75,10 @@
 						}
 						continue;
 					}
+					if (currentlyRunning != id) {
+						console.log(currentlyRunning, id);
+						return;
+					}
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[ruleIndex].right.join(' ')}`,
@@ -78,9 +88,7 @@
 					await addPause();
 				}
 			}
-			if (callback !== null) {
-				callback();
-			}
+
 			limitHit();
 			addPause();
 		} catch (e) {

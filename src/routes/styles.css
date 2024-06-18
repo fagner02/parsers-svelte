@@ -2,9 +2,11 @@
 	font-family: 'spacemono';
 	src: url('/fonts/SpaceMono-Regular.ttf');
 }
+
 * {
 	font-family: 'spacemono', monospace;
 }
+
 html,
 body,
 #app {
@@ -134,7 +136,7 @@ input:focus-within {
 
 .cards-box {
 	display: flex;
-	justify-content: start;
+	justify-content: center;
 	align-items: start;
 	flex-wrap: wrap;
 }
@@ -149,6 +151,7 @@ input:focus-within {
 		opacity: 1;
 	}
 }
+
 @keyframes rotD {
 	from {
 		transform: scale(1) translate(0px, 0px) rotate(0deg);

@@ -117,8 +117,6 @@ let closeInstruction;
 /** @type {() => Promise<void>} */
 let openInstruction;
 /** @type {() => void}*/
-let swapCallback;
-/** @type {() => void}*/
 let resetCall;
 
 /**
@@ -161,13 +159,8 @@ export function limitHit() {
 
 export async function addPause() {
 	stepCount += 1;
-	if (swapping && limit) {
-		setJumpPause(false);
-		setJumpWait(false);
-		targetStep = -1;
-		swapping = false;
-		swapCallback();
-	} else if (goBack && (stepCount === targetStep || limit)) {
+
+	if (goBack && (stepCount === targetStep || limit)) {
 		goBack = false;
 		targetStep = -1;
 		setJumpPause(false);
@@ -218,30 +211,22 @@ export function reset() {
 	killPause();
 	setJumpWait(true);
 	closeInstruction?.();
-	setJumpWait(false);
+	if (!goBack) {
+		setJumpWait(false);
+	}
 
 	resetCall();
 }
 
-/**
- * @param {() => any} callback
- */
-export function swapAlgorithm(callback) {
-	if (limit) {
-		callback();
-		swapping = false;
-		return;
+/**@type {number} */
+export let currentlyRunning = -1;
+let runningCount = 0;
+
+export function newRunningCall() {
+	currentlyRunning = runningCount;
+	runningCount++;
+	if (runningCount > 100) {
+		runningCount = 0;
 	}
-	swapCallback = callback;
-	swapping = true;
-	goForward = false;
-	goBack = false;
-	targetStep = -1;
-
-	setJumpWait(true);
-	setJumpPause(true);
-	resolveAllWaits();
-	resolvePause();
-
-	closeInstruction?.();
+	return currentlyRunning;
 }

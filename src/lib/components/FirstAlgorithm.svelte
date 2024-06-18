@@ -4,7 +4,14 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
-	import { wait, addPause, limitHit, setResetCall, swapAlgorithm } from '$lib/flowControl';
+	import {
+		wait,
+		addPause,
+		limitHit,
+		setResetCall,
+		newRunningCall,
+		currentlyRunning
+	} from '$lib/flowControl';
 	import { selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
@@ -26,11 +33,6 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
 	export let firstSet = writable([]);
 
-	/** @type {(() => void) | null} */
-	export let callback = null;
-	let count = 0;
-	/** @type {number|null}*/
-	let running = null;
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
 
@@ -82,21 +84,16 @@
 	}
 
 	async function first() {
-		if (count > 100) count = 0;
-		const id = count;
-		running = count;
-		count++;
+		const id = newRunningCall();
 
 		try {
-			if (running !== id) return;
 			await wait(0);
-			if (running !== id) return;
 			await loadGrammar();
-			if (running !== id) return;
+			if (currentlyRunning !== id) return;
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
-				if (running !== id) return;
+				if (currentlyRunning !== id) return;
 				await symbolStackElement.addToStack(
 					i,
 					rules[i].left,
@@ -107,17 +104,17 @@
 			}
 
 			while ($symbolStack.length > 0) {
-				if (running !== id) return;
+				if (currentlyRunning !== id) return;
 				await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
 
 				if (!firstIndexes.has($symbolStack[$symbolStack.length - 1].data)) {
-					if (running !== id) return;
+					if (currentlyRunning !== id) return;
 					await firstSetElement.addSetRow(
 						$symbolStack[$symbolStack.length - 1].text,
 						$symbolStack[$symbolStack.length - 1].data
 					);
 				}
-				if (running !== id) return;
+				if (currentlyRunning !== id) return;
 				let symbol = await getProdSymbol($symbolStack[$symbolStack.length - 1].data);
 
 				if (nt.includes(symbol)) {
@@ -139,43 +136,41 @@
 									const currentIndex = /**@type {number}*/ (
 										firstIndexes.get($symbolStack[$symbolStack.length - 1].data)
 									);
-									if (running !== id) return;
+									if (currentlyRunning !== id) return;
 									if (!$firstSet[currentIndex].right.includes(''))
 										await firstSetElement.joinSets([''], currentIndex);
 								}
 							}
-							if (running !== id) return;
+							if (currentlyRunning !== id) return;
 							await firstSetElement.joinSets(
 								$firstSet[firstIndex].right.filter((x) => x !== ''),
 								/**@type {number}*/ (firstIndexes.get($symbolStack[$symbolStack.length - 1].data))
 							);
 						} else {
 							await wait(1000);
-							if (running !== id) return;
+							if (currentlyRunning !== id) return;
 							await addProdToStacks(symbol);
 							complete = false;
 						}
 					}
 					if (complete) {
-						if (running !== id) return;
+						if (currentlyRunning !== id) return;
 						await symbolStackElement.removeFromStack($symbolStack.length - 1);
 					}
 				} else {
 					let index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);
 
 					while (index !== undefined) {
-						if (running !== id) return;
+						if (currentlyRunning !== id) return;
 						await firstSetElement.joinSets([symbol], index);
-						if (running !== id) return;
+						if (currentlyRunning !== id) return;
 						await symbolStackElement.removeFromStack($symbolStack.length - 1);
 						if (symbol === '') break;
 						index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);
 					}
 				}
 			}
-			if (callback !== null) {
-				callback();
-			}
+
 			limitHit();
 			addPause();
 		} catch (e) {
