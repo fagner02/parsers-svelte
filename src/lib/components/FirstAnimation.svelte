@@ -53,7 +53,7 @@
 
 	let code = '';
 	onMount(async () => {
-		code = await (await fetch('first.js')).text();
+		code = await (await fetch('src/lib/first.js')).text();
 		loadGrammar();
 		const nt = ['S', 'A', 'Bb'];
 
@@ -61,31 +61,30 @@
 		const f = first(rules, nt);
 		const ff = follow(rules, nt, f);
 		const tt = lltable(rules, nt, t, f, ff);
-		if (f !== null) {
-			firstSet.set(
-				/**@type {import('@/types').SetRow[]}*/ (
-					[...f.entries()].map((x) => {
-						let values = [];
-						for (let value of x[1].values()) {
-							values.push(value);
-							if (values.length < x[1].size * 2 - 1) {
-								values.push(',');
-							}
-						}
 
-						return {
-							left: rules[x[0]].left,
-							right: [...x[1]],
-							showRight: true,
-							rightProps: values.map((s) => {
-								return { value: s, opacity: 1 };
-							}),
-							note: x[0].toString()
-						};
-					})
-				)
-			);
-		}
+		firstSet.set(
+			/**@type {import('@/types').SetRow[]}*/ (
+				[...f.entries()].map((x) => {
+					let values = [];
+					for (let value of x[1].values()) {
+						values.push(value);
+						if (values.length < x[1].size * 2 - 1) {
+							values.push(',');
+						}
+					}
+
+					return {
+						left: rules[x[0]].left,
+						right: [...x[1]],
+						showRight: true,
+						rightProps: values.map((s) => {
+							return { value: s, opacity: 1 };
+						}),
+						note: x[0].toString()
+					};
+				})
+			)
+		);
 
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (

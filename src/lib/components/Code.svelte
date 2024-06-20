@@ -8,9 +8,11 @@
 
 <Popup let:style let:contentClass id="code" {onClose}>
 	<pre id="pre-code" class={contentClass} {style}><code
-			>{@html hljs.highlight(code, {
-				language: 'javascript'
-			}).value}</code
+			>{@html hljs
+				.highlight(code, {
+					language: 'javascript'
+				})
+				.value.replaceAll('\t', '    ')}</code
 		></pre>
 </Popup>
 
@@ -26,9 +28,10 @@
 		overflow: auto;
 		margin: 0px;
 		transition: all 0.9s 0.2s;
+		line-height: 15px;
 	}
 
-	:global(code, code > span, code > span > span) {
+	:global(code, code span) {
 		position: relative;
 		animation: rotA 0.5s;
 		font-family: monospace !important;
