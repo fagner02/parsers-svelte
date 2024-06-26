@@ -7,8 +7,6 @@ export function follow(
 	let followSet = new Map();
 	/** @type {Map<string, Set<string>>}*/
 	let joinSet = new Map();
-	/** @type {Array<string>} */
-	let joinStack = [];
 
 	followSet.set(rules[0].left, new Set(['$']));
 
@@ -59,28 +57,29 @@ export function follow(
 		}
 	}
 	for (let item of joinSet.keys()) {
-		joinStack.push(item);
-	}
+		/** @type {Array<string>} */
+		let joinStack = [item];
 
-	while (joinStack.length > 0) {
-		const topKey = joinStack[joinStack.length - 1];
-		const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
+		while (joinStack.length > 0) {
+			const topKey = joinStack[joinStack.length - 1];
+			const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
 
-		const topValue = top?.values().next().value;
-		if (joinSet.has(topValue)) {
-			joinStack.push(topValue);
-			continue;
-		}
-		const followIndex = followSet.get(topKey);
-		const joinIndex = /**@type {Set<String>}*/ (followSet.get(topValue));
-		for (let item of joinIndex) {
-			followIndex?.add(item);
-		}
+			const topValue = top?.values().next().value;
+			if (joinSet.has(topValue) && !joinStack.includes(topValue)) {
+				joinStack.push(topValue);
+				continue;
+			}
+			const _followSet = followSet.get(topKey);
+			const setToJoin = /**@type {Set<String>}*/ (followSet.get(topValue));
+			for (let item of setToJoin) {
+				_followSet?.add(item);
+			}
 
-		top.delete(topValue);
+			top.delete(topValue);
 
-		if (top.size === 0) {
-			joinStack.pop();
+			if (top.size === 0) {
+				joinStack.pop();
+			}
 		}
 	}
 

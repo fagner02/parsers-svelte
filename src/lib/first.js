@@ -15,65 +15,54 @@ export function first(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
 	/** @type {string[]} */ nt
 ) {
-	/** @type {Array<number>} */
-	let symbolStack = [];
 	/** @type {Map<number, Set<string>>} */
 	let firstSet = new Map();
+	/** @type {Map<number, Set<string>>}*/
+	let joinSet = new Map();
+
 	for (let i = 0; i < rules.length; i++) {
-		symbolStack.push(i);
+		firstSet.set(i, new Set());
+
+		for (let j = 0; j < rules[i].right.length; j++) {
+			let symbol = rules[i].right[j];
+			if (nt.includes(symbol)) {
+				if (!joinSet.has(i)) {
+					joinSet.set(i, new Set());
+				}
+				joinSet.get(i)?.add(symbol);
+			} else {
+				firstSet.get(i)?.add(symbol);
+			}
+			if (!nullable(rules, symbol)) break;
+		}
 	}
 
-	while (symbolStack.length > 0) {
-		if (!firstSet.has(symbolStack[symbolStack.length - 1])) {
-			firstSet.set(symbolStack[symbolStack.length - 1], new Set());
-		}
+	for (let item of joinSet.keys()) {
+		/** @type {Array<number>} */
+		let joinStack = [item];
 
-		let symbol = rules[symbolStack[symbolStack.length - 1]].right[0];
+		while (joinStack.length > 0) {
+			const topKey = joinStack[joinStack.length - 1];
+			const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
+			const topValue = top?.values().next().value;
 
-		if (nt.includes(symbol)) {
-			const matchingRules = rules.filter((x) => x.left === symbol);
-
-			let complete = true;
+			if (joinSet.has(topValue) && !joinStack.includes(topValue)) {
+				joinStack.push(topValue);
+				continue;
+			}
+			const _firstSet = firstSet.get(topKey);
+			const matchingRules = rules.filter((x) => x.left === topValue);
 			for (let rule of matchingRules) {
-				const firstToJoin = firstSet.get(rule.index);
-				if (firstToJoin !== undefined) {
-					for (let item of firstToJoin) {
-						if (item === '') {
-							let isNullable = true;
-							for (let s of rules[/**@type {number}*/ (symbolStack.at(-1))].right) {
-								if (!nullable(rules, s)) {
-									isNullable = false;
-									break;
-								}
-							}
-							if (isNullable) {
-								firstSet.get(symbolStack[symbolStack.length - 1])?.add('');
-							}
-						} else {
-							firstSet.get(symbolStack[symbolStack.length - 1])?.add(item);
-						}
-					}
-				} else {
-					for (let i1 = 0; i1 < rules.length; i1++) {
-						if (rules[i1].left === symbol) {
-							symbolStack.push(i1);
-						}
-					}
-					complete = false;
+				const setToJoin = /**@type {Set<String>}*/ (firstSet.get(rule.index));
+				for (let item of setToJoin) {
+					_firstSet?.add(item);
 				}
 			}
-			if (complete) {
-				symbolStack.pop();
-			}
-		} else {
-			let index = symbolStack[symbolStack.length - 1];
 
-			while (firstSet.has(index)) {
-				firstSet.get(index)?.add(symbol);
+			top.delete(topValue);
 
-				symbolStack.pop();
-				if (symbol === '') break;
-				index = symbolStack[symbolStack.length - 1];
+			if (top.size === 0) {
+				joinStack.pop();
 			}
 		}
 	}

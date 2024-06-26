@@ -55,16 +55,16 @@
 	onMount(async () => {
 		code = await (await fetch('src/lib/first.js')).text();
 		loadGrammar();
-		const nt = ['S', 'A', 'Bb'];
 
+		const nt = ['S', 'A', 'Bb'];
 		const t = ['$', 'a', 'b', 'm'];
-		const f = first(rules, nt);
-		const ff = follow(rules, nt, f);
-		const tt = lltable(rules, nt, t, f, ff);
+		const _first = first(rules, nt);
+		const _follow = follow(rules, nt, _first);
+		const _table = lltable(rules, nt, t, _first, _follow);
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[...f.entries()].map((x) => {
+				[..._first.entries()].map((x) => {
 					let values = [];
 					for (let value of x[1].values()) {
 						values.push(value);
@@ -88,7 +88,7 @@
 
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[...ff.entries()].map((x) => {
+				[..._follow.entries()].map((x) => {
 					let values = [];
 					for (let value of x[1].values()) {
 						values.push(value);
@@ -113,7 +113,7 @@
 		table.set(
 			/**@type {Map<string, import('./types').tableCol>}*/ (
 				new Map(
-					[...tt].map(([rowKey, cols]) => [
+					[..._table].map(([rowKey, cols]) => [
 						rowKey,
 						new Map(
 							[...cols].map(([colKey, cell]) => [

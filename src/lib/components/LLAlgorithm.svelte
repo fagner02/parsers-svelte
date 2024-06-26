@@ -27,7 +27,6 @@
 
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
-
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
@@ -37,12 +36,27 @@
 
 	export function reset() {
 		tableElement.resetTable();
-
 		svgLines.setHideOpacity();
-		console.log($table);
 		lltable();
 	}
 	setResetCall(reset);
+
+	async function selectFor(/**@type {string}*/ id) {
+		const elem = document.querySelector(id);
+		const box = /**@type {HTMLElement}*/ (document.querySelector('#border-selection'));
+		const parent = document.querySelector('.steps');
+		if (elem === null || box === null || parent === null) return;
+
+		const rect = elem.getBoundingClientRect();
+		const parentRect = parent.getBoundingClientRect();
+
+		const height = rect.height + 3;
+		const width = rect.width + 10;
+		box.style.height = `${height}px`;
+		box.style.width = `${width}px`;
+		box.style.top = `${rect.y - parentRect.y - 2}px`;
+		box.style.left = `${rect.x - parentRect.x - 8}px`;
+	}
 
 	async function lltable() {
 		const id = newRunningCall();
@@ -54,17 +68,16 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
+				const ruleIndex = parseFloat(/**@type {string}*/ (item.note));
 				for (let j = 0; j < item.right.length; j++) {
-					const ruleIndex = parseFloat(/**@type {string}*/ (item.note));
 					if (item.right.includes('')) {
 						const follow = /**@type {import('@/types').SetRow}*/ (
 							$followSet.find((x) => x.left === item.left)
 						);
 						for (let f = 0; f < follow.right.length; f++) {
-							if (currentlyRunning != id) {
-								console.log(currentlyRunning, id);
-								return;
-							}
+							if (currentlyRunning != id) return;
+
+							selectFor('#firstset' + item.note);
 							await tableElement.addToTable(
 								parseFloat(/**@type {string}*/ (item.note)),
 								`${item.left} -> ε`,
@@ -75,10 +88,8 @@
 						}
 						continue;
 					}
-					if (currentlyRunning != id) {
-						console.log(currentlyRunning, id);
-						return;
-					}
+					if (currentlyRunning != id) return;
+
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[ruleIndex].right.join(' ')}`,
@@ -102,6 +113,7 @@
 	});
 </script>
 
+<div id="border-selection"></div>
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
 	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
@@ -120,3 +132,12 @@
 	<SetsCard setId="first" useNote={false} set={firstSet} color={'blue'} label={'first set'}
 	></SetsCard>
 </div>
+
+<style>
+	#border-selection {
+		border: 1px solid hsl(0, 0%, 0%);
+		position: absolute;
+		z-index: 1;
+		border-radius: 8px;
+	}
+</style>
