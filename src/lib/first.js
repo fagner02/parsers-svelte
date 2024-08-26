@@ -1,15 +1,17 @@
-function nullable(
-	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-	/** @type {string}*/ symbol
-) {
-	const matchingRules = rules.filter((x) => x.left === symbol);
-	for (let rule of matchingRules) {
-		if (rule.right[0] === '') {
-			return true;
-		}
-	}
-	return false;
-}
+// function nullable(
+// 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
+// 	/** @type {string}*/ symbol
+// ) {
+// 	/** =========== FIX IT ===============================================*/
+// 	const matchingRules = rules.filter((x) => x.left === symbol);
+// 	for (let rule of matchingRules) {
+// 		if (rule.right[0] === '') {
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// 	/** =========== FIX IT ===============================================*/
+// }
 
 export function first(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
@@ -19,6 +21,34 @@ export function first(
 	let firstSet = new Map();
 	/** @type {Map<number, Set<string>>}*/
 	let joinSet = new Map();
+	/** @type {Map<string, boolean>}*/
+	let nullable = new Map();
+
+	for (let i = 0; i < rules.length; i++) {
+		if (rules[i].right[0] == '') {
+			nullable.set(rules[i].left, true);
+		} else {
+			nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
+		}
+	}
+
+	let changed = false;
+	while (changed) {
+		for (let j = 0; j < rules.length; j++) {
+			if (nullable.get(rules[j].left)) continue;
+			let isnull = true;
+			for (let k = 0; k < rules[j].right.length; k++) {
+				if (!nullable.get(rules[j].right[k])) {
+					isnull = false;
+					break;
+				}
+			}
+			if (isnull) {
+				changed = true;
+				nullable.set(rules[j].left, true);
+			}
+		}
+	}
 
 	for (let i = 0; i < rules.length; i++) {
 		firstSet.set(i, new Set());
@@ -33,7 +63,7 @@ export function first(
 			} else {
 				firstSet.get(i)?.add(symbol);
 			}
-			if (!nullable(rules, symbol)) break;
+			if (!(nullable.get(symbol) ?? false)) break;
 		}
 	}
 

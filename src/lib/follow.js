@@ -56,6 +56,7 @@ export function follow(
 			}
 		}
 	}
+
 	for (let item of joinSet.keys()) {
 		/** @type {Array<string>} */
 		let joinStack = [item];
