@@ -1,7 +1,7 @@
 <script>
 	import { getPlatform, platforms } from '$lib/utils';
-	import FillHeight from '@/FillHeight.svelte';
-	import Header from '@/Header.svelte';
+	import FillHeight from '@/Layout/FillHeight.svelte';
+	import Header from '@/Layout/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	if (getPlatform() === platforms.mobile) {

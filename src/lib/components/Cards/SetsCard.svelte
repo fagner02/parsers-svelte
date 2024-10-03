@@ -2,8 +2,9 @@
 	import { selectLSymbol } from '$lib/selectSymbol';
 	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
-	import CardBox from './CardBox.svelte';
+	import CardBox from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { text } from '@sveltejs/kit';
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
@@ -34,17 +35,18 @@
 	 * @param {number} index
 	 * @param {string} symbol
 	 */
-	export async function addSetItem(index, symbol) {
+	async function addSetItem(index, symbol) {
 		try {
 			set.update((x) => {
-				x[index].rightProps = [...x[index].rightProps, { value: symbol, opacity: 0 }];
+				x[index].rightProps = [...x[index].rightProps, { value: '', opacity: 0, hide: false }];
 				return x;
 			});
 			await wait(50);
 			set.update((x) => {
 				x[index].rightProps[x[index].rightProps.length - 1] = {
 					value: symbol,
-					opacity: 1
+					opacity: 1,
+					hide: false
 				};
 				return x;
 			});
@@ -53,25 +55,26 @@
 	}
 
 	/**
-	 * @param {Array<string>} symbols
+	 * @param {Array<any>} symbols
+	 * @param {Array<string>} texts
 	 * @param {number} index
 	 */
-	export async function joinSets(symbols, index) {
+	export async function joinSets(symbols, texts, index) {
 		try {
 			if ($set[index].rightProps[0].value === ' ') {
 				$set[index].rightProps.pop();
 			}
-			for (let i3 = 0; i3 < symbols.length; i3++) {
-				if ($set[index].right.find((x) => x === symbols[i3]) === undefined) {
+			for (let i = 0; i < symbols.length; i++) {
+				if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
 					set.update((x) => {
-						x[index].right = [...x[index].right, symbols[i3]];
+						x[index].right = [...x[index].right, symbols[i]];
 						return x;
 					});
 					if ($set[index].rightProps.length > 0) {
 						await addSetItem(index, ',');
 					}
 
-					await addSetItem(index, symbols[i3]);
+					await addSetItem(index, texts[i]);
 				}
 			}
 		} catch {}
@@ -90,7 +93,7 @@
 					left: symbol,
 					right: [],
 					showRight: false,
-					rightProps: [{ value: ' ', opacity: 0 }],
+					rightProps: [{ value: ' ', opacity: 0, hide: false }],
 					note: useNote ? indexMapIdentifier.toString() : ''
 				}
 			]);
@@ -110,6 +113,54 @@
 			});
 			await wait(0);
 		} catch {}
+	}
+
+	/**
+	 * @param {number} index
+	 * @param {any} item
+	 */
+	export async function remove(index, item) {
+		set.update((x) => {
+			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
+			console.log(rIndex, x[index]);
+			let prop = x[index].rightProps[rIndex];
+			x[index].rightProps[rIndex] = {
+				value: prop.value,
+				opacity: 0,
+				hide: true
+			};
+			if (rIndex < x[index].rightProps.length - 1) {
+				x[index].rightProps[rIndex + 1] = {
+					value: ',',
+					opacity: 0,
+					hide: true
+				};
+			}
+			return x;
+		});
+		await wait(1000);
+		set.update((x) => {
+			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
+			x[index].right = x[index].right.filter((i) => i !== item);
+			if (rIndex === x[index].rightProps.length - 1) {
+				x[index].rightProps.splice(rIndex, 1);
+			} else {
+				x[index].rightProps.splice(rIndex, 2);
+			}
+			return x;
+		});
+		await wait(500);
+	}
+
+	export function get(/**@type {any}*/ key) {
+		const index = setIndexes.get(key);
+		if (index !== undefined) {
+			return $set[index].right;
+		}
+	}
+
+	export function has(/**@type {any}*/ key) {
+		return setIndexes.has(key);
 	}
 
 	onMount(async () => {
@@ -139,11 +190,14 @@
 				<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
 				<span in:setItemIn={{ duration: 500, delay: 100 }}>{'{'}</span>
 
-				{#each item.rightProps as text, ri (`${index}-${ri}`)}
+				{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}${text.value}`)}
 					<p
 						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {charWidth *
-							(text.value === '' ? 1 : text.value.length)}px;opacity:{text.opacity};{text.value ===
-						''
+							(text.value === ''
+								? 1
+								: text.hide
+									? 0
+									: text.value.length)}px;opacity:{text.opacity};{text.value === ''
 							? "font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
 							: ''}"
 						id="{setId}r{index}-{ri}"
@@ -158,8 +212,7 @@
 					</p>
 				{/each}
 
-				<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>
-			{/if}
+				<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>{/if}
 		</p>
 	{/each}
 </CardBox>

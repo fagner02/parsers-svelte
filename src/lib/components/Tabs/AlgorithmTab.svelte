@@ -7,8 +7,8 @@
 		setCloseInstruction,
 		setOpenInstruction
 	} from '$lib/flowControl';
-	import Code from '@/Code.svelte';
-	import FillHeight from '@/FillHeight.svelte';
+	import Code from '@/Layout/Code.svelte';
+	import FillHeight from '@/Layout/FillHeight.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
 	import CodeIcon from '@icons/CodeIcon.svelte';
 	import DocIcon from '@icons/DocIcon.svelte';
@@ -16,8 +16,8 @@
 	import PlaySkipBackIcon from '@icons/PlaySkipBackIcon.svelte';
 	import PlaySkipForwardIcon from '@icons/PlaySkipForwardIcon.svelte';
 	import RestartIcon from '@icons/RestartIcon.svelte';
-	import ResultText from '@/ResultText.svelte';
-	import Info from '@/Info.svelte';
+	import ResultText from '@/Layout/ResultText.svelte';
+	import Info from '@/Layout/Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	import InfoIcon from '@icons/InfoIcon.svelte';
 	import ParseView from '@/ParseView.svelte';

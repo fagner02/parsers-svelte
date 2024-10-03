@@ -2,7 +2,7 @@
 	import { fontSize } from '$lib/globalStyle';
 </script>
 
-<div class="card-box" style="animation: rotA 0.5s;">
+<div class="card-wrapper" style="animation: rotA 0.5s;">
 	<div
 		class="card"
 		id={$$props.id}
@@ -24,7 +24,7 @@
 		color: white;
 	}
 
-	.card-box {
+	.card-wrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: start;

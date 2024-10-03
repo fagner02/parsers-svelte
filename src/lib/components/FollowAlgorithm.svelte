@@ -65,7 +65,7 @@
 			joinIndex = /**@type {number}*/ (joinIndexes.get(symbol));
 		}
 
-		await joinSetElement.joinSets(values, joinIndex);
+		await joinSetElement.joinSets(values, values, joinIndex);
 	}
 
 	async function follow() {
@@ -77,6 +77,7 @@
 			instruction = 'Since this thing is like that we have add to the stack';
 			await followSetElement.addSetRow(rules[0].left, rules[0].left);
 			await followSetElement.joinSets(
+				['$'],
 				['$'],
 				/**@type {number}*/ (followIndexes.get(rules[0].left))
 			);
@@ -105,7 +106,7 @@
 											continue;
 										}
 										const followIndex = /**@type {number}*/ (followIndexes.get(symbol));
-										await followSetElement.joinSets(item.right, followIndex);
+										await followSetElement.joinSets(item.right, item.right, followIndex);
 									}
 								}
 
@@ -118,7 +119,7 @@
 									await followSetElement.addSetRow(symbol, symbol);
 									followIndex = /**@type {number}*/ (followIndexes.get(symbol));
 								}
-								await followSetElement.joinSets([followingSymbol], followIndex);
+								await followSetElement.joinSets([followingSymbol], [followingSymbol], followIndex);
 							}
 						}
 						// await addPause();
@@ -141,7 +142,11 @@
 				}
 				const followIndex = /**@type {number}*/ (followIndexes.get(top.left));
 				const joinIndex = /**@type {number}*/ (followIndexes.get(top.right[0]));
-				await followSetElement.joinSets($followSet[joinIndex].right, followIndex);
+				await followSetElement.joinSets(
+					$followSet[joinIndex].right,
+					$followSet[joinIndex].right,
+					followIndex
+				);
 
 				top.right.splice(0, 1);
 				joinSet.update((x) => {

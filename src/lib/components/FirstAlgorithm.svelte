@@ -16,9 +16,11 @@
 	import { onMount } from 'svelte';
 
 	/**@type {StackCard}*/
-	let symbolStackElement;
+	let joinStackElement;
 	/**@type {SetsCard}*/
 	let firstSetElement;
+	/**@type {SetsCard}*/
+	let joinSetElement;
 	/**@type {SvgLines}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
@@ -29,12 +31,19 @@
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let symbolStack = writable([]);
+	let joinStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
 	export let firstSet = writable([]);
+	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
+	export let joinSet = writable([]);
+	/**@type {Map<number, import('@/types').SetRow>}*/
+	let test = new Map();
 
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
+
+	/**@type {Map<number,number>}*/
+	let joinIndexes = new Map();
 
 	let nt = ['S', 'A', 'Bb'];
 
@@ -45,7 +54,7 @@
 	}
 
 	export const reset = () => {
-		symbolStack.update(() => []);
+		joinStack.update(() => []);
 		firstSet.update(() => []);
 		svgLines.setHideOpacity();
 		firstIndexes.clear();
@@ -59,7 +68,7 @@
 	async function addProdToStacks(currentSymbol) {
 		for (let i1 = 0; i1 < rules.length; i1++) {
 			if (rules[i1].left === currentSymbol) {
-				await symbolStackElement.addToStack(
+				await joinStackElement.addToStack(
 					i1,
 					rules[i1].left,
 					rules[i1].index.toString(),
@@ -70,103 +79,131 @@
 		}
 	}
 
-	function nullable(
-		/** @type {Array<import('@/types').GrammarItem>} */ rules,
-		/** @type {string} */ symbol
-	) {
-		const matchingRules = rules.filter((x) => x.left === symbol);
-		for (let rule of matchingRules) {
-			if (rule.right[0] === '') {
-				return true;
-			}
-		}
-		return false;
-	}
+	// function nullable(
+	// 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
+	// 	/** @type {string} */ symbol
+	// ) {
+	// 	const matchingRules = rules.filter((x) => x.left === symbol);
+	// 	for (let rule of matchingRules) {
+	// 		if (rule.right[0] === '') {
+	// 			return true;
+	// 		}
+	// 	}
+	// 	return false;
+	// }
 
 	async function first() {
 		const id = newRunningCall();
 
 		try {
+			// await firstSetElement.addSetRow('h', 0);
+			// console.log(test);
+			// await firstSetElement.addSetItem(0, 'hdu');
+			// await wait(500);
+			// await firstSetElement.addSetItem(0, 'pop');
+			/** @type {Map<string, boolean>}*/
+			let nullable = new Map();
+
+			for (let i = 0; i < rules.length; i++) {
+				if (rules[i].right[0] == '') {
+					nullable.set(rules[i].left, true);
+				} else {
+					nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
+				}
+			}
+
+			let changed = false;
+			while (changed) {
+				for (let j = 0; j < rules.length; j++) {
+					if (nullable.get(rules[j].left)) continue;
+					let isnull = true;
+					for (let k = 0; k < rules[j].right.length; k++) {
+						if (!nullable.get(rules[j].right[k])) {
+							isnull = false;
+							break;
+						}
+					}
+					if (isnull) {
+						changed = true;
+						nullable.set(rules[j].left, true);
+					}
+				}
+			}
+
 			await wait(0);
 			await loadGrammar();
 			if (currentlyRunning !== id) return;
 			await addPause();
+
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
-				await symbolStackElement.addToStack(
-					i,
-					rules[i].left,
-					rules[i].index.toString(),
-					rules[i].index.toString(),
-					`#gl${i}`
-				);
+				await firstSetElement.addSetRow(rules[i].left, i);
+
+				let isNull = true;
+				for (let j = 0; j < rules[i].right.length; j++) {
+					let symbol = rules[i].right[j];
+					if (nt.includes(symbol)) {
+						if (!joinIndexes.has(i)) {
+							await joinSetElement.addSetRow(rules[i].left, i);
+						}
+
+						const matchingRules = rules.filter((x) => x.left === symbol);
+
+						await joinSetElement.joinSets(
+							matchingRules.map((x) => x.index),
+							matchingRules.map((x) => x.left),
+							i
+						);
+					} else {
+						await firstSetElement.joinSets([symbol], [symbol], i);
+					}
+					if (!(nullable.get(symbol) ?? false)) {
+						isNull = false;
+						break;
+					}
+				}
+				if (isNull) {
+					await firstSetElement.joinSets([''], [''], i);
+				}
 			}
 
-			while ($symbolStack.length > 0) {
-				if (currentlyRunning !== id) return;
-				await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
-
-				if (!firstIndexes.has($symbolStack[$symbolStack.length - 1].data)) {
-					if (currentlyRunning !== id) return;
-					await firstSetElement.addSetRow(
-						$symbolStack[$symbolStack.length - 1].text,
-						$symbolStack[$symbolStack.length - 1].data
-					);
+			for (let item of $joinSet.keys()) {
+				if ($joinSet[item].right.length === 0) {
+					continue;
 				}
-				if (currentlyRunning !== id) return;
-				let symbol = await getProdSymbol($symbolStack[$symbolStack.length - 1].data);
+				await joinStackElement.addToStack(item, rules[item].left, '', item.toString());
 
-				if (nt.includes(symbol)) {
-					const matchingRules = rules.filter((x) => x.left === symbol);
+				while ($joinStack.length > 0) {
+					const topKey = $joinStack[$joinStack.length - 1].data;
+					const top = /**@type {Array<number>}*/ (joinSetElement.get(topKey));
+					const topValue = top[0];
 
-					let complete = true;
-					for (let rule of matchingRules) {
-						const firstIndex = firstIndexes.get(rule.index);
-						if (firstIndex !== undefined) {
-							if (rule.right[0] === '') {
-								let isNullable = true;
-								for (let s of rules[/**@type {number}*/ ($symbolStack.at(-1)?.data)].right) {
-									if (!nullable(rules, s)) {
-										isNullable = false;
-										break;
-									}
-								}
-								if (isNullable) {
-									const currentIndex = /**@type {number}*/ (
-										firstIndexes.get($symbolStack[$symbolStack.length - 1].data)
-									);
-									if (currentlyRunning !== id) return;
-									if (!$firstSet[currentIndex].right.includes(''))
-										await firstSetElement.joinSets([''], currentIndex);
-								}
-							}
-							if (currentlyRunning !== id) return;
-							await firstSetElement.joinSets(
-								$firstSet[firstIndex].right.filter((x) => x !== ''),
-								/**@type {number}*/ (firstIndexes.get($symbolStack[$symbolStack.length - 1].data))
-							);
-						} else {
-							await wait(1000);
-							if (currentlyRunning !== id) return;
-							await addProdToStacks(symbol);
-							complete = false;
-						}
+					console.log('kru', topValue, joinIndexes);
+					let nextSet = joinSetElement.get(topValue);
+					if (nextSet !== undefined && !(nextSet.length === 0)) {
+						await joinStackElement.addToStack(
+							topValue,
+							rules[topValue].left,
+							topValue.toString(),
+							topValue.toString()
+						);
+						continue;
 					}
-					if (complete) {
-						if (currentlyRunning !== id) return;
-						await symbolStackElement.removeFromStack($symbolStack.length - 1);
-					}
-				} else {
-					let index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);
+					// const _firstSet = firstSetElement.get(topKey);
+					// const matchingRules = rules[topValue];
 
-					while (index !== undefined) {
-						if (currentlyRunning !== id) return;
-						await firstSetElement.joinSets([symbol], index);
-						if (currentlyRunning !== id) return;
-						await symbolStackElement.removeFromStack($symbolStack.length - 1);
-						if (symbol === '') break;
-						index = firstIndexes.get($symbolStack[$symbolStack.length - 1].data);
+					const setToJoin = /**@type {Array<String>}*/ (firstSetElement.get(topValue)).filter(
+						(x) => x !== ''
+					);
+
+					await firstSetElement.joinSets(setToJoin, setToJoin, topKey);
+
+					await joinSetElement.remove(topKey, topValue);
+					await addPause();
+
+					if (joinSetElement.get(topKey)?.length === 0) {
+						await joinStackElement.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}
@@ -185,6 +222,9 @@
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
+	{#each test.entries() as [v, k], i}
+		<p>{v}-{k}</p>
+	{/each}
 	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="first"
@@ -194,12 +234,20 @@
 		label={'first set'}
 		bind:this={firstSetElement}
 	></SetsCard>
+	<SetsCard
+		setId="join"
+		set={joinSet}
+		setIndexes={joinIndexes}
+		color={'blue'}
+		label={'join set'}
+		bind:this={joinSetElement}
+	></SetsCard>
 	<StackCard
-		stack={symbolStack}
-		stackId="symbol"
-		label="symbol stack"
+		stack={joinStack}
+		stackId="join"
+		label="join stack"
 		color="blue"
-		bind:this={symbolStackElement}
+		bind:this={joinStackElement}
 		bind:svgLines
 	></StackCard>
 </div>

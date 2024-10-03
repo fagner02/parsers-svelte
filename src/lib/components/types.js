@@ -14,11 +14,11 @@
  */
 
 /**
- * @typedef {{value: string, opacity: number}} SetItem
+ * @typedef {{value: string, opacity: number, hide: boolean}} SetItem
  */
 
 /**
- * @typedef {{left: string, right: Array<string>, note: string | null, showRight: boolean, rightProps: Array<SetItem>}} SetRow
+ * @typedef {{left: string, right: Array<any>, note: string | null, showRight: boolean, rightProps: Array<SetItem>}} SetRow
  */
 
 /**

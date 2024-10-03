@@ -1,7 +1,7 @@
 <script>
-	import FillHeight from '../FillHeight.svelte';
-	import FirstAnimation from '../FirstAnimation.svelte';
-	import TextInput from '../TextInput.svelte';
+	import FillHeight from '../Layout/FillHeight.svelte';
+	import FirstAnimation from '../LLAnimation.svelte';
+	import TextInput from '../Layout/TextInput.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [

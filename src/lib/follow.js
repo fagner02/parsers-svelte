@@ -13,45 +13,55 @@ export function follow(
 	for (let i = 0; i < rules.length; i++) {
 		for (let j = 0; j < rules[i].right.length; j++) {
 			const symbol = rules[i].right[j];
-			const followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
+			let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
-			if (nt.includes(symbol)) {
-				if (!followSet.has(symbol)) {
-					followSet.set(symbol, new Set());
-				}
+			if (!nt.includes(symbol)) {
+				continue;
+			}
+			if (!followSet.has(symbol)) {
+				followSet.set(symbol, new Set());
+			}
+			let pos = 1;
+			while (true) {
 				if (followingSymbol === null) {
 					if (!joinSet.has(symbol)) {
 						joinSet.set(symbol, new Set());
 					}
 					joinSet.get(symbol)?.add(rules[i].left);
-				} else {
-					if (nt.includes(followingSymbol)) {
-						let empty = false;
-						for (let [left, right] of firstSet) {
-							if (rules[left].left === followingSymbol) {
-								if (right.has('')) {
-									empty = true;
-									continue;
-								}
-								for (let rsymbol of right) {
+					break;
+				}
+				if (nt.includes(followingSymbol)) {
+					let empty = false;
+					for (let [left, right] of firstSet) {
+						if (rules[left].left === followingSymbol) {
+							for (let rsymbol of right) {
+								if (rsymbol !== '') {
+									console.log('add', symbol, followingSymbol, rsymbol);
+									if (!followSet.has(symbol)) {
+										followSet.set(symbol, new Set());
+									}
 									followSet.get(symbol)?.add(rsymbol);
+								} else {
+									empty = true;
 								}
 							}
 						}
-
-						if (empty) {
-							if (!joinSet.has(symbol)) {
-								joinSet.set(symbol, new Set());
-							}
-							joinSet.get(symbol)?.add(rules[i].right[j]);
-						}
-					} else {
-						if (followSet.has(symbol)) {
-							followSet.set(symbol, new Set());
-						}
-
-						followSet.get(symbol)?.add(followingSymbol);
 					}
+
+					if (empty) {
+						followingSymbol =
+							j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
+						pos++;
+					} else {
+						break;
+					}
+				} else {
+					if (!followSet.has(symbol)) {
+						followSet.set(symbol, new Set());
+					}
+
+					followSet.get(symbol)?.add(followingSymbol);
+					break;
 				}
 			}
 		}

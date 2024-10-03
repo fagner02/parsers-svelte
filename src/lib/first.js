@@ -19,7 +19,7 @@ export function first(
 ) {
 	/** @type {Map<number, Set<string>>} */
 	let firstSet = new Map();
-	/** @type {Map<number, Set<string>>}*/
+	/** @type {Map<number, Set<number>>}*/
 	let joinSet = new Map();
 	/** @type {Map<string, boolean>}*/
 	let nullable = new Map();
@@ -52,39 +52,51 @@ export function first(
 
 	for (let i = 0; i < rules.length; i++) {
 		firstSet.set(i, new Set());
-
+		let isNull = true;
 		for (let j = 0; j < rules[i].right.length; j++) {
 			let symbol = rules[i].right[j];
 			if (nt.includes(symbol)) {
 				if (!joinSet.has(i)) {
 					joinSet.set(i, new Set());
 				}
-				joinSet.get(i)?.add(symbol);
+				const matchingRules = rules.filter((x) => x.left === symbol);
+				for (let rule of matchingRules) {
+					joinSet.get(i)?.add(rule.index);
+				}
 			} else {
 				firstSet.get(i)?.add(symbol);
 			}
-			if (!(nullable.get(symbol) ?? false)) break;
+			if (!(nullable.get(symbol) ?? false)) {
+				isNull = false;
+				break;
+			}
+		}
+		if (isNull) {
+			firstSet.get(i)?.add('');
 		}
 	}
 
 	for (let item of joinSet.keys()) {
+		if (joinSet.get(item)?.size === 0) {
+			continue;
+		}
 		/** @type {Array<number>} */
 		let joinStack = [item];
 
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
-			const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
-			const topValue = top?.values().next().value;
+			const top = /**@type {Set<number>}*/ (joinSet.get(topKey));
+			const topValue = /**@type {number}*/ (top?.values().next().value);
 
-			if (joinSet.has(topValue) && !joinStack.includes(topValue)) {
+			let nextSet = joinSet.get(topValue);
+			if (nextSet !== undefined && !(nextSet.size === 0)) {
 				joinStack.push(topValue);
 				continue;
 			}
 			const _firstSet = firstSet.get(topKey);
-			const matchingRules = rules.filter((x) => x.left === topValue);
-			for (let rule of matchingRules) {
-				const setToJoin = /**@type {Set<String>}*/ (firstSet.get(rule.index));
-				for (let item of setToJoin) {
+			const setToJoin = /**@type {Set<String>}*/ (firstSet.get(topValue));
+			for (let item of setToJoin) {
+				if (item != '') {
 					_firstSet?.add(item);
 				}
 			}
@@ -95,6 +107,9 @@ export function first(
 				joinStack.pop();
 			}
 		}
+	}
+	for (var [k, v] of firstSet) {
+		console.log(k, v);
 	}
 	return firstSet;
 }

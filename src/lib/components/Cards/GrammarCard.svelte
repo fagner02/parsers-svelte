@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
-	import CardBox from './CardBox.svelte';
+	import CardBox from './CardWrapper.svelte';
 
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;

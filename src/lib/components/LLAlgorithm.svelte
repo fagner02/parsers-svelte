@@ -32,7 +32,7 @@
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let followSet;
 	let nt = ['S', 'A', 'Bb'];
-	let t = ['$', 'a', 'b', 'm'];
+	let t = ['$', 'a', 'b', 'm', 'c'];
 
 	export function reset() {
 		tableElement.resetTable();
@@ -69,27 +69,28 @@
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
 				const ruleIndex = parseFloat(/**@type {string}*/ (item.note));
-				for (let j = 0; j < item.right.length; j++) {
-					if (item.right.includes('')) {
-						const follow = /**@type {import('@/types').SetRow}*/ (
-							$followSet.find((x) => x.left === item.left)
-						);
-						for (let f = 0; f < follow.right.length; f++) {
-							if (currentlyRunning != id) return;
+				if (item.right.includes('')) {
+					const follow = /**@type {import('@/types').SetRow}*/ (
+						$followSet.find((x) => x.left === item.left)
+					);
+					for (let f = 0; f < follow.right.length; f++) {
+						if (currentlyRunning != id) return;
 
-							selectFor('#firstset' + item.note);
-							await tableElement.addToTable(
-								parseFloat(/**@type {string}*/ (item.note)),
-								`${item.left} -> ε`,
-								item.left,
-								follow.right[f]
-							);
-							await addPause();
-						}
+						selectFor('#firstset' + item.note);
+						await tableElement.addToTable(
+							parseFloat(/**@type {string}*/ (item.note)),
+							`${item.left} -> ε`,
+							item.left,
+							follow.right[f]
+						);
+						await addPause();
+					}
+				}
+				for (let j = 0; j < item.right.length; j++) {
+					if (currentlyRunning != id) return;
+					if (item.right[j] == '') {
 						continue;
 					}
-					if (currentlyRunning != id) return;
-
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[ruleIndex].right.join(' ')}`,

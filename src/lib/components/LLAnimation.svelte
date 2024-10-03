@@ -25,7 +25,7 @@
 	let rules = [];
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb\nS -> A\nA -> a a\nA -> \nBb -> b m\nBb -> m';
+	const grammar = 'S -> A Bb c\nA -> Bb a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
 	let loaded = false;
 	const loadGrammar = function () {
 		/** @type {{ left: string; right: string[]; index: number; }[]} */
@@ -57,7 +57,7 @@
 		loadGrammar();
 
 		const nt = ['S', 'A', 'Bb'];
-		const t = ['$', 'a', 'b', 'm'];
+		const t = ['$', 'a', 'b', 'm', 'c'];
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
 		const _table = lltable(rules, nt, t, _first, _follow);

@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { writable } from 'svelte/store';
-	import CardBox from './CardBox.svelte';
+	import CardBox from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth } from '$lib/globalStyle';
 
 	export let label;
