@@ -38,7 +38,7 @@
 	async function addSetItem(index, symbol) {
 		try {
 			set.update((x) => {
-				x[index].rightProps = [...x[index].rightProps, { value: '', opacity: 0, hide: false }];
+				x[index].rightProps = [...x[index].rightProps, { value: symbol, opacity: 0, hide: true }];
 				return x;
 			});
 			await wait(50);
@@ -57,10 +57,11 @@
 	/**
 	 * @param {Array<any>} symbols
 	 * @param {Array<string>} texts
-	 * @param {number} index
+	 * @param {any} key
 	 */
-	export async function joinSets(symbols, texts, index) {
+	export async function joinSets(symbols, texts, key) {
 		try {
+			const index = /**@type {number}*/ (setIndexes.get(key));
 			if ($set[index].rightProps[0].value === ' ') {
 				$set[index].rightProps.pop();
 			}
@@ -116,11 +117,12 @@
 	}
 
 	/**
-	 * @param {number} index
+	 * @param {any} key
 	 * @param {any} item
 	 */
-	export async function remove(index, item) {
+	export async function remove(key, item) {
 		set.update((x) => {
+			const index = /**@type {number}*/ (setIndexes.get(key));
 			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
 			console.log(rIndex, x[index]);
 			let prop = x[index].rightProps[rIndex];
@@ -140,6 +142,7 @@
 		});
 		await wait(1000);
 		set.update((x) => {
+			const index = /**@type {number}*/ (setIndexes.get(key));
 			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
 			x[index].right = x[index].right.filter((i) => i !== item);
 			if (rIndex === x[index].rightProps.length - 1) {
@@ -190,7 +193,7 @@
 				<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
 				<span in:setItemIn={{ duration: 500, delay: 100 }}>{'{'}</span>
 
-				{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}${text.value}`)}
+				{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}-${text.value}`)}
 					<p
 						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {charWidth *
 							(text.value === ''

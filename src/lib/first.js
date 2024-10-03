@@ -1,18 +1,3 @@
-// function nullable(
-// 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-// 	/** @type {string}*/ symbol
-// ) {
-// 	/** =========== FIX IT ===============================================*/
-// 	const matchingRules = rules.filter((x) => x.left === symbol);
-// 	for (let rule of matchingRules) {
-// 		if (rule.right[0] === '') {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// 	/** =========== FIX IT ===============================================*/
-// }
-
 export function first(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
 	/** @type {string[]} */ nt
@@ -108,8 +93,6 @@ export function first(
 			}
 		}
 	}
-	for (var [k, v] of firstSet) {
-		console.log(k, v);
-	}
+
 	return firstSet;
 }

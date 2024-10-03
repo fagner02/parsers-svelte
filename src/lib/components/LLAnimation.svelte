@@ -25,7 +25,7 @@
 	let rules = [];
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb c\nA -> Bb a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
+	const grammar = 'S -> A Bb\nA -> Bb a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
 	let loaded = false;
 	const loadGrammar = function () {
 		/** @type {{ left: string; right: string[]; index: number; }[]} */

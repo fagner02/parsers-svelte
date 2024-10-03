@@ -53,21 +53,6 @@
 	 */
 	export let callback = null;
 
-	/**
-	 * @param {string} symbol
-	 * @param {string[]} values
-	 */
-	async function addToJoinSet(symbol, values) {
-		let joinIndex = joinIndexes.get(symbol);
-
-		if (joinIndex === undefined) {
-			await joinSetElement.addSetRow(symbol, symbol);
-			joinIndex = /**@type {number}*/ (joinIndexes.get(symbol));
-		}
-
-		await joinSetElement.joinSets(values, values, joinIndex);
-	}
-
 	async function follow() {
 		const id = newRunningCall();
 		try {
@@ -76,88 +61,82 @@
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
 			await followSetElement.addSetRow(rules[0].left, rules[0].left);
-			await followSetElement.joinSets(
-				['$'],
-				['$'],
-				/**@type {number}*/ (followIndexes.get(rules[0].left))
-			);
+			await followSetElement.joinSets(['$'], ['$'], rules[0].left);
 
 			for (let i = 0; i < rules.length; i++) {
 				for (let j = 0; j < rules[i].right.length; j++) {
 					await selectRSymbol('g', i, j, 'green', true);
 
 					const symbol = rules[i].right[j];
-					const followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
+					let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
-					if (nt.includes(symbol)) {
-						if (!followIndexes.has(symbol)) {
-							await followSetElement.addSetRow(symbol, symbol);
-						}
+					if (!nt.includes(symbol)) {
+						continue;
+					}
+					if (!followIndexes.has(symbol)) {
+						await followSetElement.addSetRow(symbol, symbol);
+					}
+
+					let pos = 1;
+					while (true) {
 						if (followingSymbol === null) {
-							await addToJoinSet(symbol, [rules[i].left]);
-						} else {
-							await selectRSymbol('g', i, j + 1, 'yellow', true);
-							if (nt.includes(followingSymbol)) {
-								let empty = false;
-								for (let item of $firstSet) {
-									if (item.left === followingSymbol) {
-										if (item.right.includes('')) {
-											empty = true;
-											continue;
-										}
-										const followIndex = /**@type {number}*/ (followIndexes.get(symbol));
-										await followSetElement.joinSets(item.right, item.right, followIndex);
-									}
-								}
-
-								if (empty) {
-									await addToJoinSet(symbol, [rules[i].right[j]]);
-								}
-							} else {
-								let followIndex = /**@type {number}*/ (followIndexes.get(symbol));
-								if (followIndex === undefined) {
-									await followSetElement.addSetRow(symbol, symbol);
-									followIndex = /**@type {number}*/ (followIndexes.get(symbol));
-								}
-								await followSetElement.joinSets([followingSymbol], [followingSymbol], followIndex);
+							if (!joinSetElement.has(symbol)) {
+								await joinSetElement.addSetRow(symbol, symbol);
 							}
+							await joinSetElement.joinSets([rules[i].left], [rules[i].left], symbol);
+							break;
 						}
-						// await addPause();
+						await selectRSymbol('g', i, j + 1, 'yellow', true);
+						if (nt.includes(followingSymbol)) {
+							let empty = false;
+							for (let item of $firstSet) {
+								if (item.left === followingSymbol) {
+									if (item.right.includes('')) {
+										empty = true;
+										continue;
+									}
+									await followSetElement.joinSets(item.right, item.right, symbol);
+								}
+							}
+
+							if (!empty) {
+								break;
+							}
+							followingSymbol =
+								j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
+							pos++;
+						} else {
+							await followSetElement.joinSets([followingSymbol], [followingSymbol], symbol);
+							break;
+						}
 					}
 				}
 			}
 			for (let item of joinIndexes.keys()) {
-				await joinStackElement.addToStack(item, item, '', item);
-				// await addPause();
-			}
-			// await joinStackElement.addToStack($joinSet[0].left, $joinSet[0].left, '', $joinSet[0].left);
-			// await addPause();
-			while ($joinStack.length > 0) {
-				const top =
-					$joinSet[/**@type {number}*/ (joinIndexes.get($joinStack[$joinStack.length - 1].data))];
-
-				if (joinIndexes.has(top.right[0])) {
-					await joinStackElement.addToStack(top.right[0], top.right[0], '', top.right[0]);
+				if (joinSetElement.get(item)?.length === 0) {
 					continue;
 				}
-				const followIndex = /**@type {number}*/ (followIndexes.get(top.left));
-				const joinIndex = /**@type {number}*/ (followIndexes.get(top.right[0]));
-				await followSetElement.joinSets(
-					$followSet[joinIndex].right,
-					$followSet[joinIndex].right,
-					followIndex
-				);
+				await joinStackElement.addToStack(item, item, '', item);
+				await addPause();
 
-				top.right.splice(0, 1);
-				joinSet.update((x) => {
-					x[
-						/**@type {number}*/ (joinIndexes.get($joinStack[$joinStack.length - 1].data))
-					].rightProps.splice(0, 1);
-					return x;
-				});
+				while ($joinStack.length > 0) {
+					const topKey = $joinStack[$joinStack.length - 1].data;
+					const top = /**@type {Array<string>}*/ (joinSetElement.get(topKey));
 
-				if (top.right.length === 0) {
-					await joinStackElement.removeFromStack($joinStack.length - 1);
+					let nextSet = joinSetElement.get(top[0]);
+					if (nextSet !== undefined && !(nextSet.length === 0)) {
+						await joinStackElement.addToStack(top[0], top[0], '', top[0]);
+						continue;
+					}
+
+					const setToJoin = /**@type {Array<string>}*/ (followSetElement.get(top[0]));
+					await followSetElement.joinSets(setToJoin, setToJoin, topKey);
+
+					await joinSetElement.remove(topKey, top[0]);
+
+					if (joinSetElement.get(topKey)?.length === 0) {
+						await joinStackElement.removeFromStack($joinStack.length - 1);
+					}
 				}
 			}
 			if (callback !== null) {

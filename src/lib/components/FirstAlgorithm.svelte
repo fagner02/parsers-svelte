@@ -79,28 +79,10 @@
 		}
 	}
 
-	// function nullable(
-	// 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-	// 	/** @type {string} */ symbol
-	// ) {
-	// 	const matchingRules = rules.filter((x) => x.left === symbol);
-	// 	for (let rule of matchingRules) {
-	// 		if (rule.right[0] === '') {
-	// 			return true;
-	// 		}
-	// 	}
-	// 	return false;
-	// }
-
 	async function first() {
 		const id = newRunningCall();
 
 		try {
-			// await firstSetElement.addSetRow('h', 0);
-			// console.log(test);
-			// await firstSetElement.addSetItem(0, 'hdu');
-			// await wait(500);
-			// await firstSetElement.addSetItem(0, 'pop');
 			/** @type {Map<string, boolean>}*/
 			let nullable = new Map();
 
@@ -179,7 +161,6 @@
 					const top = /**@type {Array<number>}*/ (joinSetElement.get(topKey));
 					const topValue = top[0];
 
-					console.log('kru', topValue, joinIndexes);
 					let nextSet = joinSetElement.get(topValue);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
 						await joinStackElement.addToStack(
@@ -190,15 +171,13 @@
 						);
 						continue;
 					}
-					// const _firstSet = firstSetElement.get(topKey);
-					// const matchingRules = rules[topValue];
 
 					const setToJoin = /**@type {Array<String>}*/ (firstSetElement.get(topValue)).filter(
 						(x) => x !== ''
 					);
 
 					await firstSetElement.joinSets(setToJoin, setToJoin, topKey);
-
+					await addPause();
 					await joinSetElement.remove(topKey, topValue);
 					await addPause();
 

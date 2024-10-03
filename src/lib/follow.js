@@ -34,32 +34,22 @@ export function follow(
 					let empty = false;
 					for (let [left, right] of firstSet) {
 						if (rules[left].left === followingSymbol) {
-							for (let rsymbol of right) {
-								if (rsymbol !== '') {
-									console.log('add', symbol, followingSymbol, rsymbol);
-									if (!followSet.has(symbol)) {
-										followSet.set(symbol, new Set());
-									}
-									followSet.get(symbol)?.add(rsymbol);
-								} else {
-									empty = true;
-								}
+							if (right.has('')) {
+								empty = true;
+								continue;
 							}
+							let union = /**@type {Set<string>}*/ (followSet.get(symbol)?.union(right));
+							followSet.set(symbol, union);
 						}
 					}
 
-					if (empty) {
-						followingSymbol =
-							j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
-						pos++;
-					} else {
+					if (!empty) {
 						break;
 					}
+					followingSymbol =
+						j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
+					pos++;
 				} else {
-					if (!followSet.has(symbol)) {
-						followSet.set(symbol, new Set());
-					}
-
 					followSet.get(symbol)?.add(followingSymbol);
 					break;
 				}
@@ -68,15 +58,19 @@ export function follow(
 	}
 
 	for (let item of joinSet.keys()) {
+		if (joinSet.get(item)?.size === 0) {
+			continue;
+		}
 		/** @type {Array<string>} */
 		let joinStack = [item];
 
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
 			const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
-
 			const topValue = top?.values().next().value;
-			if (joinSet.has(topValue) && !joinStack.includes(topValue)) {
+
+			let nextSet = joinSet.get(topValue);
+			if (nextSet !== undefined && !(nextSet.size === 0)) {
 				joinStack.push(topValue);
 				continue;
 			}
@@ -92,6 +86,10 @@ export function follow(
 				joinStack.pop();
 			}
 		}
+	}
+
+	for (var [k, v] of followSet) {
+		console.log(k, v);
 	}
 
 	return followSet;
