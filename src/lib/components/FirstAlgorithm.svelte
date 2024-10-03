@@ -12,7 +12,6 @@
 		newRunningCall,
 		currentlyRunning
 	} from '$lib/flowControl';
-	import { selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
 	/**@type {StackCard}*/
@@ -47,12 +46,6 @@
 
 	let nt = ['S', 'A', 'Bb'];
 
-	/** @param {number} currentRule */
-	async function getProdSymbol(currentRule) {
-		await selectRSymbol('g', currentRule, 0, 'green', true);
-		return rules[currentRule].right[0];
-	}
-
 	export const reset = () => {
 		joinStack.update(() => []);
 		firstSet.update(() => []);
@@ -61,23 +54,6 @@
 		first();
 	};
 	setResetCall(reset);
-
-	/**
-	 * @param {string} currentSymbol
-	 */
-	async function addProdToStacks(currentSymbol) {
-		for (let i1 = 0; i1 < rules.length; i1++) {
-			if (rules[i1].left === currentSymbol) {
-				await joinStackElement.addToStack(
-					i1,
-					rules[i1].left,
-					rules[i1].index.toString(),
-					rules[i1].index.toString(),
-					`#gl${i1}`
-				);
-			}
-		}
-	}
 
 	async function first() {
 		const id = newRunningCall();

@@ -124,7 +124,7 @@
 		set.update((x) => {
 			const index = /**@type {number}*/ (setIndexes.get(key));
 			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
-			console.log(rIndex, x[index]);
+
 			let prop = x[index].rightProps[rIndex];
 			x[index].rightProps[rIndex] = {
 				value: prop.value,

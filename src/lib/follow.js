@@ -88,9 +88,5 @@ export function follow(
 		}
 	}
 
-	for (var [k, v] of followSet) {
-		console.log(k, v);
-	}
-
 	return followSet;
 }
