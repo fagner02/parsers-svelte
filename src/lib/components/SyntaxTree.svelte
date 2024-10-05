@@ -1,6 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { onMount } from 'svelte';
+	import { setTreeFunctions } from '$lib/tree';
+	import { getAllContexts, onMount, setContext } from 'svelte';
 
 	/** @type {SVGGElement} */
 	let svg;
@@ -12,6 +13,7 @@
 	let updating = false;
 	const vGap = 30;
 	const vGapPoint = vGap / 1.9;
+	let currentCallId = -1;
 
 	/**@type {import('@/types').node[][]}*/
 	let levels = [[]];
@@ -19,7 +21,7 @@
 	/**
 	 * @param {string} data
 	 */
-	async function findNode(data) {
+	function findNode(data) {
 		/**@type {import('@/types').nodeId[]}*/
 		let nodes = [{ level: 0, index: 0 }];
 
@@ -44,7 +46,7 @@
 	 * @param {number} level
 	 * @param {number | null} newItemIndex
 	 */
-	async function updateLevel(level, newItemIndex = null) {
+	function updateLevel(level, newItemIndex = null) {
 		for (let i = 0; i < levels[level].length; i++) {
 			let item = levels[level][i];
 
@@ -76,7 +78,16 @@
 	 * @param {number} id
 	 */
 	async function addToSvg(parent, data, newItemIndex, id) {
-		await updateLevel(parent.level + 1, newItemIndex);
+		const _id = currentCallId;
+		if (
+			parent.level === -1 &&
+			levels[parent.level + 1].length === 1 &&
+			levels[parent.level + 1][0].id === id
+		)
+			return;
+		updateLevel(parent.level + 1, newItemIndex);
+
+		if (currentCallId != _id) return;
 
 		levels[parent.level + 1].splice(newItemIndex, 0, {
 			data: data,
@@ -96,7 +107,7 @@
 		});
 		levels = levels;
 		await wait(100);
-
+		if (currentCallId != _id) return;
 		let newNode = levels[parent.level + 1][newItemIndex];
 		let bbox = /**@type {SVGTextElement}*/ (
 			document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
@@ -116,7 +127,7 @@
 			x: parent.x,
 			y: parent.y + parent.height / 2
 		};
-
+		if (currentCallId != _id) return;
 		newNode.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 
 		newNode.dashOffset = 0;
@@ -175,6 +186,11 @@
 		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
 		width = boxWidth;
 
+		await wait(500);
+		// height = svg.getBBox().height + 100;
+	}
+
+	export async function initializeTree(/**@type {string}*/ symbol) {
 		await addToSvg(
 			{
 				level: -1,
@@ -183,20 +199,18 @@
 				y: -vGap / 2,
 				height: vGap
 			},
-			'S',
+			symbol,
 			0,
 			0
 		);
-
-		await wait(500);
-
-		await addToTree(['haa', 'ç', 'hii'], 'S');
-		await addToTree(['h', 'k'], 'haa');
-		await addToTree(['o', 'p'], 'hii');
-		await addToTree(['o', 'p'], 'ç');
-
-		height = svg.getBBox().height + 100;
 	}
+
+	export function resetTree(/**@type {number}*/ _currentCallId) {
+		currentCallId = _currentCallId;
+		levels = [[]];
+	}
+
+	setTreeFunctions({ initializeTree, addToTree, resetTree });
 </script>
 
 <div class="svg-box" style={$$props.style}>

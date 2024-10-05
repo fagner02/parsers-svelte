@@ -44,7 +44,8 @@
 	/**@type {Map<number,number>}*/
 	let joinIndexes = new Map();
 
-	let nt = ['S', 'A', 'Bb'];
+	/**@type {Array<string>}*/
+	export let nt;
 
 	export const reset = () => {
 		joinStack.update(() => []);

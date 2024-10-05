@@ -1,8 +1,7 @@
 <script>
 	import SyntaxTree from './SyntaxTree.svelte';
 	import { getContext, setContext } from 'svelte';
-	/** @type {() => Promise<void>}*/
-	let addToTree;
+
 	/**@type {string}*/
 	export let inputString;
 	/**@type {boolean | null}*/
@@ -15,7 +14,7 @@
 </script>
 
 <div class="parse-tab">
-	<SyntaxTree bind:addToTree></SyntaxTree>
+	<slot name="tree"></slot>
 	<div class="parse">
 		<input
 			type="text"
@@ -24,7 +23,7 @@
 			placeholder="Digite a entrada aqui"
 		/>
 		<div class="parse-view">
-			<slot></slot>
+			<slot name="parse"></slot>
 		</div>
 	</div>
 </div>

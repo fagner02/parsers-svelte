@@ -31,8 +31,10 @@
 	export let firstSet;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let followSet;
-	let nt = ['S', 'A', 'Bb'];
-	let t = ['$', 'a', 'b', 'm', 'c'];
+	/**@type {Array<string>}*/
+	export let nt;
+	/**@type {Array<string>}*/
+	export let t;
 
 	export function reset() {
 		tableElement.resetTable();
@@ -68,7 +70,6 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
-				const ruleIndex = parseFloat(/**@type {string}*/ (item.note));
 				if (item.right.includes('')) {
 					const follow = /**@type {import('@/types').SetRow}*/ (
 						$followSet.find((x) => x.left === item.left)
@@ -78,8 +79,10 @@
 
 						selectFor('#firstset' + item.note);
 						await tableElement.addToTable(
-							parseFloat(/**@type {string}*/ (item.note)),
-							`${item.left} -> ε`,
+							i,
+							rules[i].right[0] === ''
+								? `${item.left} -> ε`
+								: `${item.left} -> ${rules[i].right.join(' ')}`,
 							item.left,
 							follow.right[f]
 						);
@@ -93,7 +96,7 @@
 					}
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
-						`${item.left} -> ${rules[ruleIndex].right.join(' ')}`,
+						`${item.left} -> ${rules[i].right.join(' ')}`,
 						item.left,
 						item.right[j]
 					);

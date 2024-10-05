@@ -9,6 +9,7 @@
 	import { follow } from '$lib/follow';
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
+	import SyntaxTree from './SyntaxTree.svelte';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -21,14 +22,21 @@
 	let followSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	let table = writable();
-	/** @type {Array.<import('@/types').GrammarItem>} */
+	/** @type {Array<import('@/types').GrammarItem>} */
 	let rules = [];
+	/** @type {Array<string>}*/
+	let nt = [];
+	/** @type {Array<string>}*/
+	let t = [];
+
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb\nA -> Bb a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
+	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
 	let loaded = false;
 	const loadGrammar = function () {
-		/** @type {{ left: string; right: string[]; index: number; }[]} */
+		let ntSet = new Set();
+		let tSet = new Set();
+		let alphSet = new Set();
 
 		grammar.split('\n').forEach((r) => {
 			let s = r.split('->');
@@ -39,9 +47,18 @@
 					right: s[1].trim().split(' '),
 					index: rules.length
 				});
+				alphSet = alphSet.union(new Set(s[1].trim().split(' ')));
+				ntSet.add(s[0].replaceAll(' ', ''));
 			}
 		});
 
+		alphSet.delete('');
+		for (let v of alphSet) {
+			if (!ntSet.has(v)) tSet.add(v);
+		}
+
+		t = ['$'].concat(Array.from(tSet));
+		nt = Array.from(ntSet);
 		loaded = true;
 	};
 
@@ -56,8 +73,9 @@
 		code = await (await fetch('src/lib/first.js')).text();
 		loadGrammar();
 
-		const nt = ['S', 'A', 'Bb'];
-		const t = ['$', 'a', 'b', 'm', 'c'];
+		// const nt = ['S', 'A', 'Bb'];
+		// const t = ['$', 'a', 'b', 'm', 'c'];
+
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
 		const _table = lltable(rules, nt, t, _first, _follow);
@@ -159,14 +177,16 @@
 			</div>
 			<div class="grid">
 				{#if selectedAlgorithm === 'first'}
-					<FirstAlgorithm {rules} bind:instruction bind:reset></FirstAlgorithm>
+					<FirstAlgorithm {rules} {nt} bind:instruction bind:reset></FirstAlgorithm>
 				{:else if selectedAlgorithm === 'follow'}
-					<FollowAlgorithm {rules} {firstSet} bind:instruction bind:reset></FollowAlgorithm>
+					<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction bind:reset></FollowAlgorithm>
 				{:else}
-					<LlAlgorithm {rules} {firstSet} {followSet} bind:instruction bind:reset></LlAlgorithm>
+					<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction bind:reset
+					></LlAlgorithm>
 				{/if}
 			</div>
 		</div>
+		<SyntaxTree slot="tree"></SyntaxTree>
 		<div slot="parse" class="grid" style="place-items: center;">
 			<LlParse bind:input={inputString} {table} {rules}></LlParse>
 		</div>

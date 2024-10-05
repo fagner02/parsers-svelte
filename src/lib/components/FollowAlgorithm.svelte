@@ -35,7 +35,8 @@
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 
-	let nt = ['S', 'A', 'Bb'];
+	/**@type {Array<string>}*/
+	export let nt;
 	/**@type {Map<string, number>}*/
 	let followIndexes = new Map();
 

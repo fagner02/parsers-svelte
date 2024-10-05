@@ -4,16 +4,13 @@
 	import SvgLines from './SvgLines.svelte';
 	import { addPause, getJumpPause, limitHit, setResetCall } from '$lib/flowControl';
 	import StackCard from './Cards/StackCard.svelte';
-	import { getContext, onMount, setContext } from 'svelte';
+	import { getAllContexts, getContext, onMount, setContext } from 'svelte';
+	import { getTreeFunctions } from '$lib/tree';
 
 	/**@type {SvgLines}*/
 	let svgLines;
-	/**@type {TableCard}*/
-	let tableElement;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	export let table;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
 	/**@type {string}*/
 	export let input = 'aab m';
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
@@ -32,6 +29,7 @@
 	let nt = ['S', 'A', 'Bb'];
 	let t = ['$', 'a', 'b', 'm'];
 	let count = 0;
+	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
 
 	/**
 	 * @type {number | null}
@@ -55,11 +53,23 @@
 		running = count;
 		count++;
 
+		resetTree(id);
+
+		if (initializeTree === undefined) {
+			let functions = getTreeFunctions();
+			initializeTree = functions.initializeTree;
+			addToTree = functions.addToTree;
+			resetTree = functions.resetTree;
+		}
+
 		try {
 			for (let i of ['$', startingSymbol]) {
 				if (running !== id) return;
 				await symbolStackElement.addToStack(i, i, '', $symbolStack.length.toString());
 			}
+
+			await initializeTree(startingSymbol);
+
 			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
 				if (running !== id) return;
 				await inputStackElement.addToStack(i, i, '', $inputStack.length.toString());
@@ -77,7 +87,14 @@
 					}
 					if (running !== id) return;
 					await symbolStackElement.removeFromStack($symbolStack.length - 1);
+					if (rules[prodIndex].right.includes('')) {
+						addToTree(['\u03B5'], topSymbol);
+						continue;
+					}
 					const prod = [...rules[prodIndex].right].reverse();
+
+					addToTree([...rules[prodIndex].right], topSymbol);
+
 					for (let p of prod) {
 						if (running !== id) return;
 						await symbolStackElement.addToStack(p, p, '', $symbolStack.length.toString());
@@ -105,7 +122,7 @@
 			addPause();
 		} catch (e) {}
 	}
-
+	console.log(getAllContexts());
 	onMount(async () => {
 		try {
 			await parsing();
@@ -120,7 +137,6 @@
 		columns={t}
 		{table}
 		bind:svgLines
-		bind:this={tableElement}
 		tableId="ll"
 		label="tabela ll(1)"
 		color="blue"

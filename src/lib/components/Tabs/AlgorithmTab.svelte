@@ -158,7 +158,8 @@
 		<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
 			{#if parseOn}
 				<ParseView bind:inputString>
-					<slot name="parse"></slot>
+					<slot name="tree" slot="tree"></slot>
+					<slot name="parse" slot="parse"></slot>
 				</ParseView>
 			{:else}
 				<div class="steps {$$props.class ?? ''}" style="position: relative;">
