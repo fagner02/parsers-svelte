@@ -143,15 +143,17 @@ export function setResetCall(_resetCall) {
 
 let targetStep = -1;
 let stepCount = 0;
+let maxStep = -1;
 let goForward = false;
 let goBack = false;
-let swapping = false;
 let limit = false;
 
+/** ADD CALL CHECK BEFORE LIMIT HIT */
 export function limitHit() {
 	goForward = false;
 	animating = false;
 	limit = true;
+	maxStep = stepCount;
 
 	targetStep = -1;
 	stepCount = 0;
@@ -196,9 +198,10 @@ export async function forward() {
 }
 
 export function back() {
-	if (stepCount <= 1) return;
+	if (stepCount <= 1 && !limit) return;
 	goBack = true;
-	targetStep = stepCount - 1;
+	targetStep = limit ? maxStep : stepCount - 1;
+	limit = false;
 	setJumpWait(true);
 	setJumpPause(true);
 	reset();

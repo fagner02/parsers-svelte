@@ -35,12 +35,9 @@
 	export let firstSet = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
 	export let joinSet = writable([]);
-	/**@type {Map<number, import('@/types').SetRow>}*/
-	let test = new Map();
 
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
-
 	/**@type {Map<number,number>}*/
 	let joinIndexes = new Map();
 
@@ -49,9 +46,11 @@
 
 	export const reset = () => {
 		joinStack.update(() => []);
+		joinSet.update(() => []);
 		firstSet.update(() => []);
-		svgLines.setHideOpacity();
+		svgLines?.setHideOpacity();
 		firstIndexes.clear();
+		joinIndexes.clear();
 		first();
 	};
 	setResetCall(reset);
@@ -108,13 +107,14 @@
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
-
+						if (currentlyRunning !== id) return;
 						await joinSetElement.joinSets(
 							matchingRules.map((x) => x.index),
 							matchingRules.map((x) => x.left),
 							i
 						);
 					} else {
+						if (currentlyRunning !== id) return;
 						await firstSetElement.joinSets([symbol], [symbol], i);
 					}
 					if (!(nullable.get(symbol) ?? false)) {
@@ -123,6 +123,7 @@
 					}
 				}
 				if (isNull) {
+					if (currentlyRunning !== id) return;
 					await firstSetElement.joinSets([''], [''], i);
 				}
 			}
@@ -131,6 +132,7 @@
 				if ($joinSet[item].right.length === 0) {
 					continue;
 				}
+				if (currentlyRunning !== id) return;
 				await joinStackElement.addToStack(item, rules[item].left, '', item.toString());
 
 				while ($joinStack.length > 0) {
@@ -140,6 +142,7 @@
 
 					let nextSet = joinSetElement.get(topValue);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
+						if (currentlyRunning !== id) return;
 						await joinStackElement.addToStack(
 							topValue,
 							rules[topValue].left,
@@ -153,17 +156,20 @@
 						(x) => x !== ''
 					);
 
+					if (currentlyRunning !== id) return;
 					await firstSetElement.joinSets(setToJoin, setToJoin, topKey);
 					await addPause();
+					if (currentlyRunning !== id) return;
 					await joinSetElement.remove(topKey, topValue);
 					await addPause();
 
 					if (joinSetElement.get(topKey)?.length === 0) {
+						if (currentlyRunning !== id) return;
 						await joinStackElement.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}
-
+			if (currentlyRunning !== id) return;
 			limitHit();
 			addPause();
 		} catch (e) {
@@ -178,9 +184,6 @@
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	{#each test.entries() as [v, k], i}
-		<p>{v}-{k}</p>
-	{/each}
 	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="first"

@@ -4,7 +4,14 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
-	import { wait, addPause, limitHit, setResetCall, newRunningCall } from '$lib/flowControl';
+	import {
+		wait,
+		addPause,
+		limitHit,
+		setResetCall,
+		newRunningCall,
+		currentlyRunning
+	} from '$lib/flowControl';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 
@@ -45,14 +52,11 @@
 		followIndexes = new Map();
 		joinSet.update(() => []);
 		joinIndexes = new Map();
-		svgLines.setHideOpacity();
+		joinStack.update(() => []);
+		svgLines?.setHideOpacity();
 		follow();
 	}
 	setResetCall(reset);
-	/**
-	 * @type {(() => void) | null}
-	 */
-	export let callback = null;
 
 	async function follow() {
 		const id = newRunningCall();
@@ -61,11 +65,14 @@
 			await loadGrammar();
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
+			if (currentlyRunning != id) return;
 			await followSetElement.addSetRow(rules[0].left, rules[0].left);
+			if (currentlyRunning != id) return;
 			await followSetElement.joinSets(['$'], ['$'], rules[0].left);
 
 			for (let i = 0; i < rules.length; i++) {
 				for (let j = 0; j < rules[i].right.length; j++) {
+					if (currentlyRunning != id) return;
 					await selectRSymbol('g', i, j, 'green', true);
 
 					const symbol = rules[i].right[j];
@@ -75,6 +82,7 @@
 						continue;
 					}
 					if (!followIndexes.has(symbol)) {
+						if (currentlyRunning != id) return;
 						await followSetElement.addSetRow(symbol, symbol);
 					}
 
@@ -82,11 +90,14 @@
 					while (true) {
 						if (followingSymbol === null) {
 							if (!joinSetElement.has(symbol)) {
+								if (currentlyRunning != id) return;
 								await joinSetElement.addSetRow(symbol, symbol);
 							}
+							if (currentlyRunning != id) return;
 							await joinSetElement.joinSets([rules[i].left], [rules[i].left], symbol);
 							break;
 						}
+						if (currentlyRunning != id) return;
 						await selectRSymbol('g', i, j + 1, 'yellow', true);
 						if (nt.includes(followingSymbol)) {
 							let empty = false;
@@ -96,6 +107,7 @@
 										empty = true;
 										continue;
 									}
+									if (currentlyRunning != id) return;
 									await followSetElement.joinSets(item.right, item.right, symbol);
 								}
 							}
@@ -107,6 +119,7 @@
 								j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
 							pos++;
 						} else {
+							if (currentlyRunning != id) return;
 							await followSetElement.joinSets([followingSymbol], [followingSymbol], symbol);
 							break;
 						}
@@ -117,6 +130,7 @@
 				if (joinSetElement.get(item)?.length === 0) {
 					continue;
 				}
+				if (currentlyRunning != id) return;
 				await joinStackElement.addToStack(item, item, '', item);
 				await addPause();
 
@@ -126,23 +140,26 @@
 
 					let nextSet = joinSetElement.get(top[0]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
+						if (currentlyRunning != id) return;
 						await joinStackElement.addToStack(top[0], top[0], '', top[0]);
 						continue;
 					}
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement.get(top[0]));
+
+					if (currentlyRunning != id) return;
 					await followSetElement.joinSets(setToJoin, setToJoin, topKey);
 
+					if (currentlyRunning != id) return;
 					await joinSetElement.remove(topKey, top[0]);
 
 					if (joinSetElement.get(topKey)?.length === 0) {
+						if (currentlyRunning != id) return;
 						await joinStackElement.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}
-			if (callback !== null) {
-				callback();
-			}
+			if (currentlyRunning != id) return;
 			limitHit();
 			addPause();
 		} catch (e) {
