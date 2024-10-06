@@ -7,7 +7,7 @@
 		%sveltekit.head%
 		<script src="app.js"></script>
 	</head>
-	<body data-sveltekit-preload-data="hover">
+	<body data-sveltekit-preload-data="hover" class="grid">
 		<!-- <div data-tauri-drag-region class="titlebar">
 			<div class="titlebar-button" id="titlebar-minimize">
 				<img src="minus.svg" alt="minimize" />
@@ -19,6 +19,57 @@
 				<img src="square-x.svg" alt="close" />
 			</div>
 		</div> -->
+
+		<div
+			name="discard"
+			style="
+				transition:
+					opacity 0.3s,
+					translate 0.3s;
+			"
+		>
+			<header>
+				<nav>
+					<h1>Visualizador de Parsers</h1>
+				</nav>
+			</header>
+		</div>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
+	<style name="discard">
+		html,
+		body,
+		div[name='discard'],
+		header,
+		nav {
+			height: 100%;
+			margin: 0;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-areas: 'unit';
+		}
+		div[name='discard'] {
+			pointer-events: none;
+		}
+		div[name='discard'],
+		#app {
+			grid-area: unit;
+		}
+		nav {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		header > nav > h1 {
+			color: hsl(200, 50%, 50%);
+			font-size: 20pt;
+			line-height: 18pt;
+			font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+			margin: 8px 5px;
+			font-weight: normal;
+			text-transform: uppercase;
+		}
+	</style>
 </html>
