@@ -16,13 +16,11 @@ export function lltable(
 			const follow = /**@type {Set<string>}*/ (followSet.get(rules[left].left));
 			for (let followItem of follow) {
 				table.get(rules[left].left)?.set(followItem, left);
-				console.log(rules[left].left, followItem, left);
 			}
 		}
 		for (let rightItem of right) {
 			if (rightItem !== '') {
 				table.get(rules[left].left)?.set(rightItem, left);
-				console.log('right:', rules[left].left, rightItem, left);
 			}
 		}
 	}

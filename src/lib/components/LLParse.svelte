@@ -121,7 +121,7 @@
 			addPause();
 		} catch (e) {}
 	}
-	console.log(getAllContexts());
+
 	onMount(async () => {
 		try {
 			await parsing();
