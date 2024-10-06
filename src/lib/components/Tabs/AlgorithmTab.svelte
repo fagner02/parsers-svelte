@@ -266,6 +266,14 @@
 		flex-wrap: wrap;
 		flex-direction: column;
 		max-width: inherit;
+		height: inherit;
+		border: 1px solid hsl(0, 0%, 0%, 20%);
+		border-radius: 10px;
+		overflow: auto;
+	}
+
+	:global(.steps > div) {
+		margin-top: 5px;
 	}
 
 	button {

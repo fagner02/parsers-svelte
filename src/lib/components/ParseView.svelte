@@ -1,6 +1,5 @@
 <script>
-	import SyntaxTree from './SyntaxTree.svelte';
-	import { getContext, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 
 	/**@type {string}*/
 	export let inputString;

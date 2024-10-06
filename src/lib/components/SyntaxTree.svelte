@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { setTreeFunctions } from '$lib/tree';
-	import { getAllContexts, onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {SVGGElement} */
 	let svg;
@@ -154,7 +154,7 @@
 	 * @param {string} parentData
 	 */
 	export async function addToTree(data, parentData) {
-		const parent = /**@type {import('@/types').node}*/ (await findNode(parentData));
+		const parent = /**@type {import('@/types').node}*/ (findNode(parentData));
 		if (parent === undefined) return;
 
 		parent.done = true;
