@@ -65,16 +65,10 @@
 	/**@type {string}*/
 	let inputString;
 
-	/**@type {() => void}*/
-	export let reset;
-
 	let code = '';
 	onMount(async () => {
 		code = await (await fetch('src/lib/first.js')).text();
 		loadGrammar();
-
-		// const nt = ['S', 'A', 'Bb'];
-		// const t = ['$', 'a', 'b', 'm', 'c'];
 
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
@@ -156,7 +150,7 @@
 </script>
 
 {#if loaded}
-	<AlgorithmTab resetCall={reset} bind:instruction bind:inputString {code}>
+	<AlgorithmTab bind:instruction bind:inputString {code}>
 		<div slot="steps" style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
 				<button
@@ -177,12 +171,11 @@
 			</div>
 			<div class="grid">
 				{#if selectedAlgorithm === 'first'}
-					<FirstAlgorithm {rules} {nt} bind:instruction bind:reset></FirstAlgorithm>
+					<FirstAlgorithm {rules} {nt} bind:instruction></FirstAlgorithm>
 				{:else if selectedAlgorithm === 'follow'}
-					<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction bind:reset></FollowAlgorithm>
+					<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction></FollowAlgorithm>
 				{:else}
-					<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction bind:reset
-					></LlAlgorithm>
+					<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction></LlAlgorithm>
 				{/if}
 			</div>
 		</div>

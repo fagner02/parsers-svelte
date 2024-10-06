@@ -38,7 +38,7 @@
 
 	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
 
-	export function reset() {
+	function reset() {
 		symbolStack.update(() => []);
 		inputStack.update(() => []);
 		svgLines.setHideOpacity();

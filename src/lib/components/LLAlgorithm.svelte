@@ -36,7 +36,7 @@
 	/**@type {Array<string>}*/
 	export let t;
 
-	export function reset() {
+	function reset() {
 		tableElement.resetTable();
 		svgLines.setHideOpacity();
 		lltable();

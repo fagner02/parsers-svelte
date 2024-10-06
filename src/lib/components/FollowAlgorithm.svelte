@@ -47,7 +47,7 @@
 	/**@type {Map<string, number>}*/
 	let followIndexes = new Map();
 
-	export function reset() {
+	function reset() {
 		followSet.update(() => []);
 		followIndexes = new Map();
 		joinSet.update(() => []);
@@ -167,12 +167,8 @@
 		}
 	}
 
-	async function setup() {
-		reset();
-	}
-
 	onMount(() => {
-		setup();
+		reset();
 	});
 </script>
 
