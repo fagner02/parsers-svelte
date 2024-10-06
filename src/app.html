@@ -31,6 +31,7 @@
 			<header>
 				<nav>
 					<h1>Visualizador de Parsers</h1>
+					<p>Ferramenta para o ensino de algoritmos de análise sintática</p>
 				</nav>
 			</header>
 		</div>
@@ -40,13 +41,13 @@
 		html,
 		body,
 		div[name='discard'],
-		header,
-		nav {
+		div[name='discard'] > header,
+		div[name='discard'] > header > nav {
 			height: 100%;
 			margin: 0;
 		}
 
-		.grid {
+		div[name='discard'].grid {
 			display: grid;
 			grid-template-areas: 'unit';
 		}
@@ -57,12 +58,20 @@
 		#app {
 			grid-area: unit;
 		}
-		nav {
+		div[name='discard'] > header {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 		}
-		header > nav > h1 {
+		div[name='discard'] > header > nav {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: baseline;
+			width: fit-content;
+			height: fit-content;
+		}
+		div[name='discard'] > header > nav > h1 {
 			color: hsl(200, 50%, 50%);
 			font-size: 20pt;
 			line-height: 18pt;
@@ -70,6 +79,13 @@
 			margin: 8px 5px;
 			font-weight: normal;
 			text-transform: uppercase;
+		}
+		div[name='discard'] > header > nav > p {
+			font-family: monospace;
+			text-transform: uppercase;
+			max-width: 250px;
+			/* text-align: center; */
+			margin: 0;
 		}
 	</style>
 </html>

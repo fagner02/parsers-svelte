@@ -13,8 +13,8 @@ window.onload = (eev) => {
 		console.log(div.attributes.getNamedItem('name')?.value === 'discard');
 		if (div.attributes.getNamedItem('name')?.value === 'discard') {
 			div.style.opacity = '0';
-			div.style.translate = '0px -50px';
-			setTimeout(() => div.remove(), 1000);
+			div.style.translate = '0px -20px';
+			// setTimeout(() => div.remove(), 1000);
 			break;
 		}
 	}
