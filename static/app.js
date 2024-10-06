@@ -14,7 +14,7 @@ window.onload = (eev) => {
 		if (div.attributes.getNamedItem('name')?.value === 'discard') {
 			div.style.opacity = '0';
 			div.style.translate = '0px -20px';
-			// setTimeout(() => div.remove(), 1000);
+			setTimeout(() => div.remove(), 1000);
 			break;
 		}
 	}
