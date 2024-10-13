@@ -183,6 +183,7 @@
 		color={'blue'}
 		label={'follow set'}
 		bind:this={followSetElement}
+		bind:svgLines
 	></SetsCard>
 	<SetsCard
 		setId="first"
@@ -191,6 +192,7 @@
 		setIndexes={followIndexes}
 		color={'blue'}
 		label={'first set'}
+		bind:svgLines
 	></SetsCard>
 	<SetsCard
 		setId="join"
@@ -200,6 +202,7 @@
 		color={'blue'}
 		label={'join set'}
 		bind:this={joinSetElement}
+		bind:svgLines
 	></SetsCard>
 	<StackCard
 		stack={joinStack}

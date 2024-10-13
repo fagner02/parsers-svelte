@@ -1,3 +1,36 @@
+export function calcNullable(/**@type {import('@/types').GrammarItem[]} */ rules) {
+	/** @type {Map<string, boolean>}*/
+	let nullable = new Map();
+
+	for (let i = 0; i < rules.length; i++) {
+		if (rules[i].right[0] == '') {
+			nullable.set(rules[i].left, true);
+		} else {
+			nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
+		}
+	}
+
+	let changed = false;
+	while (changed) {
+		for (let j = 0; j < rules.length; j++) {
+			if (nullable.get(rules[j].left)) continue;
+			let isnull = true;
+			for (let k = 0; k < rules[j].right.length; k++) {
+				if (!nullable.get(rules[j].right[k])) {
+					isnull = false;
+					break;
+				}
+			}
+			if (isnull) {
+				changed = true;
+				nullable.set(rules[j].left, true);
+			}
+		}
+	}
+
+	return nullable;
+}
+
 export function first(
 	/** @type {Array<import('@/types').GrammarItem>} */ rules,
 	/** @type {string[]} */ nt

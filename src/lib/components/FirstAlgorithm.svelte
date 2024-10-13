@@ -13,6 +13,7 @@
 		currentlyRunning
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
+	import { calcNullable } from '$lib/first';
 
 	/**@type {StackCard}*/
 	let joinStackElement;
@@ -59,51 +60,25 @@
 		const id = newRunningCall();
 
 		try {
-			/** @type {Map<string, boolean>}*/
-			let nullable = new Map();
-
-			for (let i = 0; i < rules.length; i++) {
-				if (rules[i].right[0] == '') {
-					nullable.set(rules[i].left, true);
-				} else {
-					nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
-				}
-			}
-
-			let changed = false;
-			while (changed) {
-				for (let j = 0; j < rules.length; j++) {
-					if (nullable.get(rules[j].left)) continue;
-					let isnull = true;
-					for (let k = 0; k < rules[j].right.length; k++) {
-						if (!nullable.get(rules[j].right[k])) {
-							isnull = false;
-							break;
-						}
-					}
-					if (isnull) {
-						changed = true;
-						nullable.set(rules[j].left, true);
-					}
-				}
-			}
-
 			await wait(0);
 			await loadGrammar();
 			if (currentlyRunning !== id) return;
 			await addPause();
 
+			const nullable = calcNullable(rules);
+
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
-				await firstSetElement.addSetRow(rules[i].left, i);
-
+				await firstSetElement.addSetRow(rules[i].left, i, `gl${i}`);
+				// console.log(`gl${i}`, `${firstSetElement.getSetId()}l${i}`);
+				// svgLines.showLine(, `${firstSetElement.getSetId()}l${i}`);
 				let isNull = true;
 				for (let j = 0; j < rules[i].right.length; j++) {
 					let symbol = rules[i].right[j];
 					if (nt.includes(symbol)) {
 						if (!joinIndexes.has(i)) {
-							await joinSetElement.addSetRow(rules[i].left, i);
+							await joinSetElement.addSetRow(rules[i].left, i, `gl${i}`);
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
@@ -111,11 +86,12 @@
 						await joinSetElement.joinSets(
 							matchingRules.map((x) => x.index),
 							matchingRules.map((x) => x.left),
-							i
+							i,
+							`gl${i}`
 						);
 					} else {
 						if (currentlyRunning !== id) return;
-						await firstSetElement.joinSets([symbol], [symbol], i);
+						await firstSetElement.joinSets([symbol], [symbol], i, `gl${i}`);
 					}
 					if (!(nullable.get(symbol) ?? false)) {
 						isNull = false;
@@ -192,6 +168,7 @@
 		color={'blue'}
 		label={'first set'}
 		bind:this={firstSetElement}
+		bind:svgLines
 	></SetsCard>
 	<SetsCard
 		setId="join"
@@ -200,6 +177,7 @@
 		color={'blue'}
 		label={'join set'}
 		bind:this={joinSetElement}
+		bind:svgLines
 	></SetsCard>
 	<StackCard
 		stack={joinStack}

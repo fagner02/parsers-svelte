@@ -5,14 +5,27 @@
 	import { onMount } from 'svelte';
 
 	let opacity = 0;
-	/** @type {string[]} */
-	let linePath;
-	/** @type {string[]} */
-	let arrowPath;
-	/** @type {Element | null} */
+	// /** @type {string[]} */
+	// let linePath;
+	// /** @type {string[]} */
+	// let arrowPath;
+	/** @type {SVGPathElement | null} */
 	let line;
-	/** @type {Element | null} */
+	/** @type {SVGElement | null} */
 	let arrow;
+
+	/**@type {string}*/
+	let _destId;
+	/**@type {string}*/
+	let _srcId;
+
+	/**@type {null | anime.AnimeInstance}*/
+	let li = null;
+	/**@type {null | anime.AnimeInstance}*/
+	let an = null;
+
+	/**@type {null | NodeJS.Timeout}*/
+	let inter = null;
 
 	export let svgId;
 
@@ -21,19 +34,24 @@
 	 * @param {boolean} src
 	 */
 	function calcPos(id, src) {
+		if (!id.startsWith('#')) {
+			id = '#' + id;
+		}
+
 		let elemRect = /**@type {DOMRect}*/ (document.querySelector(id)?.getBoundingClientRect());
 		let parentRect = /**@type {DOMRect}*/ (
 			document.querySelector('.cards-box')?.getBoundingClientRect()
 		);
 		if (src) {
 			return {
-				x: elemRect.x - parentRect.x + elemRect.height,
+				x: elemRect.x - parentRect.x + elemRect.width + 5,
 				y: elemRect.y - parentRect.y + elemRect.height
 			};
 		}
+
 		return {
-			x: elemRect.x - parentRect.x + elemRect.width / 2 - 12,
-			y: elemRect.y - parentRect.y + lineHeight + elemRect.height - 5
+			x: elemRect.left - parentRect.left - 10,
+			y: elemRect.top - parentRect.top - 5
 		};
 	}
 
@@ -42,16 +60,23 @@
 	 * @param {string} destId
 	 */
 	export async function showLine(srcId, destId) {
+		_destId = destId;
+		_srcId = srcId;
+		if (inter !== null) {
+			window.clearInterval(inter);
+			li?.pause();
+			an?.pause();
+		}
 		opacity = 1;
 
 		const targetPos = calcPos(destId, false);
 		const srcPos = calcPos(srcId, true);
 
-		linePath = [
+		const linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
 			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
 		];
-		arrowPath = [
+		const arrowPath = [
 			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
 			`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
 		];
@@ -59,19 +84,78 @@
 		let animeParams = {
 			targets: line,
 			d: linePath,
-			duration: 2000,
+			duration: 2900,
 			direction: 'forward',
 			autoplay: true,
 			easing: 'spring(1, 50, 10, 1)'
 		};
-		anime(animeParams);
-		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
+
+		li = anime(animeParams);
+		an = anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
 		await wait(500);
+
+		inter = setInterval(async () => {
+			try {
+				if (li === null || an === null) return;
+				const targetPos = calcPos(destId, false);
+				const srcPos = calcPos(srcId, true);
+
+				let nlinePath = [
+					li.animations[0].currentValue,
+					`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+				];
+				let narrowPath = [
+					an.animations[0].currentValue,
+					`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+				];
+				// /**@type {SVGPathElement}*/ (line).setAttribute('d');
+
+				let animeParams = {
+					targets: line,
+					d: nlinePath,
+					duration: 100,
+					direction: 'forward',
+					autoplay: true,
+					easing: 'linear'
+				};
+
+				li.pause();
+				li = anime(animeParams);
+				// console.log(li.animations);
+				an.pause();
+				an = anime(Object.assign(animeParams, { d: narrowPath, targets: arrow }));
+			} catch (e) {
+				if (inter != null) {
+					window.clearInterval(inter);
+					li?.pause();
+					an?.pause();
+				}
+			}
+		}, 100);
+
+		// li.pause();
+		// /**@type {SVGPathElement}*/ (line).setAttribute('d', li.animations[0].currentValue);
 	}
 
 	export async function hideLine() {
 		await wait(2000);
+		if (inter != null) {
+			li?.pause();
+			an?.pause();
+			window.clearInterval(inter);
+		}
+		const targetPos = calcPos(_destId, false);
+		const srcPos = calcPos(_srcId, true);
+
+		const linePath = [
+			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
+			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+		];
+		const arrowPath = [
+			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
+			`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+		];
 		let animeParams = {
 			targets: line,
 			d: linePath,
@@ -80,6 +164,7 @@
 			autoplay: true,
 			easing: 'easeInQuad'
 		};
+
 		anime(animeParams);
 		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 

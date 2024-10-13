@@ -37,16 +37,16 @@
  * parent: number,
  * id: number,
  * opacity: number,
- *  x: number,
- *  y: number,
- *  width: number,
- *  height: number,
- *  d: string,
- *  dashOffset: number,
- *  pos: number }} node
+ * x: number,
+ * y: number,
+ * width: number,
+ * height: number,
+ * d: string,
+ * dashOffset: number,
+ * pos: number }} node
  */
 
-/**@typedef {{level: number,index: number}} nodeId*/
+/** @typedef {{level: number,index: number}} nodeId*/
 
 /** @typedef {{data: any, text: string, opacity: number,width:number, pos: number }} tableItem*/
 
