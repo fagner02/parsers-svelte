@@ -40,33 +40,7 @@ export function first(
 	/** @type {Map<number, Set<number>>}*/
 	let joinSet = new Map();
 	/** @type {Map<string, boolean>}*/
-	let nullable = new Map();
-
-	for (let i = 0; i < rules.length; i++) {
-		if (rules[i].right[0] == '') {
-			nullable.set(rules[i].left, true);
-		} else {
-			nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
-		}
-	}
-
-	let changed = false;
-	while (changed) {
-		for (let j = 0; j < rules.length; j++) {
-			if (nullable.get(rules[j].left)) continue;
-			let isnull = true;
-			for (let k = 0; k < rules[j].right.length; k++) {
-				if (!nullable.get(rules[j].right[k])) {
-					isnull = false;
-					break;
-				}
-			}
-			if (isnull) {
-				changed = true;
-				nullable.set(rules[j].left, true);
-			}
-		}
-	}
+	let nullable = calcNullable(rules);
 
 	for (let i = 0; i < rules.length; i++) {
 		firstSet.set(i, new Set());
@@ -104,6 +78,7 @@ export function first(
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
 			const top = /**@type {Set<number>}*/ (joinSet.get(topKey));
+
 			const topValue = /**@type {number}*/ (top?.values().next().value);
 
 			let nextSet = joinSet.get(topValue);

@@ -13,8 +13,8 @@
 	/**@type {string}*/
 	export let setId;
 	export let useNote = true;
-	/**@type {import('@/SvgLines.svelte').default}*/
-	export let svgLines;
+	/**@type {import('@/SvgLines.svelte').default | null}*/
+	export let svgLines = null;
 
 	export let color;
 	export let label;
@@ -69,7 +69,7 @@
 				$set[index].rightProps.pop();
 			}
 
-			if (srcId) svgLines.showLine(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
+			if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
 
 			for (let i = 0; i < symbols.length; i++) {
 				if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
@@ -78,7 +78,7 @@
 						return x;
 					});
 					if (srcId)
-						svgLines.updateTargets(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
+						svgLines?.updateTargets(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
 
 					if ($set[index].rightProps.length > 0) {
 						await addSetItem(index, ',');
@@ -87,7 +87,7 @@
 					await addSetItem(index, texts[i]);
 				}
 			}
-			await svgLines.hideLine();
+			await svgLines?.hideLine();
 		} catch {}
 	}
 
@@ -111,7 +111,7 @@
 			]);
 
 			await wait(0);
-			if (srcId) svgLines.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
+			if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
 
 			await selectLSymbol(
 				setId,
@@ -125,7 +125,7 @@
 				return x;
 			});
 			await wait(0);
-			await svgLines.hideLine();
+			await svgLines?.hideLine();
 		} catch {}
 	}
 

@@ -76,6 +76,7 @@
 				for (let j = 0; j < rules[i].right.length; j++) {
 					let symbol = rules[i].right[j];
 					if (nt.includes(symbol)) {
+						await selectRSymbol('g', i, j, 'blue', false);
 						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 						if (!joinIndexes.has(i)) {
 							await joinSetElement.addSetRow(rules[i].left, i, `gl${i}`);
@@ -83,7 +84,6 @@
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
 
-						await selectRSymbol('g', i, j, 'blue', false);
 						if (currentlyRunning !== id) return;
 						await joinSetElement.joinSets(
 							matchingRules.map((x) => x.index),
@@ -112,7 +112,13 @@
 					continue;
 				}
 				if (currentlyRunning !== id) return;
-				await joinStackElement.addToStack(item, rules[item].left, '', item.toString());
+				await joinStackElement.addToStack(
+					item,
+					rules[item].left,
+					'',
+					item.toString(),
+					`${joinSetElement.getSetId()}l${item}`
+				);
 
 				while ($joinStack.length > 0) {
 					const topKey = $joinStack[$joinStack.length - 1].data;
@@ -136,8 +142,14 @@
 					);
 
 					if (currentlyRunning !== id) return;
-					await firstSetElement.joinSets(setToJoin, setToJoin, topKey);
+					await firstSetElement.joinSets(
+						setToJoin,
+						setToJoin,
+						topKey,
+						`${firstSetElement.getSetId()}l${topValue}`
+					);
 					await addPause();
+
 					if (currentlyRunning !== id) return;
 					await joinSetElement.remove(topKey, topValue);
 					await addPause();
