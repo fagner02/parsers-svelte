@@ -69,7 +69,7 @@
 				$set[index].rightProps.pop();
 			}
 
-			if (srcId) svgLines.showLine(srcId, `${setId}r${index}-${$set[index].rightProps.length - 1}`);
+			if (srcId) svgLines.showLine(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
 
 			for (let i = 0; i < symbols.length; i++) {
 				if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
@@ -77,6 +77,8 @@
 						x[index].right = [...x[index].right, symbols[i]];
 						return x;
 					});
+					if (srcId)
+						svgLines.updateTargets(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
 
 					if ($set[index].rightProps.length > 0) {
 						await addSetItem(index, ',');
@@ -85,6 +87,7 @@
 					await addSetItem(index, texts[i]);
 				}
 			}
+			await svgLines.hideLine();
 		} catch {}
 	}
 
@@ -229,7 +232,10 @@
 					</p>
 				{/each}
 
-				<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>{/if}
+				<span
+					in:setItemIn={{ duration: 500, delay: 200 }}
+					id="{setId}r{index}-{item.rightProps.length}">{'}'}</span
+				>{/if}
 		</p>
 	{/each}
 </CardBox>

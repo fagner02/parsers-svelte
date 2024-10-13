@@ -38,7 +38,10 @@
 			id = '#' + id;
 		}
 
-		let elemRect = /**@type {DOMRect}*/ (document.querySelector(id)?.getBoundingClientRect());
+		let elem = document.querySelector(id);
+		if (elem === null) return null;
+
+		let elemRect = /**@type {DOMRect}*/ (elem.getBoundingClientRect());
 		let parentRect = /**@type {DOMRect}*/ (
 			document.querySelector('.cards-box')?.getBoundingClientRect()
 		);
@@ -59,18 +62,29 @@
 	 * @param {string} srcId
 	 * @param {string} destId
 	 */
+	export function updateTargets(srcId, destId) {
+		_destId = destId;
+		_srcId = srcId;
+	}
+
+	/**
+	 * @param {string} srcId
+	 * @param {string} destId
+	 */
 	export async function showLine(srcId, destId) {
 		_destId = destId;
 		_srcId = srcId;
 		if (inter !== null) {
 			window.clearInterval(inter);
-			li?.pause();
-			an?.pause();
+
+			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
+			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 		}
 		opacity = 1;
 
-		const targetPos = calcPos(destId, false);
-		const srcPos = calcPos(srcId, true);
+		const targetPos = calcPos(_destId, false);
+		const srcPos = calcPos(_srcId, true);
+		if (targetPos === null || srcPos === null) return;
 
 		const linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
@@ -95,43 +109,39 @@
 
 		await wait(500);
 
-		inter = setInterval(async () => {
-			try {
-				if (li === null || an === null) return;
-				const targetPos = calcPos(destId, false);
-				const srcPos = calcPos(srcId, true);
-
-				let nlinePath = [
-					li.animations[0].currentValue,
-					`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
-				];
-				let narrowPath = [
-					an.animations[0].currentValue,
-					`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
-				];
-				// /**@type {SVGPathElement}*/ (line).setAttribute('d');
-
-				let animeParams = {
-					targets: line,
-					d: nlinePath,
-					duration: 100,
-					direction: 'forward',
-					autoplay: true,
-					easing: 'linear'
-				};
-
-				li.pause();
-				li = anime(animeParams);
-				// console.log(li.animations);
-				an.pause();
-				an = anime(Object.assign(animeParams, { d: narrowPath, targets: arrow }));
-			} catch (e) {
-				if (inter != null) {
-					window.clearInterval(inter);
-					li?.pause();
-					an?.pause();
-				}
+		inter = setInterval(() => {
+			if (li === null || an === null) return;
+			const targetPos = calcPos(_destId, false);
+			const srcPos = calcPos(_srcId, true);
+			if (targetPos === null || srcPos === null) {
+				if (inter) window.clearInterval(inter);
+				return;
 			}
+
+			const nlinePath = [
+				li.animations[0].currentValue,
+				`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+			];
+			const narrowPath = [
+				an.animations[0].currentValue,
+				`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+			];
+			// /**@type {SVGPathElement}*/ (line).setAttribute('d');
+
+			let animeParams = {
+				targets: line,
+				d: nlinePath,
+				duration: 100,
+				direction: 'forward',
+				autoplay: true,
+				easing: 'linear'
+			};
+
+			if (li) anime.remove(li.animations[0].animatable.target);
+			if (an) anime.remove(an.animations[0].animatable.target);
+
+			li = anime(animeParams);
+			an = anime(Object.assign(animeParams, { d: narrowPath, targets: arrow }));
 		}, 100);
 
 		// li.pause();
@@ -141,12 +151,15 @@
 	export async function hideLine() {
 		await wait(2000);
 		if (inter != null) {
-			li?.pause();
-			an?.pause();
+			// li?.pause();
+			// an?.pause();
+			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
+			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 			window.clearInterval(inter);
 		}
 		const targetPos = calcPos(_destId, false);
 		const srcPos = calcPos(_srcId, true);
+		if (targetPos === null || srcPos === null) return;
 
 		const linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,

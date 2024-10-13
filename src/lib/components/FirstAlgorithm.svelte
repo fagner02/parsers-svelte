@@ -14,6 +14,7 @@
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
+	import { selectRSymbol } from '$lib/selectSymbol';
 
 	/**@type {StackCard}*/
 	let joinStackElement;
@@ -71,27 +72,29 @@
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
 				await firstSetElement.addSetRow(rules[i].left, i, `gl${i}`);
-				// console.log(`gl${i}`, `${firstSetElement.getSetId()}l${i}`);
-				// svgLines.showLine(, `${firstSetElement.getSetId()}l${i}`);
 				let isNull = true;
 				for (let j = 0; j < rules[i].right.length; j++) {
 					let symbol = rules[i].right[j];
 					if (nt.includes(symbol)) {
+						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 						if (!joinIndexes.has(i)) {
 							await joinSetElement.addSetRow(rules[i].left, i, `gl${i}`);
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
+
+						await selectRSymbol('g', i, j, 'blue', false);
 						if (currentlyRunning !== id) return;
 						await joinSetElement.joinSets(
 							matchingRules.map((x) => x.index),
-							matchingRules.map((x) => x.left),
+							matchingRules.map((x) => `${x.index}:${x.left}`),
 							i,
-							`gl${i}`
+							`gr${i}-${j}`
 						);
 					} else {
 						if (currentlyRunning !== id) return;
-						await firstSetElement.joinSets([symbol], [symbol], i, `gl${i}`);
+						await selectRSymbol('g', i, j, 'green', false);
+						await firstSetElement.joinSets([symbol], [symbol], i, `gr${i}-${j}`);
 					}
 					if (!(nullable.get(symbol) ?? false)) {
 						isNull = false;
