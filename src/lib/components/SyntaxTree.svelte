@@ -1,6 +1,6 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { setTreeFunctions } from '$lib/tree';
+	import { setTreeFunctions } from '$lib/treeFunctions';
 	import { onMount } from 'svelte';
 
 	/** @type {SVGGElement} */

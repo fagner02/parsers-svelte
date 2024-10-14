@@ -11,7 +11,7 @@
 	export let color;
 	/** @type {string} */
 	export let stackId;
-	/** @type {import('@/SvgLines.svelte').default} */
+	/** @type {import('@/SvgLines.svelte').default | undefined} */
 	export let svgLines;
 
 	/**
@@ -49,7 +49,7 @@
 			await wait(10);
 
 			if (srcId) {
-				await svgLines.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
+				await svgLines?.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
 			}
 
 			stack.update((x) => {
@@ -63,10 +63,10 @@
 			});
 
 			if (srcId) {
-				await svgLines.hideLine();
+				await svgLines?.hideLine();
 			}
 
-			svgLines.setHideOpacity();
+			svgLines?.setHideOpacity();
 			await wait(500);
 		} catch (e) {}
 	}

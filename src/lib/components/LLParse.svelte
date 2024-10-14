@@ -12,9 +12,9 @@
 	} from '$lib/flowControl';
 	import StackCard from './Cards/StackCard.svelte';
 	import { getAllContexts, getContext, onMount, setContext } from 'svelte';
-	import { getTreeFunctions } from '$lib/tree';
+	import { getTreeFunctions } from '$lib/treeFunctions';
 
-	/**@type {SvgLines}*/
+	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	export let table;
@@ -41,7 +41,7 @@
 	function reset() {
 		symbolStack.update(() => []);
 		inputStack.update(() => []);
-		svgLines.setHideOpacity();
+		svgLines?.setHideOpacity();
 		context.setAccept(null);
 		try {
 			parsing();

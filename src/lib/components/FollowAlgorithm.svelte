@@ -21,7 +21,7 @@
 	let joinSetElement;
 	/**@type {StackCard}*/
 	let joinStackElement;
-	/**@type {SvgLines}*/
+	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;

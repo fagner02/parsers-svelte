@@ -15,7 +15,7 @@
 	import { onMount } from 'svelte';
 	import { first } from '$lib/first';
 
-	/**@type {SvgLines}*/
+	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {TableCard}*/
 	let tableElement;
@@ -39,13 +39,13 @@
 
 	function reset() {
 		tableElement.resetTable();
-		svgLines.setHideOpacity();
-		firstCard.hideSelect();
+		svgLines?.setHideOpacity();
+		firstCard?.hideSelect();
 		lltable();
 	}
 	setResetCall(reset);
 
-	/**@type {SetsCard}*/
+	/**@type {SetsCard | undefined}*/
 	let firstCard;
 
 	async function lltable() {
@@ -58,7 +58,7 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
-				firstCard.selectFor(`firstset${i}`);
+				firstCard?.selectFor(`firstset${i}`);
 				if (item.right.includes('')) {
 					const follow = /**@type {import('@/types').SetRow}*/ (
 						$followSet.find((x) => x.left === item.left)

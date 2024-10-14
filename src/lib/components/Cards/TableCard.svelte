@@ -39,7 +39,7 @@
 	}
 	/** @type {string} */
 	export let tableId;
-	/**@type {import('@/SvgLines.svelte').default}*/
+	/**@type {import('@/SvgLines.svelte').default | undefined}*/
 	export let svgLines;
 
 	/**
@@ -74,7 +74,7 @@
 				return x;
 			});
 			if (srcId) {
-				await svgLines.hideLine();
+				await svgLines?.hideLine();
 			}
 		} catch {}
 	}
