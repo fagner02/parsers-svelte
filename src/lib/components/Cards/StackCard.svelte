@@ -128,10 +128,10 @@
 		<p
 			id="s-{stackId}-{index}"
 			class="{stackItem.showBlock ? 'block' : ''} {color}-after"
-			style="transition: {stackItem.transition};height: {stackItem.height}rem;width: {stackItem.width}rem;opacity: {stackItem.opacity}; top: {stackItem.top}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px;"
+			style="transition: {stackItem.transition};height: {stackItem.height}px;width: {stackItem.width}px;opacity: {stackItem.opacity}; top: {stackItem.top}px;line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px;"
 		>
 			{stackItem.text}<span
-				style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, 5px)"
+				style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, 5px)"
 				>{stackItem.note}</span
 			>
 		</p>
