@@ -1,7 +1,40 @@
 <script>
+	import { wait } from '$lib/flowControl';
 	import { fontSize } from '$lib/globalStyle';
+	import { setSelectionFunctions } from '@/Cards/selectionFunction';
+	import { onMount } from 'svelte';
 
 	export let cardId;
+	/**@type {HTMLElement}*/
+	let selection;
+
+	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	const selectionFunctions = {
+		selectFor: async function (/**@type {string}*/ id) {
+			if (!id.startsWith('#')) {
+				id = '#' + id;
+			}
+			const elem = document.querySelector(id);
+			if (elem === null) return;
+			const parent = /**@type {HTMLElement}*/ (selection.parentElement);
+
+			const elemRect = elem.getBoundingClientRect();
+			const parentRect = parent.getBoundingClientRect();
+			selection.style.opacity = '1';
+			selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
+			selection.style.width = `${elemRect.width + 15}px`;
+			selection.style.height = `${elemRect.height + 3}px`;
+			await wait(500);
+		},
+		hideSelect: async function () {
+			selection.style.opacity = '0';
+		}
+	};
+	setSelectionFunctions(cardId, selectionFunctions);
+
+	onMount(() => {
+		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${cardId}`));
+	});
 </script>
 
 <div class="grid card-wrapper" style="animation: rotA 0.5s;">
@@ -36,6 +69,7 @@
 		margin: 5px;
 		padding: 5px;
 		width: max-content;
+		z-index: 0;
 	}
 	.border-selection {
 		grid-area: unit;
@@ -62,13 +96,12 @@
 		border: 2px solid hsl(200, 50%, 35%);
 		outline: 3px solid white;
 		box-shadow: 0px 0px 6px 2px hsl(200, 50%, 0%, 40%);
-		/* position: relative; */
-		z-index: 1;
 		border-radius: 8px;
 		transition:
 			width 0.5s,
 			translate 0.5s,
 			opacity 0.5s;
 		opacity: 0;
+		z-index: 1;
 	}
 </style>

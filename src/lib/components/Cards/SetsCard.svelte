@@ -1,6 +1,6 @@
 <script>
 	import { selectLSymbol } from '$lib/selectSymbol';
-	import { addPause, wait } from '$lib/flowControl';
+	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import CardBox from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
@@ -17,9 +17,6 @@
 
 	export let color;
 	export let label;
-
-	/**@type {HTMLElement}*/
-	let selection;
 
 	/**
 	 * @param {any} _
@@ -202,31 +199,7 @@
 		return setId;
 	}
 
-	export async function selectFor(/**@type {string}*/ id) {
-		if (!id.startsWith('#')) {
-			id = '#' + id;
-		}
-		const elem = document.querySelector(id);
-		if (elem === null) return;
-		const parent = /**@type {HTMLElement}*/ (selection.parentElement);
-
-		const elemRect = elem.getBoundingClientRect();
-		const parentRect = parent.getBoundingClientRect();
-		selection.style.opacity = '1';
-		selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
-		// selection.style.left = ``;
-		selection.style.width = `${elemRect.width + 10}px`;
-		selection.style.height = `${elemRect.height + 3}px`;
-		await wait(500);
-	}
-
-	export async function hideSelect() {
-		selection.style.opacity = '0';
-	}
-
 	onMount(async () => {
-		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${setId}`));
-		console.log(selection);
 		for (let i = 0; i < $set.length; i++) {
 			selectLSymbol(setId, i, 'blue', false);
 		}

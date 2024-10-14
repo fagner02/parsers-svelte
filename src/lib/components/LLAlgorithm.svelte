@@ -13,7 +13,7 @@
 		currentlyRunning
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
-	import { first } from '$lib/first';
+	import { getSelectionFunctions } from './Cards/selectionFunction';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -40,13 +40,15 @@
 	function reset() {
 		tableElement.resetTable();
 		svgLines?.setHideOpacity();
-		firstCard?.hideSelect();
+		firstFuncs?.hideSelect();
 		lltable();
 	}
 	setResetCall(reset);
 
 	/**@type {SetsCard | undefined}*/
 	let firstCard;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
+	let firstFuncs;
 
 	async function lltable() {
 		const id = newRunningCall();
@@ -58,7 +60,7 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
-				firstCard?.selectFor(`firstset${i}`);
+				firstFuncs?.selectFor(`firstset${i}`);
 				if (item.right.includes('')) {
 					const follow = /**@type {import('@/types').SetRow}*/ (
 						$followSet.find((x) => x.left === item.left)
@@ -100,6 +102,7 @@
 	}
 
 	onMount(() => {
+		firstFuncs = getSelectionFunctions(/** @type {string}*/ (firstCard?.getSetId()));
 		tableElement?.resetTable();
 		lltable();
 	});

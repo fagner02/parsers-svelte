@@ -36,7 +36,11 @@
 		} catch {}
 	};
 
-	export const cardId = 'g';
+	const cardId = 'g';
+
+	export function getCardId() {
+		return cardId;
+	}
 </script>
 
 <CardBox
@@ -54,6 +58,7 @@
 		{#each rules as rule, rulesIndex}
 			<p
 				style="line-height: {lineHeight}rem; font-size: {fontSize}rem; padding: 0px; width: fit-content"
+				id="{cardId}set{rulesIndex}"
 			>
 				<span id="{cardId}l{rulesIndex}"
 					>{rule.left}<span

@@ -14,6 +14,7 @@
 	} from '$lib/flowControl';
 	import { selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
+	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 
 	/**@type {SetsCard}*/
 	let followSetElement;
@@ -46,6 +47,8 @@
 	export let nt;
 	/**@type {Map<string, number>}*/
 	let followIndexes = new Map();
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions|undefined}*/
+	let grammarFuncs;
 
 	function reset() {
 		followSet.update(() => []);
@@ -54,6 +57,7 @@
 		joinIndexes = new Map();
 		joinStack.update(() => []);
 		svgLines?.setHideOpacity();
+		grammarFuncs?.hideSelect();
 		follow();
 	}
 	setResetCall(reset);
@@ -68,9 +72,10 @@
 			if (currentlyRunning != id) return;
 			await followSetElement.addSetRow(rules[0].left, rules[0].left);
 			if (currentlyRunning != id) return;
-			await followSetElement.joinSets(['$'], ['$'], null, rules[0].left, '');
+			await followSetElement.joinSets(['$'], ['$'], null, rules[0].left);
 
 			for (let i = 0; i < rules.length; i++) {
+				grammarFuncs?.selectFor(`gset${i}`);
 				for (let j = 0; j < rules[i].right.length; j++) {
 					if (currentlyRunning != id) return;
 
@@ -78,10 +83,10 @@
 					let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 					if (!nt.includes(symbol)) {
-						await selectRSymbol('g', i, j, 'green', true);
+						await selectRSymbol('g', i, j, 'green', false);
 						continue;
 					}
-					await selectRSymbol('g', i, j, 'blue', true);
+					await selectRSymbol('g', i, j, 'blue', false);
 
 					if (!followIndexes.has(symbol)) {
 						if (currentlyRunning != id) return;
@@ -96,11 +101,17 @@
 								await joinSetElement.addSetRow(symbol, symbol, `gr${i}-${j}`);
 							}
 							if (currentlyRunning != id) return;
-							await joinSetElement.joinSets([rules[i].left], [rules[i].left], null, symbol, '');
+							await joinSetElement.joinSets(
+								[rules[i].left],
+								[rules[i].left],
+								null,
+								symbol,
+								`gl${i}`
+							);
 							break;
 						}
 						if (currentlyRunning != id) return;
-						await selectRSymbol('g', i, j + 1, 'yellow', true);
+						await selectRSymbol('g', i, j + 1, 'yellow', false);
 						if (nt.includes(followingSymbol)) {
 							let empty = false;
 							for (let [key, item] of $firstSet.entries()) {
@@ -140,6 +151,7 @@
 					}
 				}
 			}
+			grammarFuncs?.hideSelect();
 			for (let item of joinIndexes.keys()) {
 				if (joinSetElement.get(item)?.length === 0) {
 					continue;
@@ -182,6 +194,7 @@
 	}
 
 	onMount(() => {
+		grammarFuncs = getSelectionFunctions('g');
 		reset();
 	});
 </script>
