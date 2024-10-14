@@ -58,6 +58,7 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
+				firstCard.selectFor(`firstset${i}`);
 				if (item.right.includes('')) {
 					const follow = /**@type {import('@/types').SetRow}*/ (
 						$followSet.find((x) => x.left === item.left)
@@ -65,8 +66,6 @@
 					for (let f = 0; f < follow.right.length; f++) {
 						if (currentlyRunning != id) return;
 
-						firstCard.selectFor(`firstset${i}`);
-						// selectFor('#firstset' + item.note);
 						await tableElement.addToTable(
 							i,
 							rules[i].right[0] === ''

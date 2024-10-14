@@ -25,6 +25,7 @@
 		padding: 5px 10px;
 		margin: 5px;
 		color: white;
+		width: fit-content;
 	}
 
 	.card-wrapper {
@@ -34,6 +35,7 @@
 		border-radius: 15px;
 		margin: 5px;
 		padding: 5px;
+		width: max-content;
 	}
 	.border-selection {
 		grid-area: unit;

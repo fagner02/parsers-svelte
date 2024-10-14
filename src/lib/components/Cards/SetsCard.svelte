@@ -21,9 +21,6 @@
 	/**@type {HTMLElement}*/
 	let selection;
 
-	/**@type {NodeJS.Timeout|null}*/
-	let selectInter = null;
-
 	/**
 	 * @param {any} _
 	 * @param {{duration: number, delay: number}} params
@@ -206,9 +203,6 @@
 	}
 
 	export async function selectFor(/**@type {string}*/ id) {
-		if (selectInter !== null) {
-			window.clearInterval(selectInter);
-		}
 		if (!id.startsWith('#')) {
 			id = '#' + id;
 		}
@@ -224,22 +218,9 @@
 		selection.style.width = `${elemRect.width + 10}px`;
 		selection.style.height = `${elemRect.height + 3}px`;
 		await wait(500);
-		selectInter = setInterval(() => {
-			const elemRect = elem.getBoundingClientRect();
-			const parentRect = parent.getBoundingClientRect();
-
-			selection.style.opacity = '1';
-			// selection.style.top = `${elemRect.y - parentRect.y - 9}px`;
-			// selection.style.left = `${elemRect.x - parentRect.x - 16}px`;
-			selection.style.width = `${elemRect.width + 10}px`;
-			selection.style.height = `${elemRect.height + 3}px`;
-		}, 50);
 	}
 
 	export async function hideSelect() {
-		if (selectInter !== null) {
-			window.clearInterval(selectInter);
-		}
 		selection.style.opacity = '0';
 	}
 
