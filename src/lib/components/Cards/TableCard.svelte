@@ -88,7 +88,7 @@
 	cardId={'table'}
 	style="padding: 5px;"
 >
-	<table style="font-size: {fontSize}px;">
+	<table style="font-size: {fontSize}rem;">
 		<thead>
 			<tr>
 				<th style="background: hsl(200, 40%, 70%)"></th>
@@ -107,7 +107,7 @@
 								id="t-{tableId}-{rowKey}-{colKey}"
 								style="width: {col.text.length *
 									charWidth *
-									col.width}px;opacity: {col.opacity};top: {col.pos}px;"
+									col.width}rem;opacity: {col.opacity};top: {col.pos}px;"
 							>
 								{col.text}
 							</span>
