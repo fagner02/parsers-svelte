@@ -5,13 +5,13 @@
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 
-	/**@type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>}*/
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>} */
 	export let stack;
 	export let label;
 	export let color;
 	/** @type {string} */
 	export let stackId;
-	/**@type {import('@/SvgLines.svelte').default}*/
+	/** @type {import('@/SvgLines.svelte').default} */
 	export let svgLines;
 
 	/**
@@ -123,7 +123,7 @@
 	}
 </script>
 
-<CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label}>
+<CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label} cardId={stackId}>
 	{#each [...$stack].reverse() as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="s-{stackId}-{index}"

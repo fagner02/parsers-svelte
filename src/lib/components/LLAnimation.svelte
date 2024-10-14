@@ -77,6 +77,7 @@
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._first.entries()].map((x) => {
+					/**@type {string[]}*/
 					let values = [];
 					for (let value of x[1].values()) {
 						values.push(value);
@@ -90,7 +91,7 @@
 						right: [...x[1]],
 						showRight: true,
 						rightProps: values.map((s) => {
-							return { value: s, opacity: 1 };
+							return { value: s, opacity: 1, hide: false, note: '' };
 						}),
 						note: x[0].toString()
 					};
@@ -101,6 +102,7 @@
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._follow.entries()].map((x) => {
+					/**@type {string[]}*/
 					let values = [];
 					for (let value of x[1].values()) {
 						values.push(value);
@@ -114,7 +116,7 @@
 						right: [...x[1]],
 						showRight: true,
 						rightProps: values.map((s) => {
-							return { value: s, opacity: 1 };
+							return { value: s, opacity: 1, hide: false, note: '' };
 						}),
 						note: ''
 					};

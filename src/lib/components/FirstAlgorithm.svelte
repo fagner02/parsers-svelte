@@ -87,14 +87,15 @@
 						if (currentlyRunning !== id) return;
 						await joinSetElement.joinSets(
 							matchingRules.map((x) => x.index),
-							matchingRules.map((x) => `${x.index}:${x.left}`),
+							matchingRules.map((x) => `${x.left}`),
+							matchingRules.map((x) => `${x.index}`),
 							i,
 							`gr${i}-${j}`
 						);
 					} else {
 						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, j, 'green', false);
-						await firstSetElement.joinSets([symbol], [symbol], i, `gr${i}-${j}`);
+						await firstSetElement.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
 					}
 					if (!(nullable.get(symbol) ?? false)) {
 						isNull = false;
@@ -103,7 +104,13 @@
 				}
 				if (isNull) {
 					if (currentlyRunning !== id) return;
-					await firstSetElement.joinSets([''], [''], i);
+					await firstSetElement.joinSets(
+						[''],
+						[''],
+						null,
+						i,
+						`gr${i}-${rules[i].right.length - 1}`
+					);
 				}
 			}
 
@@ -111,6 +118,7 @@
 				if ($joinSet[item].right.length === 0) {
 					continue;
 				}
+				await addPause();
 				if (currentlyRunning !== id) return;
 				await joinStackElement.addToStack(
 					item,
@@ -119,6 +127,7 @@
 					item.toString(),
 					`${joinSetElement.getSetId()}l${item}`
 				);
+				await addPause();
 
 				while ($joinStack.length > 0) {
 					const topKey = $joinStack[$joinStack.length - 1].data;
@@ -145,6 +154,7 @@
 					await firstSetElement.joinSets(
 						setToJoin,
 						setToJoin,
+						null,
 						topKey,
 						`${firstSetElement.getSetId()}l${topValue}`
 					);

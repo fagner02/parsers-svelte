@@ -68,22 +68,24 @@
 			if (currentlyRunning != id) return;
 			await followSetElement.addSetRow(rules[0].left, rules[0].left);
 			if (currentlyRunning != id) return;
-			await followSetElement.joinSets(['$'], ['$'], rules[0].left);
+			await followSetElement.joinSets(['$'], ['$'], null, rules[0].left, '');
 
 			for (let i = 0; i < rules.length; i++) {
 				for (let j = 0; j < rules[i].right.length; j++) {
 					if (currentlyRunning != id) return;
-					await selectRSymbol('g', i, j, 'green', true);
 
 					const symbol = rules[i].right[j];
 					let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 					if (!nt.includes(symbol)) {
+						await selectRSymbol('g', i, j, 'green', true);
 						continue;
 					}
+					await selectRSymbol('g', i, j, 'blue', true);
+
 					if (!followIndexes.has(symbol)) {
 						if (currentlyRunning != id) return;
-						await followSetElement.addSetRow(symbol, symbol);
+						await followSetElement.addSetRow(symbol, symbol, `gr${i}-${j}`);
 					}
 
 					let pos = 1;
@@ -91,24 +93,30 @@
 						if (followingSymbol === null) {
 							if (!joinSetElement.has(symbol)) {
 								if (currentlyRunning != id) return;
-								await joinSetElement.addSetRow(symbol, symbol);
+								await joinSetElement.addSetRow(symbol, symbol, `gr${i}-${j}`);
 							}
 							if (currentlyRunning != id) return;
-							await joinSetElement.joinSets([rules[i].left], [rules[i].left], symbol);
+							await joinSetElement.joinSets([rules[i].left], [rules[i].left], null, symbol, '');
 							break;
 						}
 						if (currentlyRunning != id) return;
 						await selectRSymbol('g', i, j + 1, 'yellow', true);
 						if (nt.includes(followingSymbol)) {
 							let empty = false;
-							for (let item of $firstSet) {
+							for (let [key, item] of $firstSet.entries()) {
 								if (item.left === followingSymbol) {
 									if (item.right.includes('')) {
 										empty = true;
 										continue;
 									}
 									if (currentlyRunning != id) return;
-									await followSetElement.joinSets(item.right, item.right, symbol);
+									await followSetElement.joinSets(
+										item.right,
+										item.right,
+										null,
+										symbol,
+										`firstl${key}`
+									);
 								}
 							}
 
@@ -120,7 +128,13 @@
 							pos++;
 						} else {
 							if (currentlyRunning != id) return;
-							await followSetElement.joinSets([followingSymbol], [followingSymbol], symbol);
+							await followSetElement.joinSets(
+								[followingSymbol],
+								[followingSymbol],
+								null,
+								symbol,
+								''
+							);
 							break;
 						}
 					}
@@ -148,7 +162,7 @@
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement.get(top[0]));
 
 					if (currentlyRunning != id) return;
-					await followSetElement.joinSets(setToJoin, setToJoin, topKey);
+					await followSetElement.joinSets(setToJoin, setToJoin, null, topKey, '');
 
 					if (currentlyRunning != id) return;
 					await joinSetElement.remove(topKey, top[0]);

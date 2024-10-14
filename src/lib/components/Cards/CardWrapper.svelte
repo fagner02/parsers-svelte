@@ -1,8 +1,11 @@
 <script>
 	import { fontSize } from '$lib/globalStyle';
+
+	export let cardId;
 </script>
 
-<div class="card-wrapper" style="animation: rotA 0.5s;">
+<div class="grid card-wrapper" style="animation: rotA 0.5s;">
+	<div class="border-selection" id="select-{cardId}"></div>
 	<div
 		class="card"
 		id={$$props.id}
@@ -25,7 +28,6 @@
 	}
 
 	.card-wrapper {
-		display: flex;
 		flex-direction: column;
 		align-items: start;
 		border: 1px solid hsl(200, 50%, 50%);
@@ -33,7 +35,11 @@
 		margin: 5px;
 		padding: 5px;
 	}
+	.border-selection {
+		grid-area: unit;
+	}
 	.card {
+		grid-area: unit;
 		height: fit-content;
 		background: white;
 		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
@@ -48,5 +54,19 @@
 			max-width 0.5s,
 			max-height 0.5s;
 		text-wrap: nowrap;
+	}
+
+	.border-selection {
+		border: 2px solid hsl(200, 50%, 35%);
+		outline: 3px solid white;
+		box-shadow: 0px 0px 6px 2px hsl(200, 50%, 0%, 40%);
+		/* position: relative; */
+		z-index: 1;
+		border-radius: 8px;
+		transition:
+			width 0.5s,
+			translate 0.5s,
+			opacity 0.5s;
+		opacity: 0;
 	}
 </style>

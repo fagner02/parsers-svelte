@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import CardBox from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
-	import { text } from '@sveltejs/kit';
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
@@ -18,6 +17,12 @@
 
 	export let color;
 	export let label;
+
+	/**@type {HTMLElement}*/
+	let selection;
+
+	/**@type {NodeJS.Timeout|null}*/
+	let selectInter = null;
 
 	/**
 	 * @param {any} _
@@ -36,11 +41,15 @@
 	/**
 	 * @param {number} index
 	 * @param {string} symbol
+	 * @param {string} note
 	 */
-	async function addSetItem(index, symbol) {
+	async function addSetItem(index, symbol, note) {
 		try {
 			set.update((x) => {
-				x[index].rightProps = [...x[index].rightProps, { value: symbol, opacity: 0, hide: true }];
+				x[index].rightProps = [
+					...x[index].rightProps,
+					{ value: symbol, opacity: 0, hide: true, note: note }
+				];
 				return x;
 			});
 			await wait(50);
@@ -48,7 +57,8 @@
 				x[index].rightProps[x[index].rightProps.length - 1] = {
 					value: symbol,
 					opacity: 1,
-					hide: false
+					hide: false,
+					note: note
 				};
 				return x;
 			});
@@ -59,17 +69,23 @@
 	/**
 	 * @param {Array<any>} symbols
 	 * @param {Array<string>} texts
+	 * @param {Array<string>|null} notes
 	 * @param {any} key
-	 * @param {string | null} srcId
+	 * @param {string|null} srcId
 	 */
-	export async function joinSets(symbols, texts, key, srcId = null) {
+	export async function joinSets(symbols, texts, notes, key, srcId = null) {
 		try {
 			const index = /**@type {number}*/ (setIndexes.get(key));
 			if ($set[index].rightProps[0].value === ' ') {
 				$set[index].rightProps.pop();
 			}
 
-			if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
+			let propIndex = $set[index].rightProps.findIndex(
+				(x) => x.note === (notes ? notes[0] : '') && x.value === (texts.length > 0 ? texts[0] : '')
+			);
+			if (propIndex === -1) propIndex = $set[index].rightProps.length;
+
+			if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${propIndex}`);
 
 			for (let i = 0; i < symbols.length; i++) {
 				if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
@@ -77,14 +93,18 @@
 						x[index].right = [...x[index].right, symbols[i]];
 						return x;
 					});
-					if (srcId)
-						svgLines?.updateTargets(srcId, `${setId}r${index}-${$set[index].rightProps.length}`);
+					propIndex = $set[index].rightProps.findIndex(
+						(x) => x.note === (notes ? notes[i] : '') && x.value === texts[i]
+					);
+					if (propIndex === -1) propIndex = $set[index].rightProps.length;
+
+					if (srcId) svgLines?.updateTargets(srcId, `${setId}r${index}-${propIndex}`);
 
 					if ($set[index].rightProps.length > 0) {
-						await addSetItem(index, ',');
+						await addSetItem(index, ',', '');
 					}
 
-					await addSetItem(index, texts[i]);
+					await addSetItem(index, texts[i], notes !== null ? notes[i] : '');
 				}
 			}
 			await svgLines?.hideLine();
@@ -105,7 +125,7 @@
 					left: symbol,
 					right: [],
 					showRight: false,
-					rightProps: [{ value: ' ', opacity: 0, hide: false }],
+					rightProps: [{ value: ' ', opacity: 0, hide: false, note: '' }],
 					note: useNote ? indexMapIdentifier.toString() : ''
 				}
 			]);
@@ -142,13 +162,15 @@
 			x[index].rightProps[rIndex] = {
 				value: prop.value,
 				opacity: 0,
-				hide: true
+				hide: true,
+				note: prop.note
 			};
 			if (rIndex < x[index].rightProps.length - 1) {
 				x[index].rightProps[rIndex + 1] = {
 					value: ',',
 					opacity: 0,
-					hide: true
+					hide: true,
+					note: ''
 				};
 			}
 			return x;
@@ -183,7 +205,47 @@
 		return setId;
 	}
 
+	export async function selectFor(/**@type {string}*/ id) {
+		if (selectInter !== null) {
+			window.clearInterval(selectInter);
+		}
+		if (!id.startsWith('#')) {
+			id = '#' + id;
+		}
+		const elem = document.querySelector(id);
+		if (elem === null) return;
+		const parent = /**@type {HTMLElement}*/ (selection.parentElement);
+
+		const elemRect = elem.getBoundingClientRect();
+		const parentRect = parent.getBoundingClientRect();
+		selection.style.opacity = '1';
+		selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
+		// selection.style.left = ``;
+		selection.style.width = `${elemRect.width + 10}px`;
+		selection.style.height = `${elemRect.height + 3}px`;
+		await wait(500);
+		selectInter = setInterval(() => {
+			const elemRect = elem.getBoundingClientRect();
+			const parentRect = parent.getBoundingClientRect();
+
+			selection.style.opacity = '1';
+			// selection.style.top = `${elemRect.y - parentRect.y - 9}px`;
+			// selection.style.left = `${elemRect.x - parentRect.x - 16}px`;
+			selection.style.width = `${elemRect.width + 10}px`;
+			selection.style.height = `${elemRect.height + 3}px`;
+		}, 50);
+	}
+
+	export async function hideSelect() {
+		if (selectInter !== null) {
+			window.clearInterval(selectInter);
+		}
+		selection.style.opacity = '0';
+	}
+
 	onMount(async () => {
+		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${setId}`));
+		console.log(selection);
 		for (let i = 0; i < $set.length; i++) {
 			selectLSymbol(setId, i, 'blue', false);
 		}
@@ -192,7 +254,7 @@
 	$: maxHeight = lineHeight * Math.max($set.length, 1);
 </script>
 
-<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label}>
+<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label} cardId={setId}>
 	{#each $set as item, index}
 		<p
 			id="{setId}set{index}"
@@ -212,17 +274,19 @@
 
 				{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}-${text.value}`)}
 					<p
-						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {charWidth *
-							(text.value === ''
-								? 1
-								: text.hide
-									? 0
-									: text.value.length)}px;opacity:{text.opacity};{text.value === ''
+						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {subCharWidth *
+							(text.hide ? 0 : text.note?.length) +
+							charWidth *
+								(text.value === ''
+									? 1
+									: text.hide
+										? 0
+										: text.value.length)}px;opacity:{text.opacity};{text.value === ''
 							? "font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
 							: ''}"
 						id="{setId}r{index}-{ri}"
 					>
-						{#if text.value === ''}
+						<sub style="font-size: {subFontSize}px;">{text.note}</sub>{#if text.value === ''}
 							&#x03B5;
 						{:else if text.value != ' '}
 							{text.value}

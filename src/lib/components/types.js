@@ -14,7 +14,7 @@
  */
 
 /**
- * @typedef {{value: string, opacity: number, hide: boolean}} SetItem
+ * @typedef {{value: string, note: string, opacity: number, hide: boolean}} SetItem
  */
 
 /**

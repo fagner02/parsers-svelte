@@ -13,6 +13,7 @@
 		currentlyRunning
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
+	import { first } from '$lib/first';
 
 	/**@type {SvgLines}*/
 	let svgLines;
@@ -39,26 +40,13 @@
 	function reset() {
 		tableElement.resetTable();
 		svgLines.setHideOpacity();
+		firstCard.hideSelect();
 		lltable();
 	}
 	setResetCall(reset);
 
-	async function selectFor(/**@type {string}*/ id) {
-		const elem = document.querySelector(id);
-		const box = /**@type {HTMLElement}*/ (document.querySelector('#border-selection'));
-		const parent = document.querySelector('.steps');
-		if (elem === null || box === null || parent === null) return;
-
-		const rect = elem.getBoundingClientRect();
-		const parentRect = parent.getBoundingClientRect();
-
-		const height = rect.height + 3;
-		const width = rect.width + 10;
-		box.style.height = `${height}px`;
-		box.style.width = `${width}px`;
-		box.style.top = `${rect.y - parentRect.y - 2}px`;
-		box.style.left = `${rect.x - parentRect.x - 8}px`;
-	}
+	/**@type {SetsCard}*/
+	let firstCard;
 
 	async function lltable() {
 		const id = newRunningCall();
@@ -77,7 +65,8 @@
 					for (let f = 0; f < follow.right.length; f++) {
 						if (currentlyRunning != id) return;
 
-						selectFor('#firstset' + item.note);
+						firstCard.selectFor(`firstset${i}`);
+						// selectFor('#firstset' + item.note);
 						await tableElement.addToTable(
 							i,
 							rules[i].right[0] === ''
@@ -117,7 +106,6 @@
 	});
 </script>
 
-<div id="border-selection"></div>
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
 	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
@@ -133,15 +121,15 @@
 	></TableCard>
 	<SetsCard setId="follow" useNote={false} set={followSet} color={'blue'} label={'follow set'}
 	></SetsCard>
-	<SetsCard setId="first" useNote={false} set={firstSet} color={'blue'} label={'first set'}
+	<SetsCard
+		setId="first"
+		useNote={false}
+		set={firstSet}
+		color={'blue'}
+		label={'first set'}
+		bind:this={firstCard}
 	></SetsCard>
 </div>
 
 <style>
-	#border-selection {
-		border: 1px solid hsl(0, 0%, 0%);
-		position: absolute;
-		z-index: 1;
-		border-radius: 8px;
-	}
 </style>

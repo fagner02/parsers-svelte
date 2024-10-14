@@ -30,31 +30,51 @@
 	export let svgId;
 
 	/**
-	 * @param {string} id
-	 * @param {boolean} src
+	 * @param {string} srcId
+	 * @param {string} destId
 	 */
-	function calcPos(id, src) {
-		if (!id.startsWith('#')) {
-			id = '#' + id;
-		}
+	function calcPos(srcId, destId) {
+		let srcElem = document.querySelector(srcId);
+		let destElem = document.querySelector(destId);
 
-		let elem = document.querySelector(id);
-		if (elem === null) return null;
+		if (srcElem === null || destElem === null)
+			return { srcPos: null, destPos: null, dirx: 1, diry: 1, dist: { x: 1, y: 1 } };
 
-		let elemRect = /**@type {DOMRect}*/ (elem.getBoundingClientRect());
+		let srcElemRect = /**@type {DOMRect}*/ (srcElem.getBoundingClientRect());
+		let destElemRect = /**@type {DOMRect}*/ (destElem.getBoundingClientRect());
+
 		let parentRect = /**@type {DOMRect}*/ (
 			document.querySelector('.cards-box')?.getBoundingClientRect()
 		);
-		if (src) {
-			return {
-				x: elemRect.x - parentRect.x + elemRect.width + 5,
-				y: elemRect.y - parentRect.y + elemRect.height
-			};
-		}
-
+		// let dist = {
+		// 	x: Math.abs(destElemRect.x - srcElemRect.x) / 1.0,
+		// 	y: Math.abs(destElemRect.y - srcElemRect.y) / 1.0
+		// };
+		// dist.x = dist.x > 1 ? 1 : dist.x;
+		// dist.y = dist.y > 1 ? 1 : dist.y;
 		return {
-			x: elemRect.left - parentRect.left - 10,
-			y: elemRect.top - parentRect.top - 5
+			srcPos: {
+				x:
+					srcElemRect.x -
+					parentRect.x +
+					(srcElemRect.x > destElemRect.x ? -5 : srcElemRect.width + 5),
+				y:
+					srcElemRect.y -
+					parentRect.y +
+					(srcElemRect.y >= destElemRect.y ? 0 : srcElemRect.height + 5)
+			},
+			destPos: {
+				x:
+					destElemRect.left -
+					parentRect.left +
+					(srcElemRect.left < destElemRect.left ? -5 : destElemRect.width + 5),
+				y:
+					destElemRect.top -
+					parentRect.top +
+					(srcElemRect.top < destElemRect.top ? -5 : destElemRect.height + 5)
+			},
+			diry: srcElemRect.top < destElemRect.top ? 1 : -1,
+			dirx: srcElemRect.left < destElemRect.left ? 1 : -1
 		};
 	}
 
@@ -63,6 +83,12 @@
 	 * @param {string} destId
 	 */
 	export function updateTargets(srcId, destId) {
+		if (!srcId.startsWith('#')) {
+			srcId = '#' + srcId;
+		}
+		if (!destId.startsWith('#')) {
+			destId = '#' + destId;
+		}
 		_destId = destId;
 		_srcId = srcId;
 	}
@@ -72,6 +98,13 @@
 	 * @param {string} destId
 	 */
 	export async function showLine(srcId, destId) {
+		if (!srcId.startsWith('#')) {
+			srcId = '#' + srcId;
+		}
+		if (!destId.startsWith('#')) {
+			destId = '#' + destId;
+		}
+
 		_destId = destId;
 		_srcId = srcId;
 		if (inter !== null) {
@@ -80,19 +113,18 @@
 			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
 			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 		}
+
+		let { srcPos, destPos, dirx, diry, dist } = calcPos(_srcId, _destId);
+		if (destPos === null || srcPos === null) return;
+
 		opacity = 1;
-
-		const targetPos = calcPos(_destId, false);
-		const srcPos = calcPos(_srcId, true);
-		if (targetPos === null || srcPos === null) return;
-
 		const linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
-			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * dirx} ${srcPos.y + 30 * diry}, ${destPos.x - 30 * dirx} ${destPos.y - 30 * diry},  ${destPos.x} ${destPos.y}`
 		];
 		const arrowPath = [
 			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
-			`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+			`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
 		];
 
 		let animeParams = {
@@ -111,22 +143,21 @@
 
 		inter = setInterval(() => {
 			if (li === null || an === null) return;
-			const targetPos = calcPos(_destId, false);
-			const srcPos = calcPos(_srcId, true);
-			if (targetPos === null || srcPos === null) {
+			let { srcPos, destPos, dirx, diry } = calcPos(_srcId, _destId);
+			if (destPos === null || srcPos === null) {
+				// console.log('destPos', _srcId, _destId);
 				if (inter) window.clearInterval(inter);
 				return;
 			}
 
 			const nlinePath = [
 				li.animations[0].currentValue,
-				`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+				`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * dirx} ${srcPos.y + 30 * diry}, ${destPos.x - 30 * dirx} ${destPos.y - 30 * diry},  ${destPos.x} ${destPos.y}`
 			];
 			const narrowPath = [
 				an.animations[0].currentValue,
-				`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+				`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
 			];
-			// /**@type {SVGPathElement}*/ (line).setAttribute('d');
 
 			let animeParams = {
 				targets: line,
@@ -157,17 +188,16 @@
 			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 			window.clearInterval(inter);
 		}
-		const targetPos = calcPos(_destId, false);
-		const srcPos = calcPos(_srcId, true);
-		if (targetPos === null || srcPos === null) return;
+		const { srcPos, destPos, dirx, diry } = calcPos(_srcId, _destId);
+		if (destPos === null || srcPos === null) return;
 
 		const linePath = [
 			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
-			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30} ${srcPos.y + 30}, ${targetPos.x - 30} ${targetPos.y - 30},  ${targetPos.x} ${targetPos.y}`
+			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * dirx} ${srcPos.y + 30 * diry}, ${destPos.x - 30 * dirx} ${destPos.y - 30 * diry},  ${destPos.x} ${destPos.y}`
 		];
 		const arrowPath = [
 			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
-			`M ${targetPos.x + 1} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 5} L ${targetPos.x + 5} ${targetPos.y + 1}`
+			`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
 		];
 		let animeParams = {
 			targets: line,
