@@ -48,16 +48,17 @@
 	label={'grammar'}
 	color={'blue'}
 	{transition}
+	cardId={'g'}
 >
 	<div style="opacity: {opacity}; transition: {opacityTransition};" id="rules">
 		{#each rules as rule, rulesIndex}
 			<p
-				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+				style="line-height: {lineHeight}rem; font-size: {fontSize}rem; padding: 0px; width: fit-content"
 			>
 				<span id="{cardId}l{rulesIndex}"
 					>{rule.left}<span
-						style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, {0.3 *
-							fontSize}px)">{rule.index}</span
+						style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
+							fontSize}rem)">{rule.index}</span
 					></span
 				>
 				<span>{'->'}</span>

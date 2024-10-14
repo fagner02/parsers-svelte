@@ -11,15 +11,18 @@
 	let text;
 
 	function updateSize() {
-		lines = Math.max(text.childElementCount + 1, Math.ceil(input.clientHeight / lineHeight));
-		height = input.scrollHeight;
-		numGap = lines.toString().length * charWidth + 15;
+		lines = Math.max(
+			text.childElementCount + 1,
+			Math.ceil((input.clientHeight * 0.0625) / lineHeight)
+		);
+		height = lines * lineHeight;
+		numGap = lines.toString().length * charWidth + 0.8;
 	}
 
 	let charWidth = 0;
 	export let numGap = 0;
-	export const fontSize = 15;
-	export const lineHeight = fontSize + 5;
+	export const fontSize = 0.8;
+	export const lineHeight = fontSize + 0.5;
 	export let lines = 1;
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
@@ -43,10 +46,10 @@
 
 <div class="grid input-box">
 	<div class="input unit {$$props.class ?? ''}" use:setInput>
-		<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
+		<div class="unit textnumbers" style="width: {numGap}rem;height: {height}rem;">
 			{#each { length: lines } as _, textInputIndex}
 				<div class="grid">
-					<p style="font-size:{12}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
+					<p style="font-size:{fontSize}rem;height: {lineHeight}rem">{textInputIndex + 1}.</p>
 				</div>
 			{/each}
 		</div>
@@ -54,7 +57,7 @@
 			use:setText
 			contenteditable="true"
 			class="text"
-			style="font-size: {fontSize}px;line-height: {lineHeight}px;"
+			style="font-size: {fontSize}rem;line-height: {lineHeight}rem;"
 		></div>
 	</div>
 	{#if !navigator.userAgent.toLowerCase().includes('firefox')}
