@@ -9,13 +9,13 @@
 	<div
 		class="card"
 		id={$$props.id}
-		style="min-height: {$$props.minHeight}rem; min-width:{$$props.minWidth}rem;max-width: {$$props.maxWidth}rem; max-height: {$$props.maxHeight}rem;{$$props.transition
+		style="min-height: {$$props.minHeight}px; min-width:{$$props.minWidth}px;max-width: {$$props.maxWidth}px; max-height: {$$props.maxHeight}px;{$$props.transition
 			? `transition: ${$$props.transition}`
 			: ''};{$$props.style}"
 	>
 		<slot></slot>
 	</div>
-	<div class="card-label {$$props.color}" style="font-size: {fontSize}rem;">{$$props.label}</div>
+	<div class="card-label {$$props.color}" style="font-size: {fontSize}px;">{$$props.label}</div>
 </div>
 
 <style>

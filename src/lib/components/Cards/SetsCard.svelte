@@ -31,7 +31,7 @@
 			duration,
 			/** @param {number} t */
 			css: (t) => `opacity: ${t < 0.5 ? 0 : (t - 0.5) / 0.5};
-			width: ${charWidth * t}rem;`
+			width: ${charWidth * t}px;`
 		};
 	}
 
@@ -239,14 +239,14 @@
 	{#each $set as item, index}
 		<p
 			id="{setId}set{index}"
-			style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content"
+			style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content"
 		>
 			<span
 				id="{setId}l{index}"
-				style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}rem"
+				style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}px"
 				>{item.left}<span
-					style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
-						fontSize}rem)">{item.note ?? ''}</span
+					style="font-size: {subFontSize}px; position: absolute;transform: translate(0px, {0.3 *
+						fontSize}px)">{item.note ?? ''}</span
 				></span
 			>
 			{#if item.showRight}
@@ -262,12 +262,12 @@
 									? 1
 									: text.hide
 										? 0
-										: text.value.length)}rem;opacity:{text.opacity};{text.value === ''
+										: text.value.length)}px;opacity:{text.opacity};{text.value === ''
 							? "font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
 							: ''}"
 						id="{setId}r{index}-{ri}"
 					>
-						<sub style="font-size: {subFontSize}rem;">{text.note}</sub>{#if text.value === ''}
+						<sub style="font-size: {subFontSize}px;">{text.note}</sub>{#if text.value === ''}
 							&#x03B5;
 						{:else if text.value != ' '}
 							{text.value}
