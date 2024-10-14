@@ -67,7 +67,7 @@ export function follow(
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
 			const top = /**@type {Set<string>}*/ (joinSet.get(topKey));
-			const topValue = top?.values().next().value;
+			const topValue = /**@type {string}*/ (top?.values().next().value);
 
 			let nextSet = joinSet.get(topValue);
 			if (nextSet !== undefined && !(nextSet.size === 0)) {
