@@ -80,6 +80,7 @@
 					if (currentlyRunning != id) return;
 
 					const symbol = rules[i].right[j];
+					let followingSymbolIndex = j + 1;
 					let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 					if (!nt.includes(symbol)) {
@@ -111,7 +112,7 @@
 							break;
 						}
 						if (currentlyRunning != id) return;
-						await selectRSymbol('g', i, j + 1, 'yellow', false);
+						await selectRSymbol('g', i, j + 1, 'orange', false);
 						if (nt.includes(followingSymbol)) {
 							let empty = false;
 							for (let [key, item] of $firstSet.entries()) {
@@ -134,6 +135,7 @@
 							if (!empty) {
 								break;
 							}
+							followingSymbolIndex = j + 1 + pos;
 							followingSymbol =
 								j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
 							pos++;
@@ -144,11 +146,12 @@
 								[followingSymbol],
 								null,
 								symbol,
-								''
+								`gr${i}-${followingSymbolIndex}`
 							);
 							break;
 						}
 					}
+					await selectRSymbol('g', i, j, 'green', false);
 				}
 			}
 			grammarFuncs?.hideSelect();
@@ -157,7 +160,13 @@
 					continue;
 				}
 				if (currentlyRunning != id) return;
-				await joinStackElement.addToStack(item, item, '', item);
+				await joinStackElement.addToStack(
+					item,
+					item,
+					'',
+					item,
+					`${joinSetElement.getSetId()}l${joinIndexes.get(item)}`
+				);
 				await addPause();
 
 				while ($joinStack.length > 0) {
@@ -167,14 +176,32 @@
 					let nextSet = joinSetElement.get(top[0]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
 						if (currentlyRunning != id) return;
-						await joinStackElement.addToStack(top[0], top[0], '', top[0]);
+						await joinStackElement.addToStack(
+							top[0],
+							top[0],
+							'',
+							top[0],
+							`${joinSetElement.getSetId()}l${joinIndexes.get(top[0])}`
+						);
 						continue;
 					}
+					await selectRSymbol(
+						joinSetElement.getSetId(),
+						/**@type {number}*/ (joinIndexes.get(topKey)),
+						0,
+						'green'
+					);
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement.get(top[0]));
 
 					if (currentlyRunning != id) return;
-					await followSetElement.joinSets(setToJoin, setToJoin, null, topKey, '');
+					await followSetElement.joinSets(
+						setToJoin,
+						setToJoin,
+						null,
+						topKey,
+						`${followSetElement.getSetId()}l${followIndexes.get(top[0])}`
+					);
 
 					if (currentlyRunning != id) return;
 					await joinSetElement.remove(topKey, top[0]);

@@ -1,7 +1,5 @@
 <script>
-	import { selectLSymbol } from '$lib/selectSymbol';
 	import { wait } from '$lib/flowControl';
-	import { onMount } from 'svelte';
 	import CardBox from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
@@ -17,6 +15,8 @@
 
 	export let color;
 	export let label;
+
+	let visible = true;
 
 	/**
 	 * @param {any} _
@@ -127,13 +127,6 @@
 			await wait(0);
 			if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
 
-			await selectLSymbol(
-				setId,
-				/**@type {number}*/ (setIndexes.get(indexMapIdentifier)),
-				'blue',
-				false
-			);
-
 			set.update((x) => {
 				x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
 				return x;
@@ -199,63 +192,64 @@
 		return setId;
 	}
 
-	onMount(async () => {
-		for (let i = 0; i < $set.length; i++) {
-			selectLSymbol(setId, i, 'blue', false);
-		}
-	});
+	export function reloadElement() {
+		visible = !visible;
+	}
 
 	$: maxHeight = lineHeight * Math.max($set.length, 1);
 </script>
 
 <CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label} cardId={setId}>
-	{#each $set as item, index}
-		<p
-			id="{setId}set{index}"
-			style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content"
-		>
-			<span
-				id="{setId}l{index}"
-				style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}rem"
-				>{item.left}<span
-					style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
-						fontSize}rem)">{item.note ?? ''}</span
-				></span
+	{#key visible}
+		{#each $set as item, index}
+			<p
+				id="{setId}set{index}"
+				style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content"
 			>
-			{#if item.showRight}
-				<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
-				<span in:setItemIn={{ duration: 500, delay: 100 }} id="{setId}r{index}--1">{'{'}</span>
-
-				{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}-${text.value}`)}
-					<p
-						style="transition: opacity 0.5s 0.2s, width 0.5s;width: {subCharWidth *
-							(text.hide ? 0 : text.note?.length) +
-							charWidth *
-								(text.value === ''
-									? 1
-									: text.hide
-										? 0
-										: text.value.length)}rem;opacity:{text.opacity};{text.value === ''
-							? "font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
-							: ''}"
-						id="{setId}r{index}-{ri}"
-					>
-						<sub style="font-size: {subFontSize}rem;">{text.note}</sub>{#if text.value === ''}
-							&#x03B5;
-						{:else if text.value != ' '}
-							{text.value}
-						{:else}
-							&nbsp;
-						{/if}
-					</p>
-				{/each}
-
 				<span
-					in:setItemIn={{ duration: 500, delay: 200 }}
-					id="{setId}r{index}-{item.rightProps.length}">{'}'}</span
-				>{/if}
-		</p>
-	{/each}
+					id="{setId}l{index}"
+					class="block {color}-after"
+					style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}rem"
+					>{item.left}<span
+						style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
+							fontSize}rem)">{item.note ?? ''}</span
+					></span
+				>
+				{#if item.showRight}
+					<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
+					<span in:setItemIn={{ duration: 500, delay: 100 }} id="{setId}r{index}--1">{'{'}</span>
+
+					{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}-${text.value}`)}
+						<p
+							style="transition: opacity 0.5s 0.2s, width 0.5s;width: {subCharWidth *
+								(text.hide ? 0 : text.note?.length) +
+								charWidth *
+									(text.value === ''
+										? 1
+										: text.hide
+											? 0
+											: text.value.length)}rem;opacity:{text.opacity};{text.value === ''
+								? "font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"
+								: ''}"
+							id="{setId}r{index}-{ri}"
+						>
+							<sub style="font-size: {subFontSize}rem;">{text.note}</sub>{#if text.value === ''}
+								&#x03B5;
+							{:else if text.value != ' '}
+								{text.value}
+							{:else}
+								&nbsp;
+							{/if}
+						</p>
+					{/each}
+
+					<span
+						in:setItemIn={{ duration: 500, delay: 200 }}
+						id="{setId}r{index}-{item.rightProps.length}">{'}'}</span
+					>{/if}
+			</p>
+		{/each}
+	{/key}
 </CardBox>
 
 <style>

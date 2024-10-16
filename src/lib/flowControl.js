@@ -215,7 +215,9 @@ export function reset() {
 	setJumpWait(true);
 	closeInstruction?.();
 	if (!goBack) {
+		targetStep = -1;
 		setJumpWait(false);
+		setJumpPause(false);
 	}
 
 	resetCall();

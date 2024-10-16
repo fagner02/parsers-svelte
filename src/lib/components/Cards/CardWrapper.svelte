@@ -11,20 +11,25 @@
 	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	const selectionFunctions = {
 		selectFor: async function (/**@type {string}*/ id) {
-			if (!id.startsWith('#')) {
-				id = '#' + id;
-			}
-			const elem = document.querySelector(id);
-			if (elem === null) return;
-			const parent = /**@type {HTMLElement}*/ (selection.parentElement);
+			try {
+				if (!id.startsWith('#')) {
+					id = '#' + id;
+				}
+				const elem = document.querySelector(id);
+				if (elem === null) return;
+				const parent = /**@type {HTMLElement}*/ (selection.parentElement);
 
-			const elemRect = elem.getBoundingClientRect();
-			const parentRect = parent.getBoundingClientRect();
-			selection.style.opacity = '1';
-			selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
-			selection.style.width = `${elemRect.width + 15}px`;
-			selection.style.height = `${elemRect.height + 3}px`;
-			await wait(500);
+				const elemRect = elem.getBoundingClientRect();
+				const parentRect = parent.getBoundingClientRect();
+
+				selection.style.opacity = '1';
+				selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
+				selection.style.width = `${elemRect.width + 15}px`;
+				selection.style.height = `${elemRect.height + 3}px`;
+				await wait(500);
+			} catch (e) {
+				console.log(e);
+			}
 		},
 		hideSelect: async function () {
 			selection.style.opacity = '0';

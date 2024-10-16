@@ -10,10 +10,13 @@
 		limitHit,
 		setResetCall,
 		newRunningCall,
-		currentlyRunning
+		currentlyRunning,
+		getJumpPause,
+		getJumpWait
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
+	import { selectRSymbol } from '$lib/selectSymbol';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -40,13 +43,18 @@
 	function reset() {
 		tableElement.resetTable();
 		svgLines?.setHideOpacity();
+		firstCard?.reloadElement();
+		followCard?.reloadElement();
 		firstFuncs?.hideSelect();
+
 		lltable();
 	}
 	setResetCall(reset);
 
 	/**@type {SetsCard | undefined}*/
 	let firstCard;
+	/**@type {SetsCard | undefined}*/
+	let followCard;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let firstFuncs;
 
@@ -60,14 +68,21 @@
 
 			for (let i = 0; i < $firstSet.length; i++) {
 				const item = $firstSet[i];
-				firstFuncs?.selectFor(`firstset${i}`);
+				if (currentlyRunning != id) return;
+				await firstFuncs?.selectFor(`${firstCard?.getSetId()}set${i}`);
 				if (item.right.includes('')) {
-					const follow = /**@type {import('@/types').SetRow}*/ (
-						$followSet.find((x) => x.left === item.left)
-					);
+					if (currentlyRunning != id) return;
+					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, 'green');
+					const followIndex = $followSet.findIndex((x) => x.left === item.left);
+					const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
 					for (let f = 0; f < follow.right.length; f++) {
+						selectRSymbol(
+							/**@type {string}*/ (followCard?.getSetId()),
+							followIndex,
+							f * 2,
+							'green'
+						);
 						if (currentlyRunning != id) return;
-
 						await tableElement.addToTable(
 							i,
 							rules[i].right[0] === ''
@@ -80,10 +95,12 @@
 					}
 				}
 				for (let j = 0; j < item.right.length; j++) {
-					if (currentlyRunning != id) return;
 					if (item.right[j] == '') {
 						continue;
 					}
+					if (currentlyRunning != id) return;
+					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, 'green');
+					if (currentlyRunning != id) return;
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[i].right.join(' ')}`,
@@ -93,7 +110,7 @@
 					await addPause();
 				}
 			}
-
+			if (currentlyRunning != id) return;
 			limitHit();
 			addPause();
 		} catch (e) {
@@ -121,7 +138,13 @@
 		label="tabela ll(1)"
 		color="blue"
 	></TableCard>
-	<SetsCard setId="follow" useNote={false} set={followSet} color={'blue'} label={'follow set'}
+	<SetsCard
+		setId="follow"
+		useNote={false}
+		set={followSet}
+		color={'blue'}
+		label={'follow set'}
+		bind:this={followCard}
 	></SetsCard>
 	<SetsCard
 		setId="first"
