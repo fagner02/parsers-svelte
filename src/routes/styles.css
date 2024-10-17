@@ -162,3 +162,16 @@ input:focus-within {
 		opacity: 0;
 	}
 }
+
+.algo-buttons {
+	display: flex;
+	justify-content: center;
+	gap: 5px;
+}
+.algo-buttons > button {
+	background: hsl(200, 60%, 50%);
+	color: white;
+	padding: 5px 10px;
+	border-radius: 10px;
+	width: fit-content;
+}

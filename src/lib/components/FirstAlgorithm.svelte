@@ -14,7 +14,7 @@
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
-	import { selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
+	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
@@ -76,7 +76,7 @@
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
-				await selectLSymbol('g', i, 'blue');
+				await selectLSymbol('g', i, colors.blue);
 				if (currentlyRunning !== id) return;
 				await grammarFuncs?.selectFor(`gset${i}`);
 				if (currentlyRunning !== id) return;
@@ -86,7 +86,7 @@
 					let symbol = rules[i].right[j];
 					if (nt.includes(symbol)) {
 						if (currentlyRunning !== id) return;
-						await selectRSymbol('g', i, j, 'blue', false);
+						await selectRSymbol('g', i, j, colors.blue, false);
 						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 						if (!joinIndexes.has(i)) {
 							if (currentlyRunning !== id) return;
@@ -105,7 +105,7 @@
 						);
 					} else {
 						if (currentlyRunning !== id) return;
-						await selectRSymbol('g', i, j, 'green', false);
+						await selectRSymbol('g', i, j, colors.green, false);
 						if (currentlyRunning !== id) return;
 						await firstSetElement?.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
 					}
@@ -204,7 +204,7 @@
 		setId="first"
 		set={firstSet}
 		setIndexes={firstIndexes}
-		color={'blue'}
+		hue={colors.blue}
 		label={'first set'}
 		bind:this={firstSetElement}
 		bind:svgLines
@@ -213,7 +213,7 @@
 		setId="join"
 		set={joinSet}
 		setIndexes={joinIndexes}
-		color={'blue'}
+		hue={colors.blue}
 		label={'join set'}
 		bind:this={joinSetElement}
 		bind:svgLines
@@ -222,7 +222,7 @@
 		stack={joinStack}
 		stackId="join"
 		label="join stack"
-		color="blue"
+		hue={colors.blue}
 		bind:this={joinStackElement}
 		bind:svgLines
 	></StackCard>

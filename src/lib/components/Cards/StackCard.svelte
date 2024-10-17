@@ -8,7 +8,7 @@
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>} */
 	export let stack;
 	export let label;
-	export let color;
+	export let hue;
 	/** @type {string} */
 	export let stackId;
 	/** @type {import('@/SvgLines.svelte').default | undefined} */
@@ -123,12 +123,12 @@
 	}
 </script>
 
-<CardBox minHeight={lineHeight} minWidth={charWidth} {color} {label} cardId={stackId}>
+<CardBox minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
 	{#each [...$stack].reverse() as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="s-{stackId}-{index}"
-			class="{stackItem.showBlock ? 'block' : ''} {color}-after"
-			style="transition: {stackItem.transition};height: {stackItem.height}rem;width: {stackItem.width}rem;opacity: {stackItem.opacity}; top: {stackItem.top}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px;"
+			class={stackItem.showBlock ? 'block' : ''}
+			style="--block-hue: {hue};transition: {stackItem.transition};height: {stackItem.height}rem;width: {stackItem.width}rem;opacity: {stackItem.opacity}; top: {stackItem.top}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px;"
 		>
 			{stackItem.text}<span
 				style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, 5px)"

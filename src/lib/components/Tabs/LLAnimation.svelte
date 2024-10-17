@@ -1,24 +1,25 @@
 <script>
 	import { onMount } from 'svelte';
-	import AlgorithmTab from './Tabs/AlgorithmTab.svelte';
-	import FirstAlgorithm from './FirstAlgorithm.svelte';
-	import FollowAlgorithm from './FollowAlgorithm.svelte';
-	import LlAlgorithm from './LLAlgorithm.svelte';
-	import LlParse from './LLParse.svelte';
+	import AlgorithmTab from './AlgorithmTab.svelte';
+	import FirstAlgorithm from '../FirstAlgorithm.svelte';
+	import FollowAlgorithm from '../FollowAlgorithm.svelte';
+	import LlAlgorithm from '../LLAlgorithm.svelte';
+	import LlParse from '../LLParse.svelte';
 	import { first } from '$lib/first';
 	import { follow } from '$lib/follow';
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
-	import SyntaxTree from './SyntaxTree.svelte';
+	import SyntaxTree from '../SyntaxTree.svelte';
+	import { loadGrammar } from '$lib/utils';
 
 	// ========== Components ====================
 	/**@type {string}*/
 	let instruction;
 	/**@type {string}*/
 	let selectedAlgorithm = 'first';
-	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
+	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
-	/**@type {import('svelte/store').Writable<import('./types').SetRow[]>}*/
+	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	let table = writable();
@@ -32,35 +33,6 @@
 	// ========== Components ====================
 
 	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
-	let loaded = false;
-	const loadGrammar = function () {
-		let ntSet = new Set();
-		let tSet = new Set();
-		let alphSet = new Set();
-
-		grammar.split('\n').forEach((r) => {
-			let s = r.split('->');
-
-			if (s.length > 1) {
-				rules.push({
-					left: s[0].replaceAll(' ', ''),
-					right: s[1].trim().split(' '),
-					index: rules.length
-				});
-				alphSet = alphSet.union(new Set(s[1].trim().split(' ')));
-				ntSet.add(s[0].replaceAll(' ', ''));
-			}
-		});
-
-		alphSet.delete('');
-		for (let v of alphSet) {
-			if (!ntSet.has(v)) tSet.add(v);
-		}
-
-		t = ['$'].concat(Array.from(tSet));
-		nt = Array.from(ntSet);
-		loaded = true;
-	};
 
 	/**@type {string}*/
 	let inputString;
@@ -68,7 +40,10 @@
 	let code = '';
 	onMount(async () => {
 		code = await (await fetch('src/lib/first.js')).text();
-		loadGrammar();
+		let g = loadGrammar(grammar);
+		nt = g.nt;
+		t = g.t;
+		rules = g.rules;
 
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
@@ -125,14 +100,14 @@
 		);
 
 		table.set(
-			/**@type {Map<string, import('./types').tableCol>}*/ (
+			/**@type {Map<string, import('../types').tableCol>}*/ (
 				new Map(
 					[..._table].map(([rowKey, cols]) => [
 						rowKey,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
 								colKey,
-								/**@type {import('./types').tableItem}*/ ({
+								/**@type {import('../types').tableItem}*/ ({
 									data: cell,
 									opacity: 1,
 									pos: 0,
@@ -151,55 +126,37 @@
 	});
 </script>
 
-{#if loaded}
-	<AlgorithmTab bind:instruction bind:inputString {code}>
-		<div slot="steps" style="max-width: inherit; width: 100%;">
-			<div class="algo-buttons">
-				<button
-					on:click={() => {
-						selectedAlgorithm = 'first';
-					}}>first</button
-				>
-				<button
-					on:click={async () => {
-						selectedAlgorithm = 'follow';
-					}}>follow</button
-				>
-				<button
-					on:click={() => {
-						selectedAlgorithm = 'table';
-					}}>table</button
-				>
-			</div>
-			<div class="grid">
-				{#if selectedAlgorithm === 'first'}
-					<FirstAlgorithm {rules} {nt} bind:instruction></FirstAlgorithm>
-				{:else if selectedAlgorithm === 'follow'}
-					<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction></FollowAlgorithm>
-				{:else}
-					<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction></LlAlgorithm>
-				{/if}
-			</div>
+<AlgorithmTab bind:instruction bind:inputString {code}>
+	<div slot="steps" style="max-width: inherit; width: 100%;">
+		<div class="algo-buttons">
+			<button
+				on:click={() => {
+					selectedAlgorithm = 'first';
+				}}>first</button
+			>
+			<button
+				on:click={async () => {
+					selectedAlgorithm = 'follow';
+				}}>follow</button
+			>
+			<button
+				on:click={() => {
+					selectedAlgorithm = 'table';
+				}}>table</button
+			>
 		</div>
-		<SyntaxTree slot="tree"></SyntaxTree>
-		<div slot="parse" class="grid" style="place-items: center;">
-			<LlParse bind:input={inputString} {table} {rules}></LlParse>
+		<div class="grid">
+			{#if selectedAlgorithm === 'first'}
+				<FirstAlgorithm {rules} {nt} bind:instruction></FirstAlgorithm>
+			{:else if selectedAlgorithm === 'follow'}
+				<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction></FollowAlgorithm>
+			{:else}
+				<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction></LlAlgorithm>
+			{/if}
 		</div>
-	</AlgorithmTab>
-{/if}
-
-<style>
-	.algo-buttons {
-		display: flex;
-		justify-content: center;
-		gap: 5px;
-	}
-
-	button {
-		background: hsl(200, 60%, 50%);
-		color: white;
-		padding: 5px 10px;
-		border-radius: 10px;
-		width: fit-content;
-	}
-</style>
+	</div>
+	<SyntaxTree slot="tree"></SyntaxTree>
+	<div slot="parse" class="grid" style="place-items: center;">
+		<LlParse bind:input={inputString} {table} {rules}></LlParse>
+	</div>
+</AlgorithmTab>

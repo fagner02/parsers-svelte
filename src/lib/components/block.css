@@ -28,8 +28,9 @@
 	left: 50%;
 	transition: background 0.5s;
 	animation: rotateAppear 0.5s;
-	box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
 	border-radius: 6px;
+	background: hsl(var(--block-hue), 60%, 50%);
+	box-shadow: 0px 0px 5px 0px hsl(var(--block-hue), 60%, 55%, 70%);
 }
 
 .empty {
@@ -50,40 +51,7 @@
 	top: 50%;
 	left: 50%;
 	animation: rotateAppear 0.5s;
-	box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);
 	border-radius: 6px;
-}
-
-.blue-after::after {
-	background: hsl(200, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(200, 60%, 55%, 90%);
-}
-.green-after::after {
-	background: hsl(100, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(100, 60%, 55%, 70%);
-}
-.yellow-after::after {
-	background: hsl(60, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(60, 60%, 55%, 70%);
-}
-.orange-after::after {
-	background: hsl(30, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(30, 60%, 55%, 70%);
-}
-
-.blue {
-	background: hsl(200, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(200, 60%, 55%, 90%);
-}
-.green {
-	background: hsl(100, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(100, 60%, 55%, 70%);
-}
-.yellow {
-	background: hsl(60, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(60, 60%, 55%, 70%);
-}
-.orange {
-	background: hsl(30, 60%, 50%);
-	box-shadow: 0px 0px 5px 0px hsl(30, 60%, 55%, 70%);
+	background: hsl(var(--block-hue), 60%, 50%);
+	box-shadow: 0px 0px 5px 0px hsl(var(--block-hue), 60%, 55%, 70%);
 }

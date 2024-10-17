@@ -38,6 +38,7 @@
 	setSelectionFunctions(cardId, selectionFunctions);
 
 	onMount(() => {
+		console.log($$props.hue);
 		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${cardId}`));
 	});
 </script>
@@ -53,7 +54,9 @@
 	>
 		<slot></slot>
 	</div>
-	<div class="card-label {$$props.color}" style="font-size: {fontSize}rem;">{$$props.label}</div>
+	<div class="card-label" style="background: hsl({$$props.hue},50%,50%);font-size: {fontSize}rem;">
+		{$$props.label}
+	</div>
 </div>
 
 <style>

@@ -14,7 +14,7 @@
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
-	import { selectRSymbol } from '$lib/selectSymbol';
+	import { colors, selectRSymbol } from '$lib/selectSymbol';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -70,7 +70,7 @@
 				await firstFuncs?.selectFor(`${firstCard?.getSetId()}set${i}`);
 				if (item.right.includes('')) {
 					if (currentlyRunning != id) return;
-					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, 'green');
+					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, colors.green);
 					const followIndex = $followSet.findIndex((x) => x.left === item.left);
 					const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
 					for (let f = 0; f < follow.right.length; f++) {
@@ -79,7 +79,7 @@
 							/**@type {string}*/ (followCard?.getSetId()),
 							followIndex,
 							f * 2,
-							'green'
+							colors.green
 						);
 						if (currentlyRunning != id) return;
 						await tableElement.addToTable(
@@ -98,7 +98,7 @@
 						continue;
 					}
 					if (currentlyRunning != id) return;
-					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, 'green');
+					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, colors.green);
 					if (currentlyRunning != id) return;
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
@@ -135,13 +135,13 @@
 		bind:this={tableElement}
 		tableId="ll"
 		label="tabela ll(1)"
-		color="blue"
+		hue={colors.blue}
 	></TableCard>
 	<SetsCard
 		setId="follow"
 		useNote={false}
 		set={followSet}
-		color={'blue'}
+		hue={colors.blue}
 		label={'follow set'}
 		bind:this={followCard}
 	></SetsCard>
@@ -149,7 +149,7 @@
 		setId="first"
 		useNote={false}
 		set={firstSet}
-		color={'blue'}
+		hue={colors.blue}
 		label={'first set'}
 		bind:this={firstCard}
 	></SetsCard>

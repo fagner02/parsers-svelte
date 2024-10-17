@@ -12,7 +12,7 @@
 		newRunningCall,
 		currentlyRunning
 	} from '$lib/flowControl';
-	import { selectRSymbol } from '$lib/selectSymbol';
+	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 
@@ -86,11 +86,11 @@
 
 					if (!nt.includes(symbol)) {
 						if (currentlyRunning != id) return;
-						await selectRSymbol('g', i, j, 'green', false);
+						await selectRSymbol('g', i, j, colors.green, false);
 						continue;
 					}
 					if (currentlyRunning != id) return;
-					await selectRSymbol('g', i, j, 'blue', false);
+					await selectRSymbol('g', i, j, colors.blue, false);
 
 					if (!followIndexes.has(symbol)) {
 						if (currentlyRunning != id) return;
@@ -115,7 +115,7 @@
 							break;
 						}
 						if (currentlyRunning != id) return;
-						await selectRSymbol('g', i, j + 1, 'orange', false);
+						await selectRSymbol('g', i, j + 1, colors.orange, false);
 						if (nt.includes(followingSymbol)) {
 							let empty = false;
 							for (let [key, item] of $firstSet.entries()) {
@@ -155,7 +155,7 @@
 						}
 					}
 					if (currentlyRunning != id) return;
-					await selectRSymbol('g', i, j, 'green', false);
+					await selectRSymbol('g', i, j, colors.green, false);
 				}
 			}
 			grammarFuncs?.hideSelect();
@@ -194,7 +194,7 @@
 						/**@type {string}*/ (joinSetElement?.getSetId()),
 						/**@type {number}*/ (joinIndexes.get(topKey)),
 						0,
-						'green'
+						colors.green
 					);
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement?.get(top[0]));
@@ -239,7 +239,7 @@
 		useNote={false}
 		set={followSet}
 		setIndexes={followIndexes}
-		color={'blue'}
+		hue={colors.blue}
 		label={'follow set'}
 		bind:this={followSetElement}
 		bind:svgLines
@@ -249,7 +249,7 @@
 		useNote={false}
 		set={firstSet}
 		setIndexes={followIndexes}
-		color={'blue'}
+		hue={colors.blue}
 		label={'first set'}
 		bind:svgLines
 	></SetsCard>
@@ -258,7 +258,7 @@
 		useNote={false}
 		set={joinSet}
 		setIndexes={joinIndexes}
-		color={'blue'}
+		hue={colors.blue}
 		label={'join set'}
 		bind:this={joinSetElement}
 		bind:svgLines
@@ -267,7 +267,7 @@
 		stack={joinStack}
 		stackId="join"
 		label="join stack"
-		color="blue"
+		hue={colors.blue}
 		bind:this={joinStackElement}
 		bind:svgLines
 	></StackCard>

@@ -4,15 +4,15 @@
 	import SvgLines from './SvgLines.svelte';
 	import {
 		addPause,
-		getJumpPause,
 		limitHit,
 		newRunningCall,
 		currentlyRunning,
 		setResetCall
 	} from '$lib/flowControl';
 	import StackCard from './Cards/StackCard.svelte';
-	import { getAllContexts, getContext, onMount, setContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
+	import { colors } from '$lib/selectSymbol';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -138,14 +138,14 @@
 		bind:svgLines
 		tableId="ll"
 		label="tabela ll(1)"
-		color="blue"
+		hue={colors.blue}
 	></TableCard>
 	<StackCard
 		bind:svgLines
 		bind:stack={inputStack}
 		bind:this={inputStackElement}
 		stackId="input"
-		color="green"
+		hue={colors.green}
 		label="entrada"
 	></StackCard>
 	<StackCard
@@ -153,7 +153,7 @@
 		bind:stack={symbolStack}
 		bind:this={symbolStackElement}
 		stackId="symbols"
-		color="green"
+		hue={colors.green}
 		label="pilha de símbolos"
 	></StackCard>
 </div>

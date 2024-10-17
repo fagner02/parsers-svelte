@@ -1,8 +1,8 @@
 <script>
 	import FillHeight from '../Layout/FillHeight.svelte';
-	import LLAnimation from '../LLAnimation.svelte';
+	import LLAnimation from './LLAnimation.svelte';
 	import TextInput from '../Layout/TextInput.svelte';
-	import SLRAnimation from '../SLRAnimation.svelte';
+	import SLRAnimation from './SLRAnimation.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [

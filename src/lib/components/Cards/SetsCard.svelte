@@ -14,7 +14,7 @@
 	/**@type {import('@/SvgLines.svelte').default | null}*/
 	export let svgLines = null;
 
-	export let color;
+	export let hue;
 	export let label;
 
 	let visible = true;
@@ -200,7 +200,7 @@
 	$: maxHeight = lineHeight * Math.max($set.length, 1);
 </script>
 
-<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {color} {label} cardId={setId}>
+<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {hue} {label} cardId={setId}>
 	{#key visible}
 		{#each $set as item, index}
 			<p
@@ -209,8 +209,9 @@
 			>
 				<span
 					id="{setId}l{index}"
-					class="block {color}-after"
-					style="width:{charWidth * item.left.length + subCharWidth * (item.note?.length ?? 0)}rem"
+					class="block"
+					style="--block-hue: {hue};width:{charWidth * item.left.length +
+						subCharWidth * (item.note?.length ?? 0)}rem"
 					>{item.left}<span
 						style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
 							fontSize}rem)">{item.note ?? ''}</span

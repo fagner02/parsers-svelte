@@ -1,6 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { colors } from '$lib/selectSymbol';
 	import CardBox from './CardWrapper.svelte';
 
 	/** @type {Array<import('@/types').GrammarItem>} */
@@ -33,7 +34,7 @@
 	minHeight={lineHeight}
 	minWidth={charWidth}
 	label={'grammar'}
-	color={'blue'}
+	hue={colors.blue}
 	cardId={'g'}
 >
 	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="rules">

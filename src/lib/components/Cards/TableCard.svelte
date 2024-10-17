@@ -5,7 +5,7 @@
 	import { charWidth, fontSize, lineHeight, subCharWidth } from '$lib/globalStyle';
 
 	export let label;
-	export let color;
+	export let hue;
 
 	/**@type {Array<string>}*/
 	export let columns;
@@ -83,7 +83,7 @@
 <CardBox
 	minHeight={lineHeight}
 	minWidth={charWidth}
-	{color}
+	{hue}
 	{label}
 	cardId={'table'}
 	style="padding: 5px;"
