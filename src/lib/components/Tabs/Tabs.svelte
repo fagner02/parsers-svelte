@@ -6,7 +6,7 @@
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
 		{ comp: TextInput, name: 'Entrada' },
-		{ comp: FirstAnimation, name: 'First' }
+		{ comp: FirstAnimation, name: 'LL(1)' }
 	];
 	let selected = items[0];
 </script>

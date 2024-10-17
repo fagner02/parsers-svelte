@@ -42,6 +42,12 @@
 			childList: true
 		});
 	}
+	function clearInput(/**@type {InputEvent}*/ ev) {
+		if (ev.inputType === 'insertFromPaste' && ev.target) {
+			const target = /**@type {HTMLElement}*/ (ev.target);
+			target.innerHTML = target.innerText.replaceAll('\n', '</br>');
+		}
+	}
 </script>
 
 <div class="grid input-box">
@@ -56,6 +62,7 @@
 		<div
 			use:setText
 			contenteditable="true"
+			on:input={clearInput}
 			class="text"
 			style="font-size: {fontSize}rem;line-height: {lineHeight}rem;"
 		></div>

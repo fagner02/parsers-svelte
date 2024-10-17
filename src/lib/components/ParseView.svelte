@@ -17,6 +17,7 @@
 	<div class="parse">
 		<input
 			type="text"
+			name="string a ser analisada"
 			bind:value={inputString}
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}
 			placeholder="Digite a entrada aqui"
