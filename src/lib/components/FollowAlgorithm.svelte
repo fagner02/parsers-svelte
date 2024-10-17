@@ -16,11 +16,11 @@
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 
-	/**@type {SetsCard}*/
+	/**@type {SetsCard | undefined}*/
 	let followSetElement;
-	/**@type {SetsCard}*/
+	/**@type {SetsCard | undefined}*/
 	let joinSetElement;
-	/**@type {StackCard}*/
+	/**@type {StackCard | undefined}*/
 	let joinStackElement;
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -70,12 +70,13 @@
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
 			if (currentlyRunning != id) return;
-			await followSetElement.addSetRow(rules[0].left, rules[0].left);
+			await followSetElement?.addSetRow(rules[0].left, rules[0].left);
 			if (currentlyRunning != id) return;
-			await followSetElement.joinSets(['$'], ['$'], null, rules[0].left);
+			await followSetElement?.joinSets(['$'], ['$'], null, rules[0].left);
 
 			for (let i = 0; i < rules.length; i++) {
-				grammarFuncs?.selectFor(`gset${i}`);
+				if (currentlyRunning != id) return;
+				await grammarFuncs?.selectFor(`gset${i}`);
 				for (let j = 0; j < rules[i].right.length; j++) {
 					if (currentlyRunning != id) return;
 
@@ -84,25 +85,27 @@
 					let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 					if (!nt.includes(symbol)) {
+						if (currentlyRunning != id) return;
 						await selectRSymbol('g', i, j, 'green', false);
 						continue;
 					}
+					if (currentlyRunning != id) return;
 					await selectRSymbol('g', i, j, 'blue', false);
 
 					if (!followIndexes.has(symbol)) {
 						if (currentlyRunning != id) return;
-						await followSetElement.addSetRow(symbol, symbol, `gr${i}-${j}`);
+						await followSetElement?.addSetRow(symbol, symbol, `gr${i}-${j}`);
 					}
 
 					let pos = 1;
 					while (true) {
 						if (followingSymbol === null) {
-							if (!joinSetElement.has(symbol)) {
+							if (!joinSetElement?.has(symbol)) {
 								if (currentlyRunning != id) return;
-								await joinSetElement.addSetRow(symbol, symbol, `gr${i}-${j}`);
+								await joinSetElement?.addSetRow(symbol, symbol, `gr${i}-${j}`);
 							}
 							if (currentlyRunning != id) return;
-							await joinSetElement.joinSets(
+							await joinSetElement?.joinSets(
 								[rules[i].left],
 								[rules[i].left],
 								null,
@@ -122,7 +125,7 @@
 										continue;
 									}
 									if (currentlyRunning != id) return;
-									await followSetElement.joinSets(
+									await followSetElement?.joinSets(
 										item.right,
 										item.right,
 										null,
@@ -141,7 +144,7 @@
 							pos++;
 						} else {
 							if (currentlyRunning != id) return;
-							await followSetElement.joinSets(
+							await followSetElement?.joinSets(
 								[followingSymbol],
 								[followingSymbol],
 								null,
@@ -151,51 +154,53 @@
 							break;
 						}
 					}
+					if (currentlyRunning != id) return;
 					await selectRSymbol('g', i, j, 'green', false);
 				}
 			}
 			grammarFuncs?.hideSelect();
 			for (let item of joinIndexes.keys()) {
-				if (joinSetElement.get(item)?.length === 0) {
+				if (joinSetElement?.get(item)?.length === 0) {
 					continue;
 				}
 				if (currentlyRunning != id) return;
-				await joinStackElement.addToStack(
+				await joinStackElement?.addToStack(
 					item,
 					item,
 					'',
 					item,
-					`${joinSetElement.getSetId()}l${joinIndexes.get(item)}`
+					`${joinSetElement?.getSetId()}l${joinIndexes.get(item)}`
 				);
 				await addPause();
 
 				while ($joinStack.length > 0) {
 					const topKey = $joinStack[$joinStack.length - 1].data;
-					const top = /**@type {Array<string>}*/ (joinSetElement.get(topKey));
+					const top = /**@type {Array<string>}*/ (joinSetElement?.get(topKey));
 
-					let nextSet = joinSetElement.get(top[0]);
+					let nextSet = joinSetElement?.get(top[0]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
 						if (currentlyRunning != id) return;
-						await joinStackElement.addToStack(
+						await joinStackElement?.addToStack(
 							top[0],
 							top[0],
 							'',
 							top[0],
-							`${joinSetElement.getSetId()}l${joinIndexes.get(top[0])}`
+							`${joinSetElement?.getSetId()}l${joinIndexes.get(top[0])}`
 						);
 						continue;
 					}
+					if (currentlyRunning != id) return;
 					await selectRSymbol(
-						joinSetElement.getSetId(),
+						/**@type {string}*/ (joinSetElement?.getSetId()),
 						/**@type {number}*/ (joinIndexes.get(topKey)),
 						0,
 						'green'
 					);
 
-					const setToJoin = /**@type {Array<string>}*/ (followSetElement.get(top[0]));
+					const setToJoin = /**@type {Array<string>}*/ (followSetElement?.get(top[0]));
 
 					if (currentlyRunning != id) return;
-					await followSetElement.joinSets(
+					await followSetElement?.joinSets(
 						setToJoin,
 						setToJoin,
 						null,
@@ -204,11 +209,11 @@
 					);
 
 					if (currentlyRunning != id) return;
-					await joinSetElement.remove(topKey, top[0]);
+					await joinSetElement?.remove(topKey, top[0]);
 
-					if (joinSetElement.get(topKey)?.length === 0) {
+					if (joinSetElement?.get(topKey)?.length === 0) {
 						if (currentlyRunning != id) return;
-						await joinStackElement.removeFromStack($joinStack.length - 1);
+						await joinStackElement?.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}

@@ -16,13 +16,13 @@
 	import { calcNullable } from '$lib/first';
 	import { selectRSymbol } from '$lib/selectSymbol';
 
-	/**@type {StackCard}*/
+	/**@type {StackCard | undefined}*/
 	let joinStackElement;
-	/**@type {SetsCard}*/
+	/**@type {SetsCard | undefined}*/
 	let firstSetElement;
-	/**@type {SetsCard}*/
+	/**@type {SetsCard | undefined}*/
 	let joinSetElement;
-	/**@type {SvgLines}*/
+	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
@@ -71,21 +71,23 @@
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
-				await firstSetElement.addSetRow(rules[i].left, i, `gl${i}`);
+				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 				let isNull = true;
 				for (let j = 0; j < rules[i].right.length; j++) {
 					let symbol = rules[i].right[j];
 					if (nt.includes(symbol)) {
+						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, j, 'blue', false);
 						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 						if (!joinIndexes.has(i)) {
-							await joinSetElement.addSetRow(rules[i].left, i, `gl${i}`);
+							if (currentlyRunning !== id) return;
+							await joinSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
 
 						if (currentlyRunning !== id) return;
-						await joinSetElement.joinSets(
+						await joinSetElement?.joinSets(
 							matchingRules.map((x) => x.index),
 							matchingRules.map((x) => `${x.left}`),
 							matchingRules.map((x) => `${x.index}`),
@@ -95,7 +97,8 @@
 					} else {
 						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, j, 'green', false);
-						await firstSetElement.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
+						if (currentlyRunning !== id) return;
+						await firstSetElement?.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
 					}
 					if (!(nullable.get(symbol) ?? false)) {
 						isNull = false;
@@ -104,7 +107,7 @@
 				}
 				if (isNull) {
 					if (currentlyRunning !== id) return;
-					await firstSetElement.joinSets(
+					await firstSetElement?.joinSets(
 						[''],
 						[''],
 						null,
@@ -120,24 +123,24 @@
 				}
 				await addPause();
 				if (currentlyRunning !== id) return;
-				await joinStackElement.addToStack(
+				await joinStackElement?.addToStack(
 					item,
 					rules[item].left,
 					'',
 					item.toString(),
-					`${joinSetElement.getSetId()}l${item}`
+					`${joinSetElement?.getSetId()}l${item}`
 				);
 				await addPause();
 
 				while ($joinStack.length > 0) {
 					const topKey = $joinStack[$joinStack.length - 1].data;
-					const top = /**@type {Array<number>}*/ (joinSetElement.get(topKey));
+					const top = /**@type {Array<number>}*/ (joinSetElement?.get(topKey));
 					const topValue = top[0];
 
-					let nextSet = joinSetElement.get(topValue);
+					let nextSet = joinSetElement?.get(topValue);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
 						if (currentlyRunning !== id) return;
-						await joinStackElement.addToStack(
+						await joinStackElement?.addToStack(
 							topValue,
 							rules[topValue].left,
 							topValue.toString(),
@@ -146,12 +149,12 @@
 						continue;
 					}
 
-					const setToJoin = /**@type {Array<String>}*/ (firstSetElement.get(topValue)).filter(
+					const setToJoin = /**@type {Array<String>}*/ (firstSetElement?.get(topValue)).filter(
 						(x) => x !== ''
 					);
 
 					if (currentlyRunning !== id) return;
-					await firstSetElement.joinSets(
+					await firstSetElement?.joinSets(
 						setToJoin,
 						setToJoin,
 						null,
@@ -161,12 +164,12 @@
 					await addPause();
 
 					if (currentlyRunning !== id) return;
-					await joinSetElement.remove(topKey, topValue);
+					await joinSetElement?.remove(topKey, topValue);
 					await addPause();
 
-					if (joinSetElement.get(topKey)?.length === 0) {
+					if (joinSetElement?.get(topKey)?.length === 0) {
 						if (currentlyRunning !== id) return;
-						await joinStackElement.removeFromStack($joinStack.length - 1);
+						await joinStackElement?.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}
