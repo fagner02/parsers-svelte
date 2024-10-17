@@ -14,7 +14,8 @@
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
-	import { selectRSymbol } from '$lib/selectSymbol';
+	import { selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
+	import { getSelectionFunctions } from './Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;
@@ -46,11 +47,15 @@
 	/**@type {Array<string>}*/
 	export let nt;
 
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
+	let grammarFuncs;
+
 	export const reset = () => {
 		joinStack.update(() => []);
 		joinSet.update(() => []);
 		firstSet.update(() => []);
 		svgLines?.setHideOpacity();
+		grammarFuncs?.hideSelect();
 		firstIndexes.clear();
 		joinIndexes.clear();
 		first();
@@ -70,6 +75,10 @@
 
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
+				if (currentlyRunning !== id) return;
+				await selectLSymbol('g', i, 'blue');
+				if (currentlyRunning !== id) return;
+				await grammarFuncs?.selectFor(`gset${i}`);
 				if (currentlyRunning !== id) return;
 				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 				let isNull = true;
@@ -116,6 +125,7 @@
 					);
 				}
 			}
+			grammarFuncs?.hideSelect();
 
 			for (let item of $joinSet.keys()) {
 				if ($joinSet[item].right.length === 0) {
@@ -182,6 +192,7 @@
 	}
 
 	onMount(async () => {
+		grammarFuncs = getSelectionFunctions('g');
 		first();
 	});
 </script>

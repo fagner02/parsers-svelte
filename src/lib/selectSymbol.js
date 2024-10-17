@@ -6,7 +6,7 @@ import { wait } from './flowControl';
  * @param {string} color
  * @param {boolean} empty
  */
-export async function selectLSymbol(card, index1, color, empty) {
+export async function selectLSymbol(card, index1, color, empty = false) {
 	let symbol = /** @type {HTMLElement} */ (document.querySelector(`#${card}l${index1}`));
 	if (symbol === null) return;
 	symbol.classList.add(empty ? 'empty' : 'block');

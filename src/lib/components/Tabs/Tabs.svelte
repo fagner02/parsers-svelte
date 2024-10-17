@@ -1,12 +1,14 @@
 <script>
 	import FillHeight from '../Layout/FillHeight.svelte';
-	import FirstAnimation from '../LLAnimation.svelte';
+	import LLAnimation from '../LLAnimation.svelte';
 	import TextInput from '../Layout/TextInput.svelte';
+	import SLRAnimation from '../SLRAnimation.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
 		{ comp: TextInput, name: 'Entrada' },
-		{ comp: FirstAnimation, name: 'LL(1)' }
+		{ comp: LLAnimation, name: 'LL(1)' },
+		{ comp: SLRAnimation, name: 'SLR' }
 	];
 	let selected = items[0];
 </script>

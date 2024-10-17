@@ -43,10 +43,10 @@
 				id="{cardId}set{rulesIndex}"
 			>
 				<span id="{cardId}l{rulesIndex}"
-					>{rule.left}<span
+					><span
 						style="font-size: {subFontSize}rem; position: relative;transform: translate(0px, {0.3 *
 							fontSize}rem)">{rule.index}</span
-					></span
+					>{rule.left}</span
 				>
 				<span>{'->'}</span>
 				{#if rule.right[0] === ''}
@@ -71,13 +71,5 @@
 	}
 	div > p > span {
 		margin: 0px 4px;
-	}
-
-	div > p > span:nth-child(2) {
-		margin: 0px;
-	}
-
-	div > p > span:first-child {
-		padding-right: 5px;
 	}
 </style>
