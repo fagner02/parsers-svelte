@@ -10,9 +10,7 @@
 		limitHit,
 		setResetCall,
 		newRunningCall,
-		currentlyRunning,
-		getJumpPause,
-		getJumpWait
+		currentlyRunning
 	} from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
@@ -76,6 +74,7 @@
 					const followIndex = $followSet.findIndex((x) => x.left === item.left);
 					const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
 					for (let f = 0; f < follow.right.length; f++) {
+						if (currentlyRunning != id) return;
 						selectRSymbol(
 							/**@type {string}*/ (followCard?.getSetId()),
 							followIndex,

@@ -80,23 +80,9 @@ export function resolvePause() {
 	clearPauses();
 }
 
-export function killPause() {
-	for (let i = 0; i < pauseRejects.length; i++) {
-		pauseRejects[i]();
-	}
-	clearPauses();
-}
-
 function clearPauses() {
 	pauseResolves.splice(0, pauseResolves.length);
 	pauseRejects.splice(0, pauseRejects.length);
-}
-
-export function killAllWaits() {
-	for (let i2 = 0; i2 < waitRejects.length; i2++) {
-		waitRejects[i2].value();
-	}
-	clearWaits();
 }
 
 export function resolveAllWaits() {
@@ -111,7 +97,7 @@ function clearWaits() {
 	waitRejects.splice(0, waitRejects.length);
 }
 
-export let animating = false;
+// export let animating = false;
 /** @type {() => Promise<void>} */
 let closeInstruction;
 /** @type {() => Promise<void>} */
@@ -138,6 +124,11 @@ export function setOpenInstruction(_openInstruction) {
  */
 export function setResetCall(_resetCall) {
 	limit = false;
+	stepCount = 0;
+	jumpWait = false;
+	jumpPause = false;
+	maxStep = -1;
+
 	resetCall = _resetCall;
 }
 
@@ -151,7 +142,7 @@ let limit = false;
 /** ADD CALL CHECK BEFORE LIMIT HIT */
 export function limitHit() {
 	goForward = false;
-	animating = false;
+	// animating = false;
 	limit = true;
 	maxStep = stepCount;
 
@@ -172,11 +163,11 @@ export async function addPause() {
 		setJumpWait(false);
 	}
 
-	animating = false;
+	// animating = false;
 	try {
 		await pause();
 	} catch {}
-	animating = true;
+	// animating = true;
 }
 
 export async function forward() {
@@ -210,8 +201,8 @@ export function back() {
 export function reset() {
 	limit = false;
 	stepCount = 0;
-	killAllWaits();
-	killPause();
+	resolveAllWaits();
+	resolvePause();
 	setJumpWait(true);
 	closeInstruction?.();
 	if (!goBack) {

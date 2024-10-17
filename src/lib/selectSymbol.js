@@ -30,3 +30,16 @@ export async function selectRSymbol(setCardId, index1, index2, color, empty = fa
 	symbol.classList.add(`${color}-after`);
 	await wait(500);
 }
+/**
+ * @param {string} setCardId
+ * @param {number} index1
+ * @param {number} index2
+ */
+export function deselect(setCardId, index1, index2) {
+	let symbol = /** @type {HTMLElement} */ (
+		document.querySelector(`#${setCardId}r${index1}-${index2}`)
+	);
+	let oldColor = symbol.classList.values().find((x) => x.includes('-after'));
+	if (oldColor) symbol.classList.remove(oldColor);
+	symbol.classList.remove('empty', 'block');
+}

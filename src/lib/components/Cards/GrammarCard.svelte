@@ -6,31 +6,15 @@
 	/** @type {Array<import('@/types').GrammarItem>} */
 	export let rules;
 	let opacity = 0;
-	let maxHeight = 0;
-	let sizeForward = `max-width 0.5s, max-height 0.5s`;
-	let opacityForward = `opacity 0.5s`;
-	let transitionBack = `none`;
-	let transition = sizeForward;
-	let opacityTransition = opacityForward;
 
 	export const loadGrammar = async function () {
 		try {
-			for (let p of document.querySelector('#rules')?.children ?? []) {
+			const rulesElem = /**@type {HTMLElement}*/ document.querySelector('#rules');
+			for (let p of rulesElem?.children ?? []) {
 				for (let s of p.children) {
 					s.classList.remove('block', 'empty');
 				}
 			}
-			transition = transitionBack;
-			opacityTransition = transitionBack;
-			await wait(0);
-			opacity = 0;
-			maxHeight = 0;
-			await wait(0);
-			transition = sizeForward;
-			opacityTransition = opacityForward;
-			await wait(0);
-
-			maxHeight = lineHeight * rules.length;
 			await wait(200);
 			opacity = 1;
 		} catch {}
@@ -48,13 +32,11 @@
 	id={'grammar'}
 	minHeight={lineHeight}
 	minWidth={charWidth}
-	{maxHeight}
 	label={'grammar'}
 	color={'blue'}
-	{transition}
 	cardId={'g'}
 >
-	<div style="opacity: {opacity}; transition: {opacityTransition};" id="rules">
+	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="rules">
 		{#each rules as rule, rulesIndex}
 			<p
 				style="line-height: {lineHeight}rem; font-size: {fontSize}rem; padding: 0px; width: fit-content"
@@ -62,7 +44,7 @@
 			>
 				<span id="{cardId}l{rulesIndex}"
 					>{rule.left}<span
-						style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
+						style="font-size: {subFontSize}rem; position: relative;transform: translate(0px, {0.3 *
 							fontSize}rem)">{rule.index}</span
 					></span
 				>
