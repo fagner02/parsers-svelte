@@ -2,10 +2,11 @@
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 	import { colors } from '$lib/selectSymbol';
-	import CardBox from './CardWrapper.svelte';
+	import { getGrammar } from '$lib/utils';
+	import CardWrapper from './CardWrapper.svelte';
 
 	/** @type {Array<import('@/types').GrammarItem>} */
-	export let rules;
+	let rules = getGrammar().rules;
 	let opacity = 0;
 
 	export const loadGrammar = async function () {
@@ -28,7 +29,7 @@
 	}
 </script>
 
-<CardBox
+<CardWrapper
 	class="card"
 	id={'grammar'}
 	minHeight={lineHeight}
@@ -60,7 +61,7 @@
 			</p>
 		{/each}
 	</div>
-</CardBox>
+</CardWrapper>
 
 <style>
 	#grammar {

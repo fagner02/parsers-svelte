@@ -1,8 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import CardBox from './CardWrapper.svelte';
+	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
-	import { deselect } from '$lib/selectSymbol';
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
@@ -200,7 +199,7 @@
 	$: maxHeight = lineHeight * Math.max($set.length, 1);
 </script>
 
-<CardBox minWidth={charWidth} minHeight={lineHeight} {maxHeight} {hue} {label} cardId={setId}>
+<CardWrapper minWidth={charWidth} minHeight={lineHeight} {maxHeight} {hue} {label} cardId={setId}>
 	{#key visible}
 		{#each $set as item, index}
 			<p
@@ -252,7 +251,7 @@
 			</p>
 		{/each}
 	{/key}
-</CardBox>
+</CardWrapper>
 
 <style>
 	p > span:nth-child(2) {

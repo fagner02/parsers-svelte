@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
+	import { getGrammar } from '$lib/utils';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -27,16 +28,11 @@
 	/**@type {string}*/
 	export let instruction;
 
-	/** @type {Array<import('@/types').GrammarItem>} */
-	export let rules;
+	let { nt, t, rules } = getGrammar();
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let followSet;
-	/**@type {Array<string>}*/
-	export let nt;
-	/**@type {Array<string>}*/
-	export let t;
 
 	function reset() {
 		tableElement.resetTable();
@@ -126,7 +122,7 @@
 
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
+	<GrammarCard bind:loadGrammar></GrammarCard>
 	<TableCard
 		rows={nt}
 		columns={t}

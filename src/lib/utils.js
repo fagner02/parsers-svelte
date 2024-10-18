@@ -14,6 +14,13 @@ export function getPlatform() {
 	return platforms.mobile;
 }
 
+/** @type {Array<import('@/types').GrammarItem>} */
+let rules = [];
+/** @type {Array<string>}*/
+let nt = [];
+/** @type {Array<string>}*/
+let t = [];
+
 /**
  * @param {string} grammar
  */
@@ -21,8 +28,7 @@ export function loadGrammar(grammar) {
 	let ntSet = new Set();
 	let tSet = new Set();
 	let alphSet = new Set();
-	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = [];
+	rules = [];
 
 	grammar.split('\n').forEach((r) => {
 		let s = r.split('->');
@@ -43,7 +49,11 @@ export function loadGrammar(grammar) {
 		if (!ntSet.has(v)) tSet.add(v);
 	}
 
-	let t = ['$'].concat(Array.from(tSet));
-	let nt = Array.from(ntSet);
+	t = ['$'].concat(Array.from(tSet));
+	nt = Array.from(ntSet);
+	return { t, nt, rules };
+}
+
+export function getGrammar() {
 	return { t, nt, rules };
 }

@@ -13,6 +13,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
+	import { getGrammar } from '$lib/utils';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -29,12 +30,9 @@
 	let symbolStackElement;
 	/** @type {StackCard}*/
 	let inputStackElement;
-	/** @type {Array<import('@/types').GrammarItem>} */
-	export let rules;
+	let { nt, t, rules } = getGrammar();
 	let context = getContext('parseView');
 	let startingSymbol = 'S';
-	let nt = ['S', 'A', 'Bb'];
-	let t = ['$', 'a', 'b', 'm'];
 
 	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
 

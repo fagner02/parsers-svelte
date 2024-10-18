@@ -10,7 +10,7 @@
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
 	import SyntaxTree from '../SyntaxTree.svelte';
-	import { loadGrammar } from '$lib/utils';
+	import { getGrammar, loadGrammar } from '$lib/utils';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -23,28 +23,18 @@
 	let followSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	let table = writable();
-	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = [];
-	/** @type {Array<string>}*/
-	let nt = [];
-	/** @type {Array<string>}*/
-	let t = [];
 
 	// ========== Components ====================
 
 	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
-
+	loadGrammar(grammar);
 	/**@type {string}*/
 	let inputString;
 
 	let code = '';
 	onMount(async () => {
 		code = await (await fetch('src/lib/first.js')).text();
-		let g = loadGrammar(grammar);
-		nt = g.nt;
-		t = g.t;
-		rules = g.rules;
-
+		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
 		const _table = lltable(rules, nt, t, _first, _follow);
@@ -147,16 +137,16 @@
 		</div>
 		<div class="grid">
 			{#if selectedAlgorithm === 'first'}
-				<FirstAlgorithm {rules} {nt} bind:instruction></FirstAlgorithm>
+				<FirstAlgorithm bind:instruction></FirstAlgorithm>
 			{:else if selectedAlgorithm === 'follow'}
-				<FollowAlgorithm {rules} {nt} {firstSet} bind:instruction></FollowAlgorithm>
+				<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
 			{:else}
-				<LlAlgorithm {rules} {nt} {t} {firstSet} {followSet} bind:instruction></LlAlgorithm>
+				<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>
 			{/if}
 		</div>
 	</div>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<LlParse bind:input={inputString} {table} {rules}></LlParse>
+		<LlParse bind:input={inputString} {table}></LlParse>
 	</div>
 </AlgorithmTab>

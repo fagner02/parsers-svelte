@@ -43,7 +43,10 @@
 	});
 </script>
 
-<div class="grid card-wrapper" style="animation: rotA 0.5s;">
+<div
+	class="grid card-wrapper"
+	style="animation: rotA 0.5s;border: 1px solid hsl({$$props.hue}, 40%, 50%);"
+>
 	<div class="border-selection" id="select-{cardId}"></div>
 	<div
 		class="card"
@@ -72,7 +75,6 @@
 	.card-wrapper {
 		flex-direction: column;
 		align-items: start;
-		border: 1px solid hsl(200, 50%, 50%);
 		border-radius: 15px;
 		margin: 5px;
 		padding: 5px;

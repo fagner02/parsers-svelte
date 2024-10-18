@@ -1,5 +1,5 @@
 <script>
-	import { loadGrammar } from '$lib/utils';
+	import { getGrammar, loadGrammar } from '$lib/utils';
 	import SLRAlgorithm from '@/SLRAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 	import { onMount } from 'svelte';
@@ -8,20 +8,8 @@
 	let inputString = '';
 	let selectedAlgorithm = 'automato';
 
-	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = [];
-	/** @type {Array<string>}*/
-	let nt = [];
-	/** @type {Array<string>}*/
-	let t = [];
-	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
-
-	onMount(() => {
-		let g = loadGrammar(grammar);
-		nt = g.nt;
-		t = g.t;
-		rules = g.rules;
-	});
+	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
+	loadGrammar(grammar);
 </script>
 
 <div></div>
@@ -37,7 +25,7 @@
 		</div>
 		<div class="grid">
 			{#if selectedAlgorithm === 'automato'}
-				<SLRAlgorithm {rules}></SLRAlgorithm>
+				<SLRAlgorithm></SLRAlgorithm>
 			{/if}
 		</div>
 	</div>

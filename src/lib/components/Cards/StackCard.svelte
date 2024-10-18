@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
-	import CardBox from './CardWrapper.svelte';
+	import CardWrapper from './CardWrapper.svelte';
 	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
 	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 
@@ -123,7 +123,7 @@
 	}
 </script>
 
-<CardBox minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
+<CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
 	{#each [...$stack].reverse() as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="s-{stackId}-{index}"
@@ -136,7 +136,7 @@
 			>
 		</p>
 	{/each}
-</CardBox>
+</CardWrapper>
 
 <style>
 	p {

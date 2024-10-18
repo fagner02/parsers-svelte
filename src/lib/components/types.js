@@ -52,7 +52,7 @@
 
 /** @typedef {Map<string, tableItem>} tableCol*/
 
-/** @typedef {{ruleIndex: number, pos: number}} StateItem*/
+/** @typedef {{ruleIndex: number, pos: number, hide: boolean}} StateItem*/
 
 /** @typedef {{states: StateItem[][], transitions: Map<number, Map<string, number>>}} Automaton*/
 

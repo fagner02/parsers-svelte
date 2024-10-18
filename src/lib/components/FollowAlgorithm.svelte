@@ -15,6 +15,7 @@
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import { getGrammar } from '$lib/utils';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement;
@@ -29,8 +30,7 @@
 	/**@type {string}*/
 	export let instruction;
 
-	/** @type {Array<import('@/types').GrammarItem>} */
-	export let rules;
+	let { nt, rules } = getGrammar();
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let followSet = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
@@ -43,8 +43,6 @@
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
 
-	/**@type {Array<string>}*/
-	export let nt;
 	/**@type {Map<string, number>}*/
 	let followIndexes = new Map();
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions|undefined}*/
@@ -233,7 +231,7 @@
 
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
+	<GrammarCard bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="follow"
 		useNote={false}

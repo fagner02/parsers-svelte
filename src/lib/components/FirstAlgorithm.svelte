@@ -16,6 +16,7 @@
 	import { calcNullable } from '$lib/first';
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
+	import { getGrammar } from '$lib/utils';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;
@@ -30,8 +31,7 @@
 
 	/**@type {string}*/
 	export let instruction;
-	/** @type {Array<import('@/types').GrammarItem>} */
-	export let rules;
+	let { nt, rules } = getGrammar();
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let joinStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
@@ -43,9 +43,6 @@
 	let firstIndexes = new Map();
 	/**@type {Map<number,number>}*/
 	let joinIndexes = new Map();
-
-	/**@type {Array<string>}*/
-	export let nt;
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarFuncs;
@@ -76,9 +73,9 @@
 			instruction = 'Since this thing is like that we have add to the stack';
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
-				await selectLSymbol('g', i, colors.blue);
-				if (currentlyRunning !== id) return;
 				await grammarFuncs?.selectFor(`gset${i}`);
+				if (currentlyRunning !== id) return;
+				await selectLSymbol('g', i, colors.blue);
 				if (currentlyRunning !== id) return;
 				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 				let isNull = true;
@@ -199,7 +196,7 @@
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard {rules} bind:loadGrammar></GrammarCard>
+	<GrammarCard bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="first"
 		set={firstSet}

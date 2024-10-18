@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { writable } from 'svelte/store';
-	import CardBox from './CardWrapper.svelte';
+	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth } from '$lib/globalStyle';
 
 	export let label;
@@ -80,7 +80,7 @@
 	}
 </script>
 
-<CardBox
+<CardWrapper
 	minHeight={lineHeight}
 	minWidth={charWidth}
 	{hue}
@@ -117,7 +117,7 @@
 			{/each}
 		</tbody>
 	</table>
-</CardBox>
+</CardWrapper>
 
 <style>
 	table {
