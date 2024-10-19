@@ -1,17 +1,12 @@
 <script>
 	import { writable } from 'svelte/store';
-	import GrammarCard from './Cards/GrammarCard.svelte';
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
 	import { onMount } from 'svelte';
 	import { newRunningCall, setResetCall, wait } from '$lib/flowControl';
-	import SetsCard from './Cards/SetsCard.svelte';
-	import { colors } from '$lib/selectSymbol';
 	import StateCard from './Cards/StateCard.svelte';
 	import { getGrammar } from '$lib/utils';
-	import graph from 'ngraph.graph';
 	import anime from 'animejs';
-	import { scale } from 'svelte/transition';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -84,7 +79,8 @@
 		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 		text.textContent = `${i}`;
 		// text.style.pointerEvents = 'none';
-
+		res.style.cursor = 'pointer';
+		res.style.pointerEvents = 'all';
 		res.append(circle);
 		res.append(text);
 		circle.setAttribute('r', `${size}`);
@@ -180,6 +176,7 @@
 		e.preventDefault();
 		console.log(e.deltaMode, e.layerX, e.layerY, e.buttons, e.movementX);
 		svgScale += e.deltaY * -0.01;
+		if (svgScale < 0) svgScale = 0;
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
