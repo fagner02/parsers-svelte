@@ -178,7 +178,7 @@
 
 	function wheel(/**@type {WheelEvent}*/ e) {
 		e.preventDefault();
-		console.log(e.deltaX, e.deltaY);
+		console.log(e.deltaMode, e.layerX, e.layerY, e.buttons, e.movementX);
 		svgScale += e.deltaY * -0.01;
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
@@ -214,22 +214,16 @@
 					direction.y += Math.round(Math.random() * -1) * Math.random();
 				}
 				let dist = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.y, 2));
-				// console.log(dist * 100);
+
 				oldPos.push({ x: n.pos.x, y: n.pos.y });
 				n.pos.x += dist === 0 ? 0 : 20 * (direction.x / dist);
 				n.pos.y += dist === 0 ? 0 : 20 * (direction.y / dist);
-				// n.obj.setAttribute('transform', `translate(${n.pos.x}, ${n.pos.y})`);
 			}
 
 			for (let [i, n] of nodes.entries()) {
 				for (let [j, c] of n.con.entries()) {
 					let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
 					let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-					// n.lines[j].setAttribute('x1', `${n.pos.x}`);
-					// n.lines[j].setAttribute('y1', `${n.pos.y}`);
-					// n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
-					// n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
-					// n.lines[j].setAttribute('dist', `${dist}`);
 				}
 			}
 		}
