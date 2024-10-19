@@ -174,9 +174,14 @@
 
 	function wheel(/**@type {WheelEvent}*/ e) {
 		e.preventDefault();
-		console.log(e.deltaMode, e.layerX, e.layerY, e.buttons, e.movementX);
-		svgScale += e.deltaY * -0.01;
-		if (svgScale < 0) svgScale = 0;
+
+		if (Math.round(e.deltaX) !== e.deltaX || Math.round(e.deltaY) !== e.deltaY) {
+			svgScale += e.deltaY * -0.01;
+			if (svgScale < 0) svgScale = 0;
+		} else {
+			svgPos = { x: svgPos.x + e.deltaX, y: svgPos.y + e.deltaY };
+		}
+
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
