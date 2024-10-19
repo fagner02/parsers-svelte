@@ -10,6 +10,7 @@
 	import StateCard from './Cards/StateCard.svelte';
 	import { getGrammar } from '$lib/utils';
 	import graph from 'ngraph.graph';
+	import anime from 'animejs';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -89,85 +90,40 @@
 	}
 	onMount(() => {
 		buildAutomaton();
-
-		// var n = graph();
-		// n.
-
-		for (let i = 0; i < 2; i++) {
-			// res.setAttribute('height', '10');
-			const size = 20;
-			const res = createNode(i, size);
-			nodes.push({
-				obj: res,
-				lines: [],
-				size,
-				pos: { x: 300 + Math.random() * 0, y: 200 + Math.random() * 0 },
-				con: []
-			});
-
-			res.setAttribute(
-				'transform',
-				`translate(${nodes[nodes.length - 1].pos.x}, ${nodes[nodes.length - 1].pos.y})`
-			);
-
-			document.querySelector('#cont')?.append(res);
-		}
-
-		for (let [i, n] of nodes.entries()) {
-			let con = 1;
-			n.con = i in nodes[con].con ? [] : [con];
-			for (let c of n.con) {
-				let res = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-				res.setAttribute('x1', `${n.pos.x}`);
-				res.setAttribute('y1', `${n.pos.y}`);
-				res.setAttribute('x2', `${nodes[c].pos.x}`);
-				res.setAttribute('y2', `${nodes[c].pos.y}`);
-				res.setAttribute('stroke', 'black');
-				res.setAttribute('stroke-width', '4');
-				document.querySelector('#cont')?.prepend(res);
-				n.lines.push(res);
-			}
-		}
-
-		setInterval(up, 50);
 	});
 
 	function addo() {
-		// for (let i = 0; i < 2; i++) {
-		let size = 20;
+		let size = 10 + Math.round(Math.random() * 50);
 		let res = createNode(nodes.length, size);
-		// res.setAttribute('height', '10');
-		let con = Math.round(Math.random() * (nodes.length - 1));
+
 		nodes.push({
 			obj: res,
 			lines: [],
-			pos: { x: nodes[con].pos.x, y: nodes[con].pos.y },
+			pos: { x: 200, y: 200 },
 			size,
 			con: []
 		});
-		res.setAttribute(
-			'transform',
-			`translate(${nodes[nodes.length - 1].pos.x}, ${nodes[nodes.length - 1].pos.y})`
-		);
+		if (nodes.length > 0) {
+			let con = nodes.length > 0 ? Math.round(Math.random() * (nodes.length - 1)) : -1;
+			nodes[nodes.length - 1].pos = { x: nodes[con].pos.x, y: nodes[con].pos.y };
+			nodes[con].con.push(nodes.length - 1);
+
+			let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			line.setAttribute('x1', `${nodes[con].pos.x}`);
+			line.setAttribute('y1', `${nodes[con].pos.y}`);
+			line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
+			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
+			line.setAttribute('stroke', 'black');
+			line.setAttribute('stroke-width', '4');
+			document.querySelector('#cont')?.prepend(line);
+			nodes[con].lines.push(line);
+		}
+
+		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
 
 		document.querySelector('#cont')?.append(res);
 
-		console.log(nodes.length, con);
-		nodes[con].con.push(nodes.length - 1);
-		// n.con = i in nodes[con].con ? [] : [con];
-		// for (let c of n.con) {
-		let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-		line.setAttribute('x1', `${nodes[con].pos.x}`);
-		line.setAttribute('y1', `${nodes[con].pos.y}`);
-		line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
-		line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
-		line.setAttribute('stroke', 'black');
-		line.setAttribute('stroke-width', '4');
-		document.querySelector('#cont')?.prepend(line);
-		nodes[con].lines.push(line);
-		// }
-		// }
-		console.log(nodes);
+		up();
 	}
 	function addl() {
 		// for (let i = 0; i < 2; i++) {
@@ -197,50 +153,81 @@
 	}
 
 	function up() {
-		for (let [j, n] of nodes.entries()) {
-			let direction = { x: 0, y: 0 };
-			let jump = false;
-			for (let [i, v] of nodes.entries()) {
-				if (i === j) continue;
-				let diff = { x: v.pos.x - n.pos.x, y: v.pos.y - n.pos.y };
-				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-				if (dist <= 0) {
-					jump = true;
-					// continue;
+		let oldPos = [];
+		for (let k = 0; k < 4; k++) {
+			for (let [j, n] of nodes.entries()) {
+				let direction = { x: 0, y: 0 };
+				let jump = false;
+				for (let [i, v] of nodes.entries()) {
+					if (i === j) continue;
+					let diff = { x: v.pos.x - n.pos.x, y: v.pos.y - n.pos.y };
+					let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+					if (dist <= 0) {
+						jump = true;
+					}
+					let limit = 20 + n.size + v.size;
+					// if ((n.con.includes(i) || v.con.includes(j)) && dist > limit + 1) {
+					// 	// direction.x += diff.x / 40;
+					// 	// direction.y += diff.y / 40;
+					// 	continue;
+					// }
+					if (dist < limit) {
+						direction.x += (diff.x * -1) / limit;
+						direction.y += (diff.y * -1) / limit;
+						continue;
+					}
 				}
-				if ((n.con.includes(i) || v.con.includes(j)) && dist > 31 + n.size + v.size) {
-					direction.x += diff.x / 40;
-					direction.y += diff.y / 40;
-					// continue;
+				if (jump) {
+					direction.x += Math.round(Math.random() * -1) * Math.random();
+					direction.y += Math.round(Math.random() * -1) * Math.random();
 				}
-				if (dist < 20 + n.size + v.size) {
-					direction.x += (diff.x * -1) / 20;
-					direction.y += (diff.y * -1) / 20;
-					continue;
+				let dist = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.y, 2));
+				// console.log(dist * 100);
+				oldPos.push({ x: n.pos.x, y: n.pos.y });
+				n.pos.x += dist === 0 ? 0 : 20 * (direction.x / dist);
+				n.pos.y += dist === 0 ? 0 : 20 * (direction.y / dist);
+				// n.obj.setAttribute('transform', `translate(${n.pos.x}, ${n.pos.y})`);
+			}
+
+			for (let [i, n] of nodes.entries()) {
+				for (let [j, c] of n.con.entries()) {
+					let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
+					let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+					// n.lines[j].setAttribute('x1', `${n.pos.x}`);
+					// n.lines[j].setAttribute('y1', `${n.pos.y}`);
+					// n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
+					// n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
+					// n.lines[j].setAttribute('dist', `${dist}`);
 				}
 			}
-			if (jump) {
-				direction.x += Math.round(Math.random() * -1) * Math.random();
-				direction.y += Math.round(Math.random() * -1) * Math.random();
-			}
-			let dist = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.y, 2));
-			n.pos.x += dist === 0 ? 0 : direction.x / dist;
-			n.pos.y += dist === 0 ? 0 : direction.y / dist;
-			n.obj.setAttribute('transform', `translate(${n.pos.x}, ${n.pos.y})`);
 		}
 
 		for (let [i, n] of nodes.entries()) {
+			anime({
+				targets: n.obj,
+				translateX: [oldPos[i].x, n.pos.x],
+				translateY: [oldPos[i].y, n.pos.y],
+				duration: 500,
+				direction: 'forward',
+				autoplay: true,
+				delay: 0,
+				easing: 'spring(1, 50, 10, 1)'
+			});
 			for (let [j, c] of n.con.entries()) {
-				let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
-				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-				n.lines[j].setAttribute('x1', `${n.pos.x}`);
-				n.lines[j].setAttribute('y1', `${n.pos.y}`);
-				n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
-				n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
-				n.lines[j].setAttribute('dist', `${dist}`);
+				anime({
+					targets: n.lines[j],
+					x1: [oldPos[i].x, n.pos.x],
+					y1: [oldPos[i].y, n.pos.y],
+					x2: [oldPos[c].x, nodes[c].pos.x],
+					y2: [oldPos[c].y, nodes[c].pos.y],
+					duration: 500,
+					direction: 'forward',
+					autoplay: true,
+					delay: 0,
+					easing: 'spring(1, 50, 10, 1)'
+				});
 			}
 		}
-		// console.log(nodes[0].pos);
 	}
 </script>
 
@@ -264,6 +251,7 @@
 	></StateCard> -->
 </div>
 <div style="border: 1px solid black;height: 500px">
+	<button on:click={(_) => up()}>up</button>
 	<button on:click={(_) => addl()}>addline</button>
 	<button on:click={(_) => addo()}>add</button>
 	<svg id="cont"> </svg>
