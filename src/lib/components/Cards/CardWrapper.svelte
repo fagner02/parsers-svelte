@@ -38,7 +38,6 @@
 	setSelectionFunctions(cardId, selectionFunctions);
 
 	onMount(() => {
-		console.log($$props.hue);
 		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${cardId}`));
 	});
 </script>

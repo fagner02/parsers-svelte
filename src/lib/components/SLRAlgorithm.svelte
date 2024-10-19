@@ -9,6 +9,7 @@
 	import { colors } from '$lib/selectSymbol';
 	import StateCard from './Cards/StateCard.svelte';
 	import { getGrammar } from '$lib/utils';
+	import graph from 'ngraph.graph';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -71,15 +72,181 @@
 			automaton.states.push($stateSet);
 		} catch {}
 	}
-
+	/**
+	 * @type {{ obj: SVGGElement; size: number; pos: { x: number; y: number; }; lines: SVGLineElement[]; con: number[]; }[]}
+	 */
+	let nodes = [];
+	function createNode(/**@type {number}*/ i, /**@type {number}*/ size) {
+		let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		text.textContent = `${i}`;
+		res.append(circle);
+		res.append(text);
+		circle.setAttribute('r', `${size}`);
+		circle.setAttribute('fill', 'hsl(0,50%,50%)');
+		return res;
+	}
 	onMount(() => {
 		buildAutomaton();
+
+		// var n = graph();
+		// n.
+
+		for (let i = 0; i < 2; i++) {
+			// res.setAttribute('height', '10');
+			const size = 20;
+			const res = createNode(i, size);
+			nodes.push({
+				obj: res,
+				lines: [],
+				size,
+				pos: { x: 300 + Math.random() * 0, y: 200 + Math.random() * 0 },
+				con: []
+			});
+
+			res.setAttribute(
+				'transform',
+				`translate(${nodes[nodes.length - 1].pos.x}, ${nodes[nodes.length - 1].pos.y})`
+			);
+
+			document.querySelector('#cont')?.append(res);
+		}
+
+		for (let [i, n] of nodes.entries()) {
+			let con = 1;
+			n.con = i in nodes[con].con ? [] : [con];
+			for (let c of n.con) {
+				let res = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+				res.setAttribute('x1', `${n.pos.x}`);
+				res.setAttribute('y1', `${n.pos.y}`);
+				res.setAttribute('x2', `${nodes[c].pos.x}`);
+				res.setAttribute('y2', `${nodes[c].pos.y}`);
+				res.setAttribute('stroke', 'black');
+				res.setAttribute('stroke-width', '4');
+				document.querySelector('#cont')?.prepend(res);
+				n.lines.push(res);
+			}
+		}
+
+		setInterval(up, 50);
 	});
+
+	function addo() {
+		// for (let i = 0; i < 2; i++) {
+		let size = 20;
+		let res = createNode(nodes.length, size);
+		// res.setAttribute('height', '10');
+		let con = Math.round(Math.random() * (nodes.length - 1));
+		nodes.push({
+			obj: res,
+			lines: [],
+			pos: { x: nodes[con].pos.x, y: nodes[con].pos.y },
+			size,
+			con: []
+		});
+		res.setAttribute(
+			'transform',
+			`translate(${nodes[nodes.length - 1].pos.x}, ${nodes[nodes.length - 1].pos.y})`
+		);
+
+		document.querySelector('#cont')?.append(res);
+
+		console.log(nodes.length, con);
+		nodes[con].con.push(nodes.length - 1);
+		// n.con = i in nodes[con].con ? [] : [con];
+		// for (let c of n.con) {
+		let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		line.setAttribute('x1', `${nodes[con].pos.x}`);
+		line.setAttribute('y1', `${nodes[con].pos.y}`);
+		line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
+		line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
+		line.setAttribute('stroke', 'black');
+		line.setAttribute('stroke-width', '4');
+		document.querySelector('#cont')?.prepend(line);
+		nodes[con].lines.push(line);
+		// }
+		// }
+		console.log(nodes);
+	}
+	function addl() {
+		// for (let i = 0; i < 2; i++) {
+		let size = 20;
+		let res = createNode(nodes.length, size);
+		// res.setAttribute('height', '10');
+		let node = Math.round(Math.random() * (nodes.length - 1));
+		let con = Math.round(Math.random() * (nodes.length - 1));
+		if (nodes[node].con.includes(con) || nodes[con].con.includes(node)) return;
+
+		nodes[con].con.push(node);
+		nodes[node].pos = { x: nodes[con].pos.x, y: nodes[con].pos.y };
+		// n.con = i in nodes[con].con ? [] : [con];
+		// for (let c of n.con) {
+		let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		line.setAttribute('x1', `${nodes[con].pos.x}`);
+		line.setAttribute('y1', `${nodes[con].pos.y}`);
+		line.setAttribute('x2', `${nodes[node].pos.x}`);
+		line.setAttribute('y2', `${nodes[node].pos.y}`);
+		line.setAttribute('stroke', 'black');
+		line.setAttribute('stroke-width', '4');
+		document.querySelector('#cont')?.prepend(line);
+		nodes[con].lines.push(line);
+		// }
+		// }
+		console.log(nodes);
+	}
+
+	function up() {
+		for (let [j, n] of nodes.entries()) {
+			let direction = { x: 0, y: 0 };
+			let jump = false;
+			for (let [i, v] of nodes.entries()) {
+				if (i === j) continue;
+				let diff = { x: v.pos.x - n.pos.x, y: v.pos.y - n.pos.y };
+				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+				if (dist <= 0) {
+					jump = true;
+					// continue;
+				}
+				if ((n.con.includes(i) || v.con.includes(j)) && dist > 31 + n.size + v.size) {
+					direction.x += diff.x / 40;
+					direction.y += diff.y / 40;
+					// continue;
+				}
+				if (dist < 20 + n.size + v.size) {
+					direction.x += (diff.x * -1) / 20;
+					direction.y += (diff.y * -1) / 20;
+					continue;
+				}
+			}
+			if (jump) {
+				direction.x += Math.round(Math.random() * -1) * Math.random();
+				direction.y += Math.round(Math.random() * -1) * Math.random();
+			}
+			let dist = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.y, 2));
+			n.pos.x += dist === 0 ? 0 : direction.x / dist;
+			n.pos.y += dist === 0 ? 0 : direction.y / dist;
+			n.obj.setAttribute('transform', `translate(${n.pos.x}, ${n.pos.y})`);
+		}
+
+		for (let [i, n] of nodes.entries()) {
+			for (let [j, c] of n.con.entries()) {
+				let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
+				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+				n.lines[j].setAttribute('x1', `${n.pos.x}`);
+				n.lines[j].setAttribute('y1', `${n.pos.y}`);
+				n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
+				n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
+				n.lines[j].setAttribute('dist', `${dist}`);
+			}
+		}
+		// console.log(nodes[0].pos);
+	}
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<!-- <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines> -->
 <div class="cards-box unit">
-	<GrammarCard bind:loadGrammar></GrammarCard>
+	<!-- <GrammarCard bind:loadGrammar></GrammarCard>
 	<StackCard
 		stack={stateStack}
 		stackId="state"
@@ -94,5 +261,17 @@
 		label="state"
 		hue={colors.pink}
 		bind:this={stateElem}
-	></StateCard>
+	></StateCard> -->
 </div>
+<div style="border: 1px solid black;height: 500px">
+	<button on:click={(_) => addl()}>addline</button>
+	<button on:click={(_) => addo()}>add</button>
+	<svg id="cont"> </svg>
+</div>
+
+<style>
+	#cont {
+		width: 100%;
+		height: 100%;
+	}
+</style>
