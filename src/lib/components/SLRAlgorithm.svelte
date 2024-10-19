@@ -11,6 +11,7 @@
 	import { getGrammar } from '$lib/utils';
 	import graph from 'ngraph.graph';
 	import anime from 'animejs';
+	import { scale } from 'svelte/transition';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -82,6 +83,8 @@
 		let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 		text.textContent = `${i}`;
+		// text.style.pointerEvents = 'none';
+
 		res.append(circle);
 		res.append(text);
 		circle.setAttribute('r', `${size}`);
@@ -104,7 +107,7 @@
 			con: []
 		});
 		if (nodes.length > 0) {
-			let con = nodes.length > 0 ? Math.round(Math.random() * (nodes.length - 1)) : -1;
+			let con = Math.round(Math.random() * (nodes.length - 1));
 			nodes[nodes.length - 1].pos = { x: nodes[con].pos.x, y: nodes[con].pos.y };
 			nodes[con].con.push(nodes.length - 1);
 
@@ -115,13 +118,13 @@
 			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
 			line.setAttribute('stroke', 'black');
 			line.setAttribute('stroke-width', '4');
-			document.querySelector('#cont')?.prepend(line);
+			document.querySelector('#cont>g')?.prepend(line);
 			nodes[con].lines.push(line);
 		}
 
 		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
 
-		document.querySelector('#cont')?.append(res);
+		document.querySelector('#cont>g')?.append(res);
 
 		up();
 	}
@@ -145,11 +148,40 @@
 		line.setAttribute('y2', `${nodes[node].pos.y}`);
 		line.setAttribute('stroke', 'black');
 		line.setAttribute('stroke-width', '4');
-		document.querySelector('#cont')?.prepend(line);
+		document.querySelector('#cont>g')?.prepend(line);
 		nodes[con].lines.push(line);
 		// }
 		// }
-		console.log(nodes);
+	}
+	let svgScale = 1;
+	let svgPos = { x: 0, y: 0 };
+	/**@type {{ x: number; y: number; } | null}*/
+	let dragPos = null;
+	function dragStart(/**@type {MouseEvent}*/ e) {
+		dragPos = { x: e.clientX, y: e.clientY };
+	}
+
+	function dragEnd(/**@type {MouseEvent}*/ e) {
+		if (dragPos === null) return;
+		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
+		svgPos = { x: svgPos.x + diff.x, y: svgPos.y + diff.y };
+		dragPos = null;
+	}
+
+	function dragMove(/**@type {MouseEvent}*/ e) {
+		if (dragPos === null) return;
+		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
+
+		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
+		g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+	}
+
+	function wheel(/**@type {WheelEvent}*/ e) {
+		e.preventDefault();
+		console.log(e.deltaX, e.deltaY);
+		svgScale += e.deltaY * -0.01;
+		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
+		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
 	function up() {
@@ -250,16 +282,32 @@
 		bind:this={stateElem}
 	></StateCard> -->
 </div>
-<div style="border: 1px solid black;height: 500px">
+<div style="height: 500px">
 	<button on:click={(_) => up()}>up</button>
 	<button on:click={(_) => addl()}>addline</button>
 	<button on:click={(_) => addo()}>add</button>
-	<svg id="cont"> </svg>
+	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+	<svg
+		role="application"
+		on:mousedown={dragStart}
+		on:mouseleave={dragEnd}
+		on:mouseup={dragEnd}
+		on:mousemove={dragMove}
+		on:wheel={wheel}
+		id="cont"
+	>
+		<g></g></svg
+	>
 </div>
 
 <style>
 	#cont {
 		width: 100%;
 		height: 100%;
+		border: 1px solid black;
+	}
+	#cont > * {
+		pointer-events: none;
+		user-select: none;
 	}
 </style>
