@@ -22,6 +22,11 @@
 					selectedAlgorithm = 'automato';
 				}}>autômato</button
 			>
+			<button
+				on:click={() => {
+					selectedAlgorithm = 'tabela';
+				}}>tabela</button
+			>
 		</div>
 		<div class="grid">
 			{#if selectedAlgorithm === 'automato'}

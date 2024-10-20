@@ -7,6 +7,8 @@
 	import StateCard from './Cards/StateCard.svelte';
 	import { getGrammar } from '$lib/utils';
 	import anime from 'animejs';
+	import GrammarCard from './Cards/GrammarCard.svelte';
+	import { colors } from '$lib/selectSymbol';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -78,7 +80,6 @@
 		let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 		text.textContent = `${i}`;
-		// text.style.pointerEvents = 'none';
 		res.style.cursor = 'pointer';
 		res.style.pointerEvents = 'all';
 		res.append(circle);
@@ -222,13 +223,6 @@
 				n.pos.x += dist === 0 ? 0 : 20 * (direction.x / dist);
 				n.pos.y += dist === 0 ? 0 : 20 * (direction.y / dist);
 			}
-
-			for (let [i, n] of nodes.entries()) {
-				for (let [j, c] of n.con.entries()) {
-					let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
-					let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-				}
-			}
 		}
 
 		for (let [i, n] of nodes.entries()) {
@@ -260,50 +254,49 @@
 	}
 </script>
 
-<!-- <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines> -->
-<div class="cards-box unit">
-	<!-- <GrammarCard bind:loadGrammar></GrammarCard>
-	<StackCard
-		stack={stateStack}
-		stackId="state"
-		label="state stack"
-		hue={colors.blue}
-		bind:this={stateStackElem}
-		bind:svgLines
-	></StackCard>
-	<StateCard
-		state={stateSet}
-		stateId={'state'}
-		label="state"
-		hue={colors.pink}
-		bind:this={stateElem}
-	></StateCard> -->
-</div>
-<div style="height: 500px">
-	<button on:click={(_) => up()}>up</button>
-	<button on:click={(_) => addl()}>addline</button>
-	<button on:click={(_) => addo()}>add</button>
+<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<div class="cards-box unit" style="padding: 0 5px;">
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<svg
-		role="application"
-		on:mousedown={dragStart}
-		on:mouseleave={dragEnd}
-		on:mouseup={dragEnd}
-		on:mousemove={dragMove}
-		on:wheel={wheel}
-		id="cont"
-	>
-		<g></g></svg
-	>
+
+	<div style="padding: 5px; padding-bottom: 0px;flex: 1; height: 100%">
+		<svg
+			role="application"
+			on:mousedown={dragStart}
+			on:mouseleave={dragEnd}
+			on:mouseup={dragEnd}
+			on:mousemove={dragMove}
+			on:wheel={wheel}
+			id="cont"
+		>
+			<g></g>
+		</svg>
+	</div>
+	<div style="flex: 0;">
+		<GrammarCard bind:loadGrammar></GrammarCard>
+		<StackCard
+			stack={stateStack}
+			stackId="state"
+			label="state stack"
+			hue={colors.blue}
+			bind:this={stateStackElem}
+			bind:svgLines
+		></StackCard>
+		<StateCard
+			state={stateSet}
+			stateId={'state'}
+			label="state"
+			hue={colors.pink}
+			bind:this={stateElem}
+		></StateCard>
+	</div>
 </div>
 
 <style>
 	#cont {
-		touch-action: auto;
-		/* pointer-events: none; */
 		width: 100%;
 		height: 100%;
-		border: 1px solid black;
+		border-radius: 10px;
+		border: 1px solid hsl(0, 0%, 0%, 20%);
 		cursor: move;
 	}
 	#cont > * {
