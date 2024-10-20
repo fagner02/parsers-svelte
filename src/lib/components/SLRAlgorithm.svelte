@@ -211,7 +211,7 @@
 		if (e.touches.length < 2) return;
 		let diff = {
 			x: e.touches[0].clientX - e.touches[1].clientX,
-			y: e.touches[0].clientY - e.touches[1].clientX
+			y: e.touches[0].clientY - e.touches[1].clientY
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		svgScale += (dist - lastDist) * 0.001;
