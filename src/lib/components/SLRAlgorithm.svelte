@@ -215,7 +215,7 @@
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		let delta = dist - lastDist;
-		delta = delta < 0 ? 0 : delta;
+		// delta = delta < 0 ? 0 : delta;
 		// @ts-ignore
 		document.querySelector('#ji').innerHTML = `${dist} - ${lastDist} - ${delta}`;
 
