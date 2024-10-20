@@ -213,7 +213,7 @@
 			y: e.touches[0].clientY - e.touches[1].clientX
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-		svgScale += (dist / lastDist) * 0.01;
+		svgScale += (dist - lastDist) * 0.001;
 	}
 	function touchEnd(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
