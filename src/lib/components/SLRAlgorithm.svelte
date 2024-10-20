@@ -214,14 +214,8 @@
 			y: e.touches[0].clientY - e.touches[1].clientY
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-		let delta = dist - lastDist;
-		// delta = delta < 0 ? 0 : delta;
-		// @ts-ignore
-		document.querySelector('#ji').innerHTML = `${dist} - ${lastDist} - ${delta}`;
-
+		svgScale += (dist - lastDist) * 0.001;
 		lastDist = dist;
-
-		svgScale += delta * 0.001;
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
@@ -316,7 +310,6 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div id="ji"></div>
 <div class="cards-box unit" style="padding: 0 5px;">
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 
