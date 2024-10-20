@@ -208,7 +208,7 @@
 			g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 			return;
 		}
-
+		if (e.touches.length < 2) return;
 		let diff = {
 			x: e.touches[0].clientX - e.touches[1].clientX,
 			y: e.touches[0].clientY - e.touches[1].clientX
