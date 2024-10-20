@@ -158,6 +158,7 @@
 	/**@type {{ x: number; y: number; } | null}*/
 	let dragPos = null;
 	function dragStart(/**@type {MouseEvent}*/ e) {
+		e.preventDefault();
 		dragPos = { x: e.clientX, y: e.clientY };
 	}
 
