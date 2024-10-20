@@ -158,7 +158,6 @@
 	/**@type {{ x: number; y: number; } | null}*/
 	let dragPos = null;
 	function dragStart(/**@type {MouseEvent}*/ e) {
-		e.preventDefault();
 		dragPos = { x: e.clientX, y: e.clientY };
 	}
 
@@ -180,6 +179,7 @@
 	let lastTouch = { x: 0, y: 0 };
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
+		e.preventDefault();
 		if (e.touches.length > 1) {
 			touchType = 'pan';
 			console.log('pan');
