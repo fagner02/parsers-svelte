@@ -215,10 +215,11 @@
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		let delta = dist - lastDist;
-		lastDist = dist;
 		delta = delta < 0 ? 0 : delta;
 		// @ts-ignore
 		document.querySelector('#ji').innerHTML = `${dist} - ${lastDist} - ${delta}`;
+
+		lastDist = dist;
 
 		svgScale += delta * 0.001;
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
