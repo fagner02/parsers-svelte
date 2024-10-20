@@ -215,6 +215,8 @@
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		svgScale += (dist - lastDist) * 0.001;
+		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
+		g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
 	function touchEnd(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
