@@ -214,6 +214,8 @@
 			y: e.touches[0].clientY - e.touches[1].clientY
 		};
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+		// @ts-ignore
+		document.querySelector('#ji').innerHTML = `${dist} - ${lastDist} - ${dist - lastDist}`;
 		svgScale += (dist - lastDist) * 0.001;
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
