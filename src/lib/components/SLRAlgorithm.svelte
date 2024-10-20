@@ -258,7 +258,7 @@
 <div class="cards-box unit" style="padding: 0 5px;">
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 
-	<div style="padding: 5px; padding-bottom: 0px;flex: 1; height: 100%">
+	<div style="padding: 5px; padding-bottom: 0px;flex: 1; height: 100%;">
 		<svg
 			role="application"
 			on:mousedown={dragStart}
@@ -297,6 +297,7 @@
 		height: 100%;
 		border-radius: 10px;
 		border: 1px solid hsl(0, 0%, 0%, 20%);
+		box-shadow: 0px 0px 5px inset hsl(0, 0%, 0%, 20%);
 		cursor: move;
 	}
 	#cont > * {
