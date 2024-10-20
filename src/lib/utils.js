@@ -39,7 +39,9 @@ export function loadGrammar(grammar) {
 				right: s[1].trim().split(' '),
 				index: rules.length
 			});
-			alphSet = alphSet.union(new Set(s[1].trim().split(' ')));
+			for (let item of new Set(s[1].trim().split(' '))) {
+				alphSet.add(item);
+			}
 			ntSet.add(s[0].replaceAll(' ', ''));
 		}
 	});

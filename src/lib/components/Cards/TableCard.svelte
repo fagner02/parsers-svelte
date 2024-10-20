@@ -1,8 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { writable } from 'svelte/store';
 	import CardWrapper from './CardWrapper.svelte';
-	import { charWidth, fontSize, lineHeight, subCharWidth } from '$lib/globalStyle';
+	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
 
 	export let label;
 	export let hue;
@@ -150,8 +149,8 @@
 			top 0.5s 0.5s,
 			height 0.5s,
 			width 0.5s,
-			translate 0.5s,
 			opacity 0.5s 0.5s;
+		white-space: nowrap;
 	}
 	th {
 		border-color: transparent;

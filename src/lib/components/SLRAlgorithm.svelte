@@ -149,6 +149,7 @@
 		// }
 		// }
 	}
+	let initialPos;
 	let svgScale = 1;
 	let svgPos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
@@ -298,6 +299,8 @@
 
 <style>
 	#cont {
+		touch-action: auto;
+		/* pointer-events: none; */
 		width: 100%;
 		height: 100%;
 		border: 1px solid black;

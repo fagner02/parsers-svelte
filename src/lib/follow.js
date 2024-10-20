@@ -38,7 +38,11 @@ export function follow(
 								empty = true;
 								continue;
 							}
-							let union = /**@type {Set<string>}*/ (followSet.get(symbol)?.union(right));
+							let union = new Set(/**@type {Set<string>}*/ followSet.get(symbol));
+							for (let item of right) {
+								union.add(item);
+							}
+
 							followSet.set(symbol, union);
 						}
 					}

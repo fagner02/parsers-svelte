@@ -23,7 +23,7 @@
 				const parentRect = parent.getBoundingClientRect();
 
 				selection.style.opacity = '1';
-				selection.style.translate = `${elemRect.x - parentRect.x - 16}px ${elemRect.y - parentRect.y - 9}px`;
+				selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
 				selection.style.width = `${elemRect.width + 15}px`;
 				selection.style.height = `${elemRect.height + 3}px`;
 				await wait(500);
@@ -108,7 +108,7 @@
 		border-radius: 8px;
 		transition:
 			width 0.5s,
-			translate 0.5s,
+			transform 0.5s,
 			opacity 0.5s;
 		opacity: 0;
 		z-index: 1;
