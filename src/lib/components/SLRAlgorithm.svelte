@@ -200,6 +200,7 @@
 	}
 	function touchMove(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
+		e.preventDefault();
 		if (touchType === 'scroll') {
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
 			lastTouch = { x: diff.x, y: diff.y };
@@ -306,6 +307,7 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<div id="ji"></div>
 <div class="cards-box unit" style="padding: 0 5px;">
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 
