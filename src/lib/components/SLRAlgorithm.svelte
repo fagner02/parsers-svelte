@@ -152,7 +152,7 @@
 		// }
 		// }
 	}
-	let initialPos;
+	let touchType = '';
 	let svgScale = 1;
 	let svgPos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
@@ -174,6 +174,54 @@
 
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
 		g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+	}
+
+	let lastTouch = { x: 0, y: 0 };
+	let lastDist = 0;
+	function touchStart(/**@type {TouchEvent}*/ e) {
+		if (e.touches.length > 1) {
+			touchType = 'pan';
+			console.log('pan');
+			let diff = {
+				x: e.touches[0].clientX - e.touches[1].clientX,
+				y: e.touches[0].clientY - e.touches[1].clientX
+			};
+			lastDist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+		} else {
+			lastTouch = {
+				x: e.touches[0].clientX,
+				y: e.touches[0].clientY
+			};
+			touchType = 'scroll';
+			console.log('scroll');
+		}
+		dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+	}
+	function touchMove(/**@type {TouchEvent}*/ e) {
+		if (dragPos === null) return;
+		if (touchType === 'scroll') {
+			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
+			lastTouch = { x: diff.x, y: diff.y };
+			let g = /**@type {SVGGElement}*/ (document.querySelector('#cont>g'));
+			g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+			return;
+		}
+
+		let diff = {
+			x: e.touches[0].clientX - e.touches[1].clientX,
+			y: e.touches[0].clientY - e.touches[1].clientX
+		};
+		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+		svgScale += (dist / lastDist) * 0.01;
+	}
+	function touchEnd(/**@type {TouchEvent}*/ e) {
+		if (dragPos === null) return;
+		if (touchType === 'scroll') {
+			svgPos = { x: svgPos.x + lastTouch.x, y: svgPos.y + lastTouch.y };
+		} else {
+		}
+		dragPos = null;
+		lastTouch = { x: 0, y: 0 };
 	}
 
 	function wheel(/**@type {WheelEvent}*/ e) {
@@ -267,6 +315,9 @@
 			on:mouseleave={dragEnd}
 			on:mouseup={dragEnd}
 			on:mousemove={dragMove}
+			on:touchstart={touchStart}
+			on:touchmove={touchMove}
+			on:touchend={touchEnd}
 			on:wheel={wheel}
 			id="cont"
 		>
