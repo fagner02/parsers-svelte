@@ -90,6 +90,8 @@
 	}
 	onMount(() => {
 		buildAutomaton();
+		addo();
+		addo();
 	});
 
 	function addo() {
@@ -296,8 +298,8 @@
 		width: 100%;
 		height: 100%;
 		border-radius: 10px;
-		border: 1px solid hsl(0, 0%, 0%, 20%);
-		box-shadow: 0px 0px 5px inset hsl(0, 0%, 0%, 20%);
+		border: 1px solid hsl(200, 50%, 50%, 100%);
+		/* box-shadow: 0px 0px 5px inset hsl(0, 0%, 0%, 20%); */
 		cursor: move;
 	}
 	#cont > * {
