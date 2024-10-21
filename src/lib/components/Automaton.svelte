@@ -1,9 +1,10 @@
 <script>
 	import anime from 'animejs';
+	import { onMount } from 'svelte';
 
-	/**
-	 * @type {{ obj: SVGGElement; size: number; pos: { x: number; y: number; }; lines: SVGLineElement[]; con: number[]; }[]}
-	 */
+	/**@type {SVGGElement}*/
+	let groupElem;
+	/** @type {{ obj: SVGGElement; size: number; pos: { x: number; y: number; }; lines: SVGLineElement[]; con: number[]; }[]}*/
 	let nodes = [];
 	function createNode(/**@type {number}*/ i, /**@type {number}*/ size) {
 		let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -17,6 +18,13 @@
 		circle.setAttribute('r', `${size}`);
 		circle.setAttribute('fill', 'hsl(0,50%,50%)');
 		return res;
+	}
+
+	export function reset() {
+		nodes = [];
+		groupElem.remove();
+		groupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		document.querySelector('#svg')?.append(groupElem);
 	}
 
 	export function addNode(/** @type {number | null}*/ from, /** @type {any}*/ data) {
@@ -41,13 +49,13 @@
 			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
 			line.setAttribute('stroke', 'black');
 			line.setAttribute('stroke-width', '4');
-			document.querySelector('#autsvg>g')?.prepend(line);
+			groupElem.prepend(line);
 			nodes[from].lines.push(line);
 		}
 
 		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
 
-		document.querySelector('#autsvg>g')?.append(res);
+		groupElem.append(res);
 
 		update();
 	}
@@ -71,7 +79,7 @@
 		if (dragPos === null) return;
 		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
 
-		let g = /**@type {SVGGElement}*/ (document.querySelector('#autsvg>g'));
+		let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
 		g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
 	let touchType = '';
@@ -103,7 +111,7 @@
 		if (touchType === 'scroll') {
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
 			lastTouch = { x: diff.x, y: diff.y };
-			let g = /**@type {SVGGElement}*/ (document.querySelector('#autsvg>g'));
+			let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
 			g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 			return;
 		}
@@ -115,7 +123,7 @@
 		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		svgScale += (dist - lastDist) * 0.001;
 		lastDist = dist;
-		let g = /**@type {SVGGElement}*/ (document.querySelector('#autsvg>g'));
+		let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
 		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 	function touchEnd(/**@type {TouchEvent}*/ e) {
@@ -138,8 +146,8 @@
 			svgPos = { x: svgPos.x + e.deltaX, y: svgPos.y + e.deltaY };
 		}
 
-		let g = /**@type {SVGGElement}*/ (document.querySelector('#autsvg>g'));
-		g.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+		// let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
+		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
 	function update() {
@@ -202,6 +210,10 @@
 			}
 		}
 	}
+
+	onMount(() => {
+		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
+	});
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -215,20 +227,20 @@
 	on:touchmove={touchMove}
 	on:touchend={touchEnd}
 	on:wheel={wheel}
-	id="autsvg"
+	id="svg"
 >
 	<g></g>
 </svg>
 
 <style>
-	#autsvg {
+	#svg {
 		width: 100%;
 		height: 100%;
 		border-radius: 10px;
 		border: 1px solid hsl(200, 50%, 50%, 100%);
 		cursor: move;
 	}
-	#autsvg > * {
+	#svg > * {
 		pointer-events: none;
 		user-select: none;
 	}

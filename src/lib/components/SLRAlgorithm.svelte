@@ -15,6 +15,8 @@
 	let stateStackElem;
 	/**@type {StateCard | undefined}*/
 	let stateElem;
+	/**@type {Automaton | undefined}*/
+	let automatonElem;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -27,13 +29,11 @@
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
 
-	/**@type {(from:number|null, data:any)=>void}*/
-	let addNode;
-
 	function reset() {
 		stateStack.update(() => []);
 		stateSet.update(() => []);
 		svgLines?.hideLine();
+		automatonElem?.reset();
 
 		buildAutomaton();
 	}
@@ -72,7 +72,7 @@
 			await stateElem?.addItem(0, 0);
 
 			await closure();
-			addNode(null, 'ndj');
+			automatonElem?.addNode(null, 'ndj');
 			automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
 			let newStates = [automaton.states[0]];
 
@@ -112,7 +112,7 @@
 						return eq;
 					});
 					if (exists) continue;
-					addNode(newStates[i].index, 'ham');
+					automatonElem?.addNode(newStates[i].index, 'ham');
 					automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
 					temp.push(automaton.states[automaton.states.length - 1]);
 				}
@@ -130,7 +130,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit" style="padding: 0 5px;">
 	<div style="padding: 5px; padding-bottom: 0px;flex: 1; height: 100%;">
-		<Automaton bind:addNode></Automaton>
+		<Automaton bind:this={automatonElem}></Automaton>
 	</div>
 	<div style="flex: 0;">
 		<GrammarCard bind:loadGrammar></GrammarCard>
