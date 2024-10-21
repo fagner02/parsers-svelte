@@ -20,14 +20,14 @@
 	let stateStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let stateSet = writable([]);
-	let { nt, rules } = getGrammar();
-
+	let { t, nt, rules } = getGrammar();
+	let stateLabel = 'state 0';
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
 
-	/**@type {any}*/
+	/**@type {(from:number|null, data:any)=>void}*/
 	let addNode;
 
 	function reset() {
@@ -72,7 +72,53 @@
 			await stateElem?.addItem(0, 0);
 
 			await closure();
-			automaton.states.push($stateSet);
+			addNode(null, 'ndj');
+			automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
+			let newStates = [automaton.states[0]];
+
+			let i = 0;
+			while (newStates.length > 0) {
+				/** @type {import('@/types').State[]}*/
+				let temp = [];
+				for (let symbol of [...t, ...nt]) {
+					stateSet.update(() => []);
+					stateLabel = `state ${automaton.states.length}`;
+					for (let prod of newStates[i].items) {
+						if (
+							prod.pos >= rules[prod.ruleIndex].right.length ||
+							rules[prod.ruleIndex].right[prod.pos] !== symbol
+						)
+							continue;
+						if ($stateSet.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+							continue;
+						await stateElem?.addItem(prod.ruleIndex, prod.pos + 1);
+					}
+					await closure();
+					let exists = automaton.states.some((x) => {
+						if (x.items.length != $stateSet.length) return false;
+						let eq = true;
+						for (let k = 0; k < x.items.length; k++) {
+							let match = false;
+							for (let m = 0; m < $stateSet.length; m++) {
+								match =
+									match ||
+									(x.items[k].pos === $stateSet[m].pos &&
+										x.items[k].ruleIndex === $stateSet[m].ruleIndex);
+								if (match) break;
+							}
+							eq = match;
+							if (!eq) break;
+						}
+						return eq;
+					});
+					if (exists) continue;
+					addNode(newStates[i].index, 'ham');
+					automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
+					temp.push(automaton.states[automaton.states.length - 1]);
+				}
+				newStates = temp;
+			}
+			stateLabel = `state -`;
 		} catch {}
 	}
 
@@ -99,7 +145,7 @@
 		<StateCard
 			state={stateSet}
 			stateId={'state'}
-			label="state"
+			label={stateLabel}
 			hue={colors.pink}
 			bind:this={stateElem}
 		></StateCard>

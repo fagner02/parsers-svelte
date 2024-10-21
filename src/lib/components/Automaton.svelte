@@ -19,7 +19,7 @@
 		return res;
 	}
 
-	export function addNode() {
+	export function addNode(/** @type {number | null}*/ from, /** @type {any}*/ data) {
 		let size = 10 + Math.round(Math.random() * 50);
 		let res = createNode(nodes.length, size);
 
@@ -30,20 +30,19 @@
 			size,
 			con: []
 		});
-		if (nodes.length > 0) {
-			let con = Math.round(Math.random() * (nodes.length - 1));
-			nodes[nodes.length - 1].pos = { x: nodes[con].pos.x, y: nodes[con].pos.y };
-			nodes[con].con.push(nodes.length - 1);
+		if (from !== null) {
+			nodes[nodes.length - 1].pos = { x: nodes[from].pos.x, y: nodes[from].pos.y };
+			nodes[from].con.push(nodes.length - 1);
 
 			let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-			line.setAttribute('x1', `${nodes[con].pos.x}`);
-			line.setAttribute('y1', `${nodes[con].pos.y}`);
+			line.setAttribute('x1', `${nodes[from].pos.x}`);
+			line.setAttribute('y1', `${nodes[from].pos.y}`);
 			line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
 			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
 			line.setAttribute('stroke', 'black');
 			line.setAttribute('stroke-width', '4');
 			document.querySelector('#autsvg>g')?.prepend(line);
-			nodes[con].lines.push(line);
+			nodes[from].lines.push(line);
 		}
 
 		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
@@ -53,7 +52,6 @@
 		update();
 	}
 
-	let touchType = '';
 	let svgScale = 1;
 	let svgPos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
@@ -76,7 +74,7 @@
 		let g = /**@type {SVGGElement}*/ (document.querySelector('#autsvg>g'));
 		g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
-
+	let touchType = '';
 	let lastTouch = { x: 0, y: 0 };
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
@@ -228,7 +226,6 @@
 		height: 100%;
 		border-radius: 10px;
 		border: 1px solid hsl(200, 50%, 50%, 100%);
-		/* box-shadow: 0px 0px 5px inset hsl(0, 0%, 0%, 20%); */
 		cursor: move;
 	}
 	#autsvg > * {

@@ -54,6 +54,8 @@
 
 /** @typedef {{ruleIndex: number, pos: number, hide: boolean}} StateItem*/
 
-/** @typedef {{states: StateItem[][], transitions: Map<number, Map<string, number>>}} Automaton*/
+/** @typedef {{index: number,items: StateItem[]}} State*/
+
+/** @typedef {{states: State[], transitions: Map<number, Map<string, number>>}} Automaton*/
 
 export const unused = {};
