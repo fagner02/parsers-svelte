@@ -3,10 +3,9 @@
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
 	import { onMount } from 'svelte';
-	import { newRunningCall, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, newRunningCall, setResetCall, wait } from '$lib/flowControl';
 	import StateCard from './Cards/StateCard.svelte';
 	import { getGrammar } from '$lib/utils';
-	import anime from 'animejs';
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import { colors } from '$lib/selectSymbol';
 	import Automaton from './Automaton.svelte';
@@ -72,8 +71,10 @@
 			await stateElem?.addItem(0, 0);
 
 			await closure();
-			automatonElem?.addNode(null, 'ndj');
+
 			automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
+			automatonElem?.addNode(null, automaton.states[automaton.states.length - 1]);
+			await addPause();
 			let newStates = [automaton.states[0]];
 
 			let i = 0;
@@ -93,6 +94,7 @@
 							continue;
 						await stateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
+					if ($stateSet.length === 0) continue;
 					await closure();
 					let exists = automaton.states.some((x) => {
 						if (x.items.length != $stateSet.length) return false;
@@ -112,8 +114,9 @@
 						return eq;
 					});
 					if (exists) continue;
-					automatonElem?.addNode(newStates[i].index, 'ham');
 					automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
+					automatonElem?.addNode(newStates[i].index, automaton.states[automaton.states.length - 1]);
+					await addPause();
 					temp.push(automaton.states[automaton.states.length - 1]);
 				}
 				newStates = temp;
