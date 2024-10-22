@@ -81,7 +81,8 @@
 			nodes[from].lines.push(line);
 
 			let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			arrow.setAttribute('r', '10');
+			arrow.setAttribute('r', '5');
+			arrow.setAttribute('fill', 'hsl(200,50%,50%)');
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
 		}
@@ -230,9 +231,7 @@
 				if (angle <= h && angle >= -h) {
 					arrowPos.x = (diff.x < 0 ? 1 : -1) * nodes[c].size.x;
 					arrowPos.y = Math.tan(-angle) * Math.abs(arrowPos.x);
-					n.arrows[j].setAttribute('fill', 'blue');
 				} else {
-					n.arrows[j].setAttribute('fill', 'red');
 					arrowPos.y = (diff.y < 0 ? 1 : -1) * nodes[c].size.y;
 					arrowPos.x = (diff.x < 0 ? 1 : -1) * Math.abs(arrowPos.y / Math.tan(angle));
 				}
@@ -248,10 +247,20 @@
 					delay: 0,
 					easing: 'spring(1, 50, 10, 1)'
 				});
+				// let oldArrowPos = {
+				// 	x: parseFloat(n.arrows[j].getAttribute('cx') ?? '0'),
+				// 	y: parseFloat(n.arrows[j].getAttribute('cy') ?? '0')
+				// };
 				anime({
 					targets: n.arrows[j],
-					cx: [oldPos[i].x, nodes[c].pos.x + arrowPos.x],
-					cy: [oldPos[i].y, nodes[c].pos.y + arrowPos.y],
+					cx:
+						c === nodes.length - 1
+							? [oldPos[c].x, nodes[c].pos.x + arrowPos.x]
+							: nodes[c].pos.x + arrowPos.x,
+					cy:
+						c === nodes.length - 1
+							? [oldPos[c].y, nodes[c].pos.y + arrowPos.y]
+							: nodes[c].pos.y + arrowPos.y,
 					duration: 500,
 					direction: 'forward',
 					autoplay: true,
