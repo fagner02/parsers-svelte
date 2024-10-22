@@ -136,13 +136,13 @@
 
 		groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
-	let touchType = '';
+	let isScroll = false;
 	let lastTouch = { x: 0, y: 0 };
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
 		e.preventDefault();
 		if (e.touches.length > 1) {
-			touchType = 'pan';
+			isScroll = false;
 			let diff = {
 				x: e.touches[0].clientX - e.touches[1].clientX,
 				y: e.touches[0].clientY - e.touches[1].clientY
@@ -153,14 +153,14 @@
 				x: e.touches[0].clientX,
 				y: e.touches[0].clientY
 			};
-			touchType = 'scroll';
+			isScroll = true;
 		}
 		dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 	}
 	function touchMove(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
 		e.preventDefault();
-		if (touchType === 'scroll') {
+		if (isScroll) {
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
 			lastTouch = { x: diff.x, y: diff.y };
 			let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
@@ -179,9 +179,8 @@
 	}
 	function touchEnd(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
-		if (touchType === 'scroll') {
+		if (isScroll) {
 			svgPos = { x: svgPos.x + lastTouch.x, y: svgPos.y + lastTouch.y };
-		} else {
 		}
 		dragPos = null;
 		lastTouch = { x: 0, y: 0 };
