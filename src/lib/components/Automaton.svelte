@@ -7,7 +7,7 @@
 
 	/**@type {SVGGElement}*/
 	let groupElem;
-	/** @type {{ obj: SVGGElement; size: {x:number,y:number}; pos: { x: number; y: number; }; lines: SVGLineElement[]; con: number[]; }[]}*/
+	/** @type {{ obj: SVGGElement; size: {x:number,y:number}; pos: { x: number; y: number; }; lines: SVGLineElement[]; arrows: SVGElement[]; con: number[]; }[]}*/
 	let nodes = [];
 
 	export function reset() {
@@ -26,6 +26,7 @@
 		let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		let circle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
 		for (let [i, item] of data.items.entries()) {
 			let span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 			let right = `${rules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${rules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
@@ -60,6 +61,7 @@
 		nodes.push({
 			obj: res,
 			lines: [],
+			arrows: [],
 			pos: { x: 200, y: 200 },
 			size,
 			con: []
@@ -73,10 +75,15 @@
 			line.setAttribute('y1', `${nodes[from].pos.y}`);
 			line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
 			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
-			line.setAttribute('stroke', 'black');
+			line.setAttribute('stroke', 'hsl(0,0%,0%, 50%)');
 			line.setAttribute('stroke-width', '4');
 			groupElem.prepend(line);
 			nodes[from].lines.push(line);
+
+			let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			arrow.setAttribute('r', '10');
+			groupElem.append(arrow);
+			nodes[from].arrows.push(arrow);
 		}
 
 		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
@@ -215,12 +222,36 @@
 				easing: 'spring(1, 50, 10, 1)'
 			});
 			for (let [j, c] of n.con.entries()) {
+				let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
+				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+				let angle = Math.asin(diff.y / dist);
+				let h = Math.atan(nodes[c].size.y / nodes[c].size.x);
+				let arrowPos = { x: 0, y: 0 };
+				if (angle <= h && angle >= -h) {
+					arrowPos.x = (diff.x < 0 ? 1 : -1) * nodes[c].size.x;
+					arrowPos.y = Math.tan(-angle) * Math.abs(arrowPos.x);
+					n.arrows[j].setAttribute('fill', 'blue');
+				} else {
+					n.arrows[j].setAttribute('fill', 'red');
+					arrowPos.y = (diff.y < 0 ? 1 : -1) * nodes[c].size.y;
+					arrowPos.x = (diff.x < 0 ? 1 : -1) * Math.abs(arrowPos.y / Math.tan(angle));
+				}
 				anime({
 					targets: n.lines[j],
 					x1: [oldPos[i].x, n.pos.x],
 					y1: [oldPos[i].y, n.pos.y],
 					x2: [oldPos[c].x, nodes[c].pos.x],
 					y2: [oldPos[c].y, nodes[c].pos.y],
+					duration: 500,
+					direction: 'forward',
+					autoplay: true,
+					delay: 0,
+					easing: 'spring(1, 50, 10, 1)'
+				});
+				anime({
+					targets: n.arrows[j],
+					cx: [oldPos[i].x, nodes[c].pos.x + arrowPos.x],
+					cy: [oldPos[i].y, nodes[c].pos.y + arrowPos.y],
 					duration: 500,
 					direction: 'forward',
 					autoplay: true,
