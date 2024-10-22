@@ -73,56 +73,72 @@
 			await closure();
 
 			automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
-			automatonElem?.addNode(null, automaton.states[automaton.states.length - 1]);
+			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1]);
 			await addPause();
 			let newStates = [automaton.states[0]];
 
-			let i = 0;
 			while (newStates.length > 0) {
 				/** @type {import('@/types').State[]}*/
 				let temp = [];
-				for (let symbol of [...t, ...nt]) {
-					stateSet.update(() => []);
-					stateLabel = `state ${automaton.states.length}`;
-					for (let prod of newStates[i].items) {
-						if (
-							prod.pos >= rules[prod.ruleIndex].right.length ||
-							rules[prod.ruleIndex].right[prod.pos] !== symbol
-						)
-							continue;
-						if ($stateSet.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
-							continue;
-						await stateElem?.addItem(prod.ruleIndex, prod.pos + 1);
-					}
-					if ($stateSet.length === 0) continue;
-					await closure();
-					let exists = automaton.states.some((x) => {
-						if (x.items.length != $stateSet.length) return false;
-						let eq = true;
-						for (let k = 0; k < x.items.length; k++) {
-							let match = false;
-							for (let m = 0; m < $stateSet.length; m++) {
-								match =
-									match ||
-									(x.items[k].pos === $stateSet[m].pos &&
-										x.items[k].ruleIndex === $stateSet[m].ruleIndex);
-								if (match) break;
-							}
-							eq = match;
-							if (!eq) break;
+				for (let i = 0; i < newStates.length; i++) {
+					for (let symbol of [...t, ...nt]) {
+						stateSet.update(() => []);
+						stateLabel = `state ${automaton.states.length}`;
+						for (let prod of newStates[i].items) {
+							if (
+								prod.pos >= rules[prod.ruleIndex].right.length ||
+								rules[prod.ruleIndex].right[prod.pos] !== symbol
+							)
+								continue;
+							if ($stateSet.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+								continue;
+							await stateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 						}
-						return eq;
-					});
-					if (exists) continue;
-					automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
-					automatonElem?.addNode(newStates[i].index, automaton.states[automaton.states.length - 1]);
-					await addPause();
-					temp.push(automaton.states[automaton.states.length - 1]);
+						if ($stateSet.length === 0) continue;
+						await closure();
+						let existent = automaton.states.findIndex((x) => {
+							if (x.items.length != $stateSet.length) return false;
+							let eq = true;
+							for (let k = 0; k < x.items.length; k++) {
+								let match = false;
+								for (let m = 0; m < $stateSet.length; m++) {
+									match =
+										match ||
+										(x.items[k].pos === $stateSet[m].pos &&
+											x.items[k].ruleIndex === $stateSet[m].ruleIndex);
+									if (match) break;
+								}
+								eq = match;
+								if (!eq) break;
+							}
+							return eq;
+						});
+						if (existent === -1) {
+							automaton.states.push({ index: automaton.states.length, items: [...$stateSet] });
+							automatonElem?.addNode(
+								newStates[i].index,
+								automaton.states.length - 1,
+								automaton.states[automaton.states.length - 1]
+							);
+							temp.push(automaton.states[automaton.states.length - 1]);
+							await addPause();
+							continue;
+						}
+
+						automatonElem?.addNode(
+							newStates[i].index,
+							existent,
+							automaton.states[automaton.states.length - 1]
+						);
+						await addPause();
+					}
 				}
 				newStates = temp;
 			}
 			stateLabel = `state -`;
-		} catch {}
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	onMount(() => {

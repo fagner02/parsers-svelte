@@ -17,64 +17,88 @@
 		document.querySelector('#svg')?.append(groupElem);
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
-
+	/**
+	 * @type {SVGRectElement[]}
+	 */
+	let highlighted = [];
 	export async function addNode(
 		/** @type {number | null}*/ from,
+		/** @type {number}*/ to,
 		/** @type {import('@/types').State}*/ data
 	) {
-		console.log(from, data);
-		let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-		let circle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-
-		for (let [i, item] of data.items.entries()) {
-			let span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-			let right = `${rules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${rules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
-			span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
-			span.setAttribute('x', '0');
-			span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
-			span.setAttribute('alignment-baseline', 'before-edge');
-			text.append(span);
+		for (let item of highlighted) {
+			item.setAttribute('fill', 'hsl(0,0%,100%)');
 		}
+		highlighted = [];
+		if (to > nodes.length - 1) {
+			let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+			let circle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 
-		res.style.cursor = 'pointer';
-		res.style.pointerEvents = 'all';
-		res.append(circle);
-		res.append(text);
-		circle.setAttribute('fill', 'hsl(0,50%,100%)');
-		circle.setAttribute('stroke', 'hsl(0,0%,80%)');
+			for (let [i, item] of data.items.entries()) {
+				let span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+				let right = `${rules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${rules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
+				span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
+				span.setAttribute('x', '0');
+				span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
+				span.setAttribute('alignment-baseline', 'before-edge');
+				text.append(span);
+			}
 
-		groupElem.append(res);
-		let textBBox = text.getBBox();
-		let padding = 10;
-		let height = textBBox.height + padding;
-		let width = textBBox.width + padding * 2;
+			res.style.cursor = 'pointer';
+			res.style.pointerEvents = 'all';
+			res.append(circle);
+			res.append(text);
+			circle.setAttribute('fill', 'hsl(0,50%,100%)');
+			circle.setAttribute('stroke', 'hsl(0,0%,80%)');
 
-		circle.setAttribute('height', `${height}`);
-		circle.setAttribute('width', `${width}`);
-		circle.setAttribute('rx', '10');
-		circle.setAttribute('x', `${-width / 2}`);
-		circle.setAttribute('y', `${-height / 2}`);
-		text.setAttribute('transform', `translate(${-textBBox.width / 2}, 0)`);
-		text.setAttribute('y', `-${textBBox.height / 2}`);
-		let size = { x: width / 2, y: height / 2 };
-		nodes.push({
-			obj: res,
-			lines: [],
-			arrows: [],
-			pos: { x: 200, y: 200 },
-			size,
-			con: []
-		});
+			groupElem.append(res);
+			let textBBox = text.getBBox();
+			let padding = 10;
+			let height = textBBox.height + padding;
+			let width = textBBox.width + padding * 2;
+
+			circle.setAttribute('height', `${height}`);
+			circle.setAttribute('width', `${width}`);
+			circle.setAttribute('rx', '10');
+			circle.setAttribute('x', `${-width / 2}`);
+			circle.setAttribute('y', `${-height / 2}`);
+			text.setAttribute('transform', `translate(${-textBBox.width / 2}, 0)`);
+			text.setAttribute('y', `-${textBBox.height / 2}`);
+			let size = { x: width / 2, y: height / 2 };
+			nodes.push({
+				obj: res,
+				lines: [],
+				arrows: [],
+				pos: { x: 200, y: 200 },
+				size,
+				con: []
+			});
+			res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
+		}
 		if (from !== null) {
-			nodes[nodes.length - 1].pos = { x: nodes[from].pos.x, y: nodes[from].pos.y };
-			nodes[from].con.push(nodes.length - 1);
+			console.log(from, to, nodes.length);
+			/**@type {SVGRectElement}*/ (nodes[from].obj.firstChild)?.setAttribute(
+				'fill',
+				'hsl(200,50%,60%)'
+			);
+			/**@type {SVGRectElement}*/ (nodes[to].obj.firstChild)?.setAttribute(
+				'fill',
+				'hsl(200,50%,60%)'
+			);
+			highlighted.push(/**@type {SVGRectElement}*/ (nodes[from].obj.firstChild));
+			highlighted.push(/**@type {SVGRectElement}*/ (nodes[to].obj.firstChild));
+
+			if (to === nodes.length - 1) {
+				nodes[to].pos = { x: nodes[from].pos.x, y: nodes[from].pos.y };
+			}
+			nodes[from].con.push(to);
 
 			let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 			line.setAttribute('x1', `${nodes[from].pos.x}`);
 			line.setAttribute('y1', `${nodes[from].pos.y}`);
-			line.setAttribute('x2', `${nodes[nodes.length - 1].pos.x}`);
-			line.setAttribute('y2', `${nodes[nodes.length - 1].pos.y}`);
+			line.setAttribute('x2', `${nodes[to].pos.x}`);
+			line.setAttribute('y2', `${nodes[to].pos.y}`);
 			line.setAttribute('stroke', 'hsl(0,0%,0%, 50%)');
 			line.setAttribute('stroke-width', '4');
 			groupElem.prepend(line);
@@ -86,10 +110,9 @@
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
 		}
-
-		res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
-
-		update();
+		let ex =
+			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];
+		update(ex);
 	}
 
 	let svgScale = 1;
@@ -177,7 +200,7 @@
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
-	function update() {
+	function update(/**@type {number[]}*/ existent) {
 		let oldPos = [];
 		for (let k = 0; k < 4; k++) {
 			for (let [j, n] of nodes.entries()) {
@@ -239,8 +262,14 @@
 					targets: n.lines[j],
 					x1: [oldPos[i].x, n.pos.x],
 					y1: [oldPos[i].y, n.pos.y],
-					x2: [oldPos[c].x, nodes[c].pos.x],
-					y2: [oldPos[c].y, nodes[c].pos.y],
+					x2:
+						i === existent[0] && c === existent[1]
+							? [oldPos[i].x, nodes[c].pos.x]
+							: [oldPos[c].x, nodes[c].pos.x],
+					y2:
+						i === existent[0] && c === existent[1]
+							? [oldPos[i].y, nodes[c].pos.y]
+							: [oldPos[c].y, nodes[c].pos.y],
 					duration: 500,
 					direction: 'forward',
 					autoplay: true,
@@ -248,16 +277,24 @@
 					easing: 'spring(1, 50, 10, 1)'
 				});
 
+				let pos = {
+					x:
+						c === existent[1] && i === existent[0]
+							? [oldPos[i].x, nodes[c].pos.x + arrowPos.x]
+							: c === nodes.length - 1 && existent[0] === -1
+								? [oldPos[c].x, nodes[c].pos.x + arrowPos.x]
+								: nodes[c].pos.x + arrowPos.x,
+					y:
+						c === existent[1] && i === existent[0]
+							? [oldPos[i].y, nodes[c].pos.y + arrowPos.y]
+							: c === nodes.length - 1 && existent[0] === -1
+								? [oldPos[c].y, nodes[c].pos.y + arrowPos.y]
+								: nodes[c].pos.y + arrowPos.y
+				};
 				anime({
 					targets: n.arrows[j],
-					cx:
-						c === nodes.length - 1
-							? [oldPos[c].x, nodes[c].pos.x + arrowPos.x]
-							: nodes[c].pos.x + arrowPos.x,
-					cy:
-						c === nodes.length - 1
-							? [oldPos[c].y, nodes[c].pos.y + arrowPos.y]
-							: nodes[c].pos.y + arrowPos.y,
+					cx: pos.x,
+					cy: pos.y,
 					duration: 500,
 					direction: 'forward',
 					autoplay: true,
