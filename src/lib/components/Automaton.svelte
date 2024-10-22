@@ -63,6 +63,7 @@
 			}
 			res.setAttribute('nodeId', `${to}`);
 			res.addEventListener('click', (e) => {
+				if (!isClick) return;
 				e.stopImmediatePropagation();
 				resetSelected();
 
@@ -78,7 +79,6 @@
 			});
 
 			res.style.cursor = 'pointer';
-			// res.style.pointerEvents = 'all';
 			res.append(circle);
 			res.append(text);
 			circle.setAttribute('fill', 'hsl(0,50%,100%)');
@@ -142,6 +142,7 @@
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
 			let selectLine = (/**@type {MouseEvent}*/ e) => {
+				if (!isClick) return;
 				e.stopImmediatePropagation();
 				resetSelected();
 				let clone = nodes[from].obj.cloneNode(true);
@@ -152,8 +153,8 @@
 				selectGroupElem.append(clone);
 				/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
 
-				selectGroupElem.prepend(arrow.cloneNode(true));
 				selectGroupElem.prepend(line.cloneNode(true));
+				selectGroupElem.append(arrow.cloneNode(true));
 			};
 			arrow.addEventListener('click', selectLine);
 			line.addEventListener('click', selectLine);
