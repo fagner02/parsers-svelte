@@ -247,10 +247,7 @@
 					delay: 0,
 					easing: 'spring(1, 50, 10, 1)'
 				});
-				// let oldArrowPos = {
-				// 	x: parseFloat(n.arrows[j].getAttribute('cx') ?? '0'),
-				// 	y: parseFloat(n.arrows[j].getAttribute('cy') ?? '0')
-				// };
+
 				anime({
 					targets: n.arrows[j],
 					cx:
