@@ -167,7 +167,10 @@
 	let svgPos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
 	let dragPos = null;
+	let isClick = false;
 	function dragStart(/**@type {MouseEvent}*/ e) {
+		e.stopImmediatePropagation();
+		isClick = true;
 		dragPos = { x: e.clientX, y: e.clientY };
 	}
 
@@ -179,17 +182,20 @@
 	}
 
 	function dragMove(/**@type {MouseEvent}*/ e) {
+		e.stopImmediatePropagation();
 		if (dragPos === null) return;
+		isClick = false;
+
 		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
 
 		groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 		selectGroupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
+
 	let isScroll = false;
 	let lastTouch = { x: 0, y: 0 };
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
-		e.preventDefault();
 		if (e.touches.length > 1) {
 			isScroll = false;
 			let diff = {
@@ -208,7 +214,7 @@
 	}
 	function touchMove(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
-		e.preventDefault();
+
 		if (isScroll) {
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
 			lastTouch = { x: diff.x, y: diff.y };
@@ -361,6 +367,8 @@
 		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#nodes'));
 		selectGroupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#selected-node'));
 		document.querySelector('#svg')?.addEventListener('click', (e) => {
+			if (!isClick) return;
+			console.log('svg');
 			resetSelected(true);
 		});
 	});
