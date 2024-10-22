@@ -7,6 +7,8 @@
 
 	/**@type {SVGGElement}*/
 	let groupElem;
+	/**@type {SVGGElement}*/
+	let selectGroupElem;
 	/** @type {{ obj: SVGGElement; size: {x:number,y:number}; pos: { x: number; y: number; }; lines: SVGLineElement[]; arrows: SVGElement[]; con: number[]; }[]}*/
 	let nodes = [];
 
@@ -14,9 +16,23 @@
 		nodes = [];
 		groupElem.remove();
 		groupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		groupElem.id = 'nodes';
+		selectGroupElem.remove();
+		selectGroupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		selectGroupElem.id = 'selected-node';
 		document.querySelector('#svg')?.append(groupElem);
+		document.querySelector('#svg')?.append(selectGroupElem);
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
+
+	function resetSelected(hide = false) {
+		let temp = selectGroupElem.cloneNode(false);
+		selectGroupElem.replaceWith(temp);
+		selectGroupElem = /**@type {SVGGElement}*/ (temp);
+		groupElem.style.opacity = hide ? '1' : '0.5';
+		groupElem.style.filter = hide ? 'none' : 'blur(5px)';
+	}
+
 	/**
 	 * @type {SVGRectElement[]}
 	 */
@@ -26,6 +42,7 @@
 		/** @type {number}*/ to,
 		/** @type {import('@/types').State}*/ data
 	) {
+		resetSelected(true);
 		for (let item of highlighted) {
 			item.setAttribute('fill', 'hsl(0,0%,100%)');
 		}
@@ -44,9 +61,24 @@
 				span.setAttribute('alignment-baseline', 'before-edge');
 				text.append(span);
 			}
+			res.setAttribute('nodeId', `${to}`);
+			res.addEventListener('click', (e) => {
+				e.stopImmediatePropagation();
+				resetSelected();
+
+				let clone = res.cloneNode(true);
+				selectGroupElem.append(clone);
+				for (let [i, c] of nodes[to].con.entries()) {
+					selectGroupElem.prepend(nodes[to].arrows[i].cloneNode(true));
+					selectGroupElem.prepend(nodes[to].lines[i].cloneNode(true));
+					clone = nodes[c].obj.cloneNode(true);
+					/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
+					selectGroupElem.append(clone);
+				}
+			});
 
 			res.style.cursor = 'pointer';
-			res.style.pointerEvents = 'all';
+			// res.style.pointerEvents = 'all';
 			res.append(circle);
 			res.append(text);
 			circle.setAttribute('fill', 'hsl(0,50%,100%)');
@@ -100,7 +132,7 @@
 			line.setAttribute('x2', `${nodes[to].pos.x}`);
 			line.setAttribute('y2', `${nodes[to].pos.y}`);
 			line.setAttribute('stroke', 'hsl(0,0%,0%, 50%)');
-			line.setAttribute('stroke-width', '4');
+			line.setAttribute('stroke-width', '7');
 			groupElem.prepend(line);
 			nodes[from].lines.push(line);
 
@@ -109,6 +141,22 @@
 			arrow.setAttribute('fill', 'hsl(200,50%,50%)');
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
+			let selectLine = (/**@type {MouseEvent}*/ e) => {
+				e.stopImmediatePropagation();
+				resetSelected();
+				let clone = nodes[from].obj.cloneNode(true);
+				selectGroupElem.append(clone);
+				/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
+
+				clone = nodes[to].obj.cloneNode(true);
+				selectGroupElem.append(clone);
+				/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
+
+				selectGroupElem.prepend(arrow.cloneNode(true));
+				selectGroupElem.prepend(line.cloneNode(true));
+			};
+			arrow.addEventListener('click', selectLine);
+			line.addEventListener('click', selectLine);
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];
@@ -135,6 +183,7 @@
 		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
 
 		groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+		selectGroupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
 	}
 	let isScroll = false;
 	let lastTouch = { x: 0, y: 0 };
@@ -163,8 +212,10 @@
 		if (isScroll) {
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
 			lastTouch = { x: diff.x, y: diff.y };
-			let g = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
-			g.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+
+			groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+			selectGroupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+
 			return;
 		}
 		if (e.touches.length < 2) return;
@@ -176,6 +227,7 @@
 		svgScale += (dist - lastDist) * 0.001;
 		lastDist = dist;
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 	function touchEnd(/**@type {TouchEvent}*/ e) {
 		if (dragPos === null) return;
@@ -197,6 +249,7 @@
 		}
 
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
 	function update(/**@type {number[]}*/ existent) {
@@ -305,7 +358,11 @@
 	}
 
 	onMount(() => {
-		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>g'));
+		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#nodes'));
+		selectGroupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#selected-node'));
+		document.querySelector('#svg')?.addEventListener('click', (e) => {
+			resetSelected(true);
+		});
 	});
 </script>
 
@@ -322,7 +379,8 @@
 	on:wheel={wheel}
 	id="svg"
 >
-	<g></g>
+	<g id="nodes"></g>
+	<g id="selected-node"></g>
 </svg>
 
 <style>
@@ -332,8 +390,13 @@
 		border-radius: 10px;
 		border: 1px solid hsl(200, 50%, 50%, 100%);
 		cursor: move;
+		pointer-events: all;
 	}
-	#svg > * {
+	:global(#nodes > *) {
+		cursor: pointer;
+		user-select: none;
+	}
+	:global(#selected-node > *) {
 		pointer-events: none;
 		user-select: none;
 	}
