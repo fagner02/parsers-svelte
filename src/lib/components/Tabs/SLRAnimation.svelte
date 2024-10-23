@@ -1,8 +1,7 @@
 <script>
-	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { loadGrammar } from '$lib/utils';
 	import SLRAlgorithm from '@/SLRAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-	import { onMount } from 'svelte';
 
 	let code = '';
 	let inputString = '';
