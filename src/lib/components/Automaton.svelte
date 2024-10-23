@@ -33,20 +33,13 @@
 		groupElem.style.filter = hide ? 'none' : 'blur(5px)';
 	}
 
-	/**
-	 * @type {SVGRectElement[]}
-	 */
-	let highlighted = [];
 	export async function addNode(
 		/** @type {number | null}*/ from,
 		/** @type {number}*/ to,
 		/** @type {import('@/types').State}*/ data
 	) {
 		resetSelected(true);
-		for (let item of highlighted) {
-			item.setAttribute('fill', 'hsl(0,0%,100%)');
-		}
-		highlighted = [];
+
 		if (to > nodes.length - 1) {
 			let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 			let circle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -82,7 +75,7 @@
 			res.append(circle);
 			res.append(text);
 			circle.setAttribute('fill', 'hsl(0,50%,100%)');
-			circle.setAttribute('stroke', 'hsl(0,0%,80%)');
+			circle.setAttribute('stroke', 'hsl(200,50%,50%)');
 
 			groupElem.append(res);
 			let textBBox = text.getBBox();
@@ -109,18 +102,6 @@
 			res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
 		}
 		if (from !== null) {
-			console.log(from, to, nodes.length);
-			/**@type {SVGRectElement}*/ (nodes[from].obj.firstChild)?.setAttribute(
-				'fill',
-				'hsl(200,50%,60%)'
-			);
-			/**@type {SVGRectElement}*/ (nodes[to].obj.firstChild)?.setAttribute(
-				'fill',
-				'hsl(200,50%,60%)'
-			);
-			highlighted.push(/**@type {SVGRectElement}*/ (nodes[from].obj.firstChild));
-			highlighted.push(/**@type {SVGRectElement}*/ (nodes[to].obj.firstChild));
-
 			if (to === nodes.length - 1) {
 				nodes[to].pos = { x: nodes[from].pos.x, y: nodes[from].pos.y };
 			}
@@ -131,7 +112,7 @@
 			line.setAttribute('y1', `${nodes[from].pos.y}`);
 			line.setAttribute('x2', `${nodes[to].pos.x}`);
 			line.setAttribute('y2', `${nodes[to].pos.y}`);
-			line.setAttribute('stroke', 'hsl(0,0%,0%, 50%)');
+			line.setAttribute('stroke', 'hsl(0,0%,30%)');
 			line.setAttribute('stroke-width', '7');
 			groupElem.prepend(line);
 			nodes[from].lines.push(line);
