@@ -23,6 +23,7 @@
 		document.querySelector('#svg')?.append(groupElem);
 		document.querySelector('#svg')?.append(selectGroupElem);
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
 	function resetSelected(hide = false) {
@@ -42,7 +43,8 @@
 
 		if (to > nodes.length - 1) {
 			let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-			let circle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 			let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 
 			for (let [i, item] of data.items.entries()) {
@@ -51,9 +53,18 @@
 				span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
 				span.setAttribute('x', '0');
 				span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
-				span.setAttribute('alignment-baseline', 'before-edge');
 				text.append(span);
 			}
+			let titleBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			let titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			let title = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+			titleText.setAttribute('font-size', '0.85rem');
+			title.append(titleBox);
+			title.append(titleText);
+			titleText.textContent = `S${to}`;
+			container.append(title);
+			container.append(text);
 			res.setAttribute('nodeId', `${to}`);
 			res.addEventListener('click', (e) => {
 				if (!isClick) return;
@@ -72,24 +83,42 @@
 			});
 
 			res.style.cursor = 'pointer';
-			res.append(circle);
-			res.append(text);
-			circle.setAttribute('fill', 'hsl(0,50%,100%)');
-			circle.setAttribute('stroke', 'hsl(200,50%,50%)');
-
+			res.append(box);
+			res.append(container);
+			box.setAttribute('fill', 'hsl(0,50%,100%)');
+			box.setAttribute('stroke', 'hsl(200,50%,50%)');
 			groupElem.append(res);
-			let textBBox = text.getBBox();
-			let padding = 10;
-			let height = textBBox.height + padding;
-			let width = textBBox.width + padding * 2;
 
-			circle.setAttribute('height', `${height}`);
-			circle.setAttribute('width', `${width}`);
-			circle.setAttribute('rx', '10');
-			circle.setAttribute('x', `${-width / 2}`);
-			circle.setAttribute('y', `${-height / 2}`);
-			text.setAttribute('transform', `translate(${-textBBox.width / 2}, 0)`);
-			text.setAttribute('y', `-${textBBox.height / 2}`);
+			let titleTextBBox = titleText.getBBox();
+			let padding = 10;
+			let height = titleTextBBox.height;
+			let width = titleTextBBox.width + padding;
+			titleBox.setAttribute('height', `${height}`);
+			titleBox.setAttribute('width', `${width}`);
+			titleBox.setAttribute('rx', '5');
+			titleBox.setAttribute('fill', 'hsl(200,50%,50%)');
+			titleText.setAttribute('fill', 'hsl(0,0%,100%)');
+			titleText.setAttribute('x', `${width / 2}`);
+			titleText.setAttribute('y', `${height / 2}`);
+
+			titleText.style.alignmentBaseline = 'central';
+			titleText.style.textAnchor = 'middle';
+			text.setAttribute('transform', `translate(0, ${height})`);
+
+			let textBBox = container.getBBox();
+			padding = 20;
+			height = textBBox.height + padding;
+			width = textBBox.width + padding;
+
+			box.setAttribute('height', `${height}`);
+			box.setAttribute('width', `${width}`);
+			box.setAttribute('rx', '10');
+			box.setAttribute('x', `${-width / 2}`);
+			box.setAttribute('y', `${-height / 2}`);
+			container.setAttribute(
+				'transform',
+				`translate(${-textBBox.width / 2}, -${textBBox.height / 2})`
+			);
 			let size = { x: width / 2, y: height / 2 };
 			nodes.push({
 				obj: res,
@@ -118,7 +147,7 @@
 			nodes[from].lines.push(line);
 
 			let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			arrow.setAttribute('r', '5');
+			arrow.setAttribute('r', '7');
 			arrow.setAttribute('fill', 'hsl(200,50%,50%)');
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
@@ -175,7 +204,6 @@
 	}
 
 	let isScroll = false;
-	let lastTouch = { x: 0, y: 0 };
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
 		if (e.touches.length > 1) {
@@ -186,23 +214,19 @@
 			};
 			lastDist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
 		} else {
-			lastTouch = {
-				x: e.touches[0].clientX,
-				y: e.touches[0].clientY
-			};
 			isScroll = true;
+			dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 		}
-		dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 	}
 	function touchMove(/**@type {TouchEvent}*/ e) {
-		if (dragPos === null) return;
-
 		if (isScroll) {
+			if (dragPos === null) return;
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
-			lastTouch = { x: diff.x, y: diff.y };
-
-			groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
-			selectGroupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
+			dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+			svgPos.x += diff.x;
+			svgPos.y += diff.y;
+			groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+			selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 
 			return;
 		}
@@ -217,13 +241,8 @@
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
-	function touchEnd(/**@type {TouchEvent}*/ e) {
-		if (dragPos === null) return;
-		if (isScroll) {
-			svgPos = { x: svgPos.x + lastTouch.x, y: svgPos.y + lastTouch.y };
-		}
+	function touchEnd() {
 		dragPos = null;
-		lastTouch = { x: 0, y: 0 };
 	}
 
 	function wheel(/**@type {WheelEvent}*/ e) {
@@ -381,6 +400,9 @@
 		border: 1px solid hsl(200, 50%, 50%, 100%);
 		cursor: move;
 		pointer-events: all;
+	}
+	:global(text, tspan) {
+		alignment-baseline: before-edge;
 	}
 	:global(#nodes > *) {
 		cursor: pointer;
