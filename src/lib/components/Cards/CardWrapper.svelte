@@ -46,18 +46,23 @@
 	class="grid card-wrapper"
 	style="animation: rotA 0.5s;border: 1px solid hsl({$$props.hue}, 40%, 50%);"
 >
-	<div class="border-selection" id="select-{cardId}"></div>
-	<div
-		class="card"
-		id={$$props.id}
-		style="min-height: {$$props.minHeight}rem; min-width:{$$props.minWidth}rem;max-width: {$$props.maxWidth}rem; max-height: {$$props.maxHeight}rem;{$$props.transition
-			? `transition: ${$$props.transition}`
-			: ''};{$$props.style}"
-	>
-		<slot></slot>
-	</div>
-	<div class="card-label" style="background: hsl({$$props.hue},50%,50%);font-size: {fontSize}rem;">
-		{$$props.label}
+	<div class="border-selection unit" id="select-{cardId}"></div>
+	<div class="unit" style="display: flex;flex-direction: column;">
+		<div
+			class="card"
+			id={$$props.id}
+			style="min-height: {$$props.minHeight}rem; min-width:{$$props.minWidth}rem;max-width: {$$props.maxWidth}rem; max-height: {$$props.maxHeight}rem;{$$props.transition
+				? `transition: ${$$props.transition}`
+				: ''};{$$props.style}"
+		>
+			<slot></slot>
+		</div>
+		<div
+			class="card-label"
+			style="background: hsl({$$props.hue},50%,50%);font-size: {fontSize}rem;"
+		>
+			{$$props.label}
+		</div>
 	</div>
 </div>
 
@@ -80,11 +85,8 @@
 		width: max-content;
 		z-index: 0;
 	}
-	.border-selection {
-		grid-area: unit;
-	}
+
 	.card {
-		grid-area: unit;
 		height: fit-content;
 		background: white;
 		box-shadow: 0px 0px 5px 0px hsl(0, 0%, 0%, 30%);

@@ -34,7 +34,7 @@
 	id={'grammar'}
 	minHeight={lineHeight}
 	minWidth={charWidth}
-	label={'grammar'}
+	label={'gramática'}
 	hue={colors.blue}
 	cardId={'g'}
 >

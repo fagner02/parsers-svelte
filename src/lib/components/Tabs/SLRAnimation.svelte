@@ -1,5 +1,6 @@
 <script>
 	import { loadGrammar } from '$lib/utils';
+	import FillHeight from '@/Layout/FillHeight.svelte';
 	import SLRAlgorithm from '@/SLRAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
@@ -14,7 +15,7 @@
 <div></div>
 
 <AlgorithmTab {inputString} {code}>
-	<div slot="steps" style="max-width: inherit; width: 100%;">
+	<FillHeight slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			<button
 				on:click={() => {
@@ -27,10 +28,10 @@
 				}}>tabela</button
 			>
 		</div>
-		<div class="grid">
+		<FillHeight class="grid">
 			{#if selectedAlgorithm === 'automato'}
 				<SLRAlgorithm></SLRAlgorithm>
 			{/if}
-		</div>
-	</div>
+		</FillHeight>
+	</FillHeight>
 </AlgorithmTab>

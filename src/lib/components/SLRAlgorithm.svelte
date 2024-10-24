@@ -9,6 +9,7 @@
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import { colors } from '$lib/selectSymbol';
 	import Automaton from './Automaton.svelte';
+	import FillHeight from './Layout/FillHeight.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -19,6 +20,8 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
+	let tempStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let stateSet = writable([]);
 	let { t, nt, rules } = getGrammar();
@@ -147,27 +150,42 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit" style="padding: 0 5px;">
-	<div style="padding: 5px; padding-bottom: 0px;flex: 1; height: 100%;">
-		<Automaton bind:this={automatonElem}></Automaton>
-	</div>
-	<div style="flex: 0;">
+<div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
+	<div style="flex: 0;display:flex;align-items:flex-end;flex-wrap:wrap">
 		<GrammarCard bind:loadGrammar></GrammarCard>
+		<StateCard
+			state={stateSet}
+			stateId={'state'}
+			label={'estado origem'}
+			hue={colors.pink}
+			bind:this={stateElem}
+		></StateCard>
+		<StateCard
+			state={stateSet}
+			stateId={'state'}
+			label={'estado destino'}
+			hue={colors.pink}
+			bind:this={stateElem}
+		></StateCard>
 		<StackCard
-			stack={stateStack}
-			stackId="state"
-			label="state stack"
+			stack={tempStack}
+			stackId="temp"
+			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
 			bind:svgLines
 		></StackCard>
-		<StateCard
-			state={stateSet}
-			stateId={'state'}
-			label={stateLabel}
-			hue={colors.pink}
-			bind:this={stateElem}
-		></StateCard>
+		<StackCard
+			stack={stateStack}
+			stackId="state"
+			label="estados processados"
+			hue={colors.blue}
+			bind:this={stateStackElem}
+			bind:svgLines
+		></StackCard>
+	</div>
+	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
+		<Automaton bind:this={automatonElem}></Automaton>
 	</div>
 </div>
 

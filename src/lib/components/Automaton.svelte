@@ -53,6 +53,7 @@
 				span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
 				span.setAttribute('x', '0');
 				span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
+				span.setAttribute('alignment-baseline', 'before-edge');
 				text.append(span);
 			}
 			let titleBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -62,7 +63,7 @@
 			titleText.setAttribute('font-size', '0.85rem');
 			title.append(titleBox);
 			title.append(titleText);
-			titleText.textContent = `S${to}`;
+			titleText.textContent = `s${to}`;
 			container.append(title);
 			container.append(text);
 			res.setAttribute('nodeId', `${to}`);
@@ -174,7 +175,7 @@
 		update(ex);
 	}
 
-	let svgScale = 1;
+	let svgScale = 0.7;
 	let svgPos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
 	let dragPos = null;
@@ -367,6 +368,7 @@
 	onMount(() => {
 		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#nodes'));
 		selectGroupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#selected-node'));
+		reset();
 		document.querySelector('#svg')?.addEventListener('click', (e) => {
 			if (!isClick) return;
 			console.log('svg');
@@ -394,6 +396,7 @@
 
 <style>
 	#svg {
+		min-height: 240px;
 		width: 100%;
 		height: 100%;
 		border-radius: 10px;
@@ -401,9 +404,7 @@
 		cursor: move;
 		pointer-events: all;
 	}
-	:global(text, tspan) {
-		alignment-baseline: before-edge;
-	}
+
 	:global(#nodes > *) {
 		cursor: pointer;
 		user-select: none;

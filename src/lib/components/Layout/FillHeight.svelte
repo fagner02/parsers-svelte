@@ -21,9 +21,11 @@
 		gap = isNaN(gap) ? 0 : gap;
 		const height = /**@type {number}*/ (parent.clientHeight);
 		let deduct = 0;
+		console.log(parent.firstElementChild?.className);
 		if (
 			(map.display !== 'flex' || map.flexDirection.includes('column')) &&
-			!(/**@type {string}*/ (parent.firstElementChild?.className).includes('unit'))
+			typeof parent.firstElementChild?.className === 'string' &&
+			!parent.firstElementChild?.className?.includes('unit')
 		) {
 			for (let i = 0; i < parent.childElementCount; i++) {
 				if (parent.children[i].isSameNode(component)) {
