@@ -21,7 +21,7 @@
 		gap = isNaN(gap) ? 0 : gap;
 		const height = /**@type {number}*/ (parent.clientHeight);
 		let deduct = 0;
-		console.log(parent.firstElementChild?.className);
+
 		if (
 			(map.display !== 'flex' || map.flexDirection.includes('column')) &&
 			typeof parent.firstElementChild?.className === 'string' &&

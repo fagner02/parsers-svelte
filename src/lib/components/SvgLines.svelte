@@ -173,7 +173,7 @@
 	}
 
 	export async function hideLine() {
-		await wait(2000);
+		await wait(1500);
 		if (inter != null) {
 			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
 			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);

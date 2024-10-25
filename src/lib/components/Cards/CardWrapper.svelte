@@ -73,7 +73,6 @@
 		padding: 5px 10px;
 		margin: 5px;
 		color: white;
-		width: fit-content;
 	}
 
 	.card-wrapper {
@@ -96,7 +95,6 @@
 		transition: width 0.3s;
 		overflow: hidden;
 		width: fit-content;
-
 		transition:
 			max-width 0.5s,
 			max-height 0.5s;
