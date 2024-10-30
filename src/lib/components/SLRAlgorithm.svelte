@@ -28,7 +28,7 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let targetState = writable([]);
 	let { t, nt, rules } = getGrammar();
-	let stateLabel = 'state 0';
+
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
@@ -87,7 +87,7 @@
 			while (newStates.length > 0) {
 				for (let symbol of [...t, ...nt]) {
 					await targetStateElem?.resetState();
-					stateLabel = `state ${automaton.states.length}`;
+
 					for (let prod of newStates[0].items) {
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
@@ -138,7 +138,6 @@
 				}
 				newStates.shift();
 			}
-			stateLabel = `state -`;
 		} catch (e) {
 			console.log(e);
 		}
