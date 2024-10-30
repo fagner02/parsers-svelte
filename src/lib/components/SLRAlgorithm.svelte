@@ -87,7 +87,8 @@
 			while (newStates.length > 0) {
 				for (let symbol of [...t, ...nt]) {
 					await targetStateElem?.resetState();
-
+					await originStateElem?.resetState();
+					await originStateElem?.loadState(newStates[0]);
 					for (let prod of newStates[0].items) {
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||

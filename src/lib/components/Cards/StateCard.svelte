@@ -30,21 +30,32 @@
 		await wait(500);
 	}
 
-	export async function loadState(/**@type {import('@/types').State}*/ stateToLoad) {
+	/**
+	 * @param {import('@/types').State} stateToLoad
+	 */
+	export async function loadState(stateToLoad) {
 		state.update(() =>
 			stateToLoad.items.map((x) => {
-				return { ruleIndex: x.ruleIndex, pos: x.pos, hide: true };
+				return /**@type {import('@/types').StateItem}*/ ({
+					ruleIndex: x.ruleIndex,
+					pos: x.pos,
+					hide: true
+				});
 			})
 		);
 		await wait(0);
-		state.update((x) => {
-			x[x.length - 1].hide = false;
-			return x;
-		});
+		state.update((x) =>
+			x.map((i) => {
+				return { ruleIndex: i.ruleIndex, pos: i.pos, hide: false };
+			})
+		);
 		await wait(500);
 	}
 
 	export async function resetState() {
+		if ($state.length === 0) {
+			return;
+		}
 		container.style.maxHeight = `${container.scrollHeight}px`;
 		container.style.maxWidth = `${container.scrollWidth}px`;
 
