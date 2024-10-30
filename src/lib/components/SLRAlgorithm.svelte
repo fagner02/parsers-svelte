@@ -1,13 +1,13 @@
 <script>
 	import { writable } from 'svelte/store';
+	import { addPause, newRunningCall, setResetCall, wait } from '$lib/flowControl';
+	import { colors } from '$lib/selectSymbol';
+	import { getGrammar } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
-	import { onMount } from 'svelte';
-	import { addPause, newRunningCall, setResetCall, wait } from '$lib/flowControl';
 	import StateCard from './Cards/StateCard.svelte';
-	import { getGrammar } from '$lib/utils';
 	import GrammarCard from './Cards/GrammarCard.svelte';
-	import { colors } from '$lib/selectSymbol';
 	import Automaton from './Automaton.svelte';
 
 	/**@type {StackCard | undefined}*/
