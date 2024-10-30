@@ -11,8 +11,6 @@
 	let rules = getGrammar().rules;
 	/**@type {HTMLElement}*/
 	let container;
-	let maxHeight = -1;
-	let maxWidth = -1;
 
 	export let hue;
 	export let label;
@@ -47,17 +45,20 @@
 	}
 
 	export async function resetState() {
-		console.log(container);
-		maxHeight = container.scrollHeight;
-		maxWidth = container.scrollWidth;
+		container.style.maxHeight = `${container.scrollHeight}px`;
+		container.style.maxWidth = `${container.scrollWidth}px`;
+
 		await wait(0);
-		maxHeight = 0;
-		maxWidth = 0;
+		container.style.maxHeight = '0px';
+		container.style.maxWidth = '0px';
+		container.style.opacity = '0';
 
 		await wait(500);
 		state.update(() => []);
-		maxHeight = -1;
-		maxWidth = -1;
+
+		container.style.maxHeight = 'unset';
+		container.style.maxWidth = 'unset';
+		container.style.opacity = '1';
 	}
 
 	onMount(() => {
@@ -68,7 +69,7 @@
 <CardWrapper minWidth={charWidth} minHeight={lineHeight} {hue} {label} cardId={stateId}>
 	<div
 		id="s-container-{stateId}"
-		style="max-height: {maxHeight}px; max-width: {maxWidth};transition: max-height 0.5s;"
+		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
 		{#each $state as item}
 			<p

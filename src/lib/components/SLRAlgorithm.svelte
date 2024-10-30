@@ -36,7 +36,8 @@
 
 	function reset() {
 		stateStack.update(() => []);
-		originState.update(() => []);
+		originStateElem?.resetState();
+		targetStateElem?.resetState();
 		svgLines?.hideLine();
 		automatonElem?.reset();
 
@@ -45,7 +46,7 @@
 	setResetCall(reset);
 
 	async function closure() {
-		let itemsToCheck = [...$originState];
+		let itemsToCheck = [...$targetState];
 		while (itemsToCheck.length > 0) {
 			/**@type {import("@/types").StateItem[]}*/
 			let temp = [];
@@ -55,8 +56,8 @@
 
 				for (let rule of rules) {
 					if (!(rule.left === symbol)) continue;
-					if ($originState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
-					await originStateElem?.addItem(rule.index, 0);
+					if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
+					await targetStateElem?.addItem(rule.index, 0);
 					temp.push({ ruleIndex: rule.index, pos: 0, hide: true });
 				}
 			}
@@ -74,18 +75,18 @@
 			/**@type {import('@/types').Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
-			await originStateElem?.addItem(0, 0);
+			await targetStateElem?.addItem(0, 0);
 
 			await closure();
 
-			automaton.states.push({ index: automaton.states.length, items: [...$originState] });
+			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1]);
 			await addPause();
 			let newStates = [automaton.states[0]];
 
 			while (newStates.length > 0) {
 				for (let symbol of [...t, ...nt]) {
-					originStateElem?.resetState();
+					await targetStateElem?.resetState();
 					stateLabel = `state ${automaton.states.length}`;
 					for (let prod of newStates[0].items) {
 						if (
@@ -93,22 +94,22 @@
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
 						)
 							continue;
-						if ($originState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+						if ($targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
 							continue;
-						await originStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
+						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
-					if ($originState.length === 0) continue;
+					if ($targetState.length === 0) continue;
 					await closure();
 					let existent = automaton.states.findIndex((x) => {
-						if (x.items.length != $originState.length) return false;
+						if (x.items.length != $targetState.length) return false;
 						let eq = true;
 						for (let k = 0; k < x.items.length; k++) {
 							let match = false;
-							for (let m = 0; m < $originState.length; m++) {
+							for (let m = 0; m < $targetState.length; m++) {
 								match =
 									match ||
-									(x.items[k].pos === $originState[m].pos &&
-										x.items[k].ruleIndex === $originState[m].ruleIndex);
+									(x.items[k].pos === $targetState[m].pos &&
+										x.items[k].ruleIndex === $targetState[m].ruleIndex);
 								if (match) break;
 							}
 							eq = match;
@@ -117,7 +118,7 @@
 						return eq;
 					});
 					if (existent === -1) {
-						automaton.states.push({ index: automaton.states.length, items: [...$originState] });
+						automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 						automatonElem?.addNode(
 							newStates[0].index,
 							automaton.states.length - 1,
@@ -154,15 +155,15 @@
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<StateCard
 			state={targetState}
-			stateId={'origin'}
-			label={'estado origem'}
+			stateId={'destino'}
+			label={'estado destino'}
 			hue={colors.pink}
-			bind:this={originStateElem}
+			bind:this={targetStateElem}
 		></StateCard>
 		<StateCard
 			state={originState}
-			stateId={'target'}
-			label={'estado destino'}
+			stateId={'origem'}
+			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
 		></StateCard>
