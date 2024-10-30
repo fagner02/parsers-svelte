@@ -9,6 +9,8 @@
 	let groupElem;
 	/**@type {SVGGElement}*/
 	let selectGroupElem;
+	/**@type {SVGElement}*/
+	let svgElem;
 	/** @type {{ obj: SVGGElement; size: {x:number,y:number}; pos: { x: number; y: number; }; lines: SVGLineElement[]; arrows: SVGElement[]; con: number[]; }[]}*/
 	let nodes = [];
 
@@ -180,10 +182,13 @@
 	/**@type {{ x: number; y: number; } | null}*/
 	let dragPos = null;
 	let isClick = false;
+
 	function dragStart(/**@type {MouseEvent}*/ e) {
+		e.preventDefault();
 		e.stopImmediatePropagation();
 		isClick = true;
 		dragPos = { x: e.clientX, y: e.clientY };
+		svgElem.style.cursor = 'grabbing';
 	}
 
 	function dragEnd(/**@type {MouseEvent}*/ e) {
@@ -191,9 +196,11 @@
 		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
 		svgPos = { x: svgPos.x + diff.x, y: svgPos.y + diff.y };
 		dragPos = null;
+		svgElem.style.cursor = 'grab';
 	}
 
 	function dragMove(/**@type {MouseEvent}*/ e) {
+		e.preventDefault();
 		e.stopImmediatePropagation();
 		if (dragPos === null) return;
 		isClick = false;
@@ -207,6 +214,7 @@
 	let isScroll = false;
 	let lastDist = 0;
 	function touchStart(/**@type {TouchEvent}*/ e) {
+		e.preventDefault();
 		if (e.touches.length > 1) {
 			isScroll = false;
 			let diff = {
@@ -220,6 +228,7 @@
 		}
 	}
 	function touchMove(/**@type {TouchEvent}*/ e) {
+		e.preventDefault();
 		if (isScroll) {
 			if (dragPos === null) return;
 			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
@@ -366,6 +375,7 @@
 	}
 
 	onMount(() => {
+		svgElem = /**@type {SVGElement}*/ (document.querySelector('#svg'));
 		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#nodes'));
 		selectGroupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#selected-node'));
 		reset();
@@ -401,7 +411,7 @@
 		height: 100%;
 		border-radius: 10px;
 		border: 1px solid hsl(200, 50%, 50%, 100%);
-		cursor: move;
+		cursor: grab;
 		pointer-events: all;
 	}
 
