@@ -182,27 +182,23 @@
 		const { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
 		if (destPos === null || srcPos === null) return;
 
-		const linePath = [
-			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
-			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * d * dirx} ${srcPos.y + 30 * d * diry}, ${destPos.x - 30 * d * dirx} ${destPos.y - 30 * d * diry},  ${destPos.x} ${destPos.y}`
-		];
-		const arrowPath = [
-			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
-			`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
-		];
+		const linePath = `M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`;
+
+		const arrowPath = `M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`;
+
 		let animeParams = {
 			targets: line,
 			d: linePath,
-			duration: 500,
-			direction: 'reverse',
+			duration: 300,
+			direction: 'forward',
 			autoplay: true,
-			easing: 'easeInQuad'
+			easing: 'linear'
 		};
 
 		anime(animeParams);
 		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-		await wait(400);
+		await wait(200);
 		opacity = 0;
 		await wait(300);
 	}
