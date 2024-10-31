@@ -1,10 +1,9 @@
 <script>
-	import { onMount } from 'svelte';
-	import CardWrapper from './CardWrapper.svelte';
-	import { getGrammar } from '$lib/utils';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { getGrammar } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import { wait } from '$lib/flowControl';
-
+	import CardWrapper from './CardWrapper.svelte';
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>}*/
 	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */

@@ -12,8 +12,6 @@
 	loadGrammar(grammar);
 </script>
 
-<div></div>
-
 <AlgorithmTab {inputString} {code}>
 	<FillHeight slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
