@@ -1,5 +1,6 @@
 <script>
 	import { loadGrammar } from '$lib/utils';
+	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
 	import SLRAlgorithm from '@/SLRAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
@@ -17,11 +18,13 @@
 		<div class="algo-buttons">
 			<button
 				on:click={() => {
+					resetSelectionFunctions();
 					selectedAlgorithm = 'automato';
 				}}>autômato</button
 			>
 			<button
 				on:click={() => {
+					resetSelectionFunctions();
 					selectedAlgorithm = 'tabela';
 				}}>tabela</button
 			>

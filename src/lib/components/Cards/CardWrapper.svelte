@@ -24,7 +24,7 @@
 
 				selection.style.opacity = '1';
 				selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
-				selection.style.width = `${elemRect.width + 15}px`;
+				selection.style.width = `${elemRect.width + 17}px`;
 				selection.style.height = `${elemRect.height + 3}px`;
 				await wait(500);
 			} catch (e) {
@@ -46,7 +46,11 @@
 	class="grid card-wrapper"
 	style="animation: rotA 0.5s;border: 1px solid hsl({$$props.hue}, 40%, 50%);"
 >
-	<div class="border-selection unit" id="select-{cardId}"></div>
+	<div
+		class="border-selection unit"
+		id="select-{cardId}"
+		style="border-color: hsl({$$props.hue}, 40%, 45%);"
+	></div>
 	<div class="unit" style="display: flex;flex-direction: column;">
 		<div
 			class="card"
@@ -96,6 +100,9 @@
 		transition: width 0.3s;
 		overflow: hidden;
 		width: fit-content;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
 		transition:
 			max-width 0.5s,
 			max-height 0.5s;

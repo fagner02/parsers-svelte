@@ -12,7 +12,7 @@
 		newRunningCall,
 		currentlyRunning
 	} from '$lib/flowControl';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { getSelectionFunctions } from './Cards/selectionFunction';

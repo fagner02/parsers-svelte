@@ -56,6 +56,8 @@
 				span.setAttribute('x', '0');
 				span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
 				span.setAttribute('alignment-baseline', 'before-edge');
+				span.setAttribute('dominant-baseline', 'text-before-edge');
+				console.log(span);
 				text.append(span);
 			}
 			let titleBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -105,6 +107,7 @@
 			titleText.setAttribute('y', `${height / 2}`);
 
 			titleText.style.alignmentBaseline = 'central';
+			titleText.style.dominantBaseline = 'central';
 			titleText.style.textAnchor = 'middle';
 			text.setAttribute('transform', `translate(0, ${height})`);
 
@@ -381,7 +384,6 @@
 		reset();
 		document.querySelector('#svg')?.addEventListener('click', (e) => {
 			if (!isClick) return;
-			console.log('svg');
 			resetSelected(true);
 		});
 	});

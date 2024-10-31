@@ -9,6 +9,7 @@
 	import StateCard from './Cards/StateCard.svelte';
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import Automaton from './Automaton.svelte';
+	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -26,11 +27,32 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let targetState = writable([]);
 	let { t, nt, rules } = getGrammar();
+	let alphabet = [...t.filter((x) => x !== '$'), ...nt];
+
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
+	let symbolList = writable(
+		alphabet.map((x) => ({
+			opacity: 1,
+			height: -1,
+			width: -1,
+			top: 0,
+			data: x,
+			text: x,
+			note: '',
+			transition: '',
+			id: x,
+			showBlock: true
+		}))
+	);
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let symbolsSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let stateSelection;
 
 	function reset() {
 		stateStack.update(() => []);
@@ -38,6 +60,8 @@
 		targetStateElem?.resetState();
 		svgLines?.hideLine();
 		automatonElem?.reset();
+		symbolsSelection.hideSelect();
+		stateSelection.hideSelect();
 
 		buildAutomaton();
 	}
@@ -86,10 +110,12 @@
 			while ($stateStack.length > 0) {
 				await originStateElem?.resetState();
 				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
-				for (let symbol of [...t, ...nt]) {
+				for (let [symbolIndex, symbol] of alphabet.entries()) {
+					await symbolsSelection.selectFor(`stack-symbolList-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
-					for (let prod of automaton.states[stateStackElem?.first()].items) {
+					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
+						await stateSelection.selectFor(`state-origem-${prodIndex}`);
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
@@ -99,6 +125,7 @@
 							continue;
 						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
+					await stateSelection.hideSelect();
 					if ($targetState.length === 0) continue;
 					await closure();
 					let existent = automaton.states.findIndex((x) => {
@@ -152,6 +179,8 @@
 	}
 
 	onMount(() => {
+		symbolsSelection = getSelectionFunctions('symbolList');
+		stateSelection = getSelectionFunctions('origem');
 		buildAutomaton();
 	});
 </script>
@@ -180,6 +209,14 @@
 			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
+			bind:svgLines
+		></StackCard>
+		<StackCard
+			stack={symbolList}
+			stackId="symbolList"
+			label="alfabeto"
+			hue={colors.green}
+			reversed={false}
 			bind:svgLines
 		></StackCard>
 	</div>

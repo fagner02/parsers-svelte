@@ -13,3 +13,7 @@ export function setSelectionFunctions(
 ) {
 	selectionFunctions.set(cardId, functions);
 }
+
+export function resetSelectionFunctions() {
+	selectionFunctions.clear();
+}

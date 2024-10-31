@@ -86,8 +86,9 @@
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
-		{#each $state as item}
+		{#each $state as item, index}
 			<p
+				id="state-{stateId}-{index}"
 				style="opacity: {item.hide ? 0 : 1};font-size: {fontSize}rem; width: {item.hide
 					? 0
 					: subCharWidth +

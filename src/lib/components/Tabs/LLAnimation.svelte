@@ -11,6 +11,7 @@
 	import { writable } from 'svelte/store';
 	import SyntaxTree from '../SyntaxTree.svelte';
 	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -121,16 +122,19 @@
 		<div class="algo-buttons">
 			<button
 				on:click={() => {
+					resetSelectionFunctions();
 					selectedAlgorithm = 'first';
 				}}>first</button
 			>
 			<button
 				on:click={async () => {
+					resetSelectionFunctions();
 					selectedAlgorithm = 'follow';
 				}}>follow</button
 			>
 			<button
 				on:click={() => {
+					resetSelectionFunctions();
 					selectedAlgorithm = 'table';
 				}}>table</button
 			>

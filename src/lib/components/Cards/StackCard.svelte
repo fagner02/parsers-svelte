@@ -9,6 +9,8 @@
 	export let stack;
 	export let label;
 	export let hue;
+	export let highlighted = true;
+	export let reversed = true;
 	/** @type {string} */
 	export let stackId;
 	/** @type {import('@/SvgLines.svelte').default | undefined} */
@@ -49,7 +51,7 @@
 			await wait(10);
 
 			if (srcId) {
-				await svgLines?.showLine(/**@type {string}*/ (srcId), `#s-${stackId}-0`);
+				await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`);
 			}
 
 			stack.update((x) => {
@@ -134,10 +136,10 @@
 </script>
 
 <CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
-	{#each [...$stack].reverse() as stackItem, index (`${stackId}-${stackItem.id}`)}
+	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
-			id="s-{stackId}-{index}"
-			class={stackItem.showBlock ? 'block' : ''}
+			id="stack-{stackId}-{index}"
+			class={highlighted && stackItem.showBlock ? 'block' : ''}
 			style="--block-hue: {hue};transition: {stackItem.transition};height: {stackItem.height}rem;width: {stackItem.width}rem;opacity: {stackItem.opacity}; top: {stackItem.top}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px;"
 		>
 			{stackItem.text}<span
