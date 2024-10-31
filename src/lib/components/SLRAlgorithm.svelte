@@ -21,8 +21,6 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let tempStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
@@ -82,14 +80,16 @@
 			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1]);
 			await addPause();
-			let newStates = [automaton.states[0]];
 
-			while (newStates.length > 0) {
+			await stateStackElem?.addToStack(0, 's0', '', '0', `label-${targetStateElem?.getId()}`);
+
+			while ($stateStack.length > 0) {
+				await originStateElem?.resetState();
+				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
 				for (let symbol of [...t, ...nt]) {
 					await targetStateElem?.resetState();
-					await originStateElem?.resetState();
-					await originStateElem?.loadState(newStates[0]);
-					for (let prod of newStates[0].items) {
+
+					for (let prod of automaton.states[stateStackElem?.first()].items) {
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
@@ -121,23 +121,30 @@
 					if (existent === -1) {
 						automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 						automatonElem?.addNode(
-							newStates[0].index,
+							stateStackElem?.first(),
 							automaton.states.length - 1,
 							automaton.states[automaton.states.length - 1]
 						);
-						newStates.push(automaton.states[automaton.states.length - 1]);
+						await stateStackElem?.addToStack(
+							automaton.states.length - 1,
+							`s${automaton.states.length - 1}`,
+							'',
+							`${automaton.states.length - 1}`,
+							`label-${targetStateElem?.getId()}`
+						);
 						await addPause();
 						continue;
 					}
 
 					automatonElem?.addNode(
-						newStates[0].index,
+						stateStackElem?.first(),
 						existent,
 						automaton.states[automaton.states.length - 1]
 					);
 					await addPause();
 				}
-				newStates.shift();
+
+				await stateStackElem?.removeFromStack(0);
 			}
 		} catch (e) {
 			console.log(e);
@@ -168,7 +175,7 @@
 			bind:this={originStateElem}
 		></StateCard>
 		<StackCard
-			stack={tempStack}
+			stack={stateStack}
 			stackId="temp"
 			label="estados novos"
 			hue={colors.blue}

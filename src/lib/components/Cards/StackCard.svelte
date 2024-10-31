@@ -102,6 +102,14 @@
 		} catch (e) {}
 	}
 
+	export function top() {
+		return $stack[$stack.length - 1].data;
+	}
+
+	export function first() {
+		return $stack[0].data;
+	}
+
 	/**
 	 * @param {number} index
 	 */
@@ -118,7 +126,9 @@
 				return x;
 			});
 			await wait(1000);
-			stack.update((x) => x.splice(0, index));
+			stack.update((x) => {
+				return [...x.slice(0, index), ...x.slice(index + 1)];
+			});
 		} catch (e) {}
 	}
 </script>

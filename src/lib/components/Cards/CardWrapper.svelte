@@ -59,6 +59,7 @@
 		</div>
 		<div
 			class="card-label"
+			id="label-{cardId}"
 			style="background: hsl({$$props.hue},50%,50%);font-size: {fontSize}rem;"
 		>
 			{$$props.label}

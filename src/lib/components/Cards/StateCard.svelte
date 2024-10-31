@@ -14,6 +14,7 @@
 
 	export let hue;
 	export let label;
+	/** @type {string}*/
 	export let stateId;
 
 	/**
@@ -72,6 +73,10 @@
 		container.style.opacity = '1';
 	}
 
+	export function getId() {
+		return stateId;
+	}
+
 	onMount(() => {
 		container = /**@type {HTMLElement}*/ (document.querySelector(`#s-container-${stateId}`));
 	});
@@ -100,8 +105,9 @@
 					{#if item.pos === index}
 						<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>{/if}<span
 						>{symbol}</span
-					>
-				{/each}
+					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}
+					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>
+				{/if}
 			</p>
 		{/each}
 	</div>
