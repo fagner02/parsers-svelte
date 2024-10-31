@@ -119,6 +119,7 @@
 			width 0.5s,
 			height 0.5s,
 			opacity 0.5s 0.3s;
+		white-space: nowrap;
 	}
 	p > span {
 		padding-right: 0.2rem;

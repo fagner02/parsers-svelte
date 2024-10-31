@@ -71,6 +71,9 @@
 			max-height 0.5s;
 		overflow: hidden;
 	}
+	p {
+		white-space: nowrap;
+	}
 	div > p > span {
 		margin: 0px 4px;
 	}

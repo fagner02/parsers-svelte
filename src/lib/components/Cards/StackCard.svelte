@@ -158,5 +158,6 @@
 			height 0.5s,
 			width 0.5s,
 			opacity 0.5s 0.5s;
+		white-space: nowrap;
 	}
 </style>

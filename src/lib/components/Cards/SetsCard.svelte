@@ -260,5 +260,6 @@
 	p {
 		padding: 0px;
 		display: flex;
+		white-space: nowrap;
 	}
 </style>
