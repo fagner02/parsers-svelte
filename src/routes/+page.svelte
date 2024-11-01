@@ -3,10 +3,11 @@
 	import FillHeight from '@/Layout/FillHeight.svelte';
 	import Header from '@/Layout/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
-	import { StatusBar, Style } from '@capacitor/status-bar';
-	if (getPlatform() === platforms.mobile) {
-		StatusBar.setStyle({ style: Style.Light });
-	}
+	import { AndroidFullScreen } from '@awesome-cordova-plugins/android-full-screen';
+	AndroidFullScreen.isImmersiveModeSupported()
+		.then(() => AndroidFullScreen.immersiveMode())
+		.catch(console.warn);
+
 	const getLtik = () => {
 		const searchParams = new URLSearchParams(window.location.search);
 		const ltik = searchParams.get('ltik');
