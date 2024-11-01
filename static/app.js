@@ -1,18 +1,29 @@
-// import { appWindow } from '@tauri-apps/api/window';
+/** @param {number} ms */
+async function wait(ms) {
+	return new Promise((resolve, _) => {
+		setTimeout(resolve, ms);
+	});
+}
+const font = new FontFace('spacemono', 'url(/fonts/SpaceMono-Regular.ttf)');
+document.fonts.add(font);
+font.load();
+window.onload = async (_) => {
+	let div = document.querySelector("div[name='discard']");
+	if (div === null) return;
 
-// document.getElementById('titlebar-minimize')?.addEventListener('click', () => appWindow.minimize());
-// document
-// 	.getElementById('titlebar-maximize')
-// 	?.addEventListener('click', () => appWindow.toggleMaximize());
-// document.getElementById('titlebar-close')?.addEventListener('click', () => appWindow.close());
-window.onload = (_) => {
-	const divs = document.getElementsByTagName('div');
-	for (let div of divs) {
-		if (div.attributes.getNamedItem('name')?.value === 'discard') {
+	while (true) {
+		if (
+			document.head.querySelectorAll('link').length > 1 ||
+			document.head.querySelectorAll('style').length > 1
+		) {
+			await wait(100);
 			div.style.opacity = '0';
 			div.style.transform = 'translate(0px, -20px)';
-			setTimeout(() => div.remove(), 1000);
-			break;
+			await wait(1000);
+			div.remove();
+			return;
 		}
+
+		await wait(100);
 	}
 };

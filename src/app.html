@@ -8,18 +8,6 @@
 		<script src="app.js"></script>
 	</head>
 	<body data-sveltekit-preload-data="hover" class="grid">
-		<!-- <div data-tauri-drag-region class="titlebar">
-			<div class="titlebar-button" id="titlebar-minimize">
-				<img src="minus.svg" alt="minimize" />
-			</div>
-			<div class="titlebar-button" id="titlebar-maximize">
-				<img src="square.svg" alt="maximize" />
-			</div>
-			<div class="titlebar-button" id="titlebar-close">
-				<img src="square-x.svg" alt="close" />
-			</div>
-		</div> -->
-
 		<div
 			name="discard"
 			style="
@@ -37,7 +25,7 @@
 		</div>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
-	<style name="discard">
+	<style>
 		html,
 		body,
 		div[name='discard'],
@@ -53,6 +41,8 @@
 		}
 		div[name='discard'] {
 			pointer-events: none;
+			background: white;
+			z-index: 2;
 		}
 		div[name='discard'],
 		#app {
@@ -75,7 +65,7 @@
 			color: hsl(200, 50%, 50%);
 			font-size: 20pt;
 			line-height: 18pt;
-			font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+			font-family: monospace;
 			margin: 8px 5px;
 			font-weight: normal;
 			text-transform: uppercase;
