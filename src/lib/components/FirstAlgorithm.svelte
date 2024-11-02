@@ -192,12 +192,10 @@
 			console.log(e);
 		}
 	}
-	/** @type {string} */
-	let pseudoCode;
 
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
-		pseudoCode = await (await fetch('src/lib/first.txt')).text();
+		let pseudoCode = await (await fetch('./first.txt')).text();
 		codeCard.setPseudoCode(pseudoCode);
 		first();
 	});
