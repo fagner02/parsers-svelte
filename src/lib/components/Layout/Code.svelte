@@ -31,7 +31,7 @@
 		line-height: 15px;
 	}
 
-	:global(code, code span) {
+	:global(#pre-code > code, #pre-code > code span) {
 		position: relative;
 		animation: rotA 0.5s;
 		font-family: monospace !important;

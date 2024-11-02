@@ -14,7 +14,8 @@ html {
 	min-width: fit-content;
 }
 
-body {
+body,
+pre {
 	margin: 0;
 }
 

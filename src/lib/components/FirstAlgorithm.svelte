@@ -12,11 +12,12 @@
 		newRunningCall,
 		currentlyRunning
 	} from '$lib/flowControl';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
+	import PseudoCode from './PseudoCode.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;
@@ -28,6 +29,8 @@
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
+	/**@type {PseudoCode}*/
+	let codeCard;
 
 	/**@type {string}*/
 	export let instruction;
@@ -71,6 +74,7 @@
 			const nullable = calcNullable(rules);
 
 			instruction = 'Since this thing is like that we have add to the stack';
+			codeCard.highlightLines([0, 1, 2]);
 			for (let i = 0; i < rules.length; i++) {
 				if (currentlyRunning !== id) return;
 				await grammarFuncs?.selectFor(`gset${i}`);
@@ -78,6 +82,7 @@
 				await selectLSymbol('g', i, colors.blue);
 				if (currentlyRunning !== id) return;
 				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
+				codeCard.highlightLines([4, 5, 6]);
 				let isNull = true;
 				for (let j = 0; j < rules[i].right.length; j++) {
 					let symbol = rules[i].right[j];
@@ -187,15 +192,20 @@
 			console.log(e);
 		}
 	}
+	/** @type {string} */
+	let pseudoCode;
 
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
+		pseudoCode = await (await fetch('src/lib/first.txt')).text();
+		codeCard.setPseudoCode(pseudoCode);
 		first();
 	});
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
+	<PseudoCode bind:this={codeCard}></PseudoCode>
 	<GrammarCard bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="first"
@@ -224,3 +234,6 @@
 		bind:svgLines
 	></StackCard>
 </div>
+
+<style>
+</style>

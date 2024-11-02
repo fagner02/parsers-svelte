@@ -1,0 +1,33 @@
+<span><b>união</b> &lt;- {}</span>
+<span><b>first</b> &lt;- {}</span>
+<span>para cada produção <b><b>p</b></b> da forma A -&gt; X<sub>1</sub>,X<sub>2</sub>...X<sub>n</sub> da gramática:</span>
+<span>    <b>first</b>(<b>p</b>) &lt;- {}</span>
+<span>    <b>nulo</b> &lt;- verdadeiro</span>
+<span>    para cada símbolo <b>X<sub>k</sub></b> na direita da produção <b>p</b>:</span>
+<span>        se <b>X<sub>k</sub></b> pertence aos não-terminais:</span>
+<span>            para cada regra <b>r</b> da forma <b>X<sub>k</sub></b> -&gt; &alpha;</span>
+<span>            adiciona <b>r</b> a <b>união</b>(<b>p</b>)</span>
+<span>        caso contrário:</span>
+<span>            adiciona <b>X<sub>k</sub></b> a <b>first</b>(<b>p</b>)</span>
+<span>        se <b>X<sub>k</sub></b> não produz &epsilon;:</span>
+<span>            <b>nulo</b> = falso</span>
+<span>            para</span>
+<span>    se <b>nulo</b> é verdadeiro:</span>
+<span>        adiciona &epsilon; a <b>first</b>(<b>p</b>)</span>
+<span></span>
+<span>para cada chave <b>k</b> de <b>união</b>:</span>
+<span>    se tamanho <b>união</b>(<b>k</b>) é vazio:</span>
+<span>        continua para próxima iteração</span>
+<span>    pilha <b>s</b></span>
+<span>    adiciona <b>k</b> ao topo de <b>s</b></span>
+<span>    enquanto tamanho de <b>s</b> &gt; 0:</span>
+<span>        <b>topo</b> &lt;- topo de <b>s</b></span>
+<span>        <b>primeiro</b> &lt;- primeiro elemento de <b>união</b>(<b>topo</b>)</span>
+<span>        se <b>união</b>(<b>primeiro</b>) não é vazio:</span>
+<span>            adiciona <b>primeiro</b> ao topo de <b>s</b></span>
+<span>            continua para a próxima iteração</span>
+<span>        para cada item <b>f</b> de <b>first</b>(<b>primeiro</b>):</span>
+<span>            adiciona <b>f</b> a <b>first</b>(<b>topo</b>)</span>
+<span>        remove <b>primeiro</b> de <b>união</b>(<b>topo</b>)</span>
+<span>        se <b>união</b>(<b>topo</b>) é vazio:</span>
+<span>            remove o topo de <b>s</b></span>
