@@ -1,4 +1,5 @@
 <script>
+	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 
 	/**@type {number[]}*/
@@ -11,7 +12,7 @@
 	/**
 	 * @param {number[]} lines
 	 */
-	export function highlightLines(lines) {
+	export async function highlightLines(lines) {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
 		}
@@ -20,6 +21,7 @@
 		for (let line of lines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,50%,80%)';
 		}
+		await wait(500);
 	}
 
 	let pcCardPos = { x: 0, y: 0 };
@@ -115,6 +117,7 @@
 	.pseudo-code-card {
 		resize: both;
 		overflow: auto;
+		cursor: grab;
 		position: absolute;
 		padding: 5px;
 		margin: 5px;
@@ -122,6 +125,8 @@
 		border-radius: 10px;
 		background: white;
 		z-index: 1;
+		height: 100px;
+		width: 100px;
 		min-height: 50px;
 		min-width: 50px;
 		top: 0;
