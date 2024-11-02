@@ -1,69 +1,73 @@
-let a = 9;
-while (true) {
-    cut();
-}
-async function firstAlg() {
-    try {
-        await wait(100);
-        await loadGrammar();
-        await addPause();
+export function first(
+	/** @type {Array<import('@/types').GrammarItem>} */ rules,
+	/** @type {string[]} */ nt
+) {
+	/** @type {Map<number, Set<string>>} */
+	let firstSet = new Map();
+	/** @type {Map<number, Set<number>>}*/
+	let joinSet = new Map();
+	/** @type {Map<string, boolean>}*/
+	let nullable = calcNullable(rules);
 
-        await addProdToStacks($rules[0].left);
+	for (let i = 0; i < rules.length; i++) {
+		firstSet.set(i, new Set());
+		let isNull = true;
+		for (let j = 0; j < rules[i].right.length; j++) {
+			let symbol = rules[i].right[j];
+			if (nt.includes(symbol)) {
+				if (!joinSet.has(i)) {
+					joinSet.set(i, new Set());
+				}
+				const matchingRules = rules.filter((x) => x.left === symbol);
+				for (let rule of matchingRules) {
+					joinSet.get(i)?.add(rule.index);
+				}
+			} else {
+				firstSet.get(i)?.add(symbol);
+			}
+			if (!(nullable.get(symbol) ?? false)) {
+				isNull = false;
+				break;
+			}
+		}
+		if (isNull) {
+			firstSet.get(i)?.add('');
+		}
+	}
 
-        while ($symbolStack.length > 0) {
-            if ($posStack[$posStack.length - 1].data == -1) {
-                await selectLSymbol('g', $symbolStack[$symbolStack.length - 1].data, 'blue', false);
-            }
-            if (!firstIndexes.has($rules[$symbolStack[$symbolStack.length - 1].data]?.left)) {
-                await firstSet.addSetRow(
-                    $symbolStack[$symbolStack.length - 1].data,
-                    $symbolStack[$symbolStack.length - 1].text
-                );
-            }
+	for (let item of joinSet.keys()) {
+		if (joinSet.get(item)?.size === 0) {
+			continue;
+		}
+		/** @type {Array<number>} */
+		let joinStack = [item];
 
-            while (true) {
-                let symbol = await nextProdSymbol($symbolStack[$symbolStack.length - 1].data);
+		while (joinStack.length > 0) {
+			const topKey = joinStack[joinStack.length - 1];
+			const top = /**@type {Set<number>}*/ (joinSet.get(topKey));
 
-                if (symbol === null) {
-                    await posStackElement.removeFromStack($posStack.length - 1);
+			const topValue = /**@type {number}*/ (top?.values().next().value);
 
-                    let topRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-                    await symbolStackElement.removeFromStack($symbolStack.length - 1);
-                    await wait(1000);
-                    if ($symbolStack.length > 0) {
-                        let lastRule = $rules[$symbolStack[$symbolStack.length - 1].data];
-                        await firstSet.joinSets(
-                            $first[firstIndexes.get(topRule.left)].right,
-                            firstIndexes.get(lastRule.left)
-                        );
-                    }
-                    if ($symbolStack.length == 0) {
-                        for (let i0 = 0; i0 < nt.length; i0++) {
-                            if (!firstIndexes.has(nt[i0])) {
-                                await addProdToStacks(nt[i0]);
-                            }
-                        }
-                    }
-                    break;
-                }
-                if (nt.includes(symbol)) {
-                    if (firstIndexes.has(symbol)) {
-                        await firstSet.joinSets(
-                            $first[firstIndexes.get(symbol)].right,
-                            firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left)
-                        );
-                    } else {
-                        await wait(1000);
-                        await addProdToStacks(symbol);
-                        break;
-                    }
-                } else {
-                    let index = firstIndexes.get($rules[$symbolStack[$symbolStack.length - 1].data].left);
-                    await firstSet.joinSets([symbol], index);
-                }
-            }
-        }
-        limitHit();
-        addPause();
-    } catch {}
+			let nextSet = joinSet.get(topValue);
+			if (nextSet !== undefined && !(nextSet.size === 0)) {
+				joinStack.push(topValue);
+				continue;
+			}
+			const _firstSet = firstSet.get(topKey);
+			const setToJoin = /**@type {Set<String>}*/ (firstSet.get(topValue));
+			for (let item of setToJoin) {
+				if (item != '') {
+					_firstSet?.add(item);
+				}
+			}
+
+			top.delete(topValue);
+
+			if (top.size === 0) {
+				joinStack.pop();
+			}
+		}
+	}
+
+	return firstSet;
 }
