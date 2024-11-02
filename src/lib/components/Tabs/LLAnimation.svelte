@@ -34,7 +34,7 @@
 
 	let code = '';
 	onMount(async () => {
-		code = await (await fetch('src/lib/first.js')).text();
+		code = await (await fetch('./first.js')).text();
 		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
