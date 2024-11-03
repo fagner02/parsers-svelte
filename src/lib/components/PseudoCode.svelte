@@ -21,6 +21,7 @@
 		for (let line of lines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,50%,80%)';
 		}
+		cardContent.children[lines[0]].scrollIntoView({ behavior: 'smooth', block: 'center' });
 		await wait(500);
 	}
 
