@@ -21,7 +21,14 @@
 		for (let line of lines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,50%,80%)';
 		}
-		cardContent.children[lines[0]].scrollIntoView({ behavior: 'smooth', block: 'center' });
+		let line = cardContent.children[lines[0]].getBoundingClientRect();
+		let content = cardContent.getBoundingClientRect();
+		let height = parseFloat(window.getComputedStyle(card).height);
+		card.scrollTo({
+			behavior: 'smooth',
+			left: 0,
+			top: line.y - content.y - height / 2 + (line.height * lines.length) / 2
+		});
 		await wait(500);
 	}
 
