@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, newRunningCall, setResetCall, wait } from '$lib/flowControl';
+	import { setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -88,8 +88,6 @@
 	}
 
 	async function buildAutomaton() {
-		const id = newRunningCall();
-
 		try {
 			await loadGrammar();
 			await wait(500);

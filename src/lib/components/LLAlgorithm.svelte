@@ -4,14 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/SvgLines.svelte';
 	import TableCard from './Cards/TableCard.svelte';
-	import {
-		wait,
-		addPause,
-		limitHit,
-		setResetCall,
-		newRunningCall,
-		currentlyRunning
-	} from '$lib/flowControl';
+	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from './Cards/selectionFunction';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
@@ -56,7 +49,6 @@
 	let firstFuncs;
 
 	async function lltable() {
-		const id = newRunningCall();
 		try {
 			await wait(100);
 			await loadGrammar();

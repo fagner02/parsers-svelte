@@ -4,14 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from './Cards/StackCard.svelte';
 	import SvgLines from './SvgLines.svelte';
-	import {
-		wait,
-		addPause,
-		limitHit,
-		setResetCall,
-		newRunningCall,
-		currentlyRunning
-	} from '$lib/flowControl';
+	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
@@ -64,8 +57,6 @@
 	setResetCall(reset);
 
 	async function first() {
-		const id = newRunningCall();
-
 		try {
 			await wait(0);
 			await loadGrammar();
