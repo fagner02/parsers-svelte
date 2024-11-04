@@ -2,13 +2,7 @@
 	import { writable } from 'svelte/store';
 	import TableCard from './Cards/TableCard.svelte';
 	import SvgLines from './SvgLines.svelte';
-	import {
-		addPause,
-		limitHit,
-		newRunningCall,
-		currentlyRunning,
-		setResetCall
-	} from '$lib/flowControl';
+	import { addPause, limitHit, newRunningCall, setResetCall } from '$lib/flowControl';
 	import StackCard from './Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
@@ -41,39 +35,34 @@
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
 		context.setAccept(null);
-		try {
-			parsing();
-		} catch {}
+
+		parsing();
 	}
 	setResetCall(reset);
 
 	async function parsing() {
 		const id = newRunningCall();
 
-		resetTree(id);
-
-		if (initializeTree === undefined) {
-			let functions = getTreeFunctions();
-			initializeTree = functions.initializeTree;
-			addToTree = functions.addToTree;
-			resetTree = functions.resetTree;
-		}
-
 		try {
+			resetTree();
+
+			if (initializeTree === undefined) {
+				let functions = getTreeFunctions();
+				initializeTree = functions.initializeTree;
+				addToTree = functions.addToTree;
+				resetTree = functions.resetTree;
+			}
 			for (let i of ['$', startingSymbol]) {
-				if (currentlyRunning !== id) return;
 				await symbolStackElement.addToStack(i, i, '', $symbolStack.length.toString());
 			}
 
 			await initializeTree(startingSymbol);
 
 			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
-				if (currentlyRunning !== id) return;
 				await inputStackElement.addToStack(i, i, '', $inputStack.length.toString());
 			}
 
 			while ($inputStack.length > 0) {
-				if (currentlyRunning !== id) return;
 				const topSymbol = $symbolStack[$symbolStack.length - 1].data;
 				const topInput = $inputStack[$inputStack.length - 1].data;
 				if (nt.includes(topSymbol)) {
@@ -82,7 +71,7 @@
 						context.setAccept(false);
 						return;
 					}
-					if (currentlyRunning !== id) return;
+
 					await symbolStackElement.removeFromStack($symbolStack.length - 1);
 					if (rules[prodIndex].right.includes('')) {
 						addToTree(['\u03B5'], topSymbol);
@@ -93,20 +82,18 @@
 					addToTree([...rules[prodIndex].right], topSymbol);
 
 					for (let p of prod) {
-						if (currentlyRunning !== id) return;
 						await symbolStackElement.addToStack(p, p, '', $symbolStack.length.toString());
 					}
 				} else {
-					if (currentlyRunning !== id) return;
 					if (topSymbol !== topInput) {
 						context.setAccept(false);
 						return;
 					}
-					if (currentlyRunning !== id) return;
-					symbolStackElement.removeFromStack($symbolStack.length - 1);
-					if (currentlyRunning !== id) return;
+
+					await symbolStackElement.removeFromStack($symbolStack.length - 1);
+
 					await inputStackElement.removeFromStack($inputStack.length - 1);
-					if (currentlyRunning !== id) return;
+
 					if ($inputStack.length === 0) {
 						context.setAccept(true);
 					}
@@ -114,16 +101,14 @@
 
 				await addPause();
 			}
-			if (currentlyRunning !== id) return;
+
 			limitHit();
-			addPause();
+			await addPause();
 		} catch (e) {}
 	}
 
 	onMount(async () => {
-		try {
-			await parsing();
-		} catch {}
+		await parsing();
 	});
 </script>
 

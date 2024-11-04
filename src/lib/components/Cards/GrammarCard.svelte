@@ -10,16 +10,21 @@
 	let opacity = 0;
 
 	export const loadGrammar = async function () {
-		try {
-			const rulesElem = /**@type {HTMLElement}*/ document.querySelector('#rules');
-			for (let p of rulesElem?.children ?? []) {
-				for (let s of p.children) {
-					s.classList.remove('block', 'empty');
+		return new Promise(async (resolve, reject) => {
+			try {
+				const rulesElem = /**@type {HTMLElement}*/ document.querySelector('#rules');
+				for (let p of rulesElem?.children ?? []) {
+					for (let s of p.children) {
+						s.classList.remove('block', 'empty');
+					}
 				}
+				await wait(200);
+				opacity = 1;
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-			await wait(200);
-			opacity = 1;
-		} catch {}
+		});
 	};
 
 	const cardId = 'g';

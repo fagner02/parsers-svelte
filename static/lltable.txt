@@ -1,0 +1,9 @@
+<span><b>tabela</b> = Matriz&#x3008;não-terminais, terminais, produção da gramática&#x3009;</span>
+<span>para cada item <b>f</b> de <b>first</b>:</span>
+<span>    <b>esquerda</b> &lt;- produção correspondente a <b>f</b></span>
+<span>    se &epsilon; pertence a <b>f</b>:</span>
+<span>        para cada símbolo <b>b</b> em <b>follow</b>(lado esquerdo da produção <b>esquerda</b>):</span>
+<span>            <b>tabela</b>[lado esquerdo da produção <b>esquerda</b>][<b>b</b>] &lt;- <b>esquerda</b></span>
+<span>    para cada símbolo <b>b</b> em <b>f</b>:</span>
+<span>        se <b>b</b> não é igual a &epsilon:</span>
+<span>            <b>tabela</b>[lado esquerdo da produção <b>esquerda</b>][<b>b</b>] &lt;- <b>esquerda</b></span>

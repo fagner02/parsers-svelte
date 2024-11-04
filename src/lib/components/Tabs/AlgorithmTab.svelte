@@ -5,7 +5,8 @@
 		forward,
 		back,
 		setCloseInstruction,
-		setOpenInstruction
+		setOpenInstruction,
+		swapAlgorithm
 	} from '$lib/flowControl';
 	import Code from '@/Layout/Code.svelte';
 	import FillHeight from '@/Layout/FillHeight.svelte';
@@ -122,6 +123,7 @@
 				class="view-button"
 				on:click={() => {
 					reset();
+					swapAlgorithm();
 					parseOn = true;
 					closePopup();
 				}}
@@ -133,6 +135,7 @@
 				class="view-button"
 				on:click={() => {
 					reset();
+					swapAlgorithm();
 					parseOn = false;
 					closePopup();
 				}}

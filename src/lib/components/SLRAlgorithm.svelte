@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, newRunningCall, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, limitHit, newRunningCall, setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -173,6 +173,8 @@
 
 				await stateStackElem?.removeFromStack(0);
 			}
+			limitHit();
+			await addPause();
 		} catch (e) {
 			console.log(e);
 		}

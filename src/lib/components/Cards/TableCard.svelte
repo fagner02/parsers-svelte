@@ -49,33 +49,38 @@
 	 * @param {string | null} srcId
 	 */
 	export async function addToTable(data, text, row, column, srcId = null) {
-		try {
-			table.update((x) => {
-				/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
-					data: data,
-					text: text,
-					opacity: 0,
-					pos: -40,
-					width: 0
+		return new Promise(async (resolve, reject) => {
+			try {
+				table.update((x) => {
+					/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+						data: data,
+						text: text,
+						opacity: 0,
+						pos: -40,
+						width: 0
+					});
+					return x;
 				});
-				return x;
-			});
-			await wait(50);
+				await wait(50);
 
-			table.update((x) => {
-				/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
-					data: data,
-					text: text,
-					opacity: 1,
-					pos: 0,
-					width: 1
+				table.update((x) => {
+					/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+						data: data,
+						text: text,
+						opacity: 1,
+						pos: 0,
+						width: 1
+					});
+					return x;
 				});
-				return x;
-			});
-			if (srcId) {
-				await svgLines?.hideLine();
+				if (srcId) {
+					await svgLines?.hideLine();
+				}
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-		} catch {}
+		});
 	}
 </script>
 

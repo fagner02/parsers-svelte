@@ -16,9 +16,12 @@
 	import { getSelectionFunctions } from './Cards/selectionFunction';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
+	import PseudoCode from './PseudoCode.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
+	/**@type {PseudoCode | undefined}*/
+	let codeCard;
 	/**@type {TableCard}*/
 	let tableElement;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
@@ -60,24 +63,29 @@
 			await addPause();
 			instruction = 'Since this thing is like that we have add to the stack';
 
+			await codeCard?.highlightLines([0]);
 			for (let i = 0; i < $firstSet.length; i++) {
+				await codeCard?.highlightLines([1]);
 				const item = $firstSet[i];
-				if (currentlyRunning != id) return;
+
 				await firstFuncs?.selectFor(`${firstCard?.getSetId()}set${i}`);
+				await codeCard?.highlightLines([2]);
+				await codeCard?.highlightLines([3]);
 				if (item.right.includes('')) {
-					if (currentlyRunning != id) return;
 					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, colors.green);
 					const followIndex = $followSet.findIndex((x) => x.left === item.left);
 					const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
 					for (let f = 0; f < follow.right.length; f++) {
-						if (currentlyRunning != id) return;
+						await codeCard?.highlightLines([4]);
+
 						selectRSymbol(
 							/**@type {string}*/ (followCard?.getSetId()),
 							followIndex,
 							f * 2,
 							colors.green
 						);
-						if (currentlyRunning != id) return;
+						await codeCard?.highlightLines([5]);
+
 						await tableElement.addToTable(
 							i,
 							rules[i].right[0] === ''
@@ -90,12 +98,15 @@
 					}
 				}
 				for (let j = 0; j < item.right.length; j++) {
+					await codeCard?.highlightLines([6]);
+					await codeCard?.highlightLines([7]);
 					if (item.right[j] == '') {
 						continue;
 					}
-					if (currentlyRunning != id) return;
+					await codeCard?.highlightLines([8]);
+
 					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, colors.green);
-					if (currentlyRunning != id) return;
+
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[i].right.join(' ')}`,
@@ -105,23 +116,25 @@
 					await addPause();
 				}
 			}
-			if (currentlyRunning != id) return;
+
 			limitHit();
-			addPause();
+			await addPause();
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		firstFuncs = getSelectionFunctions(/** @type {string}*/ (firstCard?.getSetId()));
 		tableElement?.resetTable();
+		codeCard?.setPseudoCode(await (await fetch('./lltable.txt')).text());
 		lltable();
 	});
 </script>
 
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
+	<PseudoCode bind:this={codeCard}></PseudoCode>
 	<GrammarCard bind:loadGrammar></GrammarCard>
 	<TableCard
 		rows={nt}

@@ -12,6 +12,7 @@
 	import SyntaxTree from '../SyntaxTree.svelte';
 	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
+	import { swapAlgorithm } from '$lib/flowControl';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -125,6 +126,7 @@
 				<button
 					disabled={selectedAlgorithm === algo}
 					on:click={() => {
+						swapAlgorithm();
 						resetSelectionFunctions();
 						selectedAlgorithm = algo;
 					}}>{algo}</button

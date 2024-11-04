@@ -32,45 +32,50 @@
 	 * @param {string|null} srcId
 	 */
 	export async function addToStack(data, text, note, id, srcId = null) {
-		try {
-			stack.update((x) => [
-				...x,
-				{
-					opacity: 0,
-					height: 0,
-					width: 0,
-					top: -lineHeight,
-					text,
-					note,
-					data: data,
-					transition: stackTransitionForward,
-					id,
-					showBlock: true
+		return new Promise(async (resolve, reject) => {
+			try {
+				stack.update((x) => [
+					...x,
+					{
+						opacity: 0,
+						height: 0,
+						width: 0,
+						top: -lineHeight,
+						text,
+						note,
+						data: data,
+						transition: stackTransitionForward,
+						id,
+						showBlock: true
+					}
+				]);
+				await wait(10);
+
+				if (srcId) {
+					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`);
 				}
-			]);
-			await wait(10);
 
-			if (srcId) {
-				await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`);
-			}
-
-			stack.update((x) => {
-				Object.assign(x[x.length - 1], {
-					opacity: 1,
-					height: lineHeight,
-					width: textWidth(text, note),
-					top: 0
+				stack.update((x) => {
+					Object.assign(x[x.length - 1], {
+						opacity: 1,
+						height: lineHeight,
+						width: textWidth(text, note),
+						top: 0
+					});
+					return x;
 				});
-				return x;
-			});
 
-			if (srcId) {
-				await svgLines?.hideLine();
+				if (srcId) {
+					await svgLines?.hideLine();
+				}
+
+				svgLines?.setHideOpacity();
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-
-			svgLines?.setHideOpacity();
-			await wait(500);
-		} catch (e) {}
+		});
 	}
 
 	/**
@@ -79,29 +84,34 @@
 	 * @param {number} index
 	 */
 	export async function updateItem(data, text, index) {
-		try {
-			stack.update((x) => {
-				Object.assign(x[index], {
-					data,
-					text,
-					width: textWidth(text, x[index].note),
-					showBlock: false
+		return new Promise(async (resolve, reject) => {
+			try {
+				stack.update((x) => {
+					Object.assign(x[index], {
+						data,
+						text,
+						width: textWidth(text, x[index].note),
+						showBlock: false
+					});
+					return x;
 				});
-				return x;
-			});
-			await wait(50);
+				await wait(50);
 
-			stack.update((x) => {
-				Object.assign(x[index], {
-					data,
-					text,
-					width: textWidth(text, x[index].note),
-					showBlock: true
+				stack.update((x) => {
+					Object.assign(x[index], {
+						data,
+						text,
+						width: textWidth(text, x[index].note),
+						showBlock: true
+					});
+					return x;
 				});
-				return x;
-			});
-			await wait(500);
-		} catch (e) {}
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	export function top() {
@@ -116,22 +126,27 @@
 	 * @param {number} index
 	 */
 	export async function removeFromStack(index) {
-		try {
-			stack.update((x) => {
-				Object.assign(x[index], {
-					opacity: 0,
-					height: 0,
-					width: 0,
-					top: -lineHeight,
-					transition: stackTransitionBackward
+		return new Promise(async (resolve, reject) => {
+			try {
+				stack.update((x) => {
+					Object.assign(x[index], {
+						opacity: 0,
+						height: 0,
+						width: 0,
+						top: -lineHeight,
+						transition: stackTransitionBackward
+					});
+					return x;
 				});
-				return x;
-			});
-			await wait(1000);
-			stack.update((x) => {
-				return [...x.slice(0, index), ...x.slice(index + 1)];
-			});
-		} catch (e) {}
+				await wait(1000);
+				stack.update((x) => {
+					return [...x.slice(0, index), ...x.slice(index + 1)];
+				});
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 </script>
 

@@ -13,7 +13,7 @@
 	let updating = false;
 	const vGap = 30;
 	const vGapPoint = vGap / 1.9;
-	let currentCallId = -1;
+	// let currentCallId = -1;
 
 	/**@type {import('@/types').node[][]}*/
 	let levels = [[]];
@@ -79,79 +79,85 @@
 	 * @param {number} id
 	 */
 	async function addToSvg(parent, data, newItemIndex, id) {
-		try {
-			const _id = currentCallId;
-			if (
-				parent.level === -1 &&
-				levels[parent.level + 1].length === 1 &&
-				levels[parent.level + 1][0].id === id
-			)
-				return;
-			updateLevel(parent.level + 1, newItemIndex);
+		return new Promise(async (resolve, reject) => {
+			try {
+				if (
+					parent.level === -1 &&
+					levels[parent.level + 1].length === 1 &&
+					levels[parent.level + 1][0].id === id
+				)
+					return resolve(null);
+				updateLevel(parent.level + 1, newItemIndex);
 
-			if (currentCallId != _id) return;
+				levels[parent.level + 1].splice(newItemIndex, 0, {
+					data: data,
+					done: false,
+					level: parent.level + 1,
+					index: newItemIndex,
+					parent: parent.index,
+					id: id,
+					opacity: 0,
+					x: (newItemIndex + 1) * (width / (levels[parent.level + 1].length + 2)),
+					y: vGap + parent.y + parent.height / 2,
+					width: 0,
+					height: 0,
+					d: '',
+					dashOffset: 100,
+					pos: -10
+				});
+				levels = levels;
+				await wait(100);
 
-			levels[parent.level + 1].splice(newItemIndex, 0, {
-				data: data,
-				done: false,
-				level: parent.level + 1,
-				index: newItemIndex,
-				parent: parent.index,
-				id: id,
-				opacity: 0,
-				x: (newItemIndex + 1) * (width / (levels[parent.level + 1].length + 2)),
-				y: vGap + parent.y + parent.height / 2,
-				width: 0,
-				height: 0,
-				d: '',
-				dashOffset: 100,
-				pos: -10
-			});
-			levels = levels;
-			await wait(100);
-			if (currentCallId != _id) return;
-			let newNode = levels[parent.level + 1][newItemIndex];
-			let bbox = /**@type {SVGTextElement}*/ (
-				document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
-			)?.getBBox();
-			if (!bbox) return;
-			newNode.opacity = 1;
-			newNode.width = bbox.width;
-			newNode.height = bbox.height;
-			newNode.pos = 0;
+				let newNode = levels[parent.level + 1][newItemIndex];
+				let bbox = /**@type {SVGTextElement}*/ (
+					document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
+				)?.getBBox();
+				if (!bbox) return resolve(null);
+				newNode.opacity = 1;
+				newNode.width = bbox.width;
+				newNode.height = bbox.height;
+				newNode.pos = 0;
 
-			const pos = {
-				y: newNode.y - newNode.height / 2 - 4,
-				x: newNode.x
-			};
+				const pos = {
+					y: newNode.y - newNode.height / 2 - 4,
+					x: newNode.x
+				};
 
-			const parentPos = {
-				x: parent.x,
-				y: parent.y + parent.height / 2
-			};
-			if (currentCallId != _id) return;
-			newNode.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+				const parentPos = {
+					x: parent.x,
+					y: parent.y + parent.height / 2
+				};
+				newNode.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 
-			newNode.dashOffset = 0;
-			levels = levels;
-			height = svg.getBBox().height + 100;
-			await wait(500);
-		} catch (e) {
-			// console.log(e);
-		}
+				newNode.dashOffset = 0;
+				levels = levels;
+				height = svg.getBBox().height + 100;
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	async function updateSize() {
-		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
-		width = boxWidth;
+		return new Promise(async (resolve, reject) => {
+			try {
+				boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
+				width = boxWidth;
 
-		updating = true;
+				updating = true;
 
-		for (let i = 0; i < levels.length; i++) {
-			updateLevel(i);
-		}
-		await wait(10);
-		updating = false;
+				for (let i = 0; i < levels.length; i++) {
+					updateLevel(i);
+				}
+				await wait(10);
+				updating = false;
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	/**
@@ -159,22 +165,25 @@
 	 * @param {string} parentData
 	 */
 	export async function addToTree(data, parentData) {
-		try {
-			const parent = /**@type {import('@/types').node}*/ (findNode(parentData));
-			if (parent === undefined) return;
+		return new Promise(async (resolve, reject) => {
+			try {
+				const parent = /**@type {import('@/types').node}*/ (findNode(parentData));
+				if (parent === undefined) return resolve(null);
 
-			parent.done = true;
-			if (levels.length <= parent.level + 1) levels.push([]);
-			let levelIndex = levels[parent.level + 1].findIndex((x) => x.parent === parent.index + 1);
+				parent.done = true;
+				if (levels.length <= parent.level + 1) levels.push([]);
+				let levelIndex = levels[parent.level + 1].findIndex((x) => x.parent === parent.index + 1);
 
-			levelIndex = levelIndex === -1 ? levels[parent.level + 1].length : levelIndex;
+				levelIndex = levelIndex === -1 ? levels[parent.level + 1].length : levelIndex;
 
-			for (let i = 0; i < data.length; i++) {
-				await addToSvg(parent, data[i], levelIndex + i, i);
+				for (let i = 0; i < data.length; i++) {
+					await addToSvg(parent, data[i], levelIndex + i, i);
+				}
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-		} catch (e) {
-			// console.log(e);
-		}
+		});
 	}
 
 	onMount(async () => {
@@ -189,12 +198,19 @@
 	 * @param {SVGGElement} comp
 	 */
 	async function setSvg(comp) {
-		svg = comp;
-		parentElement = /**@type {Element}*/ (document.querySelector('.svg-box'));
-		boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
-		width = boxWidth;
+		return new Promise(async (resolve, reject) => {
+			try {
+				svg = comp;
+				parentElement = /**@type {Element}*/ (document.querySelector('.svg-box'));
+				boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
+				width = boxWidth;
 
-		await wait(500);
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 		// height = svg.getBBox().height + 100;
 	}
 
@@ -213,8 +229,7 @@
 		);
 	}
 
-	export function resetTree(/**@type {number}*/ _currentCallId) {
-		currentCallId = _currentCallId;
+	export function resetTree() {
 		levels = [[]];
 	}
 

@@ -38,71 +38,83 @@
 	 * @param {string} note
 	 */
 	async function addSetItem(index, symbol, note) {
-		try {
-			set.update((x) => {
-				x[index].rightProps = [
-					...x[index].rightProps,
-					{ value: symbol, opacity: 0, hide: true, note: note }
-				];
-				return x;
-			});
-			await wait(50);
-			set.update((x) => {
-				x[index].rightProps[x[index].rightProps.length - 1] = {
-					value: symbol,
-					opacity: 1,
-					hide: false,
-					note: note
-				};
-				return x;
-			});
-			await wait(500);
-		} catch {}
+		return new Promise(async (resolve, reject) => {
+			try {
+				set.update((x) => {
+					x[index].rightProps = [
+						...x[index].rightProps,
+						{ value: symbol, opacity: 0, hide: true, note: note }
+					];
+					return x;
+				});
+				await wait(50);
+				set.update((x) => {
+					x[index].rightProps[x[index].rightProps.length - 1] = {
+						value: symbol,
+						opacity: 1,
+						hide: false,
+						note: note
+					};
+					return x;
+				});
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	/**
 	 * @param {Array<any>} symbols
 	 * @param {Array<string>} texts
-	 * @param {Array<string>|null} notes
+	 * @param {Array<string> | null} notes
 	 * @param {any} key
-	 * @param {string|null} srcId
+	 * @param {string | null} srcId
 	 */
 	export async function joinSets(symbols, texts, notes, key, srcId = null) {
-		try {
-			const index = /**@type {number}*/ (setIndexes.get(key));
-			if ($set[index].rightProps[0].value === ' ') {
-				$set[index].rightProps.pop();
-			}
-
-			let propIndex = $set[index].rightProps.findIndex(
-				(x) => x.note === (notes ? notes[0] : '') && x.value === (texts.length > 0 ? texts[0] : '')
-			);
-			if (propIndex === -1) propIndex = $set[index].rightProps.length;
-
-			if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${propIndex}`);
-
-			for (let i = 0; i < symbols.length; i++) {
-				if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
-					set.update((x) => {
-						x[index].right = [...x[index].right, symbols[i]];
-						return x;
-					});
-					propIndex = $set[index].rightProps.findIndex(
-						(x) => x.note === (notes ? notes[i] : '') && x.value === texts[i]
-					);
-					if (propIndex === -1) propIndex = $set[index].rightProps.length;
-
-					if (srcId) svgLines?.updateTargets(srcId, `${setId}r${index}-${propIndex}`);
-
-					if ($set[index].rightProps.length > 0) {
-						await addSetItem(index, ',', '');
-					}
-
-					await addSetItem(index, texts[i], notes !== null ? notes[i] : '');
+		return new Promise(async (resolve, reject) => {
+			try {
+				const index = /**@type {number}*/ (setIndexes.get(key));
+				if ($set[index].rightProps[0].value === ' ') {
+					$set[index].rightProps.pop();
 				}
+
+				let propIndex = $set[index].rightProps.findIndex(
+					(x) =>
+						x.note === (notes ? notes[0] : '') && x.value === (texts.length > 0 ? texts[0] : '')
+				);
+				if (propIndex === -1) propIndex = $set[index].rightProps.length;
+
+				if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${propIndex}`);
+
+				for (let i = 0; i < symbols.length; i++) {
+					if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
+						set.update((x) => {
+							x[index].right = [...x[index].right, symbols[i]];
+							return x;
+						});
+						propIndex = $set[index].rightProps.findIndex(
+							(x) => x.note === (notes ? notes[i] : '') && x.value === texts[i]
+						);
+						if (propIndex === -1) propIndex = $set[index].rightProps.length;
+
+						if (srcId) svgLines?.updateTargets(srcId, `${setId}r${index}-${propIndex}`);
+
+						if ($set[index].rightProps.length > 0) {
+							await addSetItem(index, ',', '');
+						}
+
+						await addSetItem(index, texts[i], notes !== null ? notes[i] : '');
+					}
+				}
+				await svgLines?.hideLine();
+				resolve(null);
+			} catch (e) {
+				console.log(e);
+				reject(e);
 			}
-			await svgLines?.hideLine();
-		} catch {}
+		});
 	}
 
 	/**
@@ -111,29 +123,35 @@
 	 * @param {string | null} srcId
 	 */
 	export async function addSetRow(symbol, indexMapIdentifier, srcId = null) {
-		try {
-			setIndexes.set(indexMapIdentifier, $set.length);
-			set.update((x) => [
-				...x,
-				{
-					left: symbol,
-					right: [],
-					showRight: false,
-					rightProps: [{ value: ' ', opacity: 0, hide: false, note: '' }],
-					note: useNote ? indexMapIdentifier.toString() : ''
-				}
-			]);
+		return new Promise(async (resolve, reject) => {
+			try {
+				setIndexes.set(indexMapIdentifier, $set.length);
+				set.update((x) => [
+					...x,
+					{
+						left: symbol,
+						right: [],
+						showRight: false,
+						rightProps: [{ value: ' ', opacity: 0, hide: false, note: '' }],
+						note: useNote ? indexMapIdentifier.toString() : ''
+					}
+				]);
 
-			await wait(0);
-			if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
+				await wait(0);
+				if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
 
-			set.update((x) => {
-				x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
-				return x;
-			});
-			await wait(0);
-			await svgLines?.hideLine();
-		} catch {}
+				set.update((x) => {
+					x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
+					return x;
+				});
+				await wait(0);
+				if (srcId) await svgLines?.hideLine();
+				return resolve(null);
+			} catch (e) {
+				console.log(e);
+				reject(e);
+			}
+		});
 	}
 
 	/**
@@ -141,40 +159,47 @@
 	 * @param {any} item
 	 */
 	export async function remove(key, item) {
-		set.update((x) => {
-			const index = /**@type {number}*/ (setIndexes.get(key));
-			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
+		return new Promise(async (resolve, reject) => {
+			try {
+				set.update((x) => {
+					const index = /**@type {number}*/ (setIndexes.get(key));
+					const rIndex = x[index].right.findIndex((i) => i === item) * 2;
 
-			let prop = x[index].rightProps[rIndex];
-			x[index].rightProps[rIndex] = {
-				value: prop.value,
-				opacity: 0,
-				hide: true,
-				note: prop.note
-			};
-			if (rIndex < x[index].rightProps.length - 1) {
-				x[index].rightProps[rIndex + 1] = {
-					value: ',',
-					opacity: 0,
-					hide: true,
-					note: ''
-				};
+					let prop = x[index].rightProps[rIndex];
+					x[index].rightProps[rIndex] = {
+						value: prop.value,
+						opacity: 0,
+						hide: true,
+						note: prop.note
+					};
+					if (rIndex < x[index].rightProps.length - 1) {
+						x[index].rightProps[rIndex + 1] = {
+							value: ',',
+							opacity: 0,
+							hide: true,
+							note: ''
+						};
+					}
+					return x;
+				});
+				await wait(1000);
+				set.update((x) => {
+					const index = /**@type {number}*/ (setIndexes.get(key));
+					const rIndex = x[index].right.findIndex((i) => i === item) * 2;
+					x[index].right = x[index].right.filter((i) => i !== item);
+					if (rIndex === x[index].rightProps.length - 1) {
+						x[index].rightProps.splice(rIndex, 1);
+					} else {
+						x[index].rightProps.splice(rIndex, 2);
+					}
+					return x;
+				});
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-			return x;
 		});
-		await wait(1000);
-		set.update((x) => {
-			const index = /**@type {number}*/ (setIndexes.get(key));
-			const rIndex = x[index].right.findIndex((i) => i === item) * 2;
-			x[index].right = x[index].right.filter((i) => i !== item);
-			if (rIndex === x[index].rightProps.length - 1) {
-				x[index].rightProps.splice(rIndex, 1);
-			} else {
-				x[index].rightProps.splice(rIndex, 2);
-			}
-			return x;
-		});
-		await wait(500);
 	}
 
 	export function get(/**@type {any}*/ key) {

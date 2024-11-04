@@ -21,55 +21,77 @@
 	 * @param {number} pos
 	 */
 	export async function addItem(ruleIndex, pos) {
-		state.update((x) => [...x, { ruleIndex: ruleIndex, pos: pos, hide: true }]);
-		await wait(0);
-		state.update((x) => {
-			x[x.length - 1].hide = false;
-			return x;
+		return new Promise(async (resolve, reject) => {
+			try {
+				state.update((x) => [...x, { ruleIndex: ruleIndex, pos: pos, hide: true }]);
+				await wait(0);
+				state.update((x) => {
+					x[x.length - 1].hide = false;
+					return x;
+				});
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
 		});
-		await wait(500);
 	}
 
 	/**
 	 * @param {import('@/types').State} stateToLoad
 	 */
 	export async function loadState(stateToLoad) {
-		state.update(() =>
-			stateToLoad.items.map((x) => {
-				return /**@type {import('@/types').StateItem}*/ ({
-					ruleIndex: x.ruleIndex,
-					pos: x.pos,
-					hide: true
-				});
-			})
-		);
-		await wait(0);
-		state.update((x) =>
-			x.map((i) => {
-				return { ruleIndex: i.ruleIndex, pos: i.pos, hide: false };
-			})
-		);
-		await wait(500);
+		return new Promise(async (resolve, reject) => {
+			try {
+				state.update(() =>
+					stateToLoad.items.map((x) => {
+						return /**@type {import('@/types').StateItem}*/ ({
+							ruleIndex: x.ruleIndex,
+							pos: x.pos,
+							hide: true
+						});
+					})
+				);
+				await wait(0);
+				state.update((x) =>
+					x.map((i) => {
+						return { ruleIndex: i.ruleIndex, pos: i.pos, hide: false };
+					})
+				);
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	export async function resetState() {
-		if ($state.length === 0) {
-			return;
-		}
-		container.style.maxHeight = `${container.scrollHeight}px`;
-		container.style.maxWidth = `${container.scrollWidth}px`;
+		return new Promise(async (resolve, reject) => {
+			try {
+				if ($state.length === 0) {
+					return resolve(null);
+				}
+				container.style.maxHeight = `${container.scrollHeight}px`;
+				container.style.maxWidth = `${container.scrollWidth}px`;
 
-		await wait(0);
-		container.style.maxHeight = '0px';
-		container.style.maxWidth = '0px';
-		container.style.opacity = '0';
+				await wait(0);
+				container.style.maxHeight = '0px';
+				container.style.maxWidth = '0px';
+				container.style.opacity = '0';
 
-		await wait(500);
-		state.update(() => []);
+				await wait(500);
+				state.update(() => []);
 
-		container.style.maxHeight = 'unset';
-		container.style.maxWidth = 'unset';
-		container.style.opacity = '1';
+				container.style.maxHeight = 'unset';
+				container.style.maxWidth = 'unset';
+
+				container.style.opacity = '1';
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	}
 
 	export function getId() {

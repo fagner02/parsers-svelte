@@ -29,7 +29,7 @@
 	let svgLines;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
-	/**@type {PseudoCode}*/
+	/**@type {PseudoCode | undefined}*/
 	let codeCard;
 
 	/**@type {string}*/
@@ -58,6 +58,7 @@
 		grammarFuncs?.hideSelect();
 		firstIndexes.clear();
 		joinIndexes.clear();
+		codeCard?.reset();
 		first();
 	};
 	setResetCall(reset);
@@ -68,44 +69,36 @@
 		try {
 			await wait(0);
 			await loadGrammar();
-			if (currentlyRunning !== id) return;
 			await addPause();
-
 			const nullable = calcNullable(rules);
 
 			instruction = 'Since this thing is like that we have add to the stack';
-			await codeCard.highlightLines([0, 1]);
+			await codeCard?.highlightLines([0, 1]);
 
 			for (let i = 0; i < rules.length; i++) {
-				await codeCard.highlightLines([2]);
-				if (currentlyRunning !== id) return;
+				await codeCard?.highlightLines([2]);
 				await grammarFuncs?.selectFor(`gset${i}`);
-				await codeCard.highlightLines([3, 4]);
-				if (currentlyRunning !== id) return;
+				await codeCard?.highlightLines([3, 4]);
 				await selectLSymbol('g', i, colors.blue);
-				if (currentlyRunning !== id) return;
 				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 				let isNull = true;
 				await addPause();
 				for (let j = 0; j < rules[i].right.length; j++) {
-					await codeCard.highlightLines([5]);
+					await codeCard?.highlightLines([5]);
 					let symbol = rules[i].right[j];
 					if (symbol === '') break;
-					await codeCard.highlightLines([6]);
+					await codeCard?.highlightLines([6]);
 					if (nt.includes(symbol)) {
-						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, j, colors.blue, false);
 						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 
 						if (!joinIndexes.has(i)) {
-							if (currentlyRunning !== id) return;
 							await joinSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
 
-						if (currentlyRunning !== id) return;
-						await codeCard.highlightLines([7, 8]);
+						await codeCard?.highlightLines([7, 8]);
 						await joinSetElement?.joinSets(
 							matchingRules.map((x) => x.index),
 							matchingRules.map((x) => `${x.left}`),
@@ -113,32 +106,29 @@
 							i,
 							`gr${i}-${j}`
 						);
-						await codeCard.highlightLines([9]);
+						await codeCard?.highlightLines([9]);
 					} else {
-						await codeCard.highlightLines([9]);
+						await codeCard?.highlightLines([9]);
 						await addPause();
-						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, j, colors.green, false);
-						if (currentlyRunning !== id) return;
-						await codeCard.highlightLines([10]);
+						await codeCard?.highlightLines([10]);
+
 						await firstSetElement?.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
 					}
 
-					await codeCard.highlightLines([11]);
+					await codeCard?.highlightLines([11]);
 					if (!(nullable.get(symbol) ?? false)) {
-						await codeCard.highlightLines([12, 13]);
+						await codeCard?.highlightLines([12, 13]);
 						isNull = false;
 						break;
 					}
 				}
-				await codeCard.highlightLines([14]);
+				await codeCard?.highlightLines([14]);
 				if (isNull) {
-					await codeCard.highlightLines([15]);
+					await codeCard?.highlightLines([15]);
 					if (rules[i].right[0] === '') {
-						if (currentlyRunning !== id) return;
 						await selectRSymbol('g', i, 0, colors.green, false);
 					}
-					if (currentlyRunning !== id) return;
 					await firstSetElement?.joinSets(
 						[''],
 						[''],
@@ -151,15 +141,15 @@
 			grammarFuncs?.hideSelect();
 
 			for (let item of $joinSet.keys()) {
-				await codeCard.highlightLines([17]);
-				await codeCard.highlightLines([18]);
+				await codeCard?.highlightLines([17]);
+				await codeCard?.highlightLines([18]);
 				if ($joinSet[item].right.length === 0) {
-					await codeCard.highlightLines([19]);
+					await codeCard?.highlightLines([19]);
 					continue;
 				}
 				await addPause();
-				await codeCard.highlightLines([20, 21]);
-				if (currentlyRunning !== id) return;
+				await codeCard?.highlightLines([20, 21]);
+
 				await joinStackElement?.addToStack(
 					item,
 					rules[item].left,
@@ -170,17 +160,17 @@
 				await addPause();
 
 				while ($joinStack.length > 0) {
-					await codeCard.highlightLines([22]);
-					await codeCard.highlightLines([23, 24]);
+					await codeCard?.highlightLines([22]);
+					await codeCard?.highlightLines([23, 24]);
 					const topKey = $joinStack[$joinStack.length - 1].data;
 					const top = /**@type {Array<number>}*/ (joinSetElement?.get(topKey));
 					const topValue = top[0];
 
 					let nextSet = joinSetElement?.get(topValue);
-					await codeCard.highlightLines([25]);
+					await codeCard?.highlightLines([25]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
-						await codeCard.highlightLines([26, 27]);
-						if (currentlyRunning !== id) return;
+						await codeCard?.highlightLines([26, 27]);
+
 						await joinStackElement?.addToStack(
 							topValue,
 							rules[topValue].left,
@@ -190,12 +180,11 @@
 						await addPause();
 						continue;
 					}
-					await codeCard.highlightLines([28, 29]);
+					await codeCard?.highlightLines([28, 29]);
 					const setToJoin = /**@type {Array<String>}*/ (firstSetElement?.get(topValue)).filter(
 						(x) => x !== ''
 					);
 
-					if (currentlyRunning !== id) return;
 					await firstSetElement?.joinSets(
 						setToJoin,
 						setToJoin,
@@ -204,23 +193,19 @@
 						`${firstSetElement.getSetId()}l${topValue}`
 					);
 					await addPause();
-
-					await codeCard.highlightLines([30]);
-					if (currentlyRunning !== id) return;
+					await codeCard?.highlightLines([30]);
 					await joinSetElement?.remove(topKey, topValue);
 					await addPause();
-
-					await codeCard.highlightLines([31]);
+					await codeCard?.highlightLines([31]);
 					if (joinSetElement?.get(topKey)?.length === 0) {
-						await codeCard.highlightLines([32]);
-						if (currentlyRunning !== id) return;
+						await codeCard?.highlightLines([32]);
 						await joinStackElement?.removeFromStack($joinStack.length - 1);
 					}
 				}
 			}
-			if (currentlyRunning !== id) return;
+
 			limitHit();
-			addPause();
+			await addPause();
 		} catch (e) {
 			console.log(e);
 		}
@@ -229,8 +214,8 @@
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
 		let pseudoCode = await (await fetch('./first.txt')).text();
-		codeCard.setPseudoCode(pseudoCode);
-		first();
+		codeCard?.setPseudoCode(pseudoCode);
+		return first();
 	});
 </script>
 

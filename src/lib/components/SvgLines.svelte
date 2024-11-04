@@ -95,115 +95,130 @@
 	 * @param {string} destId
 	 */
 	export async function showLine(srcId, destId) {
-		if (!srcId.startsWith('#')) {
-			srcId = '#' + srcId;
-		}
-		if (!destId.startsWith('#')) {
-			destId = '#' + destId;
-		}
+		return new Promise(async (resolve, reject) => {
+			try {
+				if (!srcId.startsWith('#')) {
+					srcId = '#' + srcId;
+				}
+				if (!destId.startsWith('#')) {
+					destId = '#' + destId;
+				}
 
-		_destId = destId;
-		_srcId = srcId;
-		if (inter !== null) {
-			window.clearInterval(inter);
+				_destId = destId;
+				_srcId = srcId;
+				if (inter !== null) {
+					window.clearInterval(inter);
 
-			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
-			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
-		}
+					if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
+					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
+				}
 
-		let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
-		if (destPos === null || srcPos === null) return;
+				let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
+				if (destPos === null || srcPos === null) return resolve(null);
 
-		opacity = 1;
-		const linePath = [
-			`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
-			`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * d * dirx} ${srcPos.y + 30 * d * diry}, ${destPos.x - 30 * d * dirx} ${destPos.y - 30 * d * diry},  ${destPos.x} ${destPos.y}`
-		];
-		const arrowPath = [
-			`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
-			`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
-		];
+				opacity = 1;
+				const linePath = [
+					`M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`,
+					`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * d * dirx} ${srcPos.y + 30 * d * diry}, ${destPos.x - 30 * d * dirx} ${destPos.y - 30 * d * diry},  ${destPos.x} ${destPos.y}`
+				];
+				const arrowPath = [
+					`M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`,
+					`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
+				];
 
-		let animeParams = {
-			targets: line,
-			d: linePath,
-			duration: 2900,
-			direction: 'forward',
-			autoplay: true,
-			easing: 'spring(1, 50, 10, 1)'
-		};
+				let animeParams = {
+					targets: line,
+					d: linePath,
+					duration: 2900,
+					direction: 'forward',
+					autoplay: true,
+					easing: 'spring(1, 50, 10, 1)'
+				};
 
-		li = anime(animeParams);
-		an = anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
+				li = anime(animeParams);
+				an = anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-		await wait(500);
+				await wait(500);
 
-		inter = setInterval(() => {
-			if (li === null || an === null) return;
-			let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
-			if (destPos === null || srcPos === null) {
-				if (inter) window.clearInterval(inter);
-				return;
+				inter = setInterval(() => {
+					if (li === null || an === null) return resolve(null);
+					let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
+					if (destPos === null || srcPos === null) {
+						if (inter) window.clearInterval(inter);
+						return resolve(null);
+					}
+
+					const nlinePath = [
+						li.animations[0].currentValue,
+						`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * d * dirx} ${srcPos.y + 30 * d * diry}, ${destPos.x - 30 * d * dirx} ${destPos.y - 30 * d * diry},  ${destPos.x} ${destPos.y}`
+					];
+					const narrowPath = [
+						an.animations[0].currentValue,
+						`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
+					];
+
+					let animeParams = {
+						targets: line,
+						d: nlinePath,
+						duration: 100,
+						direction: 'forward',
+						autoplay: true,
+						easing: 'linear'
+					};
+
+					if (li) anime.remove(li.animations[0].animatable.target);
+					if (an) anime.remove(an.animations[0].animatable.target);
+
+					li = anime(animeParams);
+					an = anime(Object.assign(animeParams, { d: narrowPath, targets: arrow }));
+				}, 100);
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-
-			const nlinePath = [
-				li.animations[0].currentValue,
-				`M ${srcPos.x} ${srcPos.y} C  ${srcPos.x + 30 * d * dirx} ${srcPos.y + 30 * d * diry}, ${destPos.x - 30 * d * dirx} ${destPos.y - 30 * d * diry},  ${destPos.x} ${destPos.y}`
-			];
-			const narrowPath = [
-				an.animations[0].currentValue,
-				`M ${destPos.x + 1 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 5 * diry} L ${destPos.x + 5 * dirx} ${destPos.y + 1 * diry}`
-			];
-
-			let animeParams = {
-				targets: line,
-				d: nlinePath,
-				duration: 100,
-				direction: 'forward',
-				autoplay: true,
-				easing: 'linear'
-			};
-
-			if (li) anime.remove(li.animations[0].animatable.target);
-			if (an) anime.remove(an.animations[0].animatable.target);
-
-			li = anime(animeParams);
-			an = anime(Object.assign(animeParams, { d: narrowPath, targets: arrow }));
-		}, 100);
+		});
 	}
 
 	export async function hideLine() {
-		await wait(1500);
-		if (inter != null) {
-			if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
-			if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
-			window.clearInterval(inter);
-		}
-		const { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
-		if (destPos === null || srcPos === null) return;
+		return new Promise(async (resolve, reject) => {
+			try {
+				await wait(1500);
+				if (inter != null) {
+					if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
+					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
+					window.clearInterval(inter);
+				}
+				const { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
+				if (destPos === null || srcPos === null) return resolve(null);
 
-		const linePath = `M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`;
+				const linePath = `M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`;
 
-		const arrowPath = `M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`;
+				const arrowPath = `M ${srcPos.x + 1} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 5} L ${srcPos.x + 5} ${srcPos.y + 1}`;
 
-		let animeParams = {
-			targets: line,
-			d: linePath,
-			duration: 300,
-			direction: 'forward',
-			autoplay: true,
-			easing: 'linear'
-		};
+				let animeParams = {
+					targets: line,
+					d: linePath,
+					duration: 300,
+					direction: 'forward',
+					autoplay: true,
+					easing: 'linear'
+				};
 
-		anime(animeParams);
-		anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
+				anime(animeParams);
+				anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-		await wait(200);
-		opacity = 0;
-		await wait(300);
+				await wait(200);
+				opacity = 0;
+				await wait(300);
+				resolve(null);
+			} catch (e) {
+				console.log(e);
+				reject(e);
+			}
+		});
 	}
 
-	export async function setHideOpacity() {
+	export function setHideOpacity() {
 		opacity = 0;
 	}
 

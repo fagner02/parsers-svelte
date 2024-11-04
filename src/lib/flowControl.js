@@ -1,12 +1,14 @@
-/** @type {Array<(reason?: any) => void>} */
-let pauseResolves = [];
-/** @type {Array<(reason?: any) => void>} */
-let pauseRejects = [];
+/** @type {Map<number, (reason?: any) => void>} */
+let pauseResolves = new Map();
+/** @type {Map<number, {error: Error,func:(reason?: any) => void}>} */
+let pauseRejects = new Map();
 
-/** @type {Array<{id:number, value: (reason?: any) => void}>} */
-let waitRejects = [];
-/** @type {Array<{id:number, value: (reason?: any) => void}>} */
-let waitResolves = [];
+/** @type {Map<number, (reason?: any) => void>} */
+let waitRejects = new Map();
+/** @type {Map<number, any>} */
+let waitRe = new Map();
+/** @type {Map<number, (reason?: any) => void>} */
+let waitResolves = new Map();
 
 let waitCount = 0;
 let pauseCount = 0;
@@ -39,11 +41,13 @@ export function getJumpWait() {
 /**
  * @param {number} ms
  */
-function setUpPromise(ms) {
+export async function wait(ms) {
+	if (jumpWait) return;
 	return new Promise((resolve, reject) => {
 		const index = waitCount;
-		waitRejects.push({ id: waitCount, value: reject });
-		waitResolves.push({ id: waitCount, value: resolve });
+		waitRejects.set(waitCount, reject);
+		waitRe.set(waitCount, Error('wait rejected'));
+		waitResolves.set(waitCount, resolve);
 		waitCount++;
 		setTimeout(() => {
 			return resolve(index);
@@ -51,52 +55,39 @@ function setUpPromise(ms) {
 	});
 }
 
-/**
- * @param {number} ms
- */
-export async function wait(ms) {
-	if (jumpWait) return;
-	const id = await setUpPromise(ms);
-	const index = waitRejects.findIndex((x) => x.id == id);
-	waitRejects.splice(index, 1);
-	waitResolves.splice(index, 1);
-}
-
-export function pause() {
-	if (jumpPause) return;
-
-	return new Promise((resolve, reject) => {
-		/** @type {number} */
-		pauseResolves.push(resolve);
-		pauseRejects.push(reject);
-		pauseCount++;
-	});
-}
-
 export function resolvePause() {
-	for (let i = 0; i < pauseResolves.length; i++) {
-		pauseResolves[i]();
+	for (let resolve of pauseResolves.values()) {
+		resolve();
 	}
-	clearPauses();
+	pauseResolves.clear();
+	pauseRejects.clear();
+	pauseCount = 0;
 }
-
-function clearPauses() {
-	pauseResolves.splice(0, pauseResolves.length);
-	pauseRejects.splice(0, pauseRejects.length);
+export function killPause() {
+	for (let reject of pauseRejects.values()) {
+		reject.func(reject.error);
+	}
+	pauseResolves.clear();
+	pauseRejects.clear();
+	pauseCount = 0;
 }
 
 export function resolveAllWaits() {
-	for (let i = 0; i < waitResolves.length; i++) {
-		waitResolves[i].value();
+	for (let resolve of waitResolves.values()) {
+		resolve();
 	}
-	clearWaits();
+	waitCount = 0;
+	waitResolves.clear();
+	waitRejects.clear();
 }
-
-function clearWaits() {
-	waitResolves.splice(0, waitResolves.length);
-	waitRejects.splice(0, waitRejects.length);
+export function killAllWaits() {
+	for (let [i, reject] of waitRejects) {
+		reject(waitRe.get(i));
+	}
+	waitCount = 0;
+	waitResolves.clear();
+	waitRejects.clear();
 }
-
 // export let animating = false;
 /** @type {() => Promise<void>} */
 let closeInstruction;
@@ -139,7 +130,6 @@ let goForward = false;
 let goBack = false;
 let limit = false;
 
-/** ADD CALL CHECK BEFORE LIMIT HIT */
 export function limitHit() {
 	goForward = false;
 	// animating = false;
@@ -151,22 +141,25 @@ export function limitHit() {
 }
 
 export async function addPause() {
-	stepCount += 1;
+	return new Promise(async (resolve, reject) => {
+		stepCount += 1;
 
-	if (goBack && (stepCount === targetStep || limit)) {
-		goBack = false;
-		targetStep = -1;
-		setJumpPause(false);
-		setJumpWait(false);
-	} else if (goForward) {
-		goForward = false;
-		setJumpWait(false);
-	}
+		if (goBack && (stepCount === targetStep || limit)) {
+			goBack = false;
+			targetStep = -1;
+			jumpPause = false;
+			jumpWait = false;
+		} else if (goForward) {
+			goForward = false;
+			jumpWait = false;
+		}
 
-	// animating = false;
-	try {
-		await pause();
-	} catch {}
+		if (jumpPause) return resolve(null);
+
+		pauseResolves.set(pauseCount, resolve);
+		pauseRejects.set(pauseCount, { func: reject, error: Error('pause rejected') });
+		pauseCount++;
+	});
 	// animating = true;
 }
 
@@ -178,40 +171,54 @@ export async function forward() {
 		closeInstruction?.();
 		await wait(200);
 	}
-	if (pauseResolves.length > 0) {
+	if (pauseResolves.size > 0) {
 		resolvePause();
 		openInstruction?.();
 		return;
 	}
 
-	setJumpWait(true);
+	jumpWait = true;
 	resolveAllWaits();
 }
 
 export function back() {
 	if (stepCount <= 1 && !limit) return;
 	goBack = true;
+	goForward = false;
 	targetStep = limit ? maxStep : stepCount - 1;
 	limit = false;
-	setJumpWait(true);
-	setJumpPause(true);
+	jumpWait = true;
+	jumpPause = true;
 	reset();
 }
 
 export function reset() {
 	limit = false;
 	stepCount = 0;
-	resolveAllWaits();
-	resolvePause();
-	setJumpWait(true);
+	killAllWaits();
+	killPause();
+	jumpWait = true;
 	closeInstruction?.();
 	if (!goBack) {
 		targetStep = -1;
-		setJumpWait(false);
-		setJumpPause(false);
+		jumpWait = false;
+		jumpPause = false;
 	}
 
 	resetCall();
+}
+
+export function swapAlgorithm() {
+	limit = false;
+	stepCount = 0;
+	killAllWaits();
+	killPause();
+	jumpWait = false;
+	jumpPause = false;
+	targetStep = -1;
+	goBack = false;
+	goForward = false;
+	closeInstruction?.();
 }
 
 /**@type {number} */

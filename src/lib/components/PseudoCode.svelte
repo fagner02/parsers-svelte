@@ -9,27 +9,44 @@
 	/** @type {HTMLElement} */
 	let cardContent;
 
-	/**
-	 * @param {number[]} lines
-	 */
-	export async function highlightLines(lines) {
+	export function reset() {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
 		}
+	}
 
-		highlightedLines = lines;
-		for (let line of lines) {
-			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,50%,80%)';
-		}
-		let line = cardContent.children[lines[0]].getBoundingClientRect();
-		let content = cardContent.getBoundingClientRect();
-		let height = parseFloat(window.getComputedStyle(card).height);
-		card.scrollTo({
-			behavior: 'smooth',
-			left: 0,
-			top: line.y - content.y - height / 2 + (line.height * lines.length) / 2
+	/**
+	 * @param {number[]} lines
+	 * @returns {Promise<void>}
+	 */
+	export async function highlightLines(lines) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				for (let line of highlightedLines) {
+					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =
+						'hsl(200,0%,100%)';
+				}
+
+				highlightedLines = lines;
+				for (let line of lines) {
+					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =
+						'hsl(200,50%,80%)';
+				}
+
+				let line = cardContent.children[lines[0]].getBoundingClientRect();
+				let content = cardContent.getBoundingClientRect();
+				let height = parseFloat(window.getComputedStyle(card).height);
+				card.scrollTo({
+					behavior: 'smooth',
+					left: 0,
+					top: line.y - content.y - height / 2 + (line.height * lines.length) / 2
+				});
+				await wait(500);
+				return resolve();
+			} catch (e) {
+				reject(e);
+			}
 		});
-		await wait(500);
 	}
 
 	let pcCardPos = { x: 0, y: 0 };
@@ -97,7 +114,7 @@
 	/**
 	 * @param {string} pseudoCode
 	 */
-	export async function setPseudoCode(pseudoCode) {
+	export function setPseudoCode(pseudoCode) {
 		cardContent.innerHTML = pseudoCode;
 		card.style.width = `${card.scrollWidth + card.clientWidth - cardContent.clientWidth}px`;
 	}
