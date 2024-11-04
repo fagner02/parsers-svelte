@@ -278,9 +278,9 @@
 	});
 </script>
 
-<PseudoCode bind:this={codeCard}></PseudoCode>
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
+	<PseudoCode bind:this={codeCard}></PseudoCode>
 	<GrammarCard bind:loadGrammar></GrammarCard>
 	<SetsCard
 		setId="follow"

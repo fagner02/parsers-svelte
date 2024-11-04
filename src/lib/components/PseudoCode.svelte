@@ -126,7 +126,7 @@
 		resize: both;
 		overflow: auto;
 		cursor: grab;
-		position: absolute;
+		position: relative;
 		padding: 5px;
 		margin: 5px;
 		border: 1px solid hsl(200, 50%, 50%);
