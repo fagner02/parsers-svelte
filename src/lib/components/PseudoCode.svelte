@@ -99,7 +99,6 @@
 	 */
 	export async function setPseudoCode(pseudoCode) {
 		cardContent.innerHTML = pseudoCode;
-		await wait(0);
 		card.style.width = `${card.scrollWidth + card.clientWidth - cardContent.clientWidth}px`;
 	}
 
