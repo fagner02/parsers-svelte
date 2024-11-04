@@ -137,6 +137,10 @@ input:focus-within {
 	flex-wrap: wrap;
 }
 
+.algo-buttons > button:disabled {
+	filter: opacity(0.5);
+}
+
 @keyframes rotA {
 	from {
 		transform: scale(0.5) translate(-300px, 0px) rotate(0deg);

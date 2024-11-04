@@ -16,8 +16,6 @@
 	// ========== Components ====================
 	/**@type {string}*/
 	let instruction;
-	/**@type {string}*/
-	let selectedAlgorithm = 'first';
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
@@ -115,34 +113,28 @@
 			)
 		);
 	});
+
+	const algos = ['first', 'follow', 'tabela'];
+	let selectedAlgorithm = algos[0];
 </script>
 
 <AlgorithmTab bind:instruction bind:inputString {code}>
 	<div slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
-			<button
-				on:click={() => {
-					resetSelectionFunctions();
-					selectedAlgorithm = 'first';
-				}}>first</button
-			>
-			<button
-				on:click={async () => {
-					resetSelectionFunctions();
-					selectedAlgorithm = 'follow';
-				}}>follow</button
-			>
-			<button
-				on:click={() => {
-					resetSelectionFunctions();
-					selectedAlgorithm = 'table';
-				}}>table</button
-			>
+			{#each algos as algo}
+				<button
+					disabled={selectedAlgorithm === algo}
+					on:click={() => {
+						resetSelectionFunctions();
+						selectedAlgorithm = algo;
+					}}>{algo}</button
+				>
+			{/each}
 		</div>
 		<div class="grid">
-			{#if selectedAlgorithm === 'first'}
+			{#if selectedAlgorithm === algos[0]}
 				<FirstAlgorithm bind:instruction></FirstAlgorithm>
-			{:else if selectedAlgorithm === 'follow'}
+			{:else if selectedAlgorithm === algos[1]}
 				<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
 			{:else}
 				<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>

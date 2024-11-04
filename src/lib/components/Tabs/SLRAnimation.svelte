@@ -7,30 +7,29 @@
 
 	let code = '';
 	let inputString = '';
-	let selectedAlgorithm = 'automato';
 
 	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
 	loadGrammar(grammar);
+
+	const algos = ['autômato', 'tabela'];
+	let selectedAlgorithm = algos[0];
 </script>
 
 <AlgorithmTab {inputString} {code}>
 	<FillHeight slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
-			<button
-				on:click={() => {
-					resetSelectionFunctions();
-					selectedAlgorithm = 'automato';
-				}}>autômato</button
-			>
-			<button
-				on:click={() => {
-					resetSelectionFunctions();
-					selectedAlgorithm = 'tabela';
-				}}>tabela</button
-			>
+			{#each algos as algo}
+				<button
+					disabled={selectedAlgorithm === algo}
+					on:click={() => {
+						resetSelectionFunctions();
+						selectedAlgorithm = algo;
+					}}>{algo}</button
+				>
+			{/each}
 		</div>
 		<FillHeight class="grid">
-			{#if selectedAlgorithm === 'automato'}
+			{#if selectedAlgorithm === algos[0]}
 				<SLRAlgorithm></SLRAlgorithm>
 			{/if}
 		</FillHeight>
