@@ -11,7 +11,17 @@
 	let selectGroupElem;
 	/**@type {SVGElement}*/
 	let svgElem;
-	/** @type {{ obj: SVGGElement; size: {x:number,y:number}; pos: { x: number; y: number; }; lines: SVGLineElement[]; arrows: SVGElement[]; con: number[]; }[]}*/
+	/**@typedef {{
+	 * obj: SVGGElement;
+	 * size: {x:number,y:number};
+	 * pos: { x: number; y: number; };
+	 * lines: SVGLineElement[];
+	 * arrows: SVGElement[];
+	 * conLabels: SVGGElement[];
+	 * con: number[];
+	 * }} Node*/
+	/**@typedef {{x:number, y:number}} Vec2*/
+	/** @type {Node[]}*/
 	let nodes = [];
 
 	export function reset() {
@@ -39,7 +49,8 @@
 	export async function addNode(
 		/** @type {number | null}*/ from,
 		/** @type {number}*/ to,
-		/** @type {import('@/types').State}*/ data
+		/** @type {import('@/types').State}*/ data,
+		/** @type {string?}*/ symbol
 	) {
 		resetSelected(true);
 
@@ -129,6 +140,7 @@
 				obj: res,
 				lines: [],
 				arrows: [],
+				conLabels: [],
 				pos: { x: 200, y: 200 },
 				size,
 				con: []
@@ -156,6 +168,28 @@
 			arrow.setAttribute('fill', 'hsl(200,50%,50%)');
 			groupElem.append(arrow);
 			nodes[from].arrows.push(arrow);
+
+			let label = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+			let labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			labelText.style.dominantBaseline = 'central';
+			labelText.style.alignmentBaseline = 'central';
+			labelText.style.textAnchor = 'middle';
+			labelText.textContent = symbol;
+			let labelBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			label.append(labelBox);
+			label.append(labelText);
+			groupElem.append(label);
+
+			labelBox.setAttribute('rx', '10');
+			let bbox = labelText.getBBox();
+			labelBox.setAttribute('fill', 'hsl(200,50%,90%)');
+			labelBox.setAttribute('stroke', 'hsl(200,50%,50%)');
+			labelBox.setAttribute('height', `${bbox.height + 10}`);
+			labelBox.setAttribute('width', `${bbox.width + 10}`);
+			labelBox.setAttribute('x', `${-(bbox.width + 10) / 2}`);
+			labelBox.setAttribute('y', `${-(bbox.height + 10) / 2}`);
+
+			nodes[from].conLabels.push(label);
 			let selectLine = (/**@type {MouseEvent}*/ e) => {
 				if (!isClick) return;
 				e.stopImmediatePropagation();
@@ -286,11 +320,23 @@
 					}
 					let limit = { x: 20 + n.size.x + v.size.x, y: 20 + n.size.y + v.size.y };
 
-					if (dist < limit.x) {
-						direction.x += diff.x * -1;
-					}
-					if (dist < limit.y) {
+					// if (
+					// 	diff.x < limit.x &&
+					// 	Math.abs(diff.y) <= limit.y
+					// 	// ((n.pos.x - n.size.x > v.pos.x - v.size.x && n.pos.x - n.size.x < v.pos.x + v.size.x) ||
+					// 	// 	(n.pos.x + n.size.x > v.pos.x - v.size.x && n.pos.x + n.size.x < v.pos.x + v.size.x))
+					// ) {
+					// 	direction.x += diff.x * -1;
+					// }
+					if (
+						Math.abs(diff.y) <= limit.y &&
+						Math.abs(diff.x) <= limit.x
+						// ((n.pos.y - n.size.y >= v.pos.y - v.size.y &&
+						// 	n.pos.y - n.size.y <= v.pos.y + v.size.y) ||
+						// 	(n.pos.y + n.size.y > v.pos.y - v.size.y && n.pos.y + n.size.y < v.pos.y + v.size.y))
+					) {
 						direction.y += diff.y * -1;
+						direction.x += diff.x * -1;
 					}
 				}
 				if (jump) {
@@ -317,18 +363,33 @@
 				easing: 'spring(1, 50, 10, 1)'
 			});
 			for (let [j, c] of n.con.entries()) {
-				let diff = { x: nodes[c].pos.x - n.pos.x, y: nodes[c].pos.y - n.pos.y };
+				let calArrow = (/** @type {Node} */ pos1, /** @type {Node} */ pos2) => {
+					let diff = { x: pos1.pos.x - pos2.pos.x, y: pos1.pos.y - pos2.pos.y };
+					let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+					let angle = Math.asin(diff.y / dist);
+					let h = Math.atan(pos1.size.y / pos1.size.x);
+					let arrowPos = { x: 0, y: 0 };
+					if (angle <= h && angle >= -h) {
+						arrowPos.x = (diff.x < 0 ? 1 : -1) * pos1.size.x;
+						arrowPos.y = Math.tan(-angle) * Math.abs(arrowPos.x);
+					} else {
+						arrowPos.y = (diff.y < 0 ? 1 : -1) * pos1.size.y;
+						arrowPos.x = (diff.x < 0 ? 1 : -1) * Math.abs(arrowPos.y / Math.tan(angle));
+					}
+					return arrowPos;
+				};
+
+				let arrowPos = calArrow(nodes[c], n);
+				let arrowPos2 = calArrow(n, nodes[c]);
+
+				let start = { x: n.pos.x + arrowPos2.x, y: n.pos.y + arrowPos2.y };
+				let end = { x: nodes[c].pos.x + arrowPos.x, y: nodes[c].pos.y + arrowPos.y };
+				let diff = { x: start.x - end.x, y: start.y - end.y };
 				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-				let angle = Math.asin(diff.y / dist);
-				let h = Math.atan(nodes[c].size.y / nodes[c].size.x);
-				let arrowPos = { x: 0, y: 0 };
-				if (angle <= h && angle >= -h) {
-					arrowPos.x = (diff.x < 0 ? 1 : -1) * nodes[c].size.x;
-					arrowPos.y = Math.tan(-angle) * Math.abs(arrowPos.x);
-				} else {
-					arrowPos.y = (diff.y < 0 ? 1 : -1) * nodes[c].size.y;
-					arrowPos.x = (diff.x < 0 ? 1 : -1) * Math.abs(arrowPos.y / Math.tan(angle));
-				}
+				let middle = {
+					x: start.x + (-diff.x / dist) * (dist / 2),
+					y: start.y + (-diff.y / dist) * (dist / 2)
+				};
 				anime({
 					targets: n.lines[j],
 					x1: [oldPos[i].x, n.pos.x],
@@ -341,6 +402,27 @@
 						i === existent[0] && c === existent[1]
 							? [oldPos[i].y, nodes[c].pos.y]
 							: [oldPos[c].y, nodes[c].pos.y],
+					duration: 500,
+					direction: 'forward',
+					autoplay: true,
+					delay: 0,
+					easing: 'spring(1, 50, 10, 1)'
+				});
+				anime({
+					targets: n.conLabels[j],
+					translateX:
+						i === existent[0] && c === existent[1]
+							? [oldPos[i].x, middle.x]
+							: c === nodes.length - 1 && existent[0] === -1
+								? [oldPos[c].x, middle.x]
+								: middle.x,
+					translateY:
+						i === existent[0] && c === existent[1]
+							? [oldPos[i].y, middle.y]
+							: c === nodes.length - 1 && existent[0] === -1
+								? [oldPos[c].y, middle.y]
+								: middle.y,
+
 					duration: 500,
 					direction: 'forward',
 					autoplay: true,

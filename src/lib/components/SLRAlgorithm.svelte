@@ -148,7 +148,8 @@
 						automatonElem?.addNode(
 							stateStackElem?.first(),
 							automaton.states.length - 1,
-							automaton.states[automaton.states.length - 1]
+							automaton.states[automaton.states.length - 1],
+							symbol
 						);
 						await stateStackElem?.addToStack(
 							automaton.states.length - 1,
@@ -164,7 +165,8 @@
 					automatonElem?.addNode(
 						stateStackElem?.first(),
 						existent,
-						automaton.states[automaton.states.length - 1]
+						automaton.states[automaton.states.length - 1],
+						symbol
 					);
 					await addPause();
 				}
