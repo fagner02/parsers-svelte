@@ -3,6 +3,7 @@
 	import LLAnimation from './LLAnimation.svelte';
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
+	import { swapAlgorithm } from '$lib/flowControl';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
@@ -23,6 +24,7 @@
 					? 'hsl(200,50%,50%)'
 					: 'hsl(200,50%,70%)'};"
 				on:click={() => {
+					swapAlgorithm();
 					selected = item;
 				}}>{item.name}</button
 			>
