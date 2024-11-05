@@ -140,7 +140,7 @@ input:focus-within {
 .algo-buttons > button:disabled {
 	color: hsl(200, 50%, 50%);
 	background: white;
-	border: 1px solid hsl(200, 50%, 50%);
+	outline: 1px solid hsl(200, 50%, 50%);
 }
 
 @keyframes rotA {
