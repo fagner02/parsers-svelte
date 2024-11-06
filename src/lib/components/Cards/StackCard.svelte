@@ -13,7 +13,7 @@
 	export let reversed = true;
 	/** @type {string} */
 	export let stackId;
-	/** @type {import('@/SvgLines.svelte').default | undefined} */
+	/** @type {import('@/Structures/SvgLines.svelte').default | undefined} */
 	export let svgLines;
 
 	/**

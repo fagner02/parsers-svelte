@@ -1,16 +1,15 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import StackCard from './Cards/StackCard.svelte';
-	import SvgLines from './SvgLines.svelte';
-	import StateCard from './Cards/StateCard.svelte';
-	import GrammarCard from './Cards/GrammarCard.svelte';
-	import Automaton from './Automaton.svelte';
+	import StackCard from '@/Cards/StackCard.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
+	import StateCard from '@/Cards/StateCard.svelte';
+	import GrammarCard from '@/Cards/GrammarCard.svelte';
+	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
-	import SetsCard from './Cards/SetsCard.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -23,12 +22,10 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItemLR1>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let originState = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItemLR1>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let targetState = writable([]);
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let firstSet;
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== '$'), ...nt];
 
@@ -73,50 +70,17 @@
 	async function closure() {
 		let itemsToCheck = [...$targetState];
 		while (itemsToCheck.length > 0) {
-			/**@type {import("@/types").StateItemLR1[]}*/
+			/**@type {import("@/types").StateItem[]}*/
 			let temp = [];
 			for (let item of itemsToCheck) {
 				let symbol = rules[item.ruleIndex].right[item.pos];
 				if (!nt.includes(symbol)) continue;
-				let lookahead = new Set();
-				if (rules[item.ruleIndex].right.length - 1 === item.pos) {
-					lookahead = new Set(item.lookahead);
-				} else {
-					/**@type {string[]}*/
-					let betaFirst = [];
-					let nullable = true;
-					for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-						let beta = rules[item.ruleIndex].right[item.pos + i];
-						if (!nt.includes(beta)) {
-							betaFirst.push(beta);
-							nullable = false;
-							break;
-						} else {
-							let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
-							betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
 
-							if (!first.includes('')) {
-								nullable = false;
-								break;
-							}
-						}
-					}
-					if (nullable) {
-						lookahead = new Set([...betaFirst, ...item.lookahead]);
-					} else {
-						lookahead = new Set(betaFirst);
-					}
-				}
 				for (let rule of rules) {
 					if (!(rule.left === symbol)) continue;
-					let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
-
-					if (existent === -1) {
-						await targetStateElem?.addItem(rule.index, 0, lookahead);
-						temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
-						continue;
-					}
-					await targetStateElem?.updateLookahead(lookahead, existent);
+					if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
+					await targetStateElem?.addItem(rule.index, 0);
+					temp.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 				}
 			}
 			itemsToCheck = temp;
@@ -128,16 +92,15 @@
 			await loadGrammar();
 			await wait(500);
 
-			/**@type {import('@/types').AutomatonLR1}*/
+			/**@type {import('@/types').Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
-			await targetStateElem?.addItem(0, 0, new Set(['$']));
+			await targetStateElem?.addItem(0, 0);
 
 			await closure();
 
-			automaton.states.push({ index: 0, items: [...$targetState] });
-			automatonElem?.addNode(null, 0, automaton.states[0], null);
-
+			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
+			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1]);
 			await addPause();
 
 			await stateStackElem?.addToStack(0, 's0', '', '0', `label-${targetStateElem?.getId()}`);
@@ -158,7 +121,7 @@
 							continue;
 						if ($targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
 							continue;
-						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1, prod.lookahead);
+						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
 					await stateSelection.hideSelect();
 					if ($targetState.length === 0) continue;
@@ -168,14 +131,11 @@
 						let eq = true;
 						for (let k = 0; k < x.items.length; k++) {
 							let match = false;
-
 							for (let m = 0; m < $targetState.length; m++) {
 								match =
 									match ||
 									(x.items[k].pos === $targetState[m].pos &&
-										x.items[k].ruleIndex === $targetState[m].ruleIndex &&
-										x.items[k].lookahead.size === $targetState[m].lookahead?.size &&
-										x.items[k].lookahead.values().every((x) => $targetState[m].lookahead.has(x)));
+										x.items[k].ruleIndex === $targetState[m].ruleIndex);
 								if (match) break;
 							}
 							eq = match;
@@ -213,6 +173,8 @@
 
 				await stateStackElem?.removeFromStack(0);
 			}
+			limitHit();
+			await addPause();
 		} catch (e) {
 			console.log(e);
 		}
@@ -229,7 +191,6 @@
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
 		<GrammarCard bind:loadGrammar></GrammarCard>
-		<SetsCard set={firstSet} label="first" setId="first" hue={200}></SetsCard>
 		<StateCard
 			state={targetState}
 			stateId={'destino'}

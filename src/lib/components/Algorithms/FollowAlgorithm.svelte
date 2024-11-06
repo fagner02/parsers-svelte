@@ -3,13 +3,13 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
-	import SvgLines from '@/SvgLines.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
-	import PseudoCode from './PseudoCode.svelte';
+	import PseudoCode from '@/Structures/PseudoCode.svelte';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement;

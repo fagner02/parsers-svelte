@@ -38,7 +38,7 @@
 	}
 	/** @type {string} */
 	export let tableId;
-	/**@type {import('@/SvgLines.svelte').default | undefined}*/
+	/**@type {import('@/Structures/SvgLines.svelte').default | undefined}*/
 	export let svgLines;
 
 	/**

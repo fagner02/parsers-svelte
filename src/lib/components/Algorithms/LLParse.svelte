@@ -1,9 +1,9 @@
 <script>
 	import { writable } from 'svelte/store';
-	import TableCard from './Cards/TableCard.svelte';
-	import SvgLines from './SvgLines.svelte';
+	import TableCard from '@/Cards/TableCard.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { addPause, limitHit, setResetCall } from '$lib/flowControl';
-	import StackCard from './Cards/StackCard.svelte';
+	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';

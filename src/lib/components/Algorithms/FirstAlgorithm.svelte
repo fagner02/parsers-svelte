@@ -2,15 +2,15 @@
 	import { writable } from 'svelte/store';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import SetsCard from '@/Cards/SetsCard.svelte';
-	import StackCard from './Cards/StackCard.svelte';
-	import SvgLines from './SvgLines.svelte';
+	import StackCard from '@/Cards/StackCard.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { calcNullable } from '$lib/first';
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
-	import { getSelectionFunctions } from './Cards/selectionFunction';
+	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
-	import PseudoCode from './PseudoCode.svelte';
+	import PseudoCode from '@/Structures/PseudoCode.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;

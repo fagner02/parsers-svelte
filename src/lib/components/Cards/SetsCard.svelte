@@ -10,7 +10,7 @@
 	/**@type {string}*/
 	export let setId;
 	export let useNote = true;
-	/**@type {import('@/SvgLines.svelte').default | null}*/
+	/**@type {import('@/Structures/SvgLines.svelte').default | null}*/
 	export let svgLines = null;
 
 	export let hue;

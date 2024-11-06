@@ -2,7 +2,7 @@
 	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
-	import CLRAlgorithm from '@/CLRAlgorithm.svelte';
+	import CLRAlgorithm from '@/Algorithms/CLRAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 	import { first } from '$lib/first';
 	import { writable } from 'svelte/store';

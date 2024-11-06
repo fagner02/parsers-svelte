@@ -3,7 +3,7 @@
 	import { loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
-	import SLRAlgorithm from '@/SLRAlgorithm.svelte';
+	import SLRAlgorithm from '@/Algorithms/LR0Automaton.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
 	let code = '';

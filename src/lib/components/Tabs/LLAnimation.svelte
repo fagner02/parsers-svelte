@@ -1,15 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
 	import AlgorithmTab from './AlgorithmTab.svelte';
-	import FirstAlgorithm from '../FirstAlgorithm.svelte';
-	import FollowAlgorithm from '../FollowAlgorithm.svelte';
-	import LlAlgorithm from '../LLAlgorithm.svelte';
-	import LlParse from '../LLParse.svelte';
+	import FirstAlgorithm from '@/Algorithms/FirstAlgorithm.svelte';
+	import FollowAlgorithm from '@/Algorithms/FollowAlgorithm.svelte';
+	import LlAlgorithm from '@/Algorithms/LLAlgorithm.svelte';
+	import LlParse from '@/Algorithms/LLParse.svelte';
 	import { first } from '$lib/first';
 	import { follow } from '$lib/follow';
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
-	import SyntaxTree from '../SyntaxTree.svelte';
+	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
