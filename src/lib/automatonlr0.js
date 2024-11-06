@@ -41,7 +41,7 @@ export function automatonlr0(rules, nt, t) {
 	automaton.states.push({ index: automaton.states.length, items: [...state0] });
 
 	stateStack.push(0);
-	let alphabet = [...nt, ...t].filter((x) => x !== '');
+	let alphabet = [...t, ...nt].filter((x) => x !== '');
 	while (stateStack.length > 0) {
 		for (let symbol of alphabet) {
 			/**@type {import('@/types').StateItem[]} */
@@ -73,18 +73,19 @@ export function automatonlr0(rules, nt, t) {
 				}
 				return eq;
 			});
+			if (!automaton.transitions.has(stateStack[0]))
+				automaton.transitions.set(stateStack[0], new Map());
 			if (existent === -1) {
 				automaton.states.push({ index: automaton.states.length, items: [...state1] });
-				if (!automaton.transitions.has(stateStack[0]))
-					automaton.transitions.set(automaton.states[stateStack[0]].index, new Map());
-				automaton.transitions
-					.get(automaton.states[stateStack[0]].index)
-					?.set(symbol, automaton.states.length - 1);
+
+				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
 
 				stateStack.push(automaton.states.length - 1);
 
 				continue;
 			}
+
+			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
 		}
 		stateStack.shift();
 	}

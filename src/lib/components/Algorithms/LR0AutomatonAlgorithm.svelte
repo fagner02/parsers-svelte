@@ -100,7 +100,7 @@
 			await closure();
 
 			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
-			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1]);
+			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1], null);
 			await addPause();
 
 			await stateStackElem?.addToStack(0, 's0', '', '0', `label-${targetStateElem?.getId()}`);
@@ -162,12 +162,7 @@
 						continue;
 					}
 
-					automatonElem?.addNode(
-						stateStackElem?.first(),
-						existent,
-						automaton.states[automaton.states.length - 1],
-						symbol
-					);
+					automatonElem?.addNode(stateStackElem?.first(), existent, null, symbol);
 					await addPause();
 				}
 

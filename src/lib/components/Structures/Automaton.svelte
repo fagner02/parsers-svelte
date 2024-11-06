@@ -49,13 +49,13 @@
 	/**
 	 * @param {number?} from
 	 * @param {number} to
-	 * @param {import('@/types').State} data
+	 * @param {import('@/types').State?} data
 	 * @param {string?} symbol
 	 */
 	export async function addNode(from, to, data, symbol, shouldUpdate = true) {
 		resetSelected(true);
 
-		if (to > nodes.length - 1) {
+		if (to > nodes.length - 1 && data) {
 			let res = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 			let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 			let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -457,10 +457,13 @@
 	/**
 	 * @param {import('@/types').Automaton} automaton
 	 */
-	export function loadAutomaton(automaton) {
-		let states = [automaton.states[0]];
+	export async function loadAutomaton(automaton) {
+		console.log(automaton);
+		let states = [
+			/**@type {import('@/types').State}*/ (automaton.states.find((x) => x.index === 0))
+		];
 
-		addNode(null, states[0].index, states[0], null, true);
+		addNode(null, states[0].index, states[0], null);
 		while (states.length > 0) {
 			let transitions = automaton.transitions.get(states[0].index);
 			if (!transitions) {
@@ -468,7 +471,7 @@
 				continue;
 			}
 			for (let [symbol, state] of transitions) {
-				addNode(states[0].index, state, automaton.states[state], symbol, true);
+				addNode(states[0].index, state, automaton.states[state], symbol);
 				states.push(automaton.states[state]);
 			}
 			states.shift();

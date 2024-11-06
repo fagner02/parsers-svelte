@@ -229,7 +229,7 @@
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
 		<GrammarCard bind:loadGrammar></GrammarCard>
-		<SetsCard set={firstSet} label="first" setId="first" hue={200}></SetsCard>
+		<SetsCard set={firstSet} label="first" setId="first" hue={colors.blue}></SetsCard>
 		<StateCard
 			state={targetState}
 			stateId={'destino'}
