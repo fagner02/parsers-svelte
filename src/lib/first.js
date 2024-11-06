@@ -43,7 +43,6 @@ export function first(
 	/** @type {Map<string, boolean>}*/
 	let nullable = calcNullable(rules);
 
-	console.log('null', nullable);
 	for (let i = 0; i < rules.length; i++) {
 		firstSet.set(i, new Set());
 		let isNull = true;

@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { setResetCall, wait } from '$lib/flowControl';
+	import { addPause, setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -11,7 +11,6 @@
 	import Automaton from './Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from './Cards/SetsCard.svelte';
-	import SlrAlgorithm from './SLRAlgorithm.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -24,9 +23,9 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItemLR1>>} */
 	let originState = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItemLR1>>} */
 	let targetState = writable([]);
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
@@ -74,7 +73,7 @@
 	async function closure() {
 		let itemsToCheck = [...$targetState];
 		while (itemsToCheck.length > 0) {
-			/**@type {import("@/types").StateItem[]}*/
+			/**@type {import("@/types").StateItemLR1[]}*/
 			let temp = [];
 			for (let item of itemsToCheck) {
 				let symbol = rules[item.ruleIndex].right[item.pos];
@@ -103,7 +102,7 @@
 						}
 					}
 					if (nullable) {
-						lookahead = new Set([...betaFirst, .../**@type {Set<string>}*/ (item.lookahead)]);
+						lookahead = new Set([...betaFirst, ...item.lookahead]);
 					} else {
 						lookahead = new Set(betaFirst);
 					}
@@ -117,7 +116,7 @@
 						temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
 						continue;
 					}
-					await targetStateElem?.updateLookahead(/**@type {Set<string>}*/ (lookahead), existent);
+					await targetStateElem?.updateLookahead(lookahead, existent);
 				}
 			}
 			itemsToCheck = temp;
@@ -129,12 +128,91 @@
 			await loadGrammar();
 			await wait(500);
 
-			/**@type {import('@/types').Automaton}*/
+			/**@type {import('@/types').AutomatonLR1}*/
 			let automaton = { states: [], transitions: new Map() };
 
 			await targetStateElem?.addItem(0, 0, new Set(['$']));
 
 			await closure();
+
+			automaton.states.push({ index: 0, items: [...$targetState] });
+			automatonElem?.addNode(null, 0, automaton.states[0], null);
+
+			await addPause();
+
+			await stateStackElem?.addToStack(0, 's0', '', '0', `label-${targetStateElem?.getId()}`);
+
+			while ($stateStack.length > 0) {
+				await originStateElem?.resetState();
+				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
+				for (let [symbolIndex, symbol] of alphabet.entries()) {
+					await symbolsSelection.selectFor(`stack-symbolList-${symbolIndex}`);
+					await targetStateElem?.resetState();
+
+					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
+						await stateSelection.selectFor(`state-origem-${prodIndex}`);
+						if (
+							prod.pos >= rules[prod.ruleIndex].right.length ||
+							rules[prod.ruleIndex].right[prod.pos] !== symbol
+						)
+							continue;
+						if ($targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+							continue;
+						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1, prod.lookahead);
+					}
+					await stateSelection.hideSelect();
+					if ($targetState.length === 0) continue;
+					await closure();
+					let existent = automaton.states.findIndex((x) => {
+						if (x.items.length != $targetState.length) return false;
+						let eq = true;
+						for (let k = 0; k < x.items.length; k++) {
+							let match = false;
+
+							for (let m = 0; m < $targetState.length; m++) {
+								match =
+									match ||
+									(x.items[k].pos === $targetState[m].pos &&
+										x.items[k].ruleIndex === $targetState[m].ruleIndex &&
+										x.items[k].lookahead.size === $targetState[m].lookahead?.size &&
+										x.items[k].lookahead.values().every((x) => $targetState[m].lookahead.has(x)));
+								if (match) break;
+							}
+							eq = match;
+							if (!eq) break;
+						}
+						return eq;
+					});
+					if (existent === -1) {
+						automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
+						automatonElem?.addNode(
+							stateStackElem?.first(),
+							automaton.states.length - 1,
+							automaton.states[automaton.states.length - 1],
+							symbol
+						);
+						await stateStackElem?.addToStack(
+							automaton.states.length - 1,
+							`s${automaton.states.length - 1}`,
+							'',
+							`${automaton.states.length - 1}`,
+							`label-${targetStateElem?.getId()}`
+						);
+						await addPause();
+						continue;
+					}
+
+					automatonElem?.addNode(
+						stateStackElem?.first(),
+						existent,
+						automaton.states[automaton.states.length - 1],
+						symbol
+					);
+					await addPause();
+				}
+
+				await stateStackElem?.removeFromStack(0);
+			}
 		} catch (e) {
 			console.log(e);
 		}

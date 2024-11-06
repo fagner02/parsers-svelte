@@ -1,5 +1,5 @@
 <script>
-	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { wait } from '$lib/flowControl';
@@ -24,7 +24,15 @@
 	export async function addItem(ruleIndex, pos, lookahead = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				state.update((x) => [...x, { ruleIndex: ruleIndex, pos: pos, hide: true, lookahead }]);
+				state.update((x) => [
+					...x,
+					{
+						ruleIndex: ruleIndex,
+						pos: pos,
+						hide: true,
+						lookahead: lookahead ? new Set(lookahead) : null
+					}
+				]);
 				await wait(0);
 				let elem = /**@type {HTMLElement}*/ (
 					document.querySelector(`#state-${stateId}-${$state.length - 1}`)
@@ -161,8 +169,8 @@
 						<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>{/if}<span
 						>{symbol}</span
 					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}
-					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>
-				{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
+					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span
+					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
 					>&lcub;{#each item.lookahead as l, index}{l}{#if index < item.lookahead.size - 1},{/if}{/each}&rcub;{/if}
 			</p>
 		{/each}

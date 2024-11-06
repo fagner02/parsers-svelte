@@ -5,5 +5,5 @@
 <span>        para cada símbolo <b>b</b> em <b>follow</b>(lado esquerdo da produção <b>esquerda</b>):</span>
 <span>            <b>tabela</b>[lado esquerdo da produção <b>esquerda</b>][<b>b</b>] &lt;- <b>esquerda</b></span>
 <span>    para cada símbolo <b>b</b> em <b>f</b>:</span>
-<span>        se <b>b</b> não é igual a &epsilon:</span>
+<span>        se <b>b</b> não é igual a &epsilon;:</span>
 <span>            <b>tabela</b>[lado esquerdo da produção <b>esquerda</b>][<b>b</b>] &lt;- <b>esquerda</b></span>

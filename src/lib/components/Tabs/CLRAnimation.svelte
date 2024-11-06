@@ -36,7 +36,7 @@
 				])
 			);
 		}
-		console.log('first', mergedFirst, _first);
+
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[...mergedFirst.entries()].map((x) => {

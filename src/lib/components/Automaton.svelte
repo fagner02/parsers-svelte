@@ -64,6 +64,9 @@
 				let span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 				let right = `${rules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${rules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
 				span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
+				if (item.lookahead) {
+					span.textContent += `,{${[...item.lookahead].join(',')}}`;
+				}
 				span.setAttribute('x', '0');
 				span.setAttribute('dy', i === 0 ? '0' : '1.5rem');
 				span.setAttribute('alignment-baseline', 'before-edge');
@@ -203,7 +206,6 @@
 				selectGroupElem.append(clone);
 				/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
 
-				console.log('nekfj');
 				selectGroupElem.prepend(line.cloneNode(true));
 				selectGroupElem.append(label.cloneNode(true));
 				selectGroupElem.append(arrow.cloneNode(true));
