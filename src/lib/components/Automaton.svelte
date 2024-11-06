@@ -89,8 +89,9 @@
 				let clone = res.cloneNode(true);
 				selectGroupElem.append(clone);
 				for (let [i, c] of nodes[to].con.entries()) {
-					selectGroupElem.prepend(nodes[to].arrows[i].cloneNode(true));
+					selectGroupElem.append(nodes[to].arrows[i].cloneNode(true));
 					selectGroupElem.prepend(nodes[to].lines[i].cloneNode(true));
+					selectGroupElem.append(nodes[to].conLabels[i].cloneNode(true));
 					clone = nodes[c].obj.cloneNode(true);
 					/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
 					selectGroupElem.append(clone);
@@ -202,11 +203,14 @@
 				selectGroupElem.append(clone);
 				/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
 
+				console.log('nekfj');
 				selectGroupElem.prepend(line.cloneNode(true));
+				selectGroupElem.append(label.cloneNode(true));
 				selectGroupElem.append(arrow.cloneNode(true));
 			};
 			arrow.addEventListener('click', selectLine);
 			line.addEventListener('click', selectLine);
+			label.addEventListener('click', selectLine);
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];

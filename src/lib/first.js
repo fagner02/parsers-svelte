@@ -3,15 +3,16 @@ export function calcNullable(/**@type {import('@/types').GrammarItem[]} */ rules
 	let nullable = new Map();
 
 	for (let i = 0; i < rules.length; i++) {
-		if (rules[i].right[0] == '') {
+		if (rules[i].right[0] === '') {
 			nullable.set(rules[i].left, true);
 		} else {
 			nullable.set(rules[i].left, nullable.get(rules[i].left) ?? false);
 		}
 	}
 
-	let changed = false;
+	let changed = true;
 	while (changed) {
+		changed = false;
 		for (let j = 0; j < rules.length; j++) {
 			if (nullable.get(rules[j].left)) continue;
 			let isnull = true;
@@ -42,6 +43,7 @@ export function first(
 	/** @type {Map<string, boolean>}*/
 	let nullable = calcNullable(rules);
 
+	console.log('null', nullable);
 	for (let i = 0; i < rules.length; i++) {
 		firstSet.set(i, new Set());
 		let isNull = true;

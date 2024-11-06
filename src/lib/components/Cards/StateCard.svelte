@@ -19,16 +19,48 @@
 	/**
 	 * @param {number} ruleIndex
 	 * @param {number} pos
+	 * @param {Set<string>?} lookahead
 	 */
-	export async function addItem(ruleIndex, pos) {
+	export async function addItem(ruleIndex, pos, lookahead = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				state.update((x) => [...x, { ruleIndex: ruleIndex, pos: pos, hide: true }]);
+				state.update((x) => [...x, { ruleIndex: ruleIndex, pos: pos, hide: true, lookahead }]);
 				await wait(0);
+				let elem = /**@type {HTMLElement}*/ (
+					document.querySelector(`#state-${stateId}-${$state.length - 1}`)
+				);
+
+				elem.style.width = `${elem.scrollWidth}px`;
+				elem.style.height = `${elem.scrollHeight}px`;
+				elem.style.opacity = '1';
+				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
+	/**
+	 * @param {Set<string>} lookahead
+	 * @param {number} existent
+	 */
+	export async function updateLookahead(lookahead, existent) {
+		return new Promise(async (resolve, reject) => {
+			try {
 				state.update((x) => {
-					x[x.length - 1].hide = false;
+					x[existent].lookahead = new Set([
+						.../**@type {Set<string>}*/ (x[existent].lookahead),
+						...lookahead.values()
+					]);
 					return x;
 				});
+				await wait(0);
+				let elem = /**@type {HTMLElement}*/ (
+					document.querySelector(`#state-${stateId}-${existent}`)
+				);
+
+				elem.style.width = `${elem.scrollWidth}px`;
 				await wait(500);
 				resolve(null);
 			} catch (e) {
@@ -48,16 +80,24 @@
 						return /**@type {import('@/types').StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,
-							hide: true
+							lookahead: x.lookahead
 						});
 					})
 				);
 				await wait(0);
-				state.update((x) =>
-					x.map((i) => {
-						return { ruleIndex: i.ruleIndex, pos: i.pos, hide: false };
-					})
-				);
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
+				while (elem !== null) {
+					elem.style.width = `${elem.scrollWidth}px`;
+					elem.style.height = `${elem.scrollHeight}px`;
+					elem.style.opacity = '1';
+
+					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+				}
+				// state.update((x) =>
+				// 	x.map((i) => {
+				// 		return { ruleIndex: i.ruleIndex, pos: i.pos, lookahead: i.lookahead };
+				// 	})
+				// );
 				await wait(500);
 				resolve(null);
 			} catch (e) {
@@ -111,14 +151,7 @@
 		{#each $state as item, index}
 			<p
 				id="state-{stateId}-{index}"
-				style="opacity: {item.hide ? 0 : 1};font-size: {fontSize}rem; width: {item.hide
-					? 0
-					: subCharWidth +
-						0.2 * (rules[item.ruleIndex].right.length + 1) +
-						charWidth *
-							(rules[item.ruleIndex].right.join('').length +
-								4 +
-								rules[item.ruleIndex].left.length)}rem; height: {item.hide ? 0 : lineHeight}rem"
+				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"
 			>
 				<span style="font-size: {subFontSize}rem;margin: 0; padding: 0">{item.ruleIndex}</span
 				>{rules[item.ruleIndex].left}
@@ -129,7 +162,8 @@
 						>{symbol}</span
 					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}
 					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>
-				{/if}
+				{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
+					>&lcub;{#each item.lookahead as l, index}{l}{#if index < item.lookahead.size - 1},{/if}{/each}&rcub;{/if}
 			</p>
 		{/each}
 	</div>

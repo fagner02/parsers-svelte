@@ -52,7 +52,7 @@
 
 /** @typedef {Map<string, tableItem>} tableCol*/
 
-/** @typedef {{ruleIndex: number, pos: number, hide: boolean}} StateItem*/
+/** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>?}} StateItem*/
 
 /** @typedef {{index: number,items: StateItem[]}} State*/
 

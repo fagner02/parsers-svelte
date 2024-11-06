@@ -10,6 +10,8 @@
 	import GrammarCard from './Cards/GrammarCard.svelte';
 	import Automaton from './Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import SetsCard from './Cards/SetsCard.svelte';
+	import SlrAlgorithm from './SLRAlgorithm.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -26,6 +28,8 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
 	let targetState = writable([]);
+	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
+	export let firstSet;
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== '$'), ...nt];
 
@@ -75,12 +79,45 @@
 			for (let item of itemsToCheck) {
 				let symbol = rules[item.ruleIndex].right[item.pos];
 				if (!nt.includes(symbol)) continue;
+				let lookahead = new Set();
+				if (rules[item.ruleIndex].right.length - 1 === item.pos) {
+					lookahead = new Set(item.lookahead);
+				} else {
+					/**@type {string[]}*/
+					let betaFirst = [];
+					let nullable = true;
+					for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
+						let beta = rules[item.ruleIndex].right[item.pos + i];
+						if (!nt.includes(beta)) {
+							betaFirst.push(beta);
+							nullable = false;
+							break;
+						} else {
+							let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
+							betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
 
+							if (!first.includes('')) {
+								nullable = false;
+								break;
+							}
+						}
+					}
+					if (nullable) {
+						lookahead = new Set([...betaFirst, .../**@type {Set<string>}*/ (item.lookahead)]);
+					} else {
+						lookahead = new Set(betaFirst);
+					}
+				}
 				for (let rule of rules) {
 					if (!(rule.left === symbol)) continue;
-					if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
-					await targetStateElem?.addItem(rule.index, 0);
-					temp.push({ ruleIndex: rule.index, pos: 0, hide: true });
+					let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
+
+					if (existent === -1) {
+						await targetStateElem?.addItem(rule.index, 0, lookahead);
+						temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
+						continue;
+					}
+					await targetStateElem?.updateLookahead(/**@type {Set<string>}*/ (lookahead), existent);
 				}
 			}
 			itemsToCheck = temp;
@@ -95,7 +132,7 @@
 			/**@type {import('@/types').Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
-			await targetStateElem?.addItem(0, 0);
+			await targetStateElem?.addItem(0, 0, new Set(['$']));
 
 			await closure();
 		} catch (e) {
@@ -114,6 +151,7 @@
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
 		<GrammarCard bind:loadGrammar></GrammarCard>
+		<SetsCard set={firstSet} label="first" setId="first" hue={200}></SetsCard>
 		<StateCard
 			state={targetState}
 			stateId={'destino'}

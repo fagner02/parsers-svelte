@@ -80,7 +80,7 @@
 					if (!(rule.left === symbol)) continue;
 					if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
 					await targetStateElem?.addItem(rule.index, 0);
-					temp.push({ ruleIndex: rule.index, pos: 0, hide: true });
+					temp.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 				}
 			}
 			itemsToCheck = temp;

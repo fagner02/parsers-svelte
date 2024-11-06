@@ -1,4 +1,5 @@
 <script>
+	import { swapAlgorithm } from '$lib/flowControl';
 	import { loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
@@ -22,6 +23,7 @@
 				<button
 					disabled={selectedAlgorithm === algo}
 					on:click={() => {
+						swapAlgorithm();
 						resetSelectionFunctions();
 						selectedAlgorithm = algo;
 					}}>{algo}</button

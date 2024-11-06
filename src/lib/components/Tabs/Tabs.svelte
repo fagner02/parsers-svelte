@@ -4,12 +4,14 @@
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
 	import { swapAlgorithm } from '$lib/flowControl';
+	import CLRAnimation from './CLRAnimation.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
 		{ comp: TextInput, name: 'Entrada' },
 		{ comp: LLAnimation, name: 'LL(1)' },
-		{ comp: SLRAnimation, name: 'SLR' }
+		{ comp: SLRAnimation, name: 'SLR' },
+		{ comp: CLRAnimation, name: 'CLR' }
 	];
 	let selected = items[0];
 </script>

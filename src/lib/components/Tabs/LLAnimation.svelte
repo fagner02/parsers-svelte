@@ -26,7 +26,7 @@
 
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb\nA -> a a\nA -> \nBb -> b m\nBb -> m\nBb -> ';
+	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
 	loadGrammar(grammar);
 	/**@type {string}*/
 	let inputString;
@@ -38,7 +38,7 @@
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
 		const _table = lltable(rules, nt, t, _first, _follow);
-
+		console.log(_first);
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._first.entries()].map((x) => {
