@@ -1,11 +1,15 @@
 <script>
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { loadGrammar } from '$lib/utils';
+	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
-	import SLRAlgorithm from '@/Algorithms/LR0Automaton.svelte';
+	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
+	import SLRTableAlgorithm from '@/Algorithms/SLRTableAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-
+	import { writable } from 'svelte/store';
+	import { follow } from '$lib/follow';
+	import { first } from '$lib/first';
+	import { automatonlr0 } from '$lib/automatonlr0';
 	let code = '';
 	let inputString = '';
 
@@ -14,6 +18,41 @@
 
 	const algos = ['autômato', 'tabela'];
 	let selectedAlgorithm = algos[0];
+	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
+	let followSet = writable([]);
+	/**@type {import('@/types').Automaton}*/
+	let automaton;
+
+	(() => {
+		const { rules, nt, t } = getGrammar();
+		const _follow = follow(rules, nt, first(rules, nt));
+		followSet.set(
+			/**@type {import('@/types').SetRow[]}*/ (
+				[..._follow.entries()].map((x) => {
+					/**@type {string[]}*/
+					let values = [];
+					for (let value of x[1].values()) {
+						values.push(value);
+						if (values.length < x[1].size * 2 - 1) {
+							values.push(',');
+						}
+					}
+
+					return {
+						left: x[0],
+						right: [...x[1]],
+						showRight: true,
+						rightProps: values.map((s) => {
+							return { value: s, opacity: 1, hide: false, note: '' };
+						}),
+						note: ''
+					};
+				})
+			)
+		);
+
+		automaton = automatonlr0(rules, nt, t);
+	})();
 </script>
 
 <AlgorithmTab {inputString} {code}>
@@ -32,7 +71,9 @@
 		</div>
 		<FillHeight class="grid">
 			{#if selectedAlgorithm === algos[0]}
-				<SLRAlgorithm></SLRAlgorithm>
+				<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
+			{:else}
+				<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
 			{/if}
 		</FillHeight>
 	</FillHeight>

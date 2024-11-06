@@ -46,12 +46,13 @@
 		groupElem.style.filter = hide ? 'none' : 'blur(5px)';
 	}
 
-	export async function addNode(
-		/** @type {number | null}*/ from,
-		/** @type {number}*/ to,
-		/** @type {import('@/types').State}*/ data,
-		/** @type {string?}*/ symbol
-	) {
+	/**
+	 * @param {number?} from
+	 * @param {number} to
+	 * @param {import('@/types').State} data
+	 * @param {string?} symbol
+	 */
+	export async function addNode(from, to, data, symbol, shouldUpdate = true) {
 		resetSelected(true);
 
 		if (to > nodes.length - 1) {
@@ -216,7 +217,7 @@
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];
-		update(ex);
+		if (shouldUpdate) update(ex);
 	}
 
 	let svgScale = 0.7;
@@ -311,7 +312,10 @@
 		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
-	function update(/**@type {number[]}*/ existent) {
+	/**
+	 * @param {number[]} existent
+	 */
+	function update(existent) {
 		let oldPos = [];
 		for (let k = 0; k < 4; k++) {
 			for (let [j, n] of nodes.entries()) {
@@ -326,21 +330,7 @@
 					}
 					let limit = { x: 20 + n.size.x + v.size.x, y: 20 + n.size.y + v.size.y };
 
-					// if (
-					// 	diff.x < limit.x &&
-					// 	Math.abs(diff.y) <= limit.y
-					// 	// ((n.pos.x - n.size.x > v.pos.x - v.size.x && n.pos.x - n.size.x < v.pos.x + v.size.x) ||
-					// 	// 	(n.pos.x + n.size.x > v.pos.x - v.size.x && n.pos.x + n.size.x < v.pos.x + v.size.x))
-					// ) {
-					// 	direction.x += diff.x * -1;
-					// }
-					if (
-						Math.abs(diff.y) <= limit.y &&
-						Math.abs(diff.x) <= limit.x
-						// ((n.pos.y - n.size.y >= v.pos.y - v.size.y &&
-						// 	n.pos.y - n.size.y <= v.pos.y + v.size.y) ||
-						// 	(n.pos.y + n.size.y > v.pos.y - v.size.y && n.pos.y + n.size.y < v.pos.y + v.size.y))
-					) {
+					if (Math.abs(diff.y) <= limit.y && Math.abs(diff.x) <= limit.x) {
 						direction.y += diff.y * -1;
 						direction.x += diff.x * -1;
 					}
@@ -461,6 +451,27 @@
 					easing: 'spring(1, 50, 10, 1)'
 				});
 			}
+		}
+	}
+
+	/**
+	 * @param {import('@/types').Automaton} automaton
+	 */
+	export function loadAutomaton(automaton) {
+		let states = [automaton.states[0]];
+
+		addNode(null, states[0].index, states[0], null, true);
+		while (states.length > 0) {
+			let transitions = automaton.transitions.get(states[0].index);
+			if (!transitions) {
+				states.shift();
+				continue;
+			}
+			for (let [symbol, state] of transitions) {
+				addNode(states[0].index, state, automaton.states[state], symbol, true);
+				states.push(automaton.states[state]);
+			}
+			states.shift();
 		}
 	}
 

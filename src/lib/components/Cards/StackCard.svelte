@@ -148,6 +148,10 @@
 			}
 		});
 	}
+
+	export function getId() {
+		return stackId;
+	}
 </script>
 
 <CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>

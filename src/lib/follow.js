@@ -1,8 +1,9 @@
-export function follow(
-	/** @type {Array<import('@/types').GrammarItem>} */ rules,
-	/**@type {string[]} */ nt,
-	/** @type {Map<number, Set<string>>} */ firstSet
-) {
+/**
+ * @param {Array<import('@/types').GrammarItem>} rules
+ * @param {string[]} nt
+ * @param {Map<number, Set<string>>} firstSet
+ */
+export function follow(rules, nt, firstSet) {
 	/** @type {Map<string, Set<string>>}*/
 	let followSet = new Map();
 	/** @type {Map<string, Set<string>>}*/
