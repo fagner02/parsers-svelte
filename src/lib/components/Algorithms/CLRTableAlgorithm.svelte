@@ -15,8 +15,6 @@
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
-	/**@type {StackCard | undefined}*/
-	let symbolListElem;
 	/**@type {TableCard | undefined}*/
 	let tableElem;
 	/**@type {StateCard | undefined}*/
@@ -35,21 +33,6 @@
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== ''), ...nt];
 
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
-	let symbolList = writable(
-		alphabet.map((x) => ({
-			opacity: 1,
-			height: -1,
-			width: -1,
-			top: 0,
-			data: x,
-			text: x,
-			note: '',
-			transition: '',
-			id: x,
-			showBlock: true
-		}))
-	);
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	console.log(rows);
 	let columns = [...alphabet];
@@ -76,7 +59,6 @@
 
 	async function buildAutomaton() {
 		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
-		if (symbolListElem) symbolsSelection = getSelectionFunctions(symbolListElem.getId());
 		try {
 			await loadGrammar();
 			await wait(500);
@@ -130,7 +112,6 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
-		<GrammarCard bind:loadGrammar></GrammarCard>
 		<TableCard
 			{rows}
 			{columns}
@@ -141,6 +122,7 @@
 			tableId="slrtable"
 			bind:this={tableElem}
 		></TableCard>
+		<GrammarCard bind:loadGrammar></GrammarCard>
 		<StateCard
 			{state}
 			stateId={'destino'}
@@ -155,15 +137,6 @@
 			hue={colors.blue}
 			bind:this={stateStackElem}
 			bind:svgLines
-		></StackCard>
-		<StackCard
-			stack={symbolList}
-			stackId="symbolList"
-			label="alfabeto"
-			hue={colors.green}
-			reversed={false}
-			bind:svgLines
-			bind:this={symbolListElem}
 		></StackCard>
 	</div>
 	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
