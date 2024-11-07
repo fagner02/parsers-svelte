@@ -26,13 +26,13 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItemLR1>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let state = writable([]);
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>}*/
 	let table = writable(new Map());
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let followSet;
-	/**@type {import('@/types').Automaton}*/
+	/**@type {import('@/types').LR0Automaton}*/
 	export let automaton;
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== ''), ...nt];

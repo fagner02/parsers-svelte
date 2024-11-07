@@ -105,3 +105,26 @@ export function first(
 
 	return firstSet;
 }
+
+/**
+ * @param {Map<number, Set<string>>} first
+ * @param {Array<import('@/types').GrammarItem>} rules
+ */
+export function mergedFirst(first, rules) {
+	/**@type {Map<string, Set<string>>}*/
+	let mergedFirst = new Map();
+
+	for (let [k, v] of first) {
+		if (!mergedFirst.has(rules[k].left)) {
+			mergedFirst.set(rules[k].left, new Set());
+		}
+		mergedFirst.set(
+			rules[k].left,
+			new Set([
+				.../**@type {Set<string>}*/ (mergedFirst.get(rules[k].left)).values(),
+				...v.values()
+			])
+		);
+	}
+	return mergedFirst;
+}

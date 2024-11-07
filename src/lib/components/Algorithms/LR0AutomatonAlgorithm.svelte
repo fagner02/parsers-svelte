@@ -22,9 +22,9 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let originState = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>} */
+	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let targetState = writable([]);
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== '$'), ...nt];
@@ -70,7 +70,7 @@
 	async function closure() {
 		let itemsToCheck = [...$targetState];
 		while (itemsToCheck.length > 0) {
-			/**@type {import("@/types").StateItem[]}*/
+			/**@type {import("@/types").LR0StateItem[]}*/
 			let temp = [];
 			for (let item of itemsToCheck) {
 				let symbol = rules[item.ruleIndex].right[item.pos];
@@ -92,7 +92,7 @@
 			await loadGrammar();
 			await wait(500);
 
-			/**@type {import('@/types').Automaton}*/
+			/**@type {import('@/types').LR0Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
 			await targetStateElem?.addItem(0, 0);

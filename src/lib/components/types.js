@@ -52,15 +52,13 @@
 
 /** @typedef {Map<string, tableItem>} tableCol*/
 
-/** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>?}} StateItem*/
-/** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>}} StateItemLR1*/
+/** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>?}} LR0StateItem*/
+/** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>}} LR1StateItem*/
 
-/** @typedef {{index: number,items: StateItem[]}} State*/
+/** @typedef {{index: number,items: LR0StateItem[]}} LR0State*/
+/** @typedef {{index: number,items: LR1StateItem[]}} LR1State*/
 
-/** @typedef {{index: number,items: StateItemLR1[]}} StateLR1*/
-
-/** @typedef {{states: State[], transitions: Map<number, Map<string, number>>}} Automaton*/
-
-/** @typedef {{states: StateLR1[], transitions: Map<number, Map<string, number>>}} AutomatonLR1*/
+/** @typedef {{states: LR0State[], transitions: Map<number, Map<string, number>>}} LR0Automaton*/
+/** @typedef {{states: LR1State[], transitions: Map<number, Map<string, number>>}} LR1Automaton*/
 
 export const unused = {};

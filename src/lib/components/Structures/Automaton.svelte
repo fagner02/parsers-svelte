@@ -20,7 +20,6 @@
 	 * conLabels: SVGGElement[];
 	 * con: number[];
 	 * }} Node*/
-	/**@typedef {{x:number, y:number}} Vec2*/
 	/** @type {Node[]}*/
 	let nodes = [];
 
@@ -49,7 +48,7 @@
 	/**
 	 * @param {number?} from
 	 * @param {number} to
-	 * @param {import('@/types').State?} data
+	 * @param {import('@/types').LR0State?} data
 	 * @param {string?} symbol
 	 */
 	export async function addNode(from, to, data, symbol, shouldUpdate = true) {
@@ -270,6 +269,7 @@
 			dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 		}
 	}
+
 	function touchMove(/**@type {TouchEvent}*/ e) {
 		e.preventDefault();
 		if (isScroll) {
@@ -294,6 +294,7 @@
 		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
+
 	function touchEnd() {
 		dragPos = null;
 	}
@@ -455,12 +456,12 @@
 	}
 
 	/**
-	 * @param {import('@/types').Automaton} automaton
+	 * @param {import('@/types').LR0Automaton} automaton
 	 */
 	export async function loadAutomaton(automaton) {
 		console.log(automaton);
 		let states = [
-			/**@type {import('@/types').State}*/ (automaton.states.find((x) => x.index === 0))
+			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];
 
 		addNode(null, states[0].index, states[0], null);

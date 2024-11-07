@@ -9,7 +9,7 @@
 	import { writable } from 'svelte/store';
 	import { follow } from '$lib/follow';
 	import { first } from '$lib/first';
-	import { automatonlr0 } from '$lib/automatonlr0';
+	import { lr0Automaton } from '$lib/lr0automaton';
 	let code = '';
 	let inputString = '';
 
@@ -20,7 +20,7 @@
 	let selectedAlgorithm = algos[0];
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable([]);
-	/**@type {import('@/types').Automaton}*/
+	/**@type {import('@/types').LR0Automaton}*/
 	let automaton;
 
 	(() => {
@@ -51,7 +51,7 @@
 			)
 		);
 
-		automaton = automatonlr0(rules, nt, t);
+		automaton = lr0Automaton(rules, nt, t);
 	})();
 </script>
 

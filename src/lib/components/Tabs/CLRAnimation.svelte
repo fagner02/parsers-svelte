@@ -2,44 +2,35 @@
 	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
-	import CLRAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
+	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-	import { first } from '$lib/first';
+	import { first, mergedFirst } from '$lib/first';
 	import { writable } from 'svelte/store';
 	import { swapAlgorithm } from '$lib/flowControl';
+	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
+	import { lr0Automaton } from '$lib/lr0automaton';
+	import { lr1Automaton } from '$lib/lr1automaton';
 
 	let code = '';
 	let inputString = '';
 
 	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
 	loadGrammar(grammar);
-	let { rules, nt } = getGrammar();
+	let { rules, nt, t } = getGrammar();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
 
-	const _first = first(rules, nt);
+	/**@type {import('@/types').LR1Automaton}*/
+	let automaton;
 
 	(() => {
-		/**@type {Map<string, Set<string>>}*/
-		let mergedFirst = new Map();
-
-		for (let [k, v] of _first) {
-			if (!mergedFirst.has(rules[k].left)) {
-				mergedFirst.set(rules[k].left, new Set());
-			}
-			mergedFirst.set(
-				rules[k].left,
-				new Set([
-					.../**@type {Set<string>}*/ (mergedFirst.get(rules[k].left)).values(),
-					...v.values()
-				])
-			);
-		}
+		const _first = first(rules, nt);
+		const _mergedFirst = mergedFirst(_first, rules);
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[...mergedFirst.entries()].map((x) => {
+				[..._mergedFirst.entries()].map((x) => {
 					/**@type {string[]}*/
 					let values = [];
 					for (let value of x[1].values()) {
@@ -61,6 +52,8 @@
 				})
 			)
 		);
+
+		automaton = lr1Automaton(rules, nt, t, _mergedFirst);
 	})();
 
 	const algos = ['autômato', 'tabela'];
@@ -83,7 +76,9 @@
 		</div>
 		<FillHeight class="grid">
 			{#if selectedAlgorithm === algos[0]}
-				<CLRAlgorithm {firstSet}></CLRAlgorithm>
+				<LR1AutomatonAlgorithm {firstSet}></LR1AutomatonAlgorithm>
+			{:else}
+				<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>
 			{/if}
 		</FillHeight>
 	</FillHeight>

@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
-	/** @type {import('svelte/store').Writable<Array<import('@/types').StateItem>>}*/
+	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>}*/
 	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */
 	let rules = getGrammar().rules;
@@ -78,14 +78,14 @@
 	}
 
 	/**
-	 * @param {import('@/types').State} stateToLoad
+	 * @param {import('@/types').LR0State} stateToLoad
 	 */
 	export async function loadState(stateToLoad) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				state.update(() =>
 					stateToLoad.items.map((x) => {
-						return /**@type {import('@/types').StateItem}*/ ({
+						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,
 							lookahead: x.lookahead

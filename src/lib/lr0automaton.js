@@ -1,12 +1,12 @@
 /**
- * @param {import('@/types').StateItem[]} state
+ * @param {import('@/types').LR0StateItem[]} state
  * @param {import('@/types').GrammarItem[]} rules
  * @param {string[]} nt
  */
 export function closure(state, rules, nt) {
 	let itemsToCheck = [...state];
 	while (itemsToCheck.length > 0) {
-		/**@type {import("@/types").StateItem[]}*/
+		/**@type {import("@/types").LR0StateItem[]}*/
 		let temp = [];
 		for (let item of itemsToCheck) {
 			let symbol = rules[item.ruleIndex].right[item.pos];
@@ -27,11 +27,11 @@ export function closure(state, rules, nt) {
  * @param {string[]} nt
  * @param {string[]} t
  */
-export function automatonlr0(rules, nt, t) {
-	/**@type {import('@/types').Automaton}*/
+export function lr0Automaton(rules, nt, t) {
+	/**@type {import('@/types').LR0Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
 
-	/**@type {import('@/types').StateItem[]} */
+	/**@type {import('@/types').LR0StateItem[]} */
 	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: null }];
 
 	/**@type {number[]} */
@@ -44,7 +44,7 @@ export function automatonlr0(rules, nt, t) {
 	let alphabet = [...t, ...nt].filter((x) => x !== '');
 	while (stateStack.length > 0) {
 		for (let symbol of alphabet) {
-			/**@type {import('@/types').StateItem[]} */
+			/**@type {import('@/types').LR0StateItem[]} */
 			let state1 = [];
 			for (let prod of automaton.states[stateStack[0]].items) {
 				if (
