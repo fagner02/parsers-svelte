@@ -34,17 +34,11 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
-		alphabet.map((x) => ({
-			opacity: 1,
-			height: -1,
-			width: -1,
-			top: 0,
+		alphabet.map((x, index) => ({
 			data: x,
 			text: x,
 			note: '',
-			transition: '',
-			id: x,
-			showBlock: true
+			id: index
 		}))
 	);
 
@@ -140,7 +134,7 @@
 
 			await addPause();
 
-			await stateStackElem?.addToStack(0, 's0', '', '0', `label-${targetStateElem?.getId()}`);
+			await stateStackElem?.addToStack(0, 's0', '', `label-${targetStateElem?.getId()}`);
 
 			while ($stateStack.length > 0) {
 				await originStateElem?.resetState();
@@ -195,7 +189,6 @@
 							automaton.states.length - 1,
 							`s${automaton.states.length - 1}`,
 							'',
-							`${automaton.states.length - 1}`,
 							`label-${targetStateElem?.getId()}`
 						);
 						await addPause();

@@ -198,7 +198,6 @@
 					item,
 					item,
 					'',
-					item,
 					`${joinSetElement?.getSetId()}l${joinIndexes.get(item)}`
 				);
 				await addPause();
@@ -218,7 +217,6 @@
 							top[0],
 							top[0],
 							'',
-							top[0],
 							`${joinSetElement?.getSetId()}l${joinIndexes.get(top[0])}`
 						);
 						await codeCard?.highlightLines([43]);

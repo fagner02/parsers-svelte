@@ -37,21 +37,6 @@
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== ''), ...nt];
 
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
-	let symbolList = writable(
-		alphabet.map((x) => ({
-			opacity: 1,
-			height: -1,
-			width: -1,
-			top: 0,
-			data: x,
-			text: x,
-			note: '',
-			transition: '',
-			id: x,
-			showBlock: true
-		}))
-	);
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	console.log(rows);
 	let columns = [...alphabet];
@@ -127,6 +112,16 @@
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
+		stateStack.set(
+			automaton.states.map(
+				(x) =>
+					/**@type {import('@/types').StackItem<number>}*/ ({
+						data: x.index,
+						text: `s${x.index}`,
+						id: x.index
+					})
+			)
+		);
 		buildAutomaton();
 	});
 </script>
@@ -160,15 +155,6 @@
 			hue={colors.blue}
 			bind:this={stateStackElem}
 			bind:svgLines
-		></StackCard>
-		<StackCard
-			stack={symbolList}
-			stackId="symbolList"
-			label="alfabeto"
-			hue={colors.green}
-			reversed={false}
-			bind:svgLines
-			bind:this={symbolListElem}
 		></StackCard>
 	</div>
 	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">

@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, limitHit, setResetCall } from '$lib/flowControl';
+	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
@@ -51,13 +51,13 @@
 				resetTree = functions.resetTree;
 			}
 			for (let i of ['$', startingSymbol]) {
-				await symbolStackElement.addToStack(i, i, '', $symbolStack.length.toString());
+				await symbolStackElement.addToStack(i, i, '');
 			}
 
 			await initializeTree(startingSymbol);
 
 			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
-				await inputStackElement.addToStack(i, i, '', $inputStack.length.toString());
+				await inputStackElement.addToStack(i, i, '');
 			}
 
 			while ($inputStack.length > 0) {
@@ -80,7 +80,7 @@
 					addToTree([...rules[prodIndex].right], topSymbol);
 
 					for (let p of prod) {
-						await symbolStackElement.addToStack(p, p, '', $symbolStack.length.toString());
+						await symbolStackElement.addToStack(p, p, '');
 					}
 				} else {
 					if (topSymbol !== topInput) {

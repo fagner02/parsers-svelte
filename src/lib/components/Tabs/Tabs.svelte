@@ -11,7 +11,7 @@
 		{ comp: TextInput, name: 'Entrada' },
 		{ comp: LLAnimation, name: 'LL(1)' },
 		{ comp: SLRAnimation, name: 'SLR' },
-		{ comp: CLRAnimation, name: 'CLR' }
+		{ comp: CLRAnimation, name: 'LR(1)' }
 	];
 	let selected = items[0];
 </script>

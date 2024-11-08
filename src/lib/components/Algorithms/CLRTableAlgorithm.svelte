@@ -117,7 +117,7 @@
 			{columns}
 			{svgLines}
 			bind:table
-			label="tabela slr"
+			label="tabela clr"
 			hue={colors.blue}
 			tableId="slrtable"
 			bind:this={tableElem}

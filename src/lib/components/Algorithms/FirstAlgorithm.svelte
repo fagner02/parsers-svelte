@@ -145,7 +145,6 @@
 					item,
 					rules[item].left,
 					'',
-					item.toString(),
 					`${joinSetElement?.getSetId()}l${item}`
 				);
 				await addPause();
@@ -162,12 +161,7 @@
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
 						await codeCard?.highlightLines([26, 27]);
 
-						await joinStackElement?.addToStack(
-							topValue,
-							rules[topValue].left,
-							topValue.toString(),
-							topValue.toString()
-						);
+						await joinStackElement?.addToStack(topValue, rules[topValue].left, topValue.toString());
 						await addPause();
 						continue;
 					}
@@ -212,35 +206,45 @@
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<PseudoCode bind:this={codeCard}></PseudoCode>
-	<GrammarCard bind:loadGrammar></GrammarCard>
-	<SetsCard
-		setId="first"
-		set={firstSet}
-		setIndexes={firstIndexes}
-		hue={colors.blue}
-		label={'first set'}
-		bind:this={firstSetElement}
-		bind:svgLines
-	></SetsCard>
-	<SetsCard
-		setId="join"
-		set={joinSet}
-		setIndexes={joinIndexes}
-		hue={colors.blue}
-		label={'join set'}
-		bind:this={joinSetElement}
-		bind:svgLines
-	></SetsCard>
-	<StackCard
-		stack={joinStack}
-		stackId="join"
-		label="join stack"
-		hue={colors.blue}
-		bind:this={joinStackElement}
-		bind:svgLines
-	></StackCard>
+	<div style="justify-content: flex-end">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
+	</div>
+	<div>
+		<GrammarCard bind:loadGrammar></GrammarCard>
+		<SetsCard
+			setId="first"
+			set={firstSet}
+			setIndexes={firstIndexes}
+			hue={colors.blue}
+			label={'first set'}
+			bind:this={firstSetElement}
+			bind:svgLines
+		></SetsCard>
+		<SetsCard
+			setId="join"
+			set={joinSet}
+			setIndexes={joinIndexes}
+			hue={colors.blue}
+			label={'join set'}
+			bind:this={joinSetElement}
+			bind:svgLines
+		></SetsCard>
+		<StackCard
+			stack={joinStack}
+			stackId="join"
+			label="join stack"
+			hue={colors.blue}
+			bind:this={joinStackElement}
+			bind:svgLines
+		></StackCard>
+	</div>
 </div>
 
 <style>
+	.cards-box > div {
+		flex: 1;
+		flex-wrap: wrap;
+		display: flex;
+		align-items: flex-start;
+	}
 </style>

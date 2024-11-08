@@ -1,11 +1,14 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { onMount } from 'svelte';
 	import CardWrapper from './CardWrapper.svelte';
-	const stackTransitionForward = `top 0.5s 0.5s, height 0.5s, width 0.5s, opacity 0.5s 0.5s`;
-	const stackTransitionBackward = `top 0.5s, height 0.5s 0.5s, width 0.5s 0.5s, opacity 0.5s`;
 
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>} */
+	/**
+	 * @template T
+	 * @typedef {import('@/types').StackItem<T>} StackItem*/
+
+	/** @type {import("svelte/store").Writable<Array<StackItem<any>>>} */
 	export let stack;
 	export let label;
 	export let hue;
@@ -15,55 +18,42 @@
 	export let stackId;
 	/** @type {import('@/Structures/SvgLines.svelte').default | undefined} */
 	export let svgLines;
-
-	/**
-	 * @param {string} text
-	 * @param {string} note
-	 */
-	function textWidth(text, note) {
-		return text.length * charWidth + note.length * subCharWidth;
-	}
+	let idCount = 0;
 
 	/**
 	 * @param {any} data
 	 * @param {string} text
 	 * @param {string} note
-	 * @param {string} id
 	 * @param {string|null} srcId
 	 */
-	export async function addToStack(data, text, note, id, srcId = null) {
+	export async function addToStack(data, text, note, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				await wait(0);
+				if ($stack.length === 0) idCount = 0;
 				stack.update((x) => [
 					...x,
 					{
-						opacity: 0,
-						height: 0,
-						width: 0,
-						top: -lineHeight,
 						text,
 						note,
 						data: data,
-						transition: stackTransitionForward,
-						id,
-						showBlock: true
+						id: idCount
 					}
 				]);
+				idCount++;
 				await wait(10);
 
 				if (srcId) {
 					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`);
 				}
 
-				stack.update((x) => {
-					Object.assign(x[x.length - 1], {
-						opacity: 1,
-						height: lineHeight,
-						width: textWidth(text, note),
-						top: 0
-					});
-					return x;
-				});
+				let elem = /**@type {HTMLElement}*/ (
+					document.querySelector(`#stack-${stackId}-${reversed ? 0 : $stack.length - 1}`)
+				);
+				elem.style.height = `${elem.scrollHeight}px`;
+				elem.style.width = `${elem.scrollWidth}px`;
+				elem.style.opacity = '1';
+				elem.style.top = '0px';
 
 				if (srcId) {
 					await svgLines?.hideLine();
@@ -89,23 +79,13 @@
 				stack.update((x) => {
 					Object.assign(x[index], {
 						data,
-						text,
-						width: textWidth(text, x[index].note),
-						showBlock: false
+						text
 					});
 					return x;
 				});
-				await wait(50);
-
-				stack.update((x) => {
-					Object.assign(x[index], {
-						data,
-						text,
-						width: textWidth(text, x[index].note),
-						showBlock: true
-					});
-					return x;
-				});
+				await wait(0);
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${index}`));
+				elem.style.width = `${elem.scrollWidth}px`;
 				await wait(500);
 				resolve(null);
 			} catch (e) {
@@ -128,16 +108,16 @@
 	export async function removeFromStack(index) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				stack.update((x) => {
-					Object.assign(x[index], {
-						opacity: 0,
-						height: 0,
-						width: 0,
-						top: -lineHeight,
-						transition: stackTransitionBackward
-					});
-					return x;
-				});
+				let elem = /**@type {HTMLElement}*/ (
+					document.querySelector(
+						`#stack-${stackId}-${reversed ? $stack.length - 1 - index : index}`
+					)
+				);
+				elem.style.width = '0px';
+				elem.style.height = '0px';
+				elem.style.opacity = '0';
+				elem.style.top = `-${lineHeight}rem`;
+
 				await wait(1000);
 				stack.update((x) => {
 					return [...x.slice(0, index), ...x.slice(index + 1)];
@@ -149,17 +129,54 @@
 		});
 	}
 
+	/**
+	 * @param {StackItem<any>[]} items
+	 */
+	export async function loadStack(items) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				stack.set(items);
+
+				await wait(0);
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
+
+				while (elem) {
+					elem.style.height = `${elem.scrollHeight}px`;
+					elem.style.width = `${elem.scrollWidth}px`;
+					elem.style.opacity = '1';
+					elem.style.top = '0px';
+					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+				}
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
 	export function getId() {
 		return stackId;
 	}
+
+	onMount(async () => {
+		let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
+
+		while (elem) {
+			elem.style.height = `${elem.scrollHeight}px`;
+			elem.style.width = `${elem.scrollWidth}px`;
+			elem.style.opacity = '1';
+			elem.style.top = '0px';
+			elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+		}
+	});
 </script>
 
 <CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
 	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="stack-{stackId}-{index}"
-			class={highlighted && stackItem.showBlock ? 'block' : ''}
-			style="--block-hue: {hue};transition: {stackItem.transition};height: {stackItem.height}rem;width: {stackItem.width}rem;opacity: {stackItem.opacity}; top: {stackItem.top}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px;"
+			class={`stack-item ${highlighted ? 'block' : ''}`}
+			style="--block-hue: {hue};top: -{lineHeight}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem;"
 		>
 			{stackItem.text}<span
 				style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, 5px)"
@@ -178,5 +195,16 @@
 			width 0.5s,
 			opacity 0.5s 0.5s;
 		white-space: nowrap;
+	}
+	.stack-item {
+		height: 0;
+		width: 0;
+		opacity: 0;
+		padding: 0;
+		transition:
+			width 0.5s,
+			height 0.5s,
+			opacity 0.5s,
+			top 0.5s;
 	}
 </style>

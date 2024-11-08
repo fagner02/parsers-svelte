@@ -1,16 +1,11 @@
 /**
  * @template T
  * @typedef {{
- * opacity: number,
- * height: number,
- * width: number,
- * top: number,
  * data: T,
  * text: string,
  * note: string,
- * transition: string,
- * id: string,
- * showBlock: boolean }} StackItem<T>
+ * id: number
+ * }} StackItem<T>
  */
 
 /**
