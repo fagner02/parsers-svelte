@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 
@@ -174,15 +174,16 @@
 				}, 100);
 				resolve(null);
 			} catch (e) {
+				console.log(e);
 				reject(e);
 			}
 		});
 	}
 
-	export async function hideLine() {
+	export async function hideLine(shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				await wait(1500);
+				if (shouldWait) await wait(1500);
 				if (inter != null) {
 					if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
@@ -207,12 +208,11 @@
 				anime(animeParams);
 				anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-				await wait(200);
+				if (shouldWait) await wait(200);
 				opacity = 0;
-				await wait(300);
+				if (shouldWait) await wait(300);
 				resolve(null);
 			} catch (e) {
-				console.log(e);
 				reject(e);
 			}
 		});
@@ -231,7 +231,7 @@
 <svg id={svgId} xmlns="http://www.w3.org/2000/svg" class="unit" overflow="visible">
 	<defs>
 		<path
-			stroke-dasharray="6,10"
+			stroke-dasharray="5,8"
 			id="{svgId}-line"
 			d="M 0 0 C 20 20, 50 0, 60 10"
 			stroke-linecap="round"
@@ -247,9 +247,9 @@
 		/>
 	</defs>
 	<g id="{svgId}-lines" style="transition: all 0.2s;opacity:{opacity}">
-		<use xlink:href="#{svgId}-line" stroke-width="12" stroke="white" />
+		<use xlink:href="#{svgId}-line" stroke-width="10" stroke="white" />
 		<use xlink:href="#{svgId}-line" stroke="black" stroke-width="4" />
-		<use xlink:href="#{svgId}-arrow" stroke-width="12" stroke="white" />
+		<use xlink:href="#{svgId}-arrow" stroke-width="10" stroke="white" />
 		<use xlink:href="#{svgId}-arrow" stroke="black" stroke-width="4"></use>
 	</g>
 </svg>

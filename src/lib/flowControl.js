@@ -55,6 +55,15 @@ export async function wait(ms) {
 	});
 }
 
+/**
+ * @param {number} ms
+ */
+export async function noJumpWait(ms) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => resolve, ms);
+	});
+}
+
 export function resolvePause() {
 	for (let resolve of pauseResolves.values()) {
 		resolve();

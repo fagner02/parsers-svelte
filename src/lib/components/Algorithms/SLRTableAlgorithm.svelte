@@ -147,6 +147,7 @@
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={stateElem}
+			bind:svgLines
 		></StateCard>
 		<StackCard
 			stack={stateStack}

@@ -52,14 +52,15 @@
 	let stateSelection;
 
 	function reset() {
-		stateStack.update(() => []);
-		originStateElem?.resetState();
-		targetStateElem?.resetState();
-		svgLines?.hideLine();
-		automatonElem?.reset();
-		symbolsSelection.hideSelect();
-		stateSelection.hideSelect();
-
+		try {
+			stateStack.update(() => []);
+			originStateElem?.resetState();
+			targetStateElem?.resetState();
+			svgLines?.hideLine(false);
+			automatonElem?.reset();
+			symbolsSelection.hideSelect();
+			stateSelection.hideSelect();
+		} catch (e) {}
 		buildAutomaton();
 	}
 	setResetCall(reset);
@@ -229,6 +230,7 @@
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={targetStateElem}
+			bind:svgLines
 		></StateCard>
 		<StateCard
 			state={originState}
@@ -236,6 +238,7 @@
 			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
+			bind:svgLines
 		></StateCard>
 		<StackCard
 			stack={stateStack}

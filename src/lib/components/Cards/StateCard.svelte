@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>}*/
 	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */
@@ -15,13 +16,16 @@
 	export let label;
 	/** @type {string}*/
 	export let stateId;
+	/**@type {SvgLines | undefined}*/
+	export let svgLines;
 
 	/**
 	 * @param {number} ruleIndex
 	 * @param {number} pos
 	 * @param {Set<string>?} lookahead
+	 * @param {string?} srcId
 	 */
-	export async function addItem(ruleIndex, pos, lookahead = null) {
+	export async function addItem(ruleIndex, pos, lookahead = null, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				state.update((x) => [
@@ -37,11 +41,14 @@
 				let elem = /**@type {HTMLElement}*/ (
 					document.querySelector(`#state-${stateId}-${$state.length - 1}`)
 				);
+				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${$state.length - 1}`);
 
 				elem.style.width = `${elem.scrollWidth}px`;
 				elem.style.height = `${elem.scrollHeight}px`;
 				elem.style.opacity = '1';
-				await wait(500);
+
+				await wait(1500);
+				await svgLines?.hideLine(false);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -101,11 +108,7 @@
 
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
-				// state.update((x) =>
-				// 	x.map((i) => {
-				// 		return { ruleIndex: i.ruleIndex, pos: i.pos, lookahead: i.lookahead };
-				// 	})
-				// );
+
 				await wait(500);
 				resolve(null);
 			} catch (e) {
@@ -156,9 +159,9 @@
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
-		{#each $state as item, index}
+		{#each $state as item, rindex}
 			<p
-				id="state-{stateId}-{index}"
+				id="state-{stateId}-{rindex}"
 				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"
 			>
 				<span style="font-size: {subFontSize}rem;margin: 0; padding: 0">{item.ruleIndex}</span
@@ -166,8 +169,8 @@
 				-&gt;
 				{#each rules[item.ruleIndex].right as symbol, index}
 					{#if item.pos === index}
-						<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span>{/if}<span
-						>{symbol}</span
+						<span style="margin: 0;color: hsl(300,60%,45%)">&bull;</span>{/if}<span
+						id="state-{stateId}-{rindex}-{index}">{symbol}</span
 					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}
 					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span
 					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
@@ -186,6 +189,6 @@
 		white-space: nowrap;
 	}
 	p > span {
-		padding-right: 0.2rem;
+		margin: 0 0.2rem;
 	}
 </style>

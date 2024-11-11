@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
-	import { colors } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -47,6 +47,8 @@
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let stateSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let targetStateSelection;
 
 	function reset() {
 		stateStack.update(() => []);
@@ -62,23 +64,42 @@
 	setResetCall(reset);
 
 	async function closure() {
-		let itemsToCheck = [...$targetState];
-		while (itemsToCheck.length > 0) {
-			/**@type {import("@/types").LR0StateItem[]}*/
-			let temp = [];
-			for (let item of itemsToCheck) {
-				let symbol = rules[item.ruleIndex].right[item.pos];
-				if (!nt.includes(symbol)) continue;
+		return new Promise(async (resolve, reject) => {
+			try {
+				let itemsToCheck = [...$targetState];
+				while (itemsToCheck.length > 0) {
+					let item = itemsToCheck[0];
+					let index = $targetState.findIndex(
+						(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
+					);
+					await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
+					let symbol = rules[item.ruleIndex].right[item.pos];
+					if (!nt.includes(symbol)) {
+						itemsToCheck.shift();
+						continue;
+					}
 
-				for (let rule of rules) {
-					if (!(rule.left === symbol)) continue;
-					if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
-					await targetStateElem?.addItem(rule.index, 0);
-					temp.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+					for (let rule of rules) {
+						if (!(rule.left === symbol)) continue;
+						if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
+
+						await selectSymbol(
+							`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
+							colors.pink,
+							false
+						);
+						await targetStateElem?.addItem(rule.index, 0, null, `gl${rule.index}`);
+						itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+					}
+					await deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`);
+					itemsToCheck.shift();
 				}
+				targetStateSelection.hideSelect();
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-			itemsToCheck = temp;
-		}
+		});
 	}
 
 	async function buildAutomaton() {
@@ -89,7 +110,7 @@
 			/**@type {import('@/types').LR0Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
-			await targetStateElem?.addItem(0, 0);
+			await targetStateElem?.addItem(0, 0, null, `gl0`);
 
 			await closure();
 
@@ -171,6 +192,7 @@
 	onMount(() => {
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
+		targetStateSelection = getSelectionFunctions('destino');
 		buildAutomaton();
 	});
 </script>
@@ -185,6 +207,7 @@
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={targetStateElem}
+			bind:svgLines
 		></StateCard>
 		<StateCard
 			state={originState}
@@ -192,6 +215,7 @@
 			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
+			bind:svgLines
 		></StateCard>
 		<StackCard
 			stack={stateStack}
