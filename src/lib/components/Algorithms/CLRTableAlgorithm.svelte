@@ -30,8 +30,7 @@
 	let table = writable(new Map());
 	/**@type {import('@/types').LR1Automaton}*/
 	export let automaton;
-	let { t, nt, rules } = getGrammar();
-	let alphabet = [...t.filter((x) => x !== ''), ...nt];
+	let { t, nt, rules, alphabet } = getGrammar();
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 
@@ -46,13 +45,14 @@
 	let stateSelection;
 
 	function reset() {
-		stateStack.update(() => []);
-		stateElem?.resetState();
-		svgLines?.hideLine();
-		symbolsSelection?.hideSelect();
-		stateSelection?.hideSelect();
-		tableElem?.resetTable();
-
+		try {
+			stateStack.update(() => []);
+			stateElem?.resetState(false);
+			svgLines?.hideLine(false);
+			symbolsSelection?.hideSelect();
+			stateSelection?.hideSelect();
+			tableElem?.resetTable();
+		} catch (e) {}
 		buildAutomaton();
 	}
 	setResetCall(reset);

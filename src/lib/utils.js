@@ -57,5 +57,5 @@ export function loadGrammar(grammar) {
 }
 
 export function getGrammar() {
-	return { t, nt, rules };
+	return { t, nt, rules, alphabet: [...t, ...nt], startingSymbol: rules[0].left };
 }

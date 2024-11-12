@@ -1,6 +1,6 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
 	import CardWrapper from './CardWrapper.svelte';
 
@@ -21,7 +21,8 @@
 	let idCount = 0;
 
 	/**
-	 * @param {any} data
+	 * @template T
+	 * @param {T} data
 	 * @param {string} text
 	 * @param {string} note
 	 * @param {string|null} srcId
@@ -29,7 +30,7 @@
 	export async function addToStack(data, text, note, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				await wait(0);
+				await wait(10);
 				if ($stack.length === 0) idCount = 0;
 				stack.update((x) => [
 					...x,
@@ -172,7 +173,7 @@
 </script>
 
 <CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
-	{#each $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
+	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="stack-{stackId}-{index}"
 			class={`stack-item ${highlighted ? 'block' : ''}`}

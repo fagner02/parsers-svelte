@@ -12,6 +12,7 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
+	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -26,7 +27,7 @@
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let state = writable([]);
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>}*/
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>}*/
 	let table = writable(new Map());
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let followSet;
@@ -41,8 +42,7 @@
 			id: index
 		}))
 	]);
-	let { t, nt, rules } = getGrammar();
-	let alphabet = [...t.filter((x) => x !== ''), ...nt];
+	let { nt, rules, alphabet } = getGrammar();
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	let columns = [...alphabet];
@@ -56,12 +56,13 @@
 	let stateSelection;
 
 	function reset() {
-		stateElem?.resetState();
-		svgLines?.hideLine();
-		symbolsSelection?.hideSelect();
-		stateSelection?.hideSelect();
-		tableElem?.resetTable();
-
+		try {
+			stateElem?.resetState(false);
+			svgLines?.hideLine(false);
+			symbolsSelection?.hideSelect();
+			stateSelection?.hideSelect();
+			tableElem?.resetTable();
+		} catch (e) {}
 		buildAutomaton();
 	}
 	setResetCall(reset);
@@ -77,15 +78,26 @@
 				for (let i of s.items) {
 					await addPause();
 					if (i.pos === rules[i.ruleIndex].right.length || rules[i.ruleIndex].right[0] === '') {
+						if (i.ruleIndex === 0) {
+							await tableElem?.addToTable(
+								{ action: 'a', state: i.ruleIndex },
+								`a`,
+								`s${s.index}`,
+								'$'
+							);
+							continue;
+						}
 						let follow = $followSet.find((x) => x.left === rules[i.ruleIndex].left);
 						if (!follow) continue;
-						for (let symbol of follow.right)
+
+						for (let symbol of follow.right) {
 							await tableElem?.addToTable(
 								{ action: 'r', state: i.ruleIndex },
 								`r${i.ruleIndex}`,
 								`s${s.index}`,
 								symbol
 							);
+						}
 						continue;
 					}
 					let transition = automaton.transitions.get(s.index)?.get(rules[i.ruleIndex].right[i.pos]);

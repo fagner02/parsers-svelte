@@ -1,25 +1,30 @@
 <script>
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
 	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
 	import SLRTableAlgorithm from '@/Algorithms/SLRTableAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
+	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
+	import SlrParse from '@/Algorithms/SLRParse.svelte';
 	import { writable } from 'svelte/store';
 	import { follow } from '$lib/follow';
 	import { first } from '$lib/first';
 	import { lr0Automaton } from '$lib/lr0automaton';
+	import { slrTable } from '$lib/slrtable';
+	import Automaton from '@/Structures/Automaton.svelte';
+	import CardWrapper from '@/Cards/CardWrapper.svelte';
 	let code = '';
-	let inputString = '';
-
-	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
-	loadGrammar(grammar);
+	/**@type {string} */
+	let inputString;
 
 	const algos = ['autômato', 'tabela'];
 	let selectedAlgorithm = algos[0];
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable([]);
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
+	let table = writable(new Map());
 	/**@type {import('@/types').LR0Automaton}*/
 	let automaton;
 
@@ -52,6 +57,30 @@
 		);
 
 		automaton = lr0Automaton(rules, nt, t);
+
+		const _table = slrTable(automaton, rules, nt, t, _follow);
+
+		table.set(
+			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
+				new Map(
+					[..._table].map(([rowKey, cols]) => [
+						`s${rowKey}`,
+						new Map(
+							[...cols].map(([colKey, cell]) => [
+								colKey,
+								/**@type {import('@/types').tableItem<string>}*/ ({
+									data: cell,
+									opacity: 1,
+									pos: 0,
+									text: cell,
+									width: 1
+								})
+							])
+						)
+					])
+				)
+			)
+		);
 	})();
 </script>
 
@@ -77,4 +106,12 @@
 			{/if}
 		</FillHeight>
 	</FillHeight>
+	<SyntaxTree slot="tree"></SyntaxTree>
+	<div slot="parse" class="grid" style="place-items: center;">
+		<SlrParse
+			bind:input={inputString}
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></SlrParse>
+	</div>
 </AlgorithmTab>

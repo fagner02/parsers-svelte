@@ -117,7 +117,7 @@
 		});
 	}
 
-	export async function resetState() {
+	export async function resetState(shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				if ($state.length === 0) {
@@ -126,12 +126,12 @@
 				container.style.maxHeight = `${container.scrollHeight}px`;
 				container.style.maxWidth = `${container.scrollWidth}px`;
 
-				await wait(0);
+				if (shouldWait) await wait(0);
 				container.style.maxHeight = '0px';
 				container.style.maxWidth = '0px';
 				container.style.opacity = '0';
 
-				await wait(500);
+				if (shouldWait) await wait(500);
 				state.update(() => []);
 
 				container.style.maxHeight = 'unset';

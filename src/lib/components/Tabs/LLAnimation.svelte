@@ -10,7 +10,7 @@
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
-	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
 
@@ -23,11 +23,8 @@
 	let followSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
 	let table = writable();
-
 	// ========== Components ====================
 
-	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
-	loadGrammar(grammar);
 	/**@type {string}*/
 	let inputString;
 
@@ -90,7 +87,7 @@
 		);
 
 		table.set(
-			/**@type {Map<string, import('../types').tableCol>}*/ (
+			/**@type {Map<string, import('@/types').tableCol>}*/ (
 				new Map(
 					[..._table].map(([rowKey, cols]) => [
 						rowKey,

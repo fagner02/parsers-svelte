@@ -29,9 +29,8 @@
 	let targetState = writable([]);
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
-	let { t, nt, rules } = getGrammar();
-	let alphabet = [...t.filter((x) => x !== '$'), ...nt];
-
+	let { nt, rules, alphabet } = getGrammar();
+	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
 		alphabet.map((x, index) => ({
@@ -56,8 +55,8 @@
 	function reset() {
 		try {
 			stateStack.update(() => []);
-			originStateElem?.resetState();
-			targetStateElem?.resetState();
+			originStateElem?.resetState(false);
+			targetStateElem?.resetState(false);
 			svgLines?.hideLine(false);
 			automatonElem?.reset();
 			symbolsSelection.hideSelect();

@@ -1,5 +1,5 @@
 <script>
-	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillHeight from '@/Layout/FillHeight.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
@@ -8,14 +8,10 @@
 	import { writable } from 'svelte/store';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
-	import { lr0Automaton } from '$lib/lr0automaton';
 	import { lr1Automaton } from '$lib/lr1automaton';
 
 	let code = '';
 	let inputString = '';
-
-	const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
-	loadGrammar(grammar);
 	let { rules, nt, t } = getGrammar();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/

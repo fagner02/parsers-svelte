@@ -11,7 +11,7 @@
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>} */
 	export let table;
 	/**@type {string}*/
 	export let input = 'aab m';
@@ -24,9 +24,8 @@
 	let symbolStackElement;
 	/** @type {StackCard}*/
 	let inputStackElement;
-	let { nt, t, rules } = getGrammar();
+	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
-	let startingSymbol = 'S';
 
 	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
 
@@ -42,6 +41,7 @@
 
 	async function parsing() {
 		try {
+			await wait(100);
 			resetTree();
 
 			if (initializeTree === undefined) {

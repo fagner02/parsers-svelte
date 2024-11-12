@@ -43,9 +43,13 @@
 
 /** @typedef {{level: number,index: number}} nodeId*/
 
-/** @typedef {{data: any, text: string, opacity: number,width:number, pos: number }} tableItem*/
+/**
+ * @template T
+ * @typedef {{data: T, text: string, opacity: number,width:number, pos: number }} tableItem*/
 
-/** @typedef {Map<string, tableItem>} tableCol*/
+/**
+ * @template T
+ * @typedef {Map<string, tableItem<T>>} tableCol*/
 
 /** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>?}} LR0StateItem*/
 /** @typedef {{ruleIndex: number, pos: number, lookahead: Set<string>}} LR1StateItem*/

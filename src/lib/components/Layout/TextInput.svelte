@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/globalStyle';
 	import ExpandIcon from '@icons/ExpandIcon.svelte';
+	import { loadGrammar } from '$lib/utils';
 
 	/**@type {number}*/
 	let height;
@@ -26,6 +27,9 @@
 	export let lines = 1;
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
+		const grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
+		/**@type {HTMLElement}*/ (document.querySelector('.input>.text')).innerText = grammar;
+		loadGrammar(grammar);
 		updateSize();
 	});
 
@@ -47,6 +51,7 @@
 			const target = /**@type {HTMLElement}*/ (ev.target);
 			target.innerHTML = target.innerText.replaceAll('\n', '</br>');
 		}
+		loadGrammar(/**@type {HTMLElement}*/ (ev.target)?.innerText);
 	}
 </script>
 
