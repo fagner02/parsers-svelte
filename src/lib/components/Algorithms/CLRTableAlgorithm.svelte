@@ -34,7 +34,7 @@
 	let alphabet = [...t.filter((x) => x !== ''), ...nt];
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
-	console.log(rows);
+
 	let columns = [...alphabet];
 	/**@type {SvgLines | undefined}*/
 	let svgLines;

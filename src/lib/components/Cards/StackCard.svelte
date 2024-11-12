@@ -172,7 +172,7 @@
 </script>
 
 <CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
-	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
+	{#each $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="stack-{stackId}-{index}"
 			class={`stack-item ${highlighted ? 'block' : ''}`}

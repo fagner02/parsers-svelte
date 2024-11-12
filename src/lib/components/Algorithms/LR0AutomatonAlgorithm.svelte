@@ -132,10 +132,21 @@
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
-						)
+						) {
 							continue;
-						if ($targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+						}
+						await selectSymbol(
+							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
+							colors.pink,
+							false
+						);
+						if (
+							$targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)
+						) {
+							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 							continue;
+						}
+						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
 					await stateSelection.hideSelect();

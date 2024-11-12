@@ -459,7 +459,6 @@
 	 * @param {import('@/types').LR0Automaton} automaton
 	 */
 	export async function loadAutomaton(automaton) {
-		console.log(automaton);
 		let states = [
 			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];

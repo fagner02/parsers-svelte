@@ -24,8 +24,6 @@
 	/**@type {Automaton | undefined}*/
 	let automatonElem;
 
-	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
-	let stateStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let state = writable([]);
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>}*/
@@ -34,11 +32,19 @@
 	export let followSet;
 	/**@type {import('@/types').LR0Automaton}*/
 	export let automaton;
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>} */
+	let stateList = writable([
+		...automaton.states.map((x, index) => ({
+			text: `s${x.index}`,
+			note: '',
+			data: x.index,
+			id: index
+		}))
+	]);
 	let { t, nt, rules } = getGrammar();
 	let alphabet = [...t.filter((x) => x !== ''), ...nt];
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
-	console.log(rows);
 	let columns = [...alphabet];
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -50,7 +56,6 @@
 	let stateSelection;
 
 	function reset() {
-		stateStack.update(() => []);
 		stateElem?.resetState();
 		svgLines?.hideLine();
 		symbolsSelection?.hideSelect();
@@ -112,16 +117,6 @@
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
-		stateStack.set(
-			automaton.states.map(
-				(x) =>
-					/**@type {import('@/types').StackItem<number>}*/ ({
-						data: x.index,
-						text: `s${x.index}`,
-						id: x.index
-					})
-			)
-		);
 		buildAutomaton();
 	});
 </script>
@@ -150,11 +145,10 @@
 			bind:svgLines
 		></StateCard>
 		<StackCard
-			stack={stateStack}
-			stackId="temp"
+			stack={stateList}
+			stackId="statelist"
 			label="estados novos"
 			hue={colors.blue}
-			bind:this={stateStackElem}
 			bind:svgLines
 		></StackCard>
 	</div>
