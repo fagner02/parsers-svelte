@@ -11,7 +11,7 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
-	import SetsCard from '@/Cards/SetsCard.svelte';
+	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -26,7 +26,7 @@
 	let stateStack = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let state = writable([]);
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>}*/
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>}*/
 	let table = writable(new Map());
 	/**@type {import('@/types').LR1Automaton}*/
 	export let automaton;
@@ -67,13 +67,23 @@
 				for (let i of s.items) {
 					await addPause();
 					if (i.pos === rules[i.ruleIndex].right.length || rules[i.ruleIndex].right[0] === '') {
-						for (let symbol of i.lookahead)
+						if (i.ruleIndex === 0) {
+							await tableElem?.addToTable(
+								{ action: 'a', state: i.ruleIndex },
+								`a${i.ruleIndex}`,
+								`s${s.index}`,
+								'$'
+							);
+							continue;
+						}
+						for (let symbol of i.lookahead) {
 							await tableElem?.addToTable(
 								{ action: 'r', state: i.ruleIndex },
 								`r${i.ruleIndex}`,
 								`s${s.index}`,
 								symbol
 							);
+						}
 						continue;
 					}
 					let transition = automaton.transitions.get(s.index)?.get(rules[i.ruleIndex].right[i.pos]);
