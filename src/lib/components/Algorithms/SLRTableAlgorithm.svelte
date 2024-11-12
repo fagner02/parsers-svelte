@@ -136,14 +136,6 @@
 			bind:this={tableElem}
 		></TableCard>
 		<SetsCard set={followSet} label="follow" setId="follow" hue={200}></SetsCard>
-		<StateCard
-			{state}
-			stateId={'destino'}
-			label={'estado destino'}
-			hue={colors.pink}
-			bind:this={stateElem}
-			bind:svgLines
-		></StateCard>
 		<StackCard
 			stack={stateList}
 			stackId="statelist"

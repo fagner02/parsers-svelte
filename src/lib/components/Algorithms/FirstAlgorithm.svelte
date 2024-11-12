@@ -206,7 +206,7 @@
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit">
-	<div style="justify-content: flex-end">
+	<div>
 		<PseudoCode bind:this={codeCard}></PseudoCode>
 	</div>
 	<div>
