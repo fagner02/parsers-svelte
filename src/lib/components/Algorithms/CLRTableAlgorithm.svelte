@@ -70,7 +70,7 @@
 						if (i.ruleIndex === 0) {
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
-								`a${i.ruleIndex}`,
+								`a`,
 								`s${s.index}`,
 								'$'
 							);
