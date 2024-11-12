@@ -158,17 +158,11 @@
 
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
 						await stateSelection.selectFor(`state-origem-${prodIndex}`);
-						// if (
-						// 	prod.pos < rules[prod.ruleIndex].right.length &&
-						// 	rules[prod.ruleIndex].right[prod.pos] !== ''
-						// ) {
 
-						// }
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
 						) {
-							// deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 							continue;
 						}
 						await selectSymbol(
