@@ -63,11 +63,11 @@
 			stateSelection?.hideSelect();
 			tableElem?.resetTable();
 		} catch (e) {}
-		buildAutomaton();
+		slrTable();
 	}
 	setResetCall(reset);
 
-	async function buildAutomaton() {
+	async function slrTable() {
 		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
 		if (symbolListElem) symbolsSelection = getSelectionFunctions(symbolListElem.getId());
 		try {
@@ -129,7 +129,7 @@
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
-		buildAutomaton();
+		slrTable();
 	});
 </script>
 

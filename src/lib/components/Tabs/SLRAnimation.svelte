@@ -13,8 +13,6 @@
 	import { first } from '$lib/first';
 	import { lr0Automaton } from '$lib/lr0automaton';
 	import { slrTable } from '$lib/slrtable';
-	import Automaton from '@/Structures/Automaton.svelte';
-	import CardWrapper from '@/Cards/CardWrapper.svelte';
 	let code = '';
 	/**@type {string} */
 	let inputString;

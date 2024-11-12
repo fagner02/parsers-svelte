@@ -26,7 +26,7 @@
 	let stateStackElement;
 	/** @type {StackCard}*/
 	let inputStackElement;
-	let { nt, rules, alphabet, startingSymbol } = getGrammar();
+	let { rules, alphabet, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
 	/**
 	 * @type {() => Promise<any>}
@@ -100,6 +100,7 @@
 					await stateStackElement.addToStack(rules[rule].left, rules[rule].left, '');
 					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
 				}
+
 				await addPause();
 			}
 

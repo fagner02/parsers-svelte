@@ -53,11 +53,11 @@
 			stateSelection?.hideSelect();
 			tableElem?.resetTable();
 		} catch (e) {}
-		buildAutomaton();
+		clrTable();
 	}
 	setResetCall(reset);
 
-	async function buildAutomaton() {
+	async function clrTable() {
 		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
 		try {
 			await loadGrammar();
@@ -115,7 +115,7 @@
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
-		buildAutomaton();
+		clrTable();
 	});
 </script>
 

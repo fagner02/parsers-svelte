@@ -8,14 +8,20 @@
 	import { writable } from 'svelte/store';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
+	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
+	import ClrParse from '@/Algorithms/CLRParse.svelte';
 	import { lr1Automaton } from '$lib/lr1automaton';
+	import { clrTable } from '$lib/clrTable';
 
 	let code = '';
-	let inputString = '';
+	/**@type {string}*/
+	let inputString;
 	let { rules, nt, t } = getGrammar();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
+	let table = writable(new Map());
 
 	/**@type {import('@/types').LR1Automaton}*/
 	let automaton;
@@ -50,6 +56,30 @@
 		);
 
 		automaton = lr1Automaton(rules, nt, t, _mergedFirst);
+
+		const _table = clrTable(automaton, rules, nt, t);
+
+		table.set(
+			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
+				new Map(
+					[..._table].map(([rowKey, cols]) => [
+						`s${rowKey}`,
+						new Map(
+							[...cols].map(([colKey, cell]) => [
+								colKey,
+								/**@type {import('@/types').tableItem<string>}*/ ({
+									data: cell,
+									opacity: 1,
+									pos: 0,
+									text: cell,
+									width: 1
+								})
+							])
+						)
+					])
+				)
+			)
+		);
 	})();
 
 	const algos = ['autômato', 'tabela'];
@@ -78,4 +108,12 @@
 			{/if}
 		</FillHeight>
 	</FillHeight>
+	<SyntaxTree slot="tree"></SyntaxTree>
+	<div slot="parse" class="grid" style="place-items: center;">
+		<ClrParse
+			bind:input={inputString}
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></ClrParse>
+	</div>
 </AlgorithmTab>
