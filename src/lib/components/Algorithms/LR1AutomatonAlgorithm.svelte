@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause, setResetCall, wait } from '$lib/flowControl';
-	import { colors } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -50,6 +50,8 @@
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let stateSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let targetStateSelection;
 
 	function reset() {
 		try {
@@ -68,54 +70,64 @@
 	async function closure() {
 		let itemsToCheck = [...$targetState];
 		while (itemsToCheck.length > 0) {
-			/**@type {import("@/types").LR1StateItem[]}*/
-			let temp = [];
-			for (let item of itemsToCheck) {
-				let symbol = rules[item.ruleIndex].right[item.pos];
-				if (!nt.includes(symbol)) continue;
-				let lookahead = new Set();
-				if (rules[item.ruleIndex].right.length - 1 === item.pos) {
-					lookahead = new Set(item.lookahead);
-				} else {
-					/**@type {string[]}*/
-					let betaFirst = [];
-					let nullable = true;
-					for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-						let beta = rules[item.ruleIndex].right[item.pos + i];
-						if (!nt.includes(beta)) {
-							betaFirst.push(beta);
+			const item = itemsToCheck[0];
+			let index = $targetState.findIndex(
+				(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
+			);
+
+			await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
+			let symbol = rules[item.ruleIndex].right[item.pos];
+			if (!nt.includes(symbol)) {
+				itemsToCheck.shift();
+				continue;
+			}
+			let lookahead = new Set();
+			if (rules[item.ruleIndex].right.length - 1 === item.pos) {
+				lookahead = new Set(item.lookahead);
+			} else {
+				/**@type {string[]}*/
+				let betaFirst = [];
+				let nullable = true;
+				for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
+					let beta = rules[item.ruleIndex].right[item.pos + i];
+					if (!nt.includes(beta)) {
+						betaFirst.push(beta);
+						nullable = false;
+						break;
+					} else {
+						let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
+						betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
+
+						if (!first.includes('')) {
 							nullable = false;
 							break;
-						} else {
-							let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
-							betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
-
-							if (!first.includes('')) {
-								nullable = false;
-								break;
-							}
 						}
 					}
-					if (nullable) {
-						lookahead = new Set([...betaFirst, ...item.lookahead]);
-					} else {
-						lookahead = new Set(betaFirst);
-					}
 				}
-				for (let rule of rules) {
-					if (!(rule.left === symbol)) continue;
-					let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
-
-					if (existent === -1) {
-						await targetStateElem?.addItem(rule.index, 0, lookahead);
-						temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
-						continue;
-					}
-					await targetStateElem?.updateLookahead(lookahead, existent);
+				if (nullable) {
+					lookahead = new Set([...betaFirst, ...item.lookahead]);
+				} else {
+					lookahead = new Set(betaFirst);
 				}
 			}
-			itemsToCheck = temp;
+			for (let rule of rules) {
+				if (!(rule.left === symbol)) continue;
+				let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
+				await selectSymbol(
+					`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
+					colors.pink,
+					false
+				);
+				if (existent === -1) {
+					await targetStateElem?.addItem(rule.index, 0, lookahead, `gl${rule.index}`);
+					itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead });
+					continue;
+				}
+				await targetStateElem?.updateLookahead(lookahead, existent);
+			}
+			itemsToCheck.shift();
 		}
+		targetStateSelection.hideSelect();
 	}
 
 	async function buildAutomaton() {
@@ -126,7 +138,7 @@
 			/**@type {import('@/types').LR1Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 
-			await targetStateElem?.addItem(0, 0, new Set(['$']));
+			await targetStateElem?.addItem(0, 0, new Set(['$']), `gl0`);
 
 			await closure();
 
@@ -146,14 +158,38 @@
 
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
 						await stateSelection.selectFor(`state-origem-${prodIndex}`);
+						// if (
+						// 	prod.pos < rules[prod.ruleIndex].right.length &&
+						// 	rules[prod.ruleIndex].right[prod.pos] !== ''
+						// ) {
+
+						// }
 						if (
 							prod.pos >= rules[prod.ruleIndex].right.length ||
 							rules[prod.ruleIndex].right[prod.pos] !== symbol
-						)
+						) {
+							// deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 							continue;
-						if ($targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1))
+						}
+						await selectSymbol(
+							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
+							colors.pink,
+							false
+						);
+						if (
+							$targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)
+						) {
+							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 							continue;
-						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1, prod.lookahead);
+						}
+
+						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
+						await targetStateElem?.addItem(
+							prod.ruleIndex,
+							prod.pos + 1,
+							prod.lookahead,
+							`state-${originStateElem?.getId()}-${prodIndex}`
+						);
 					}
 					await stateSelection.hideSelect();
 					if ($targetState.length === 0) continue;
@@ -215,6 +251,7 @@
 	onMount(() => {
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
+		targetStateSelection = getSelectionFunctions('destino');
 		buildAutomaton();
 	});
 </script>
