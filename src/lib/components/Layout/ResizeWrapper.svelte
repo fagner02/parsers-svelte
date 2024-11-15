@@ -171,6 +171,8 @@
 		position: relative;
 		width: fit-content;
 		height: fit-content;
+		margin: 5px;
+		z-index: 1;
 	}
 	.lb-handle {
 		cursor: sw-resize;

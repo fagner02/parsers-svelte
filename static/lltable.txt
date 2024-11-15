@@ -1,4 +1,4 @@
-<span><b>tabela</b> = Matriz&#x3008;não-terminais, terminais, produção da gramática&#x3009;</span>
+<span><b>tabela</b> &lt;- Matriz&#x3008;não-terminais, terminais, produção da gramática&#x3009;</span>
 <span>para cada item <b>f</b> de <b>first</b>:</span>
 <span>    <b>esquerda</b> &lt;- produção correspondente a <b>f</b></span>
 <span>    se &epsilon; pertence a <b>f</b>:</span>

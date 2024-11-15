@@ -1,0 +1,30 @@
+<span>Algoritmo autômato lr0:</span>
+<span><b>autômato</b> &lt;- &#x3008;estados, transições&#x3009;</span>
+<span><b>estado0</b> &lt;- [item da forma { posição: 0, regra: primeira regra da gramática }]</span>
+<span><b>filaEstados</b> &lt</span>
+<span>closure(<b>estado0</b>)</span>
+<span>adiciona <b>estado0</b> aos estados do <b>autômato</b></span>
+<span>adiciona <b>estado0</b> ao início de <b>filaEstados</b></span>
+<span>enquanto tamanho de <b>filaEstados</b> &gt; 0:</span>
+<span>    para cada símbolo <b>b</b> no alfabeto da gramática:</span>
+<span>        <b>estado1</b> &lt;- []</span>
+<span>        para cada item <b>p</b> no primeiro estado de <b>filaEstados</b>:</span>
+<span>            se o símbolo na posição de <b>p</b> for diferente de <b>b</b>:</span>
+<span>                continua para próxima iteração</span>
+<span>            se a posição de <b>p</b> for a ultima posição da regra:</span>
+<span>                continua para próxima iteração</span>
+<span>            se <b>p</b> já existe em <b>estado1</b>:</span>
+<span>                continua para próxima iteração</span>
+<span>            adiciona item da forma { regra: regra de <b>p</b>, posição: posição de <b>p</b> + 1 } em <b>estado1</b> </span>
+<span>        se <b>estado1</b> for vazio:</span>
+<span>            continua para próxima iteração</span>
+<span>        closure(<b>estado1</b>)</span>
+<span>        se <b>estado1</b>  não existe nos estados do <b>autômato</b>:</span>
+<span>            adiciona <b>estado1</b> aos estados do <b>autômato</b></span>
+<span>            <b>t</b> &lt;- transição com o símbolo <b>b</b> indo do primeiro estado de <b>filaEstados</b> para <b>estado1</b>  </span>
+<span>            adiciona <b>t</b> as transições do <b>autômato</b></span>
+<span>            adiciona <b>estado1</b> ao início de <b>filaEstados</b></span>
+<span>            continua para próxima iteração</span>
+<span>        <b>t</b> &lt;- transição com o símbolo <b>b</b> indo do primeiro estado de <b>filaEstados</b> para o estado existente </span>
+<span>        adiciona <b>t</b> as transições do <b>autômato</b></span>
+<span>    remove o primeiro estado de <b>filaEstados</b></span>

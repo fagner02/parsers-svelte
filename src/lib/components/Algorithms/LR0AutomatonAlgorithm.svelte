@@ -20,6 +20,8 @@
 	let targetStateElem;
 	/**@type {Automaton | undefined}*/
 	let automatonElem;
+	/**@type {PseudoCode | undefined}*/
+	let codeCard;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -202,55 +204,53 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
 		targetStateSelection = getSelectionFunctions('destino');
+		codeCard?.setPseudoCode(await (await fetch('./lr0automaton.txt')).text());
 		buildAutomaton();
 	});
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
-		<PseudoCode></PseudoCode>
-		<GrammarCard bind:loadGrammar></GrammarCard>
-		<StateCard
-			state={targetState}
-			stateId={'destino'}
-			label={'estado destino'}
-			hue={colors.pink}
-			bind:this={targetStateElem}
-			bind:svgLines
-		></StateCard>
-		<StateCard
-			state={originState}
-			stateId={'origem'}
-			label={'estado origem'}
-			hue={colors.pink}
-			bind:this={originStateElem}
-			bind:svgLines
-		></StateCard>
-		<StackCard
-			stack={stateStack}
-			stackId="temp"
-			label="estados novos"
-			hue={colors.blue}
-			bind:this={stateStackElem}
-			bind:svgLines
-		></StackCard>
-		<StackCard
-			stack={symbolList}
-			stackId="symbolList"
-			label="alfabeto"
-			hue={colors.green}
-			reversed={false}
-			bind:svgLines
-		></StackCard>
-	</div>
-	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
-		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
-	</div>
+<div class="cards-box unit">
+	<PseudoCode bind:this={codeCard}></PseudoCode>
+	<GrammarCard bind:loadGrammar></GrammarCard>
+	<StateCard
+		state={targetState}
+		stateId={'destino'}
+		label={'estado destino'}
+		hue={colors.pink}
+		bind:this={targetStateElem}
+		bind:svgLines
+	></StateCard>
+	<StateCard
+		state={originState}
+		stateId={'origem'}
+		label={'estado origem'}
+		hue={colors.pink}
+		bind:this={originStateElem}
+		bind:svgLines
+	></StateCard>
+	<StackCard
+		stack={stateStack}
+		stackId="temp"
+		label="estados novos"
+		hue={colors.blue}
+		bind:this={stateStackElem}
+		bind:svgLines
+	></StackCard>
+	<StackCard
+		stack={symbolList}
+		stackId="symbolList"
+		label="alfabeto"
+		hue={colors.green}
+		reversed={false}
+		bind:svgLines
+	></StackCard>
+
+	<Automaton id="lr0" bind:this={automatonElem}></Automaton>
 </div>
 
 <style>

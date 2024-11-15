@@ -14,6 +14,14 @@ export class Interaction {
 	targets = [];
 	/**@type {Elem | undefined} */
 	transformListener;
+	/**@type {Elem|undefined} */
+	moveTarget;
+	/**@type {Elem | undefined}*/
+	resizedElem;
+	/**@type {DOMRect | null} */
+	resizeInitial = null;
+	resizeDirLeft = false;
+	resizeDirTop = false;
 
 	/**
 	 * @param {Elem} listener
@@ -27,6 +35,7 @@ export class Interaction {
 	}
 
 	attachTransformListeners() {
+		this.dragPos = null;
 		if (this.moveTarget) {
 			this.moveTarget.style.cursor = 'unset';
 			/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
@@ -93,8 +102,7 @@ export class Interaction {
 			}
 		}
 	}
-	/**@type {Elem|undefined} */
-	moveTarget;
+
 	/**
 	 * @param {Elem} target
 	 */
@@ -145,6 +153,7 @@ export class Interaction {
 		document.ontouchend = (e) => {
 			this.moveEnd(e);
 		};
+
 		let x, y;
 		if (e instanceof MouseEvent) {
 			x = e.clientX;
@@ -202,13 +211,6 @@ export class Interaction {
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 		this.dragPos = null;
 	}
-
-	/**@type {Elem | undefined}*/
-	resizedElem;
-	/**@type {DOMRect | null} */
-	resizeInitial = null;
-	resizeDirLeft = false;
-	resizeDirTop = false;
 
 	resizeStart() {
 		if (!this.resizedElem) return;
@@ -294,9 +296,9 @@ export class Interaction {
 	 */
 	dragMove(e) {
 		if (this.resizeInitial) return;
+		if (this.dragPos === null) return;
 		e.preventDefault();
 		e.stopImmediatePropagation();
-		if (this.dragPos === null) return;
 		this.isClick = false;
 
 		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
