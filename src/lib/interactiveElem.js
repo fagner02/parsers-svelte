@@ -109,6 +109,9 @@ export class Interaction {
 		this.moveTarget.onmousedown = (e) => {
 			this.moveStart(e);
 		};
+		this.moveTarget.ontouchstart = (e) => {
+			this.moveStart(e);
+		};
 		this.moveTarget.style.cursor = 'move';
 		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'none';
 	}
