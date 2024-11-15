@@ -80,13 +80,15 @@ export class Interaction {
 			for (let v of 'bt') {
 				const handle = handles.get(h + v);
 				if (handle) {
-					handle.onmousedown = (e) => {
+					let start = (/** @type {MouseEvent|TouchEvent} */ e) => {
 						this.resizeDirLeft = h === 'l';
 						this.resizeDirTop = v === 't';
 						e.stopImmediatePropagation();
 						e.preventDefault();
 						this.resizeStart();
 					};
+					handle.onmousedown = start;
+					handle.ontouchstart = start;
 				}
 			}
 		}
@@ -133,6 +135,12 @@ export class Interaction {
 		};
 		document.onmousemove = (e) => {
 			this.moveMove(e);
+		};
+		document.ontouchmove = (e) => {
+			this.moveMove(e);
+		};
+		document.ontouchend = (e) => {
+			this.moveEnd(e);
 		};
 		let x, y;
 		if (e instanceof MouseEvent) {
@@ -207,6 +215,12 @@ export class Interaction {
 			this.resizeEnd();
 		};
 		document.onmouseleave = () => {
+			this.resizeEnd();
+		};
+		document.ontouchmove = (e) => {
+			this.resizeMove(e);
+		};
+		document.ontouchend = () => {
 			this.resizeEnd();
 		};
 	}
