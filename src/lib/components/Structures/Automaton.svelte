@@ -1,10 +1,16 @@
 <script>
+	import { wait } from '$lib/flowControl';
 	import { getGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
+	import { Interaction } from '$lib/interactiveElem';
+	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
+	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
 
 	let rules = getGrammar().rules;
 
+	/**@type {string}*/
+	export let id;
 	/**@type {SVGGElement}*/
 	let groupElem;
 	/**@type {SVGGElement}*/
@@ -23,6 +29,8 @@
 	/** @type {Node[]}*/
 	let nodes = [];
 
+	/**@type {Interaction}*/
+	let svgInteraction = new Interaction();
 	export function reset() {
 		nodes = [];
 		groupElem.remove();
@@ -31,10 +39,9 @@
 		selectGroupElem.remove();
 		selectGroupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		selectGroupElem.id = 'selected-node';
-		document.querySelector('#svg')?.append(groupElem);
-		document.querySelector('#svg')?.append(selectGroupElem);
-		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
+		document.querySelector(`#${id}-svg`)?.append(groupElem);
+		document.querySelector(`#${id}-svg`)?.append(selectGroupElem);
+		svgInteraction.updateTargets([groupElem, selectGroupElem]);
 	}
 
 	function resetSelected(hide = false) {
@@ -43,6 +50,7 @@
 		selectGroupElem = /**@type {SVGGElement}*/ (temp);
 		groupElem.style.opacity = hide ? '1' : '0.5';
 		groupElem.style.filter = hide ? 'none' : 'blur(5px)';
+		svgInteraction.updateTargets([selectGroupElem, groupElem]);
 	}
 
 	/**
@@ -50,8 +58,9 @@
 	 * @param {number} to
 	 * @param {import('@/types').LR0State?} data
 	 * @param {string?} symbol
+	 * @param {boolean?} shouldUpdate
 	 */
-	export async function addNode(from, to, data, symbol, shouldUpdate = true) {
+	export function addNode(from, to, data, symbol, shouldUpdate = true) {
 		resetSelected(true);
 
 		if (to > nodes.length - 1 && data) {
@@ -85,7 +94,7 @@
 			container.append(text);
 			res.setAttribute('nodeId', `${to}`);
 			res.addEventListener('click', (e) => {
-				if (!isClick) return;
+				if (!svgInteraction.isClick) return;
 				e.stopImmediatePropagation();
 				resetSelected();
 
@@ -195,7 +204,7 @@
 
 			nodes[from].conLabels.push(label);
 			let selectLine = (/**@type {MouseEvent}*/ e) => {
-				if (!isClick) return;
+				if (!svgInteraction.isClick) return;
 				e.stopImmediatePropagation();
 				resetSelected();
 				let clone = nodes[from].obj.cloneNode(true);
@@ -217,100 +226,6 @@
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];
 		if (shouldUpdate) update(ex);
-	}
-
-	let svgScale = 0.7;
-	let svgPos = { x: 0, y: 0 };
-	/**@type {{ x: number; y: number; } | null}*/
-	let dragPos = null;
-	let isClick = false;
-
-	function dragStart(/**@type {MouseEvent}*/ e) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		isClick = true;
-		dragPos = { x: e.clientX, y: e.clientY };
-		svgElem.style.cursor = 'grabbing';
-	}
-
-	function dragEnd(/**@type {MouseEvent}*/ e) {
-		if (dragPos === null) return;
-		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
-		svgPos = { x: svgPos.x + diff.x, y: svgPos.y + diff.y };
-		dragPos = null;
-		svgElem.style.cursor = 'grab';
-	}
-
-	function dragMove(/**@type {MouseEvent}*/ e) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		if (dragPos === null) return;
-		isClick = false;
-
-		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
-
-		groupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
-		selectGroupElem.style.transform = `translate(${svgPos.x + diff.x}px,${svgPos.y + diff.y}px) scale(${svgScale})`;
-	}
-
-	let isScroll = false;
-	let lastDist = 0;
-	function touchStart(/**@type {TouchEvent}*/ e) {
-		e.preventDefault();
-		if (e.touches.length > 1) {
-			isScroll = false;
-			let diff = {
-				x: e.touches[0].clientX - e.touches[1].clientX,
-				y: e.touches[0].clientY - e.touches[1].clientY
-			};
-			lastDist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-		} else {
-			isScroll = true;
-			dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-		}
-	}
-
-	function touchMove(/**@type {TouchEvent}*/ e) {
-		e.preventDefault();
-		if (isScroll) {
-			if (dragPos === null) return;
-			let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
-			dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-			svgPos.x += diff.x;
-			svgPos.y += diff.y;
-			groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-			selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-
-			return;
-		}
-		if (e.touches.length < 2) return;
-		let diff = {
-			x: e.touches[0].clientX - e.touches[1].clientX,
-			y: e.touches[0].clientY - e.touches[1].clientY
-		};
-		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-		svgScale += (dist - lastDist) * 0.001;
-		lastDist = dist;
-		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-	}
-
-	function touchEnd() {
-		dragPos = null;
-	}
-
-	function wheel(/**@type {WheelEvent}*/ e) {
-		e.preventDefault();
-
-		if (Math.round(e.deltaX) !== e.deltaX || Math.round(e.deltaY) !== e.deltaY) {
-			svgScale += e.deltaY * -0.01;
-			if (svgScale < 0) svgScale = 0;
-		} else {
-			svgPos = { x: svgPos.x + e.deltaX, y: svgPos.y + e.deltaY };
-		}
-
-		groupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
-		selectGroupElem.style.transform = `translate(${svgPos.x}px,${svgPos.y}px) scale(${svgScale})`;
 	}
 
 	/**
@@ -464,6 +379,7 @@
 		];
 
 		addNode(null, states[0].index, states[0], null);
+		await wait(100);
 		while (states.length > 0) {
 			let transitions = automaton.transitions.get(states[0].index);
 			if (!transitions) {
@@ -472,6 +388,7 @@
 			}
 			for (let [symbol, state] of transitions) {
 				addNode(states[0].index, state, automaton.states[state], symbol);
+				await wait(100);
 				states.push(automaton.states[state]);
 			}
 			states.shift();
@@ -479,42 +396,34 @@
 	}
 
 	onMount(() => {
-		svgElem = /**@type {SVGElement}*/ (document.querySelector('#svg'));
-		groupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#nodes'));
-		selectGroupElem = /**@type {SVGGElement}*/ (document.querySelector('#svg>#selected-node'));
+		svgElem = /**@type {SVGElement}*/ (document.querySelector(`#${id}-svg`));
+		groupElem = /**@type {SVGGElement}*/ (document.querySelector(`#${id}-svg>#nodes`));
+		selectGroupElem = /**@type {SVGGElement}*/ (
+			document.querySelector(`#${id}-svg>#selected-node`)
+		);
+		svgInteraction.setTransformInteraction(svgElem, svgElem, [groupElem, selectGroupElem]);
+
 		reset();
-		document.querySelector('#svg')?.addEventListener('click', (e) => {
-			if (!isClick) return;
+		svgElem?.addEventListener('click', (e) => {
+			if (!svgInteraction.isClick) return;
 			resetSelected(true);
 		});
 	});
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<svg
-	role="application"
-	on:mousedown={dragStart}
-	on:mouseleave={dragEnd}
-	on:mouseup={dragEnd}
-	on:mousemove={dragMove}
-	on:touchstart={touchStart}
-	on:touchmove={touchMove}
-	on:touchend={touchEnd}
-	on:wheel={wheel}
-	id="svg"
->
-	<g id="nodes"></g>
-	<g id="selected-node"></g>
-</svg>
+<ResizeWrapper component={AutomatonIcon} {id} bind:interaction={svgInteraction}>
+	<svg class="unit border" id="{id}-svg">
+		<g id="nodes"></g>
+		<g id="selected-node"></g>
+	</svg>
+</ResizeWrapper>
 
 <style>
-	#svg {
+	.border {
 		min-height: 240px;
 		width: 100%;
 		height: 100%;
-		border-radius: 10px;
-		border: 1px solid hsl(200, 50%, 50%, 100%);
-		cursor: grab;
 		pointer-events: all;
 	}
 

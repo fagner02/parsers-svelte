@@ -157,7 +157,7 @@
 		></StackCard>
 	</div>
 	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
-		<Automaton bind:this={automatonElem}></Automaton>
+		<Automaton id="slr" bind:this={automatonElem}></Automaton>
 	</div>
 </div>
 

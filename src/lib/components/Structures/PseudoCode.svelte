@@ -1,6 +1,9 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
+	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
+	import { Interaction } from '$lib/interactiveElem';
+	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 
 	/**@type {number[]}*/
 	let highlightedLines = [];
@@ -8,6 +11,7 @@
 	let card;
 	/** @type {HTMLElement} */
 	let cardContent;
+	let interaction = new Interaction();
 
 	export function reset() {
 		for (let line of highlightedLines) {
@@ -49,68 +53,6 @@
 		});
 	}
 
-	let pcCardPos = { x: 0, y: 0 };
-	/**@type {{ x: number; y: number; } | null}*/
-	let dragPos = null;
-	function dragStart(/**@type {MouseEvent}*/ e) {
-		let bbox = card.getBoundingClientRect();
-
-		if (
-			e.clientX < bbox.right + 20 &&
-			e.clientX > bbox.right - 20 &&
-			e.clientY < bbox.bottom + 20 &&
-			e.clientY > bbox.bottom - 20
-		) {
-			return;
-		}
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		dragPos = { x: e.clientX, y: e.clientY };
-
-		card.style.cursor = 'grabbing';
-	}
-
-	function dragEnd(/**@type {MouseEvent}*/ e) {
-		if (dragPos === null) return;
-		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
-		pcCardPos = { x: pcCardPos.x + diff.x, y: pcCardPos.y + diff.y };
-		dragPos = null;
-		card.style.cursor = 'grab';
-	}
-
-	function dragMove(/**@type {MouseEvent}*/ e) {
-		if (dragPos === null) return;
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		let diff = { x: e.clientX - dragPos.x, y: e.clientY - dragPos.y };
-		dragPos = { x: e.clientX, y: e.clientY };
-		pcCardPos = { x: pcCardPos.x + diff.x, y: pcCardPos.y + diff.y };
-
-		card.style.top = `${pcCardPos.y}px`;
-		card.style.left = `${pcCardPos.x}px`;
-	}
-
-	function touchStart(/**@type {TouchEvent}*/ e) {
-		e.preventDefault();
-
-		dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-	}
-	function touchMove(/**@type {TouchEvent}*/ e) {
-		e.preventDefault();
-
-		if (dragPos === null) return;
-		let diff = { x: e.touches[0].clientX - dragPos.x, y: e.touches[0].clientY - dragPos.y };
-		dragPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-		pcCardPos.x += diff.x;
-		pcCardPos.y += diff.y;
-		card.style.top = `${pcCardPos.y}px`;
-		card.style.left = `${pcCardPos.x}px`;
-		return;
-	}
-	function touchEnd() {
-		dragPos = null;
-	}
-
 	/**
 	 * @param {string} pseudoCode
 	 */
@@ -126,35 +68,22 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-	class="pseudo-code-card unit"
-	on:mousedown={dragStart}
-	on:mouseleave={dragEnd}
-	on:mouseup={dragEnd}
-	on:mousemove={dragMove}
-	on:touchstart={touchStart}
-	on:touchmove={touchMove}
-	on:touchend={touchEnd}
->
-	<pre style="font-size: 11px;" id="pseudocode"></pre>
-</div>
+<ResizeWrapper component={FileCodeIcon} id="code" {interaction}>
+	<div class="pseudo-code-card">
+		<pre style="font-size: 11px;" id="pseudocode"></pre>
+	</div>
+</ResizeWrapper>
 
 <style>
 	.pseudo-code-card {
-		resize: both;
+		min-height: 50px;
+		min-width: 50px;
+		height: 100px;
 		overflow: auto;
 		cursor: grab;
 		position: relative;
 		padding: 5px;
-		margin: 5px;
-		border: 1px solid hsl(200, 50%, 50%);
-		border-radius: 10px;
-		background: white;
 		z-index: 1;
-		height: 100px;
-		width: 100px;
-		min-height: 50px;
-		min-width: 50px;
 		top: 0;
 		left: 0;
 	}
