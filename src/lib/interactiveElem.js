@@ -119,7 +119,7 @@ export class Interaction {
 	}
 
 	/**
-	 * @param {MouseEvent} e
+	 * @param {MouseEvent | TouchEvent} e
 	 */
 	moveStart(e) {
 		e.preventDefault();
@@ -134,18 +134,34 @@ export class Interaction {
 		document.onmousemove = (e) => {
 			this.moveMove(e);
 		};
-		this.dragPos = { x: e.clientX, y: e.clientY };
+		let x, y;
+		if (e instanceof MouseEvent) {
+			x = e.clientX;
+			y = e.clientY;
+		} else {
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
+		}
+		this.dragPos = { x: x, y: y };
 	}
 
 	/**
-	 * @param {MouseEvent} e
+	 * @param {MouseEvent | TouchEvent} e
 	 */
 	moveMove(e) {
 		if (!this.dragPos || !this.moveTarget) return;
 		e.preventDefault();
 		e.stopImmediatePropagation();
-		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
-		this.dragPos = { x: e.clientX, y: e.clientY };
+		let x, y;
+		if (e instanceof MouseEvent) {
+			x = e.clientX;
+			y = e.clientY;
+		} else {
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
+		}
+		let diff = { x: x - this.dragPos.x, y: y - this.dragPos.y };
+		this.dragPos = { x: x, y: y };
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 
 		this.moveTarget.style.top = `${this.movePos.y}px`;
@@ -153,7 +169,7 @@ export class Interaction {
 	}
 
 	/**
-	 * @param {MouseEvent} e
+	 * @param {MouseEvent|TouchEvent} e
 	 */
 	moveEnd(e) {
 		document.onmouseup = null;
@@ -161,8 +177,15 @@ export class Interaction {
 		document.onmousemove = null;
 
 		if (!this.dragPos || !this.moveTarget) return;
-
-		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
+		let x, y;
+		if (e instanceof MouseEvent) {
+			x = e.clientX;
+			y = e.clientY;
+		} else {
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
+		}
+		let diff = { x: x - this.dragPos.x, y: y - this.dragPos.y };
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 		this.dragPos = null;
 	}
@@ -181,28 +204,44 @@ export class Interaction {
 			this.resizeMove(e);
 		};
 		document.onmouseup = () => {
-			this.resizeInitial = null;
-			document.onmousemove = null;
-			document.onmouseup = null;
+			this.resizeEnd();
+		};
+		document.onmouseleave = () => {
+			this.resizeEnd();
 		};
 	}
 
+	resizeEnd() {
+		this.resizeInitial = null;
+		document.onmousemove = null;
+		document.onmouseup = null;
+		document.onmouseleave = null;
+	}
+
 	/**
-	 * @param {MouseEvent} e
+	 * @param {MouseEvent|TouchEvent} e
 	 */
 	resizeMove(e) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		if (!this.resizedElem || !this.resizeInitial) return;
-		if (this.resizeDirLeft) {
-			this.resizedElem.style.width = `${this.resizeInitial.right - e.clientX}px`;
+		let x, y;
+		if (e instanceof MouseEvent) {
+			x = e.clientX;
+			y = e.clientY;
 		} else {
-			this.resizedElem.style.width = `${e.clientX - this.resizeInitial.left}px`;
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
+		}
+		if (this.resizeDirLeft) {
+			this.resizedElem.style.width = `${this.resizeInitial.right - x}px`;
+		} else {
+			this.resizedElem.style.width = `${x - this.resizeInitial.left}px`;
 		}
 		if (this.resizeDirTop) {
-			this.resizedElem.style.height = `${this.resizeInitial.bottom - e.clientY}px`;
+			this.resizedElem.style.height = `${this.resizeInitial.bottom - y}px`;
 		} else {
-			this.resizedElem.style.height = `${e.clientY - this.resizeInitial.top}px`;
+			this.resizedElem.style.height = `${y - this.resizeInitial.top}px`;
 		}
 	}
 
