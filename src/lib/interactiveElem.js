@@ -29,6 +29,7 @@ export class Interaction {
 		document.onmousemove = null;
 		document.ontouchend = null;
 		document.ontouchmove = null;
+		document.ontouchcancel = null;
 	}
 	/**
 	 * @param {Elem} target
@@ -78,6 +79,9 @@ export class Interaction {
 			this.moveMove(e);
 		};
 		document.ontouchend = (e) => {
+			this.moveEnd(e);
+		};
+		document.ontouchcancel = (e) => {
 			this.moveEnd(e);
 		};
 
