@@ -10,6 +10,7 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import PseudoCode from '@/Structures/PseudoCode.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -212,6 +213,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
+		<PseudoCode></PseudoCode>
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<StateCard
 			state={targetState}

@@ -186,6 +186,8 @@ export class Interaction {
 		document.onmouseup = null;
 		document.onmouseleave = null;
 		document.onmousemove = null;
+		document.ontouchend = null;
+		document.ontouchmove = null;
 
 		if (!this.dragPos || !this.moveTarget) return;
 		let x, y;
@@ -230,9 +232,11 @@ export class Interaction {
 
 	resizeEnd() {
 		this.resizeInitial = null;
-		document.onmousemove = null;
 		document.onmouseup = null;
 		document.onmouseleave = null;
+		document.onmousemove = null;
+		document.ontouchend = null;
+		document.ontouchmove = null;
 	}
 
 	/**

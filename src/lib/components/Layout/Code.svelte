@@ -19,7 +19,6 @@
 <style>
 	:global(#code) {
 		background: white;
-		/* background: linear-gradient(127deg, hsl(215, 30%, 10%), hsl(215, 30%, 15%)); */
 		border: 1px solid hsl(200, 50%, 50%);
 	}
 
