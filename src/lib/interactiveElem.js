@@ -31,6 +31,7 @@ export class Interaction {
 		document.ontouchmove = null;
 		document.ontouchcancel = null;
 	}
+
 	/**
 	 * @param {Elem} target
 	 */
@@ -63,9 +64,10 @@ export class Interaction {
 	 * @param {MouseEvent | TouchEvent} e
 	 */
 	moveStart(e) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-
+		if (e instanceof MouseEvent) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		}
 		document.onmouseup = (e) => {
 			this.moveEnd(e);
 		};
@@ -131,6 +133,7 @@ export class Interaction {
 			x = e.clientX;
 			y = e.clientY;
 		} else {
+			if (e.touches.length === 0) return;
 			x = e.touches[0].clientX;
 			y = e.touches[0].clientY;
 		}

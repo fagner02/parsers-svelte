@@ -129,7 +129,6 @@
 		gap: 5px;
 		transition: opacity 0.5s;
 		overflow: hidden;
-		pointer-events: visible;
 	}
 	.action-tray > button {
 		border: 1px solid hsl(0, 0%, 20%);
@@ -161,7 +160,6 @@
 		transition:
 			width 0.5s,
 			height 0.5s;
-		pointer-events: visible;
 		z-index: 1;
 	}
 	:global(.resize-content > *) {
@@ -199,6 +197,9 @@
 		background: white;
 		z-index: 1;
 		transition: opacity 0.5s;
-		pointer-events: visible;
+	}
+	.resize-wrapper,
+	.resize-handle {
+		touch-action: none;
 	}
 </style>
