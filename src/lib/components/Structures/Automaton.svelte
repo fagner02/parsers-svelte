@@ -401,7 +401,7 @@
 		selectGroupElem = /**@type {SVGGElement}*/ (
 			document.querySelector(`#${id}-svg>#selected-node`)
 		);
-		svgInteraction.setTransformInteraction(svgElem, svgElem, [groupElem, selectGroupElem]);
+		svgInteraction.setTransformInteraction(svgElem, [groupElem, selectGroupElem]);
 
 		reset();
 		svgElem?.addEventListener('click', (e) => {
@@ -424,7 +424,6 @@
 		min-height: 240px;
 		width: 100%;
 		height: 100%;
-		pointer-events: all;
 	}
 
 	:global(#nodes > *) {

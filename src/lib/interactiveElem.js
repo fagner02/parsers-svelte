@@ -2,6 +2,7 @@
 export class Interaction {
 	scale = 0.7;
 	pos = { x: 0, y: 0 };
+	movePos = { x: 0, y: 0 };
 	/**@type {{ x: number; y: number; } | null}*/
 	dragPos = null;
 	isClick = false;
@@ -11,40 +12,64 @@ export class Interaction {
 	cursor;
 	/** @type {(Elem)[]} */
 	targets = [];
+	/**@type {Elem | undefined} */
+	transformListener;
 
 	/**
 	 * @param {Elem} listener
-	 * @param {Elem} cursor
 	 * @param {(Elem)[]} targets
 	 */
-	setTransformInteraction(listener, cursor, targets) {
-		this.cursor = cursor;
+	setTransformInteraction(listener, targets) {
 		this.targets = targets;
-		listener.onmousedown = (e) => {
+		this.transformListener = listener;
+		listener.style.cursor = 'grab';
+		this.attachTransformListeners();
+	}
+
+	attachTransformListeners() {
+		if (this.moveTarget) {
+			this.moveTarget.style.cursor = 'unset';
+			/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
+		}
+		if (!this.transformListener) return;
+		this.transformListener.onmousedown = (e) => {
 			this.dragStart(e);
 		};
-		listener.onmouseleave = (e) => {
+		this.transformListener.onmouseleave = (e) => {
 			this.dragEnd(e);
 		};
-		listener.onmouseup = (e) => {
+		this.transformListener.onmouseup = (e) => {
 			this.dragEnd(e);
 		};
-		listener.onmousemove = (e) => {
+		this.transformListener.onmousemove = (e) => {
 			this.dragMove(e);
 		};
-		listener.ontouchstart = (e) => {
+		this.transformListener.ontouchstart = (e) => {
 			this.touchStart(e);
 		};
-		listener.ontouchmove = (e) => {
+		this.transformListener.ontouchmove = (e) => {
 			this.touchMove(e);
 		};
-		listener.ontouchend = (_) => {
+		this.transformListener.ontouchend = (_) => {
 			this.touchEnd();
 		};
-		listener.onwheel = (e) => {
+		this.transformListener.onwheel = (e) => {
 			this.wheel(e);
 		};
 	}
+
+	removeTransformListeners() {
+		if (!this.transformListener) return;
+		this.transformListener.onmousedown = null;
+		this.transformListener.onmouseleave = null;
+		this.transformListener.onmouseup = null;
+		this.transformListener.onmousemove = null;
+		this.transformListener.ontouchstart = null;
+		this.transformListener.ontouchmove = null;
+		this.transformListener.ontouchend = null;
+		this.transformListener.onwheel = null;
+	}
+
 	/**
 	 * @param {Map<string, Elem?>} handles
 	 * @param {Elem} target
@@ -66,60 +91,80 @@ export class Interaction {
 			}
 		}
 	}
-
+	/**@type {Elem|undefined} */
+	moveTarget;
 	/**
 	 * @param {Elem} target
 	 */
 	setMoveInteraction(target) {
-		target.onmousedown = (e) => {
-			this.moveStart(e, target);
-		};
-		target.onmouseup = (e) => {
-			this.moveEnd(e, target);
-		};
-		target.onmousemove = (e) => {
-			this.moveMove(e, target);
-		};
+		this.moveTarget = target;
+		this.attachMoveListeners();
 	}
 
-	/**
-	 * @param {MouseEvent} e
-	 * @param {Elem} target
-	 */
-	moveStart(e, target) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		this.dragPos = { x: e.clientX, y: e.clientY };
-
-		target.style.cursor = 'grabbing';
-	}
-
-	/**
-	 * @param {MouseEvent} e
-	 * @param {Elem} target
-	 */
-	moveMove(e, target) {
-		if (this.dragPos === null) return;
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
-		this.dragPos = { x: e.clientX, y: e.clientY };
-		this.pos = { x: this.pos.x + diff.x, y: this.pos.y + diff.y };
-
-		target.style.top = `${this.pos.y}px`;
-		target.style.left = `${this.pos.x}px`;
-	}
-
-	/**
-	 * @param {MouseEvent} e
-	 * @param {Elem} target
-	 */
-	moveEnd(e, target) {
-		if (this.dragPos === null) return;
-		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
-		this.pos = { x: this.pos.x + diff.x, y: this.pos.y + diff.y };
+	attachMoveListeners() {
 		this.dragPos = null;
-		target.style.cursor = 'grab';
+		if (!this.moveTarget) return;
+		this.moveTarget.onmousedown = (e) => {
+			this.moveStart(e);
+		};
+		this.moveTarget.style.cursor = 'move';
+		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'none';
+	}
+
+	removeMoveListeners() {
+		if (!this.moveTarget) return;
+		this.moveTarget.onmousedown = null;
+		this.moveTarget.onmouseup = null;
+		this.moveTarget.onmousemove = null;
+	}
+
+	/**
+	 * @param {MouseEvent} e
+	 */
+	moveStart(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+
+		document.onmouseup = (e) => {
+			this.moveEnd(e);
+		};
+		document.onmouseleave = (e) => {
+			this.moveEnd(e);
+		};
+		document.onmousemove = (e) => {
+			this.moveMove(e);
+		};
+		this.dragPos = { x: e.clientX, y: e.clientY };
+	}
+
+	/**
+	 * @param {MouseEvent} e
+	 */
+	moveMove(e) {
+		if (!this.dragPos || !this.moveTarget) return;
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
+		this.dragPos = { x: e.clientX, y: e.clientY };
+		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
+
+		this.moveTarget.style.top = `${this.movePos.y}px`;
+		this.moveTarget.style.left = `${this.movePos.x}px`;
+	}
+
+	/**
+	 * @param {MouseEvent} e
+	 */
+	moveEnd(e) {
+		document.onmouseup = null;
+		document.onmouseleave = null;
+		document.onmousemove = null;
+
+		if (!this.dragPos || !this.moveTarget) return;
+
+		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
+		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
+		this.dragPos = null;
 	}
 
 	/**@type {Elem | undefined}*/
@@ -165,23 +210,23 @@ export class Interaction {
 	 * @param {MouseEvent} e
 	 */
 	dragStart(e) {
-		if (!this.cursor || this.resizeInitial) return;
+		if (!this.transformListener || this.resizeInitial) return;
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		this.isClick = true;
 		this.dragPos = { x: e.clientX, y: e.clientY };
-		this.cursor.style.cursor = 'grabbing';
+		this.transformListener.style.cursor = 'grabbing';
 	}
 
 	/**
 	 * @param {MouseEvent} e
 	 */
 	dragEnd(e) {
-		if (!this.dragPos || !this.cursor || this.resizeInitial) return;
+		if (!this.dragPos || !this.transformListener || this.resizeInitial) return;
 		let diff = { x: e.clientX - this.dragPos.x, y: e.clientY - this.dragPos.y };
 		this.pos = { x: this.pos.x + diff.x, y: this.pos.y + diff.y };
 		this.dragPos = null;
-		this.cursor.style.cursor = 'grab';
+		this.transformListener.style.cursor = 'grab';
 	}
 
 	/**

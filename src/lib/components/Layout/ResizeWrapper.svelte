@@ -1,17 +1,66 @@
 <script>
 	import { wait } from '$lib/flowControl';
+	import HandIcon from '@icons/HandIcon.svelte';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
+	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
 
+	/**@type {string}*/
 	export let id;
 	/**@type {import("$lib/interactiveElem").Interaction}*/
 	export let interaction;
 	let minimized = false;
+	let grabbing = true;
 	let width = 0;
 	let height = 0;
 
 	export let component;
 
+	async function open() {
+		minimized = false;
+
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		content.style.width = `${width}px`;
+		content.style.height = `${height}px`;
+		wrapper.style.overflow = 'unset';
+
+		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '1';
+		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
+			/**@type {HTMLElement}*/ (handle).style.opacity = '1';
+			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'all';
+		}
+		await wait(500);
+		content.style.width = 'unset';
+		content.style.height = 'unset';
+		if (grabbing) {
+			interaction.removeMoveListeners();
+			interaction.attachTransformListeners();
+		}
+	}
+
+	async function close() {
+		minimized = true;
+
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		width = content.scrollWidth;
+		height = content.scrollHeight;
+		content.style.width = `${content.scrollWidth}px`;
+		content.style.height = `${content.scrollHeight}px`;
+		await wait(0);
+		content.style.width = '40px';
+		content.style.height = '40px';
+		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '0';
+		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
+			/**@type {HTMLElement}*/ (handle).style.opacity = '0';
+			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'none';
+		}
+		await wait(500);
+		wrapper.style.overflow = 'hidden';
+		interaction.removeTransformListeners();
+		interaction.attachMoveListeners();
+	}
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
 		interaction.setResizeInteraction(
@@ -24,6 +73,8 @@
 			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
 		);
 		interaction.setMoveInteraction(wrapper);
+		interaction.removeMoveListeners();
+		interaction.attachTransformListeners();
 	});
 </script>
 
@@ -39,50 +90,29 @@
 		class="unit action-tray"
 		style="opacity: {minimized ? 0 : 1};width: {minimized ? '0px' : 'fit-content'}"
 	>
+		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
-			on:click={async () => {
-				minimized = true;
-
-				let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
-				let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
-				width = content.scrollWidth;
-				height = content.scrollHeight;
-				content.style.width = `${content.scrollWidth}px`;
-				content.style.height = `${content.scrollHeight}px`;
-				await wait(0);
-				content.style.width = '40px';
-				content.style.height = '40px';
-				/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '0';
-				for (let handle of /**@type {NodeListOf<HTMLElement>}*/ (
-					wrapper.querySelectorAll('.resize-handle')
-				)) {
-					handle.style.opacity = '0';
-				}
-			}}><MinimizeIcon></MinimizeIcon></button
-		>
-	</div>
-	{#if minimized}
-		<button
-			class="unit open-window"
-			on:click={async () => {
-				minimized = false;
-
-				let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
-				let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
-				content.style.width = `${width}px`;
-				content.style.height = `${height}px`;
-
-				/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '1';
-				for (let handle of /**@type {NodeListOf<HTMLElement>}*/ (
-					wrapper.querySelectorAll('.resize-handle')
-				)) {
-					handle.style.opacity = '1';
-				}
-				await wait(500);
-				content.style.width = 'unset';
-				content.style.height = 'unset';
+			disabled={!grabbing}
+			on:click={() => {
+				grabbing = false;
+				interaction.removeTransformListeners();
+				interaction.attachMoveListeners();
 			}}
 		>
+			<MoveIcon></MoveIcon></button
+		>
+		<button
+			disabled={grabbing}
+			on:click={() => {
+				grabbing = true;
+				interaction.removeMoveListeners();
+				interaction.attachTransformListeners();
+			}}
+			><HandIcon></HandIcon>
+		</button>
+	</div>
+	{#if minimized}
+		<button class="unit open-window" on:click={open}>
 			<svelte:component this={component}></svelte:component>
 		</button>
 	{/if}
@@ -99,9 +129,13 @@
 		gap: 5px;
 		transition: opacity 0.5s;
 		overflow: hidden;
+		pointer-events: visible;
 	}
 	.action-tray > button {
 		border: 1px solid hsl(0, 0%, 20%);
+	}
+	.action-tray > button:disabled {
+		filter: brightness(0.6);
 	}
 	@keyframes appear {
 		from {
@@ -127,6 +161,8 @@
 		transition:
 			width 0.5s,
 			height 0.5s;
+		pointer-events: visible;
+		z-index: 1;
 	}
 	:global(.resize-content > *) {
 		transition: opacity 0.5s;
@@ -161,5 +197,6 @@
 		background: white;
 		z-index: 1;
 		transition: opacity 0.5s;
+		pointer-events: visible;
 	}
 </style>

@@ -80,7 +80,6 @@
 		min-width: 50px;
 		height: 100px;
 		overflow: auto;
-		cursor: grab;
 		position: relative;
 		padding: 5px;
 		z-index: 1;
