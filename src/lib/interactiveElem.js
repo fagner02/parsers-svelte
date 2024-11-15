@@ -23,86 +23,13 @@ export class Interaction {
 	resizeDirLeft = false;
 	resizeDirTop = false;
 
-	/**
-	 * @param {Elem} listener
-	 * @param {(Elem)[]} targets
-	 */
-	setTransformInteraction(listener, targets) {
-		this.targets = targets;
-		this.transformListener = listener;
-		listener.style.cursor = 'grab';
-		this.attachTransformListeners();
+	removeDocumentListeners() {
+		document.onmouseup = null;
+		document.onmouseleave = null;
+		document.onmousemove = null;
+		document.ontouchend = null;
+		document.ontouchmove = null;
 	}
-
-	attachTransformListeners() {
-		this.dragPos = null;
-		if (this.moveTarget) {
-			this.moveTarget.style.cursor = 'unset';
-			/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
-		}
-		if (!this.transformListener) return;
-		this.transformListener.onmousedown = (e) => {
-			this.dragStart(e);
-		};
-		this.transformListener.onmouseleave = (e) => {
-			this.dragEnd(e);
-		};
-		this.transformListener.onmouseup = (e) => {
-			this.dragEnd(e);
-		};
-		this.transformListener.onmousemove = (e) => {
-			this.dragMove(e);
-		};
-		this.transformListener.ontouchstart = (e) => {
-			this.touchStart(e);
-		};
-		this.transformListener.ontouchmove = (e) => {
-			this.touchMove(e);
-		};
-		this.transformListener.ontouchend = (_) => {
-			this.touchEnd();
-		};
-		this.transformListener.onwheel = (e) => {
-			this.wheel(e);
-		};
-	}
-
-	removeTransformListeners() {
-		if (!this.transformListener) return;
-		this.transformListener.onmousedown = null;
-		this.transformListener.onmouseleave = null;
-		this.transformListener.onmouseup = null;
-		this.transformListener.onmousemove = null;
-		this.transformListener.ontouchstart = null;
-		this.transformListener.ontouchmove = null;
-		this.transformListener.ontouchend = null;
-		this.transformListener.onwheel = null;
-	}
-
-	/**
-	 * @param {Map<string, Elem?>} handles
-	 * @param {Elem} target
-	 */
-	setResizeInteraction(handles, target) {
-		this.resizedElem = target;
-		for (let h of 'lr') {
-			for (let v of 'bt') {
-				const handle = handles.get(h + v);
-				if (handle) {
-					let start = (/** @type {MouseEvent|TouchEvent} */ e) => {
-						this.resizeDirLeft = h === 'l';
-						this.resizeDirTop = v === 't';
-						e.stopImmediatePropagation();
-						e.preventDefault();
-						this.resizeStart();
-					};
-					handle.onmousedown = start;
-					handle.ontouchstart = start;
-				}
-			}
-		}
-	}
-
 	/**
 	 * @param {Elem} target
 	 */
@@ -127,8 +54,8 @@ export class Interaction {
 	removeMoveListeners() {
 		if (!this.moveTarget) return;
 		this.moveTarget.onmousedown = null;
-		this.moveTarget.onmouseup = null;
-		this.moveTarget.onmousemove = null;
+		this.moveTarget.ontouchstart = null;
+		this.removeDocumentListeners();
 	}
 
 	/**
@@ -192,11 +119,7 @@ export class Interaction {
 	 * @param {MouseEvent|TouchEvent} e
 	 */
 	moveEnd(e) {
-		document.onmouseup = null;
-		document.onmouseleave = null;
-		document.onmousemove = null;
-		document.ontouchend = null;
-		document.ontouchmove = null;
+		this.removeDocumentListeners();
 
 		if (!this.dragPos || !this.moveTarget) return;
 		let x, y;
@@ -210,6 +133,30 @@ export class Interaction {
 		let diff = { x: x - this.dragPos.x, y: y - this.dragPos.y };
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 		this.dragPos = null;
+	}
+
+	/**
+	 * @param {Map<string, Elem?>} handles
+	 * @param {Elem} target
+	 */
+	setResizeInteraction(handles, target) {
+		this.resizedElem = target;
+		for (let h of 'lr') {
+			for (let v of 'bt') {
+				const handle = handles.get(h + v);
+				if (handle) {
+					let start = (/** @type {MouseEvent|TouchEvent} */ e) => {
+						this.resizeDirLeft = h === 'l';
+						this.resizeDirTop = v === 't';
+						e.stopImmediatePropagation();
+						e.preventDefault();
+						this.resizeStart();
+					};
+					handle.onmousedown = start;
+					handle.ontouchstart = start;
+				}
+			}
+		}
 	}
 
 	resizeStart() {
@@ -234,11 +181,7 @@ export class Interaction {
 
 	resizeEnd() {
 		this.resizeInitial = null;
-		document.onmouseup = null;
-		document.onmouseleave = null;
-		document.onmousemove = null;
-		document.ontouchend = null;
-		document.ontouchmove = null;
+		this.removeDocumentListeners();
 	}
 
 	/**
@@ -266,6 +209,62 @@ export class Interaction {
 		} else {
 			this.resizedElem.style.height = `${y - this.resizeInitial.top}px`;
 		}
+	}
+
+	/**
+	 * @param {Elem} listener
+	 * @param {(Elem)[]} targets
+	 */
+	setTransformInteraction(listener, targets) {
+		this.targets = targets;
+		this.transformListener = listener;
+		listener.style.cursor = 'grab';
+		this.attachTransformListeners();
+	}
+
+	attachTransformListeners() {
+		this.dragPos = null;
+		if (this.moveTarget) {
+			this.moveTarget.style.cursor = 'unset';
+			/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
+		}
+		if (!this.transformListener) return;
+		this.transformListener.onmousedown = (e) => {
+			this.dragStart(e);
+		};
+		this.transformListener.onmouseleave = (e) => {
+			this.dragEnd(e);
+		};
+		this.transformListener.onmouseup = (e) => {
+			this.dragEnd(e);
+		};
+		this.transformListener.onmousemove = (e) => {
+			this.dragMove(e);
+		};
+		this.transformListener.ontouchstart = (e) => {
+			this.touchStart(e);
+		};
+		this.transformListener.ontouchmove = (e) => {
+			this.touchMove(e);
+		};
+		this.transformListener.ontouchend = (_) => {
+			this.touchEnd();
+		};
+		this.transformListener.onwheel = (e) => {
+			this.wheel(e);
+		};
+	}
+
+	removeTransformListeners() {
+		if (!this.transformListener) return;
+		this.transformListener.onmousedown = null;
+		this.transformListener.onmouseleave = null;
+		this.transformListener.onmouseup = null;
+		this.transformListener.onmousemove = null;
+		this.transformListener.ontouchstart = null;
+		this.transformListener.ontouchmove = null;
+		this.transformListener.ontouchend = null;
+		this.transformListener.onwheel = null;
 	}
 
 	/**
