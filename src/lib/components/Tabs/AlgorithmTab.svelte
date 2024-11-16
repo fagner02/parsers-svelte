@@ -6,7 +6,9 @@
 		back,
 		setCloseInstruction,
 		setOpenInstruction,
-		swapAlgorithm
+		swapAlgorithm,
+		setLimitHitCallback,
+		skipToEnd
 	} from '$lib/flowControl';
 	import Code from '@/Layout/Code.svelte';
 	import FillHeight from '@/Layout/FillHeight.svelte';
@@ -22,6 +24,7 @@
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	import InfoIcon from '@icons/InfoIcon.svelte';
 	import ParseView from '@/ParseView.svelte';
+	import ForwardIcon from '@icons/ForwardIcon.svelte';
 
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
@@ -29,7 +32,7 @@
 
 	// ============== flow control ==================================
 	/** @type {boolean} */
-	let animating;
+	let limit = false;
 	// ============== flow control ==================================
 
 	let parseOn = false;
@@ -88,6 +91,14 @@
 		} catch {}
 	}
 
+	/**
+	 * @param {boolean} value
+	 */
+	function limitHitCallback(value) {
+		limit = value;
+	}
+
+	setLimitHitCallback(limitHitCallback);
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
 
@@ -146,14 +157,17 @@
 		</div>
 
 		<div class="flow-controls controls">
-			<button style="filter: brightness({animating ? 80 : 100}%);" on:click={back}>
+			<button on:click={back}>
 				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
-			<button on:click={reset} style="filter: brightness({animating ? 80 : 100}%);">
+			<button on:click={reset}>
 				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 			</button>
-			<button on:click={forward} style="filter: brightness({animating ? 80 : 100}%);">
+			<button disabled={limit} on:click={forward}>
 				<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+			</button>
+			<button disabled={limit} on:click={skipToEnd}>
+				<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
 			</button>
 		</div>
 	</div>
@@ -257,6 +271,10 @@
 		gap: 10px;
 		height: fit-content;
 	}
+
+	/* .controls > button:disabled {
+		filter: brightness(0.6);
+	} */
 
 	.flow-controls {
 		justify-content: center;

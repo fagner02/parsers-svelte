@@ -2,6 +2,7 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
+	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
 	export let label;
 	export let hue;
@@ -11,7 +12,7 @@
 	/**@type {Array<string>}*/
 	export let rows;
 
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>} */
 	export let table;
 
 	export function resetTable() {
@@ -52,7 +53,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				table.update((x) => {
-					/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
 						data: data,
 						text: text,
 						opacity: 0,
@@ -64,7 +65,7 @@
 				await wait(50);
 
 				table.update((x) => {
-					/**@type {import('@/types').tableCol}*/ (x.get(row)).set(column, {
+					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
 						data: data,
 						text: text,
 						opacity: 1,
@@ -95,23 +96,22 @@
 	<table style="font-size: {fontSize}rem;">
 		<thead>
 			<tr>
-				<th style="background: hsl(200, 40%, 70%)"></th>
+				<th style="background: hsl({hue}, 40%, 70%)"></th>
 				{#each columns as column, index}
-					<th> {column} </th>
+					<th style="background: hsl({hue}, 60%, 40%);"> {column} </th>
 				{/each}
 			</tr>
 		</thead>
 		<tbody>
 			{#each $table as [rowKey, row]}
 				<tr>
-					<th><span>{rowKey}</span></th>
+					<th style="background: hsl({hue}, 60%, 40%);"><span>{rowKey}</span></th>
 					{#each row as [colKey, col]}
 						<td>
 							<span
 								id="t-{tableId}-{rowKey}-{colKey}"
-								style="width: {col.text.length *
-									charWidth *
-									col.width}rem;opacity: {col.opacity};top: {col.pos}px;"
+								style="width: {col.text.length * charWidth * col.width}rem;
+									opacity: {col.opacity};top: {col.pos}px;"
 							>
 								{col.text}
 							</span>
@@ -132,7 +132,6 @@
 	}
 
 	th {
-		background: hsl(200, 60%, 40%);
 		color: white;
 	}
 

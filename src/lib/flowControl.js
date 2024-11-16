@@ -2,7 +2,6 @@
 let pauseResolves = new Map();
 /** @type {Map<number, {error: Error,func:(reason?: any) => void}>} */
 let pauseRejects = new Map();
-
 /** @type {Map<number, (reason?: any) => void>} */
 let waitRejects = new Map();
 /** @type {Map<number, any>} */
@@ -97,7 +96,7 @@ export function killAllWaits() {
 	waitResolves.clear();
 	waitRejects.clear();
 }
-// export let animating = false;
+
 /** @type {() => Promise<void>} */
 let closeInstruction;
 /** @type {() => Promise<void>} */
@@ -124,42 +123,53 @@ export function setOpenInstruction(_openInstruction) {
  */
 export function setResetCall(_resetCall) {
 	limit = false;
-	stepCount = 0;
+	currentStep = 0;
 	jumpWait = false;
 	jumpPause = false;
 	maxStep = -1;
 
 	resetCall = _resetCall;
 }
-
+const actions = { none: -1, forward: 0, skipping: 1, back: 2 };
 let targetStep = -1;
-let stepCount = 0;
+let currentStep = 0;
 let maxStep = -1;
-let goForward = false;
-let goBack = false;
+let action = actions.none;
 let limit = false;
-
+/**@type {((value: boolean) => void)?}*/
+let limitHitCallback;
 export function limitHit() {
-	goForward = false;
-	// animating = false;
+	limitHitCallback?.(true);
 	limit = true;
-	maxStep = stepCount;
+	maxStep = currentStep;
 
 	targetStep = -1;
-	stepCount = 0;
+	currentStep = 0;
+}
+
+/**
+ * @param {(value:boolean)=>void} callback
+ */
+export function setLimitHitCallback(callback) {
+	limitHitCallback = callback;
 }
 
 export async function addPause() {
 	return new Promise(async (resolve, reject) => {
-		stepCount += 1;
-
-		if (goBack && (stepCount === targetStep || limit)) {
-			goBack = false;
+		currentStep += 1;
+		if (action === actions.skipping && limit) {
+			action = actions.none;
+			jumpPause = false;
+			jumpWait = false;
+		}
+		if (action === actions.back && (currentStep === targetStep || limit)) {
+			action = actions.none;
 			targetStep = -1;
 			jumpPause = false;
 			jumpWait = false;
-		} else if (goForward) {
-			goForward = false;
+		}
+		if (action === actions.forward) {
+			action = actions.none;
 			jumpWait = false;
 		}
 
@@ -169,14 +179,13 @@ export async function addPause() {
 		pauseRejects.set(pauseCount, { func: reject, error: Error('pause rejected') });
 		pauseCount++;
 	});
-	// animating = true;
 }
 
 export async function forward() {
 	if (limit) return;
-	goForward = true;
+	action = actions.forward;
 
-	if (stepCount > 1) {
+	if (currentStep > 1) {
 		closeInstruction?.();
 		await wait(200);
 	}
@@ -190,12 +199,27 @@ export async function forward() {
 	resolveAllWaits();
 }
 
+export async function skipToEnd() {
+	action = actions.skipping;
+
+	jumpWait = true;
+	jumpPause = true;
+	if (pauseResolves.size > 0) {
+		resolvePause();
+		openInstruction?.();
+		return;
+	}
+
+	jumpWait = true;
+	resolveAllWaits();
+}
+
 export function back() {
-	if (stepCount <= 1 && !limit) return;
-	goBack = true;
-	goForward = false;
-	targetStep = limit ? maxStep : stepCount - 1;
+	if (currentStep <= 1 && !limit) return;
+	action = actions.back;
+	targetStep = limit ? maxStep : currentStep - 1;
 	limit = false;
+	limitHitCallback?.(false);
 	jumpWait = true;
 	jumpPause = true;
 	reset();
@@ -203,12 +227,13 @@ export function back() {
 
 export function reset() {
 	limit = false;
-	stepCount = 0;
+	limitHitCallback?.(false);
+	currentStep = 0;
 	killAllWaits();
 	killPause();
 	jumpWait = true;
 	closeInstruction?.();
-	if (!goBack) {
+	if (!(action === actions.back)) {
 		targetStep = -1;
 		jumpWait = false;
 		jumpPause = false;
@@ -219,26 +244,13 @@ export function reset() {
 
 export function swapAlgorithm() {
 	limit = false;
-	stepCount = 0;
+	limitHitCallback?.(false);
+	currentStep = 0;
 	killAllWaits();
 	killPause();
 	jumpWait = false;
 	jumpPause = false;
 	targetStep = -1;
-	goBack = false;
-	goForward = false;
+	action = actions.none;
 	closeInstruction?.();
-}
-
-/**@type {number} */
-export let currentlyRunning = -1;
-let runningCount = 0;
-
-export function newRunningCall() {
-	currentlyRunning = runningCount;
-	runningCount++;
-	if (runningCount > 100) {
-		runningCount = 0;
-	}
-	return currentlyRunning;
 }
