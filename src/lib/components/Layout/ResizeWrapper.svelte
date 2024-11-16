@@ -33,6 +33,7 @@
 		await wait(500);
 		content.style.width = 'unset';
 		content.style.height = 'unset';
+		content.style.overflow = 'visible';
 		if (grabbing) {
 			interaction.removeMoveListeners();
 			interaction.attachTransformListeners();
@@ -51,6 +52,7 @@
 		await wait(0);
 		content.style.width = '40px';
 		content.style.height = '40px';
+		content.style.overflow = 'hidden';
 		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '0';
 		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
 			/**@type {HTMLElement}*/ (handle).style.opacity = '0';
