@@ -261,6 +261,8 @@
 		gap: 10px;
 		margin: 5px;
 		justify-content: space-between;
+		min-height: fit-content;
+		overflow: scroll;
 		width: 100%;
 		width: -webkit-fill-available;
 		width: -moz-available;
