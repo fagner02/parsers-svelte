@@ -262,7 +262,7 @@
 		margin: 5px;
 		justify-content: space-between;
 		min-height: fit-content;
-		overflow: scroll;
+		flex-wrap: wrap;
 		width: 100%;
 		width: -webkit-fill-available;
 		width: -moz-available;
@@ -273,10 +273,6 @@
 		gap: 10px;
 		height: fit-content;
 	}
-
-	/* .controls > button:disabled {
-		filter: brightness(0.6);
-	} */
 
 	.flow-controls {
 		justify-content: center;

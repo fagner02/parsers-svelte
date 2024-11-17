@@ -37,6 +37,10 @@ export function getJumpWait() {
 	return jumpWait;
 }
 
+export function getAction() {
+	return action;
+}
+
 /**
  * @param {number} ms
  */
@@ -130,11 +134,11 @@ export function setResetCall(_resetCall) {
 
 	resetCall = _resetCall;
 }
-const actions = { none: -1, forward: 0, skipping: 1, back: 2 };
+export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
 let targetStep = -1;
 let currentStep = 0;
 let maxStep = -1;
-let action = actions.none;
+let action = flowActions.none;
 let limit = false;
 /**@type {((value: boolean) => void)?}*/
 let limitHitCallback;
@@ -157,19 +161,19 @@ export function setLimitHitCallback(callback) {
 export async function addPause() {
 	return new Promise(async (resolve, reject) => {
 		currentStep += 1;
-		if (action === actions.skipping && limit) {
-			action = actions.none;
+		if (action === flowActions.skipping && limit) {
+			action = flowActions.none;
 			jumpPause = false;
 			jumpWait = false;
 		}
-		if (action === actions.back && (currentStep === targetStep || limit)) {
-			action = actions.none;
+		if (action === flowActions.back && (currentStep === targetStep || limit)) {
+			action = flowActions.none;
 			targetStep = -1;
 			jumpPause = false;
 			jumpWait = false;
 		}
-		if (action === actions.forward) {
-			action = actions.none;
+		if (action === flowActions.forward) {
+			action = flowActions.none;
 			jumpWait = false;
 		}
 
@@ -183,7 +187,7 @@ export async function addPause() {
 
 export async function forward() {
 	if (limit) return;
-	action = actions.forward;
+	action = flowActions.forward;
 
 	if (currentStep > 1) {
 		closeInstruction?.();
@@ -200,7 +204,7 @@ export async function forward() {
 }
 
 export async function skipToEnd() {
-	action = actions.skipping;
+	action = flowActions.skipping;
 
 	jumpWait = true;
 	jumpPause = true;
@@ -216,7 +220,7 @@ export async function skipToEnd() {
 
 export function back() {
 	if (currentStep <= 1 && !limit) return;
-	action = actions.back;
+	action = flowActions.back;
 	targetStep = limit ? maxStep : currentStep - 1;
 	limit = false;
 	limitHitCallback?.(false);
@@ -233,7 +237,7 @@ export function reset() {
 	killPause();
 	jumpWait = true;
 	closeInstruction?.();
-	if (!(action === actions.back)) {
+	if (!(action === flowActions.back)) {
 		targetStep = -1;
 		jumpWait = false;
 		jumpPause = false;
@@ -251,6 +255,6 @@ export function swapAlgorithm() {
 	jumpWait = false;
 	jumpPause = false;
 	targetStep = -1;
-	action = actions.none;
+	action = flowActions.none;
 	closeInstruction?.();
 }

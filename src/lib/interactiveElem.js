@@ -55,6 +55,8 @@ export class Interaction {
 
 	removeMoveListeners() {
 		if (!this.moveTarget) return;
+		this.moveTarget.style.cursor = 'unset';
+		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
 		this.moveTarget.onmousedown = null;
 		this.moveTarget.ontouchstart = null;
 		this.removeDocumentListeners();
@@ -231,10 +233,6 @@ export class Interaction {
 
 	attachTransformListeners() {
 		this.dragPos = null;
-		if (this.moveTarget) {
-			this.moveTarget.style.cursor = 'unset';
-			/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
-		}
 		if (!this.transformListener) return;
 		this.transformListener.onmousedown = (e) => {
 			this.dragStart(e);

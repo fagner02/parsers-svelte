@@ -10,9 +10,16 @@
 	/**@type {import("$lib/interactiveElem").Interaction}*/
 	export let interaction;
 	let minimized = false;
-	let grabbing = true;
 	let width = 0;
 	let height = 0;
+	let selected = 'grab';
+	/**@type {(()=>void)?}*/
+	let removeCallback = null;
+
+	/**
+	 * @type {any[]}
+	 */
+	export let actions = [];
 
 	export let component;
 
@@ -34,7 +41,7 @@
 		content.style.width = 'unset';
 		content.style.height = 'unset';
 		content.style.overflow = 'visible';
-		if (grabbing) {
+		if (selected === 'grab') {
 			interaction.removeMoveListeners();
 			interaction.attachTransformListeners();
 		}
@@ -94,9 +101,10 @@
 	>
 		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
-			disabled={!grabbing}
+			disabled={selected === 'move'}
 			on:click={() => {
-				grabbing = false;
+				selected = 'move';
+				removeCallback?.();
 				interaction.removeTransformListeners();
 				interaction.attachMoveListeners();
 			}}
@@ -104,14 +112,28 @@
 			<MoveIcon></MoveIcon></button
 		>
 		<button
-			disabled={grabbing}
+			disabled={selected === 'grab'}
 			on:click={() => {
-				grabbing = true;
+				selected = 'grab';
+				removeCallback?.();
 				interaction.removeMoveListeners();
 				interaction.attachTransformListeners();
 			}}
 			><HandIcon></HandIcon>
 		</button>
+		{#each actions as action}
+			<button
+				disabled={selected === action.name}
+				on:click={() => {
+					removeCallback?.();
+					interaction.removeTransformListeners();
+					interaction.removeMoveListeners();
+					selected = action.name;
+					action.callback();
+					removeCallback = action.removeCallback;
+				}}><svelte:component this={action.icon}></svelte:component></button
+			>
+		{/each}
 	</div>
 	{#if minimized}
 		<button class="unit open-window" on:click={open}>
@@ -168,7 +190,7 @@
 		transition: opacity 0.5s;
 	}
 	.resize-wrapper {
-		position: relative;
+		position: absolute;
 		width: fit-content;
 		height: fit-content;
 		margin: 5px;

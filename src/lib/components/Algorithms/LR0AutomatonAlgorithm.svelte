@@ -198,6 +198,7 @@
 				await stateStackElem?.removeFromStack(0);
 			}
 			limitHit();
+			automatonElem?.update(undefined, 10);
 			await addPause();
 		} catch (e) {
 			console.log(e);

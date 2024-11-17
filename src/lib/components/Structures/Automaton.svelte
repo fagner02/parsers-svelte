@@ -1,11 +1,12 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { flowActions, getAction, getJumpWait, wait } from '$lib/flowControl';
 	import { getGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 	import { Interaction } from '$lib/interactiveElem';
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
+	import CodeIcon from '@icons/CodeIcon.svelte';
 
 	let rules = getGrammar().rules;
 
@@ -28,9 +29,10 @@
 	 * }} Node*/
 	/** @type {Node[]}*/
 	let nodes = [];
-
 	/**@type {Interaction}*/
 	let svgInteraction = new Interaction();
+	let moveElements = false;
+
 	export function reset() {
 		nodes = [];
 		groupElem.remove();
@@ -51,6 +53,22 @@
 		groupElem.style.opacity = hide ? '1' : '0.5';
 		groupElem.style.filter = hide ? 'none' : 'blur(5px)';
 		svgInteraction.updateTargets([selectGroupElem, groupElem]);
+	}
+
+	function calArrow(/** @type {Node} */ pos1, /** @type {Node} */ pos2) {
+		let diff = { x: pos1.pos.x - pos2.pos.x, y: pos1.pos.y - pos2.pos.y };
+		let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+		let angle = Math.asin(diff.y / dist);
+		let h = Math.atan(pos1.size.y / pos1.size.x);
+		let arrowPos = { x: 0, y: 0 };
+		if (angle <= h && angle >= -h) {
+			arrowPos.x = (diff.x < 0 ? 1 : -1) * pos1.size.x;
+			arrowPos.y = Math.tan(-angle) * Math.abs(arrowPos.x);
+		} else {
+			arrowPos.y = (diff.y < 0 ? 1 : -1) * pos1.size.y;
+			arrowPos.x = (diff.x < 0 ? 1 : -1) * Math.abs(arrowPos.y / Math.tan(angle));
+		}
+		return arrowPos;
 	}
 
 	/**
@@ -108,6 +126,57 @@
 					/**@type {SVGGElement}*/ (clone).style.pointerEvents = 'none';
 					selectGroupElem.append(clone);
 				}
+			});
+			let rect = svgElem.getBoundingClientRect();
+			let pos = false;
+			res.addEventListener('mousedown', (e) => {
+				if (!moveElements) return;
+				pos = true;
+				rect = svgElem.getBoundingClientRect();
+			});
+			res.addEventListener('mousemove', (e) => {
+				if (!pos) return;
+
+				nodes[to].pos = {
+					x: (e.clientX - rect.x - svgInteraction.pos.x) / svgInteraction.scale,
+					y: (e.clientY - rect.y - svgInteraction.pos.y) / svgInteraction.scale
+				};
+				for (let [i, n] of nodes.entries()) {
+					n.obj.style.transform = `translate(${n.pos.x}px,${n.pos.y}px)`;
+
+					for (let [j, c] of n.con.entries()) {
+						if (c !== to && i !== to) continue;
+
+						let arrowPos = calArrow(nodes[c], n);
+						let arrowPos2 = calArrow(n, nodes[c]);
+
+						let start = { x: n.pos.x + arrowPos2.x, y: n.pos.y + arrowPos2.y };
+						let end = { x: nodes[c].pos.x + arrowPos.x, y: nodes[c].pos.y + arrowPos.y };
+						let diff = { x: start.x - end.x, y: start.y - end.y };
+						let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+						let middle = {
+							x: start.x + (-diff.x / dist) * (dist / 2),
+							y: start.y + (-diff.y / dist) * (dist / 2)
+						};
+
+						n.lines[j].setAttribute('x1', `${n.pos.x}`);
+						n.lines[j].setAttribute('y1', `${n.pos.y}`);
+						n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
+						n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
+
+						n.conLabels[j].style.transform = `translate(${middle.x}px,${middle.y}px)`;
+
+						n.arrows[j].setAttribute('cx', `${nodes[c].pos.x + arrowPos.x}`);
+						n.arrows[j].setAttribute('cy', `${nodes[c].pos.y + arrowPos.y}`);
+					}
+				}
+				// res.style.transform = `translateX(${nodes[to].pos.x}px) translateY(${nodes[to].pos.y}px)`;
+			});
+			res.addEventListener('mouseup', (e) => {
+				pos = false;
+			});
+			res.addEventListener('mouseleave', (e) => {
+				pos = false;
 			});
 
 			res.style.cursor = 'pointer';
@@ -224,16 +293,17 @@
 			label.addEventListener('click', selectLine);
 		}
 		let ex =
-			to === (nodes.length - 1 && from !== null) ? [-1, -1] : [/**@type {number}*/ (from), to];
-		if (shouldUpdate) update(ex);
+			to === (nodes.length - 1 && from !== null) ? undefined : [/**@type {number}*/ (from), to];
+		if (shouldUpdate && getAction() !== flowActions.skipping) update(ex);
 	}
 
 	/**
 	 * @param {number[]} existent
+	 * @param {number} numberOfUpdates
 	 */
-	function update(existent) {
+	export function update(existent = [-1, -1], numberOfUpdates = 4) {
 		let oldPos = [];
-		for (let k = 0; k < 4; k++) {
+		for (let k = 0; k < numberOfUpdates; k++) {
 			for (let [j, n] of nodes.entries()) {
 				let direction = { x: 0, y: 0 };
 				let jump = false;
@@ -378,8 +448,8 @@
 			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];
 
-		addNode(null, states[0].index, states[0], null);
-		await wait(100);
+		addNode(null, states[0].index, states[0], null, false);
+
 		while (states.length > 0) {
 			let transitions = automaton.transitions.get(states[0].index);
 			if (!transitions) {
@@ -387,12 +457,14 @@
 				continue;
 			}
 			for (let [symbol, state] of transitions) {
-				addNode(states[0].index, state, automaton.states[state], symbol);
-				await wait(100);
+				addNode(states[0].index, state, automaton.states[state], symbol, false);
+
 				states.push(automaton.states[state]);
 			}
 			states.shift();
 		}
+
+		update([-1, -1], 10);
 	}
 
 	onMount(() => {
@@ -409,10 +481,24 @@
 			resetSelected(true);
 		});
 	});
+
+	const actions = [
+		{
+			icon: CodeIcon,
+			callback: () => {
+				resetSelected(true);
+				moveElements = true;
+			},
+			removeCallback: () => {
+				moveElements = false;
+			},
+			name: 'move-elements'
+		}
+	];
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<ResizeWrapper component={AutomatonIcon} {id} bind:interaction={svgInteraction}>
+<ResizeWrapper {actions} component={AutomatonIcon} {id} bind:interaction={svgInteraction}>
 	<svg class="unit border" id="{id}-svg">
 		<g id="nodes"></g>
 		<g id="selected-node"></g>
