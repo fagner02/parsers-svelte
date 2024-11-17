@@ -7,6 +7,7 @@
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
 	import CodeIcon from '@icons/CodeIcon.svelte';
+	import HandMoveIcon from '@icons/HandMoveIcon.svelte';
 
 	let rules = getGrammar().rules;
 
@@ -484,7 +485,7 @@
 
 	const actions = [
 		{
-			icon: CodeIcon,
+			icon: HandMoveIcon,
 			callback: () => {
 				resetSelected(true);
 				moveElements = true;
