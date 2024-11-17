@@ -190,7 +190,7 @@
 		transition: opacity 0.5s;
 	}
 	.resize-wrapper {
-		position: absolute;
+		position: relative;
 		width: fit-content;
 		height: fit-content;
 		margin: 5px;
