@@ -33,7 +33,57 @@
 	/**@type {Interaction}*/
 	let svgInteraction = new Interaction();
 	let moveElements = false;
+	let selectedElement = { index: -1, rect: { x: 0, y: 0 } };
+	function move(/**@type {MouseEvent|TouchEvent}*/ e) {
+		let x = 0;
+		let y = 0;
+		if (e instanceof MouseEvent) {
+			x = e.clientX;
+			y = e.clientY;
+		} else {
+			if (e.touches.length === 0) return;
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
+		}
+		nodes[selectedElement.index].pos = {
+			x: (x - selectedElement.rect.x - svgInteraction.pos.x) / svgInteraction.scale,
+			y: (y - selectedElement.rect.y - svgInteraction.pos.y) / svgInteraction.scale
+		};
+		for (let [i, n] of nodes.entries()) {
+			n.obj.style.transform = `translate(${n.pos.x}px,${n.pos.y}px)`;
 
+			for (let [j, c] of n.con.entries()) {
+				if (c !== selectedElement.index && i !== selectedElement.index) continue;
+
+				let arrowPos = calArrow(nodes[c], n);
+				let arrowPos2 = calArrow(n, nodes[c]);
+
+				let start = { x: n.pos.x + arrowPos2.x, y: n.pos.y + arrowPos2.y };
+				let end = { x: nodes[c].pos.x + arrowPos.x, y: nodes[c].pos.y + arrowPos.y };
+				let diff = { x: start.x - end.x, y: start.y - end.y };
+				let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
+				let middle = {
+					x: start.x + (-diff.x / dist) * (dist / 2),
+					y: start.y + (-diff.y / dist) * (dist / 2)
+				};
+
+				n.lines[j].setAttribute('x1', `${n.pos.x}`);
+				n.lines[j].setAttribute('y1', `${n.pos.y}`);
+				n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
+				n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
+
+				n.conLabels[j].style.transform = `translate(${middle.x}px,${middle.y}px)`;
+
+				n.arrows[j].setAttribute('cx', `${nodes[c].pos.x + arrowPos.x}`);
+				n.arrows[j].setAttribute('cy', `${nodes[c].pos.y + arrowPos.y}`);
+			}
+		}
+	}
+	function endMove() {
+		document.onmousemove = null;
+		document.onmouseleave = null;
+		document.onmouseup = null;
+	}
 	export function reset() {
 		nodes = [];
 		groupElem.remove();
@@ -128,57 +178,18 @@
 					selectGroupElem.append(clone);
 				}
 			});
-			let rect = svgElem.getBoundingClientRect();
-			let pos = false;
-			res.addEventListener('mousedown', (e) => {
+
+			let startMove = () => {
 				if (!moveElements) return;
-				pos = true;
-				rect = svgElem.getBoundingClientRect();
-			});
-			res.addEventListener('mousemove', (e) => {
-				if (!pos) return;
+				let rect = svgElem.getBoundingClientRect();
+				selectedElement = { index: to, rect: { x: rect.x, y: rect.y } };
 
-				nodes[to].pos = {
-					x: (e.clientX - rect.x - svgInteraction.pos.x) / svgInteraction.scale,
-					y: (e.clientY - rect.y - svgInteraction.pos.y) / svgInteraction.scale
-				};
-				for (let [i, n] of nodes.entries()) {
-					n.obj.style.transform = `translate(${n.pos.x}px,${n.pos.y}px)`;
-
-					for (let [j, c] of n.con.entries()) {
-						if (c !== to && i !== to) continue;
-
-						let arrowPos = calArrow(nodes[c], n);
-						let arrowPos2 = calArrow(n, nodes[c]);
-
-						let start = { x: n.pos.x + arrowPos2.x, y: n.pos.y + arrowPos2.y };
-						let end = { x: nodes[c].pos.x + arrowPos.x, y: nodes[c].pos.y + arrowPos.y };
-						let diff = { x: start.x - end.x, y: start.y - end.y };
-						let dist = Math.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.y, 2));
-						let middle = {
-							x: start.x + (-diff.x / dist) * (dist / 2),
-							y: start.y + (-diff.y / dist) * (dist / 2)
-						};
-
-						n.lines[j].setAttribute('x1', `${n.pos.x}`);
-						n.lines[j].setAttribute('y1', `${n.pos.y}`);
-						n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
-						n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
-
-						n.conLabels[j].style.transform = `translate(${middle.x}px,${middle.y}px)`;
-
-						n.arrows[j].setAttribute('cx', `${nodes[c].pos.x + arrowPos.x}`);
-						n.arrows[j].setAttribute('cy', `${nodes[c].pos.y + arrowPos.y}`);
-					}
-				}
-				// res.style.transform = `translateX(${nodes[to].pos.x}px) translateY(${nodes[to].pos.y}px)`;
-			});
-			res.addEventListener('mouseup', (e) => {
-				pos = false;
-			});
-			res.addEventListener('mouseleave', (e) => {
-				pos = false;
-			});
+				document.onmousemove = move;
+				document.onmouseup = endMove;
+				document.onmouseleave = endMove;
+			};
+			res.addEventListener('mousedown', startMove);
+			res.addEventListener('touchstart', startMove);
 
 			res.style.cursor = 'pointer';
 			res.append(box);
