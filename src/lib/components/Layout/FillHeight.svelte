@@ -48,8 +48,9 @@
 			parseFloat(compMap.paddingBottom) +
 			parseFloat(compMap.marginBottom) +
 			parseFloat(compMap.marginTop);
-		if (component.style.height === `${height - deduct - compInsets}px`) return;
-		component.style.height = `${height - deduct - compInsets}px`;
+		const newHeight = `${height - deduct - compInsets}px`;
+		if (component.style.height === newHeight) return;
+		component.style.height = newHeight;
 	}
 	function setWidth() {
 		parent = /**@type {HTMLElement}*/ (component.parentElement);
@@ -85,9 +86,9 @@
 			parseFloat(compMap.paddingLeft) +
 			parseFloat(compMap.marginLeft) +
 			parseFloat(compMap.marginRight);
-
-		if (component.style.maxWidth === `${width - deduct - compInsets}px`) return;
-		component.style.maxWidth = `${width - deduct - compInsets}px`;
+		const newWidth = `${width - deduct - compInsets}px`;
+		if (component.style.maxWidth === newWidth) return;
+		component.style.maxWidth = newWidth;
 	}
 
 	function setSize() {
