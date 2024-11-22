@@ -186,6 +186,9 @@ export class Interaction {
 		document.ontouchend = () => {
 			this.resizeEnd();
 		};
+		document.ontouchcancel = () => {
+			this.resizeEnd();
+		};
 	}
 
 	resizeEnd() {
@@ -205,6 +208,7 @@ export class Interaction {
 			x = e.clientX;
 			y = e.clientY;
 		} else {
+			if (e.touches.length == 0) return;
 			x = e.touches[0].clientX;
 			y = e.touches[0].clientY;
 		}
