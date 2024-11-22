@@ -1,5 +1,5 @@
 <script>
-	const config = { attributes: true, childList: true, subtree: true };
+	const config = { attributes: true, childList: true, subtree: false };
 
 	/** @type {HTMLDivElement} */
 	let component;
@@ -58,7 +58,7 @@
 		const map = window.getComputedStyle(parent);
 		const compMap = window.getComputedStyle(component);
 
-		const width = /**@type {number}*/ (parent.clientWidth);
+		const width = /**@type {number}*/ Math.round(parent.getBoundingClientRect().width);
 		let deduct = 0;
 		if (
 			map.display === 'flex' &&
@@ -91,6 +91,7 @@
 	}
 
 	function setSize() {
+		console.log('resize');
 		if (fillWidth) setWidth();
 		if (fillHeight) setHeight();
 	}
