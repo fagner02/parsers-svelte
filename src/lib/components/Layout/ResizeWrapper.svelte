@@ -13,12 +13,14 @@
 	let width = 0;
 	let height = 0;
 	let selected = 'grab';
+	let isInteracting = false;
 	/**@type {(()=>void)?}*/
 	let removeCallback = null;
+	let interactingCallback = (/**@type {boolean}*/ value) => {
+		isInteracting = value;
+	};
 
-	/**
-	 * @type {any[]}
-	 */
+	/** @type {any[]} */
 	export let actions = [];
 
 	export let component;
@@ -72,6 +74,7 @@
 	}
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+
 		interaction.setResizeInteraction(
 			new Map([
 				['lb', document.querySelector(`#${id}-lb-handle`)],
@@ -84,6 +87,7 @@
 		interaction.setMoveInteraction(wrapper);
 		interaction.removeMoveListeners();
 		interaction.attachTransformListeners();
+		interaction.setInteractingCallback(interactingCallback);
 	});
 </script>
 
@@ -97,7 +101,9 @@
 	<div class="unit resize-handle rt-handle" id="{id}-rt-handle"></div>
 	<div
 		class="unit action-tray"
-		style="opacity: {minimized ? 0 : 1};width: {minimized ? '0px' : 'fit-content'}"
+		style="opacity: {minimized ? 0 : 1};width: {minimized
+			? '0px'
+			: 'fit-content'};pointer-events: {isInteracting ? 'none' : 'all'}"
 	>
 		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
 		<button

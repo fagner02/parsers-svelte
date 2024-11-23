@@ -22,7 +22,15 @@ export class Interaction {
 	resizeInitial = null;
 	resizeDirLeft = false;
 	resizeDirTop = false;
+	/**@type {((value: boolean)=>void)?} */
+	interactingCallback = null;
 
+	/**
+	 * @param {((value: boolean) => void)?} callback
+	 */
+	setInteractingCallback(callback) {
+		this.interactingCallback = callback;
+	}
 	removeDocumentListeners() {
 		document.onmouseup = null;
 		document.onmouseleave = null;
@@ -70,6 +78,7 @@ export class Interaction {
 			e.preventDefault();
 			e.stopImmediatePropagation();
 		}
+		this.interactingCallback?.(true);
 		document.onmouseup = (e) => {
 			this.moveEnd(e);
 		};
@@ -128,7 +137,7 @@ export class Interaction {
 	 */
 	moveEnd(e) {
 		this.removeDocumentListeners();
-
+		this.interactingCallback?.(false);
 		if (!this.dragPos || !this.moveTarget) return;
 		let x, y;
 		if (e instanceof MouseEvent) {
@@ -170,6 +179,7 @@ export class Interaction {
 
 	resizeStart() {
 		if (!this.resizedElem) return;
+		this.interactingCallback?.(true);
 		this.resizeInitial = this.resizedElem.getBoundingClientRect();
 		document.onmousemove = (e) => {
 			this.resizeMove(e);
@@ -192,6 +202,7 @@ export class Interaction {
 	}
 
 	resizeEnd() {
+		this.interactingCallback?.(false);
 		this.resizeInitial = null;
 		this.removeDocumentListeners();
 	}
