@@ -1,5 +1,5 @@
 <script>
-	import FillHeight from '../Layout/FillHeight.svelte';
+	import FillSize from '../Layout/FillSize.svelte';
 	import LLAnimation from './LLAnimation.svelte';
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
@@ -16,7 +16,7 @@
 	let selected = items[0];
 </script>
 
-<FillHeight class="tab {$$props.class ?? ''}">
+<FillSize class="tab {$$props.class ?? ''}">
 	<div class="tab-item-list">
 		{#each items as item}
 			<button
@@ -32,10 +32,10 @@
 			>
 		{/each}
 	</div>
-	<FillHeight class="tab-content">
+	<FillSize class="tab-content">
 		<svelte:component this={selected.comp}></svelte:component>
-	</FillHeight>
-</FillHeight>
+	</FillSize>
+</FillSize>
 
 <style>
 	:global(.tab) {

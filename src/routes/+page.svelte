@@ -1,6 +1,6 @@
 <script>
 	import { getPlatform, platforms } from '$lib/utils';
-	import FillHeight from '@/Layout/FillHeight.svelte';
+	import FillSize from '@/Layout/FillSize.svelte';
 	import Header from '@/Layout/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
 	import { AndroidFullScreen } from '@awesome-cordova-plugins/android-full-screen';
@@ -23,9 +23,9 @@
 <div id="app">
 	<Header></Header>
 
-	<FillHeight id="app-content" class="grid borders maxWidth">
+	<FillSize id="app-content" class="grid borders maxWidth">
 		<Tabs class="unit "></Tabs>
-	</FillHeight>
+	</FillSize>
 </div>
 
 <style>

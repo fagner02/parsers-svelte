@@ -1,7 +1,7 @@
 <script>
 	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
-	import FillHeight from '@/Layout/FillHeight.svelte';
+	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 	import { first, mergedFirst } from '$lib/first';
@@ -87,7 +87,7 @@
 </script>
 
 <AlgorithmTab {inputString} {code}>
-	<FillHeight slot="steps" style="max-width: inherit; width: 100%;">
+	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
 				<button
@@ -100,14 +100,14 @@
 				>
 			{/each}
 		</div>
-		<FillHeight class="grid">
+		<FillSize class="grid">
 			{#if selectedAlgorithm === algos[0]}
 				<LR1AutomatonAlgorithm {firstSet}></LR1AutomatonAlgorithm>
 			{:else}
 				<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>
 			{/if}
-		</FillHeight>
-	</FillHeight>
+		</FillSize>
+	</FillSize>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
 		<ClrParse

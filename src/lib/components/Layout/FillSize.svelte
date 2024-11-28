@@ -5,8 +5,8 @@
 	let component;
 	/** @type {Element} */
 	let parent;
-	let fillHeight = true;
-	let fillWidth = true;
+	export let fillHeight = true;
+	export let fillWidth = true;
 
 	const observer = new MutationObserver(setSize);
 	const resize = new ResizeObserver(setSize);
@@ -87,11 +87,12 @@
 			parseFloat(compMap.marginLeft) +
 			parseFloat(compMap.marginRight);
 		const newWidth = `${width - deduct - compInsets}px`;
-		if (component.style.maxWidth === newWidth) return;
-		component.style.maxWidth = newWidth;
+		if (component.style.width === newWidth) return;
+		component.style.width = newWidth;
 	}
 
 	function setSize() {
+		console.log('resiz');
 		if (fillWidth) setWidth();
 		if (fillHeight) setHeight();
 	}

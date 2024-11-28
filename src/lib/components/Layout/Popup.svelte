@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
-	import FillHeight from './FillHeight.svelte';
+	import FillSize from './FillSize.svelte';
 	import CloseButton from './CloseButton.svelte';
 
 	export let flex = 0.1;
@@ -18,15 +18,16 @@
 	});
 </script>
 
-<FillHeight
-	style="display: flex;flex-direction: column;justify-content: center;padding-top: 20px"
+<FillSize
+	style="display: flex;flex-direction: column;justify-content: center;padding-top: 20px;"
 	class="maxWidth"
+	fillWidth={false}
 >
 	<CloseButton {onClose}></CloseButton>
 	<div
 		id={$$props.id}
 		class="popup-box maxWidth"
-		style="transform: scale({flex}, 1);height: inherit"
+		style="transform: scale({flex}, 1);height: inherit;"
 	>
 		<slot
 			maxWidth={flex}
@@ -36,7 +37,7 @@
 			style="opacity: {opacity};transform: translate(0px, {pos}px)"
 		></slot>
 	</div>
-</FillHeight>
+</FillSize>
 
 <style>
 	.popup-box {

@@ -11,7 +11,7 @@
 		skipToEnd
 	} from '$lib/flowControl';
 	import Code from '@/Layout/Code.svelte';
-	import FillHeight from '@/Layout/FillHeight.svelte';
+	import FillSize from '@/Layout/FillSize.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
 	import CodeIcon from '@icons/CodeIcon.svelte';
 	import DocIcon from '@icons/DocIcon.svelte';
@@ -106,7 +106,7 @@
 	$: isAnim = selected === 'noPopup';
 </script>
 
-<FillHeight class="contents">
+<FillSize class="contents">
 	<div class="controls-box">
 		<div class="controls">
 			<button
@@ -171,7 +171,7 @@
 			</button>
 		</div>
 	</div>
-	<FillHeight id="wrapper" class="grid maxWidth">
+	<FillSize id="wrapper" class="grid maxWidth">
 		<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
 			{#if parseOn}
 				<ParseView bind:inputString>
@@ -215,8 +215,8 @@
 				</div>
 			</div>
 		</div>
-	</FillHeight>
-</FillHeight>
+	</FillSize>
+</FillSize>
 
 <style>
 	:global(.popup) {

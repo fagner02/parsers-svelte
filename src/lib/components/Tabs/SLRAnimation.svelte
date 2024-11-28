@@ -2,7 +2,7 @@
 	import { swapAlgorithm } from '$lib/flowControl';
 	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
-	import FillHeight from '@/Layout/FillHeight.svelte';
+	import FillSize from '@/Layout/FillSize.svelte';
 	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
 	import SLRTableAlgorithm from '@/Algorithms/SLRTableAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
@@ -83,7 +83,7 @@
 </script>
 
 <AlgorithmTab {inputString} {code}>
-	<FillHeight slot="steps" style="max-width: inherit; width: 100%;">
+	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
 				<button
@@ -96,14 +96,14 @@
 				>
 			{/each}
 		</div>
-		<FillHeight class="grid">
+		<FillSize class="grid">
 			{#if selectedAlgorithm === algos[0]}
 				<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
 			{:else}
 				<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
 			{/if}
-		</FillHeight>
-	</FillHeight>
+		</FillSize>
+	</FillSize>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
 		<SlrParse
