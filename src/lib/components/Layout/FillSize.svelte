@@ -87,8 +87,8 @@
 			parseFloat(compMap.marginLeft) +
 			parseFloat(compMap.marginRight);
 		const newWidth = `${width - deduct - compInsets}px`;
-		if (component.style.width === newWidth) return;
-		component.style.width = newWidth;
+		if (component.style.maxWidth === newWidth) return;
+		component.style.maxWidth = newWidth;
 	}
 
 	function setSize() {
