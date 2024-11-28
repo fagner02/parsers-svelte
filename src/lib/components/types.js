@@ -22,6 +22,8 @@
 
 /**@typedef {{comp: ConstructorOfATypedSvelteComponent, name: string}} TabItem*/
 
+/**@typedef {{ x: number, y: number }} Vec2*/
+
 /**
  * @typedef {{
  * data: string,

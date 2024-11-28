@@ -20,8 +20,8 @@
 	let svgElem;
 	/**@typedef {{
 	 * obj: SVGGElement;
-	 * size: {x:number,y:number};
-	 * pos: { x: number; y: number; };
+	 * size: import('@/types').Vec2;
+	 * pos: import('@/types').Vec2;
 	 * lines: SVGLineElement[];
 	 * arrows: SVGElement[];
 	 * conLabels: SVGGElement[];
@@ -32,7 +32,7 @@
 	/**@type {Interaction}*/
 	let svgInteraction = new Interaction();
 	let moveElements = false;
-	let selectedElement = { index: -1, rect: { x: 0, y: 0 } };
+	let selectedElement = { index: -1, rect: { x: 0, y: 0 }, diff: { x: 0, y: 0 } };
 	function move(/**@type {MouseEvent|TouchEvent}*/ e) {
 		let x = 0;
 		let y = 0;
@@ -44,6 +44,8 @@
 			x = e.touches[0].clientX;
 			y = e.touches[0].clientY;
 		}
+		x += selectedElement.diff.x;
+		y += selectedElement.diff.y;
 		nodes[selectedElement.index].pos = {
 			x: (x - selectedElement.rect.x - svgInteraction.pos.x) / svgInteraction.scale,
 			y: (y - selectedElement.rect.y - svgInteraction.pos.y) / svgInteraction.scale
@@ -178,10 +180,28 @@
 				}
 			});
 
-			let startMove = () => {
+			let startMove = (/**@type {MouseEvent|TouchEvent}*/ e) => {
 				if (!moveElements) return;
+				let x = 0;
+				let y = 0;
+				if (e instanceof MouseEvent) {
+					x = e.clientX;
+					y = e.clientY;
+				} else {
+					if (e.touches.length === 0) return;
+					x = e.touches[0].clientX;
+					y = e.touches[0].clientY;
+				}
 				let rect = svgElem.getBoundingClientRect();
-				selectedElement = { index: to, rect: { x: rect.x, y: rect.y } };
+				let diff = {
+					x: nodes[to].pos.x * svgInteraction.scale + svgInteraction.pos.x + rect.x - x,
+					y: nodes[to].pos.y * svgInteraction.scale + svgInteraction.pos.y + rect.y - y
+				};
+				selectedElement = {
+					index: to,
+					rect: { x: rect.x, y: rect.y },
+					diff
+				};
 
 				document.onmousemove = move;
 				document.onmouseup = endMove;
