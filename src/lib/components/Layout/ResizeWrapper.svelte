@@ -49,7 +49,12 @@
 		}
 	}
 
-	async function close() {
+	/**
+	 * @param {MouseEvent} e
+	 */
+	async function close(e) {
+		console.log('click');
+		e.stopImmediatePropagation();
 		minimized = true;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
@@ -84,7 +89,7 @@
 			]),
 			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
 		);
-		interaction.setMoveInteraction(wrapper);
+		interaction.setMoveInteraction(/**@type {HTMLElement}*/ (wrapper.firstElementChild));
 		interaction.removeMoveListeners();
 		interaction.attachTransformListeners();
 		interaction.setInteractingCallback(interactingCallback);
@@ -93,7 +98,7 @@
 
 <div class="grid resize-wrapper" style={$$props.style} id="{id}-resize-wrapper">
 	<div class="unit resize-content">
-		<slot></slot>
+		<slot name="content"></slot>
 	</div>
 	<div class="unit resize-handle lb-handle" id="{id}-lb-handle"></div>
 	<div class="unit resize-handle lt-handle" id="{id}-lt-handle"></div>
@@ -108,7 +113,7 @@
 		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
 			disabled={selected === 'move'}
-			on:click={() => {
+			on:click={(e) => {
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
@@ -119,7 +124,9 @@
 		>
 		<button
 			disabled={selected === 'grab'}
-			on:click={() => {
+			on:click={(e) => {
+				console.log('graaaaa');
+				e.stopImmediatePropagation();
 				selected = 'grab';
 				removeCallback?.();
 				interaction.removeMoveListeners();

@@ -58,6 +58,7 @@ export class Interaction {
 			this.moveStart(e);
 		};
 		this.moveTarget.style.cursor = 'move';
+
 		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'none';
 	}
 
@@ -74,6 +75,7 @@ export class Interaction {
 	 * @param {MouseEvent | TouchEvent} e
 	 */
 	moveStart(e) {
+		console.log('start');
 		if (e instanceof MouseEvent) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
@@ -128,8 +130,8 @@ export class Interaction {
 		this.dragPos = { x: x, y: y };
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 
-		this.moveTarget.style.top = `${this.movePos.y}px`;
-		this.moveTarget.style.left = `${this.movePos.x}px`;
+		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.top = `${this.movePos.y}px`;
+		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.left = `${this.movePos.x}px`;
 	}
 
 	/**

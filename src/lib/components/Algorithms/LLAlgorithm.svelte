@@ -17,7 +17,7 @@
 	let codeCard;
 	/**@type {TableCard}*/
 	let tableElement;
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>} */
 	export let table = writable(new Map());
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
@@ -119,7 +119,9 @@
 	onMount(async () => {
 		firstFuncs = getSelectionFunctions(/** @type {string}*/ (firstCard?.getSetId()));
 		tableElement?.resetTable();
-		codeCard?.setPseudoCode(await (await fetch('./lltable.txt')).text());
+		fetch('./lltable.txt').then((data) =>
+			data.text().then((text) => codeCard?.setPseudoCode(text))
+		);
 		lltable();
 	});
 </script>

@@ -69,7 +69,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <ResizeWrapper component={FileCodeIcon} id="code" {interaction}>
-	<div class="pseudo-code-card">
+	<div slot="content" class="pseudo-code-card">
 		<pre style="font-size: 11px;" id="pseudocode"></pre>
 	</div>
 </ResizeWrapper>

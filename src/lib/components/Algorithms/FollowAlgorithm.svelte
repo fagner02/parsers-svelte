@@ -10,6 +10,7 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import { text } from '@sveltejs/kit';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement;
@@ -262,7 +263,7 @@
 
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
-		codeCard?.setPseudoCode(await (await fetch('./follow.txt')).text());
+		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 		reset();
 	});
 </script>

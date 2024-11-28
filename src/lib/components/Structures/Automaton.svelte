@@ -1,12 +1,11 @@
 <script>
-	import { flowActions, getAction, getJumpWait, wait } from '$lib/flowControl';
+	import { flowActions, getAction } from '$lib/flowControl';
 	import { getGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 	import { Interaction } from '$lib/interactiveElem';
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
-	import CodeIcon from '@icons/CodeIcon.svelte';
 	import HandMoveIcon from '@icons/HandMoveIcon.svelte';
 
 	let rules = getGrammar().rules;
@@ -511,7 +510,7 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <ResizeWrapper {actions} component={AutomatonIcon} {id} bind:interaction={svgInteraction}>
-	<svg class="unit border" id="{id}-svg">
+	<svg slot="content" class="unit border" id="{id}-svg">
 		<g id="nodes"></g>
 		<g id="selected-node"></g>
 	</svg>

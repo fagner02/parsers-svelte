@@ -198,8 +198,8 @@
 
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
-		let pseudoCode = await (await fetch('./first.txt')).text();
-		codeCard?.setPseudoCode(pseudoCode);
+		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
+
 		return first();
 	});
 </script>

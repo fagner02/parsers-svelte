@@ -92,7 +92,6 @@
 	}
 
 	function setSize() {
-		console.log('resize');
 		if (fillWidth) setWidth();
 		if (fillHeight) setHeight();
 	}

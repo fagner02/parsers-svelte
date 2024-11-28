@@ -12,7 +12,7 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
-	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
+	import PseudoCode from '@/Structures/PseudoCode.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -24,6 +24,8 @@
 	let stateElem;
 	/**@type {Automaton | undefined}*/
 	let automatonElem;
+	/**@type {PseudoCode | undefined}*/
+	let codeCard;
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let state = writable([]);
@@ -124,7 +126,10 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		fetch('./slrtable.txt').then((data) =>
+			data.text().then((text) => codeCard?.setPseudoCode(text))
+		);
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
@@ -136,6 +141,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<TableCard
 			{rows}

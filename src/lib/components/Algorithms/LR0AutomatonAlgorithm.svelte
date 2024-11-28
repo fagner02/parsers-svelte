@@ -209,7 +209,9 @@
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
 		targetStateSelection = getSelectionFunctions('destino');
-		codeCard?.setPseudoCode(await (await fetch('./lr0automaton.txt')).text());
+		fetch('./lr0automaton.txt').then((data) =>
+			data.text().then((text) => codeCard?.setPseudoCode(text))
+		);
 		buildAutomaton();
 	});
 </script>
