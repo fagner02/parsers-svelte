@@ -5,20 +5,22 @@
  * @param {Map<string,Set<string>>} firstSet
  */
 export function lr1Automaton(rules, nt, t, firstSet) {
-	/**@type {import('@/types').LR1Automaton}*/
-	let automaton = { states: [], transitions: new Map() };
+    autômato &lt;- &#x3008;estados, transições&#x3009;
+    estado0  &lt;- [item da forma { posição: 0, regra: primeira regra da gramática }]
 
-	/**@type {import('@/types').LR1StateItem[]} */
-	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: new Set(['$']) }];
+    closurelr1(estado0)
+	
+    adiciona estado0 ao autômato
 
-	/**@type {number[]} */
-	let stateStack = [];
-	closure(state0, rules, nt, firstSet);
-
-	automaton.states.push({ index: 0, items: [...state0] });
-
-	stateStack.push(0);
-	let alphabet = [...t, ...nt].filter((x) => x !== '');
+    filaEstados &lt;- [estado0]
+    enquanto tamanho de filaEstados > 0:
+        para cada símbolo b do alfabeto:
+            estado1 &lt;- {}
+            para cada item no primeiro estado de filaEstados:
+                se b for diferente do símbolo da produção do item na posição do item:
+                    continua para próxima iteração
+                novoItem &lt;- item da forma {produção: produção do item, posição: posição do item + 1, lookahead: lookahead do item}
+                adiciona novoItem a estado1
 	while (stateStack.length > 0) {
 		for (let symbol of alphabet) {
 			/**@type {import('@/types').LR1StateItem[]} */

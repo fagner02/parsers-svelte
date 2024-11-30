@@ -1,61 +1,36 @@
-/**
- * @param {import('@/types').LR1StateItem[]} state
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
- * @param {Map<string, Set<string>>} firstSet
- */
-export function closure(state, rules, nt, firstSet) {
-    
-	let itemsToCheck = [...state];
-	while (itemsToCheck.length > 0) {
-		/**@type {import("@/types").LR1StateItem[]}*/
-		let temp = [];
-		for (let item of itemsToCheck) {
-			let symbol = rules[item.ruleIndex].right[item.pos];
-			if (!nt.includes(symbol)) continue;
-			let lookahead = new Set();
-			if (rules[item.ruleIndex].right.length - 1 === item.pos) {
-				lookahead = new Set(item.lookahead);
-			} else {
-				/**@type {string[]}*/
-				let betaFirst = [];
-				let nullable = true;
-				for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-					let beta = rules[item.ruleIndex].right[item.pos + i];
-					if (!nt.includes(beta)) {
-						betaFirst.push(beta);
-						nullable = false;
-						break;
-					} else {
-						let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
-						betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
-
-						if (!first.includes('')) {
-							nullable = false;
-							break;
-						}
-					}
-				}
-				if (nullable) {
-					lookahead = new Set([...betaFirst, ...item.lookahead]);
-				} else {
-					lookahead = new Set(betaFirst);
-				}
-			}
-			for (let rule of rules) {
-				if (!(rule.left === symbol)) continue;
-				let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
-
-				if (existent === -1) {
-					state.push({ ruleIndex: rule.index, pos: 0, lookahead });
-					temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
-					continue;
-				}
-				for (let l of lookahead) {
-					state[existent].lookahead.add(l);
-				}
-			}
-		}
-		itemsToCheck = temp;
-	}
-}
+Algoritmo closure lr1:
+    filaEstados &lt;- [estado]
+    enquanto tamanho de filaEstados > 0:
+        item &lt;- primeiro de filaEstados
+        b &lt;- símbolo da produção do item na posição do item
+        se b é terminal:
+            remove primeiro de filaEstados
+            continua para próxima iteração
+        lookahead &lt;- {}
+        se posição do item for a ultima posição da produção:
+            lookahead &lt;- lookahead do item
+        caso contrário:
+            firstBeta &lt;- {}
+            nulo &lt;- verdadeiro
+            para cada símbolo beta na produção do item a partir da posição do item:
+                se beta é terminal:
+                    adiciona beta a betaFirst
+                    nulo &lt;- falso
+                    interrompe o loop
+                caso contrário:
+                    adiciona first(beta) sem &epsilon; a betaFirst
+                    se first(beta) não inclui &epsilon;:
+                        nulo &lt;- false
+                        interrompe o loop
+            se nulo é verdadeiro:
+                lookahead &lt;- betaFirst &cup; lookahead do item
+            caso contrário:
+                lookahead &lt;- betaFirst
+        para cada produção r do não terminal b:
+            novoItem &lt;- item da forma {produção: r, posição: 0, lookahead: lookahead}
+            se novoItem não existe em estado:
+                adiciona novoItem a estado
+                adiciona novoItem a filaEstados
+            caso contrário
+                adiciona lookahead em lookahead do item existente
+        remove primeiro de filaEstados

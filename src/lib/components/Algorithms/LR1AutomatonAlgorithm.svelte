@@ -169,20 +169,22 @@
 							colors.pink,
 							false
 						);
-						if (
-							$targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)
-						) {
-							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
-							continue;
+
+						let existent = $targetState.findIndex(
+							(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
+						);
+						if (existent === -1) {
+							await targetStateElem?.addItem(
+								prod.ruleIndex,
+								prod.pos + 1,
+								prod.lookahead,
+								`state-${originStateElem?.getId()}-${prodIndex}`
+							);
+						} else {
+							await targetStateElem?.updateLookahead(prod.lookahead, existent);
 						}
 
 						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
-						await targetStateElem?.addItem(
-							prod.ruleIndex,
-							prod.pos + 1,
-							prod.lookahead,
-							`state-${originStateElem?.getId()}-${prodIndex}`
-						);
 					}
 					await stateSelection.hideSelect();
 					if ($targetState.length === 0) continue;
@@ -238,6 +240,7 @@
 			}
 
 			limitHit();
+			automatonElem?.update(undefined, 10);
 			await addPause();
 		} catch (e) {
 			console.log(e);

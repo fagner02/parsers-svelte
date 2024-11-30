@@ -7,55 +7,56 @@
 export function closure(state, rules, nt, firstSet) {
 	let itemsToCheck = [...state];
 	while (itemsToCheck.length > 0) {
-		/**@type {import("@/types").LR1StateItem[]}*/
-		let temp = [];
-		for (let item of itemsToCheck) {
-			let symbol = rules[item.ruleIndex].right[item.pos];
-			if (!nt.includes(symbol)) continue;
-			let lookahead = new Set();
-			if (rules[item.ruleIndex].right.length - 1 === item.pos) {
-				lookahead = new Set(item.lookahead);
-			} else {
-				/**@type {string[]}*/
-				let betaFirst = [];
-				let nullable = true;
-				for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-					let beta = rules[item.ruleIndex].right[item.pos + i];
-					if (!nt.includes(beta)) {
-						betaFirst.push(beta);
+		let item = itemsToCheck[0];
+		let symbol = rules[item.ruleIndex].right[item.pos];
+		if (!nt.includes(symbol)) {
+			itemsToCheck.shift();
+			continue;
+		}
+		let lookahead = new Set();
+		if (rules[item.ruleIndex].right.length - 1 === item.pos) {
+			lookahead = new Set(item.lookahead);
+		} else {
+			/**@type {string[]}*/
+			let betaFirst = [];
+			let nullable = true;
+			for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
+				let beta = rules[item.ruleIndex].right[item.pos + i];
+				if (!nt.includes(beta)) {
+					betaFirst.push(beta);
+					nullable = false;
+					break;
+				} else {
+					let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
+					betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
+
+					if (!first.includes('')) {
 						nullable = false;
 						break;
-					} else {
-						let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
-						betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
-
-						if (!first.includes('')) {
-							nullable = false;
-							break;
-						}
 					}
 				}
-				if (nullable) {
-					lookahead = new Set([...betaFirst, ...item.lookahead]);
-				} else {
-					lookahead = new Set(betaFirst);
-				}
 			}
-			for (let rule of rules) {
-				if (!(rule.left === symbol)) continue;
-				let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
-
-				if (existent === -1) {
-					state.push({ ruleIndex: rule.index, pos: 0, lookahead });
-					temp.push({ ruleIndex: rule.index, pos: 0, lookahead });
-					continue;
-				}
-				for (let l of lookahead) {
-					state[existent].lookahead.add(l);
-				}
+			if (nullable) {
+				lookahead = new Set([...betaFirst, ...item.lookahead]);
+			} else {
+				lookahead = new Set(betaFirst);
 			}
 		}
-		itemsToCheck = temp;
+		for (let rule of rules) {
+			if (!(rule.left === symbol)) continue;
+			let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
+
+			if (existent === -1) {
+				state.push({ ruleIndex: rule.index, pos: 0, lookahead });
+				itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead });
+				continue;
+			}
+			for (let l of lookahead) {
+				state[existent].lookahead.add(l);
+			}
+		}
+
+		itemsToCheck.shift();
 	}
 }
 
@@ -90,8 +91,14 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					rules[prod.ruleIndex].right[prod.pos] !== symbol
 				)
 					continue;
-				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) continue;
-				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: prod.lookahead });
+				let existent = state1.findIndex(
+					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
+				);
+				if (existent === -1) {
+					state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: prod.lookahead });
+				} else {
+					state1[existent].lookahead = new Set([...state1[existent].lookahead, ...prod.lookahead]);
+				}
 			}
 			if (state1.length === 0) continue;
 			closure(state1, rules, nt, firstSet);

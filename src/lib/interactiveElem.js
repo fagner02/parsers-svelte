@@ -75,7 +75,6 @@ export class Interaction {
 	 * @param {MouseEvent | TouchEvent} e
 	 */
 	moveStart(e) {
-		console.log('start');
 		if (e instanceof MouseEvent) {
 			e.preventDefault();
 			e.stopImmediatePropagation();

@@ -53,7 +53,6 @@
 	 * @param {MouseEvent} e
 	 */
 	async function close(e) {
-		console.log('click');
 		e.stopImmediatePropagation();
 		minimized = true;
 
@@ -125,7 +124,6 @@
 		<button
 			disabled={selected === 'grab'}
 			on:click={(e) => {
-				console.log('graaaaa');
 				e.stopImmediatePropagation();
 				selected = 'grab';
 				removeCallback?.();

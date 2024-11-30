@@ -6,20 +6,21 @@
 export function closure(state, rules, nt) {
 	let itemsToCheck = [...state];
 	while (itemsToCheck.length > 0) {
-		/**@type {import("@/types").LR0StateItem[]}*/
-		let temp = [];
-		for (let item of itemsToCheck) {
-			let symbol = rules[item.ruleIndex].right[item.pos];
-			if (!nt.includes(symbol)) continue;
-
-			for (let rule of rules) {
-				if (!(rule.left === symbol)) continue;
-				if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
-				state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
-				temp.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
-			}
+		let item = itemsToCheck[0];
+		let symbol = rules[item.ruleIndex].right[item.pos];
+		if (!nt.includes(symbol)) {
+			itemsToCheck.shift();
+			continue;
 		}
-		itemsToCheck = temp;
+
+		for (let rule of rules) {
+			if (!(rule.left === symbol)) continue;
+			if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
+			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+			itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+		}
+
+		itemsToCheck.shift();
 	}
 }
 /**
@@ -52,6 +53,9 @@ export function lr0Automaton(rules, nt, t) {
 					rules[prod.ruleIndex].right[prod.pos] !== symbol
 				)
 					continue;
+				let existent = state1.findIndex(
+					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
+				);
 				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) continue;
 				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: null });
 			}
