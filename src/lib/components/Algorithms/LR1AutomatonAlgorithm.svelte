@@ -61,6 +61,7 @@
 			automatonElem?.reset();
 			symbolsSelection.hideSelect();
 			stateSelection.hideSelect();
+			targetStateSelection.hideSelect();
 		} catch (e) {}
 		buildAutomaton();
 	}
