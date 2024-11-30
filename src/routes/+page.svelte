@@ -26,7 +26,7 @@
 <div id="app">
 	<Header></Header>
 
-	<FillSize id="app-content" class="grid borders maxWidth">
+	<FillSize fillWidth={false} id="app-content" class="grid borders maxWidth">
 		<Tabs class="unit "></Tabs>
 	</FillSize>
 </div>
