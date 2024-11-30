@@ -5,7 +5,7 @@
 {#if getPlatform() === platforms.web}
 	<header>
 		<nav>
-			<h1>Visualizador de Parsers</h1>
+			<h1>VANSI: Visualizador de Analisadores Sintáticos</h1>
 		</nav>
 	</header>
 {/if}
