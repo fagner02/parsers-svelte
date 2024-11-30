@@ -17,8 +17,11 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>VANSI: Visualizador de Analisadores Sintáticos</title>
+	<meta
+		name="description"
+		content="VANSI é uma ferramenta para visualização e ensino de algoritmos de análise sintática"
+	/>
 </svelte:head>
 <div id="app">
 	<Header></Header>
