@@ -9,7 +9,7 @@
 	export let id;
 	/**@type {import("$lib/interactiveElem").Interaction}*/
 	export let interaction;
-	let minimized = false;
+	let minimized = true;
 	let width = 0;
 	let height = 0;
 	let selected = 'grab';
@@ -53,7 +53,7 @@
 	 * @param {MouseEvent} e
 	 */
 	async function close(e) {
-		e.stopImmediatePropagation();
+		e?.stopImmediatePropagation();
 		minimized = true;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
@@ -196,9 +196,15 @@
 			width 0.5s,
 			height 0.5s;
 		z-index: 1;
+		width: 40px;
+		height: 40px;
+		overflow: hidden;
 	}
 	:global(.resize-content > *) {
 		transition: opacity 0.5s;
+	}
+	:global(.resize-content > *) {
+		opacity: 0;
 	}
 	.resize-wrapper {
 		position: relative;
@@ -206,6 +212,7 @@
 		height: fit-content;
 		margin: 5px;
 		z-index: 1;
+		overflow: hidden;
 	}
 	.lb-handle {
 		cursor: sw-resize;
@@ -232,6 +239,8 @@
 		background: white;
 		z-index: 1;
 		transition: opacity 0.5s;
+		opacity: 0;
+		pointer-events: none;
 	}
 	.resize-wrapper,
 	.resize-handle {

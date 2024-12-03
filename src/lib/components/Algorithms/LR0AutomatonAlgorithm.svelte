@@ -218,43 +218,46 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit">
-	<PseudoCode bind:this={codeCard}></PseudoCode>
-	<GrammarCard bind:loadGrammar></GrammarCard>
-	<StateCard
-		state={targetState}
-		stateId={'destino'}
-		label={'estado destino'}
-		hue={colors.pink}
-		bind:this={targetStateElem}
-		bind:svgLines
-	></StateCard>
-	<StateCard
-		state={originState}
-		stateId={'origem'}
-		label={'estado origem'}
-		hue={colors.pink}
-		bind:this={originStateElem}
-		bind:svgLines
-	></StateCard>
-	<StackCard
-		stack={stateStack}
-		stackId="temp"
-		label="estados novos"
-		hue={colors.blue}
-		bind:this={stateStackElem}
-		bind:svgLines
-	></StackCard>
-	<StackCard
-		stack={symbolList}
-		stackId="symbolList"
-		label="alfabeto"
-		hue={colors.green}
-		reversed={false}
-		bind:svgLines
-	></StackCard>
-
-	<Automaton id="lr0" bind:this={automatonElem}></Automaton>
+<div class=" unit grid">
+	<div class="cards-box unit" style="max-width: inherit;">
+		<GrammarCard bind:loadGrammar></GrammarCard>
+		<StateCard
+			state={targetState}
+			stateId={'destino'}
+			label={'estado destino'}
+			hue={colors.pink}
+			bind:this={targetStateElem}
+			bind:svgLines
+		></StateCard>
+		<StateCard
+			state={originState}
+			stateId={'origem'}
+			label={'estado origem'}
+			hue={colors.pink}
+			bind:this={originStateElem}
+			bind:svgLines
+		></StateCard>
+		<StackCard
+			stack={stateStack}
+			stackId="temp"
+			label="estados novos"
+			hue={colors.blue}
+			bind:this={stateStackElem}
+			bind:svgLines
+		></StackCard>
+		<StackCard
+			stack={symbolList}
+			stackId="symbolList"
+			label="alfabeto"
+			hue={colors.green}
+			reversed={false}
+			bind:svgLines
+		></StackCard>
+	</div>
+	<div class="unit">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
+	</div>
 </div>
 
 <style>

@@ -10,7 +10,8 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
-	import { text } from '@sveltejs/kit';
+	import { setInfoComponent } from '$lib/infoText';
+	import FollowInfo from '@/Info/FollowInfo.svelte';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement;
@@ -264,6 +265,7 @@
 	onMount(async () => {
 		grammarFuncs = getSelectionFunctions('g');
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
+		setInfoComponent(FollowInfo);
 		reset();
 	});
 </script>

@@ -10,6 +10,8 @@
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import TableLl1 from '@/Info/TableLL1.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -122,6 +124,7 @@
 		fetch('./lltable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
+		setInfoComponent(TableLl1);
 		lltable();
 	});
 </script>

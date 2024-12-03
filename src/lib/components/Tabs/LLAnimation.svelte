@@ -13,6 +13,7 @@
 	import { getGrammar } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
+	import Automaton from '@/Structures/Automaton.svelte';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -21,7 +22,7 @@
 	let firstSet = writable();
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable();
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol>>} */
+	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>} */
 	let table = writable();
 	// ========== Components ====================
 
@@ -87,14 +88,14 @@
 		);
 
 		table.set(
-			/**@type {Map<string, import('@/types').tableCol>}*/ (
+			/**@type {Map<string, import('@/types').tableCol<any>>}*/ (
 				new Map(
 					[..._table].map(([rowKey, cols]) => [
 						rowKey,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
 								colKey,
-								/**@type {import('../types').tableItem}*/ ({
+								/**@type {import('../types').tableItem<any>}*/ ({
 									data: cell,
 									opacity: 1,
 									pos: 0,

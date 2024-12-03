@@ -1,11 +1,13 @@
 <script>
 	import Popup from './Popup.svelte';
-
+	import { component } from '$lib/infoText';
 	export let onClose;
 </script>
 
 <Popup let:style let:contentClass id="info" {onClose}>
-	<div class={contentClass} {style}>Text</div>
+	<div id="info-content" class={contentClass} style={`padding: 0px 10px;${style}`}>
+		<svelte:component this={component}></svelte:component>
+	</div>
 </Popup>
 
 <style>

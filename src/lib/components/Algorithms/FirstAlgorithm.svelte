@@ -11,6 +11,8 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import FistInfo from '@/Info/FistInfo.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;
@@ -200,6 +202,7 @@
 		grammarFuncs = getSelectionFunctions('g');
 		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
+		setInfoComponent(FistInfo);
 		return first();
 	});
 </script>
