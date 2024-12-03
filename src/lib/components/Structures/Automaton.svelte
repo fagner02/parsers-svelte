@@ -96,6 +96,7 @@
 		document.querySelector(`#${id}-svg`)?.append(groupElem);
 		document.querySelector(`#${id}-svg`)?.append(selectGroupElem);
 		svgInteraction.updateTargets([groupElem, selectGroupElem]);
+		setSize();
 	}
 
 	function resetSelected(hide = false) {
@@ -497,7 +498,8 @@
 
 		update([-1, -1], 10);
 	}
-
+	/**@type {()=>void}*/
+	let setSize;
 	onMount(() => {
 		svgElem = /**@type {SVGElement}*/ (document.querySelector(`#${id}-svg`));
 		groupElem = /**@type {SVGGElement}*/ (document.querySelector(`#${id}-svg>#nodes`));
@@ -507,6 +509,7 @@
 		svgInteraction.setTransformInteraction(svgElem, [groupElem, selectGroupElem]);
 
 		reset();
+
 		svgElem?.addEventListener('click', (e) => {
 			if (!svgInteraction.isClick) return;
 			resetSelected(true);
@@ -529,7 +532,13 @@
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<ResizeWrapper {actions} component={AutomatonIcon} {id} bind:interaction={svgInteraction}>
+<ResizeWrapper
+	bind:setSize
+	{actions}
+	component={AutomatonIcon}
+	{id}
+	bind:interaction={svgInteraction}
+>
 	<svg slot="content" class="unit border" id="{id}-svg">
 		<g id="nodes"></g>
 		<g id="selected-node"></g>
@@ -539,7 +548,7 @@
 <style>
 	.border {
 		min-height: 240px;
-		width: 100%;
+		min-width: 240px;
 		height: 100%;
 	}
 

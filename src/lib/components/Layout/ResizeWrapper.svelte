@@ -76,6 +76,13 @@
 		interaction.removeTransformListeners();
 		interaction.attachMoveListeners();
 	}
+	export function setSize() {
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		console.log(content.scrollWidth, content.scrollHeight);
+		width = content.scrollWidth;
+		height = content.scrollHeight;
+	}
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
 
@@ -89,9 +96,9 @@
 			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
 		);
 		interaction.setMoveInteraction(/**@type {HTMLElement}*/ (wrapper.firstElementChild));
-		interaction.removeMoveListeners();
-		interaction.attachTransformListeners();
 		interaction.setInteractingCallback(interactingCallback);
+		interaction.removeTransformListeners();
+		interaction.attachMoveListeners();
 	});
 </script>
 
@@ -201,10 +208,8 @@
 		overflow: hidden;
 	}
 	:global(.resize-content > *) {
-		transition: opacity 0.5s;
-	}
-	:global(.resize-content > *) {
 		opacity: 0;
+		transition: opacity 0.5s;
 	}
 	.resize-wrapper {
 		position: relative;

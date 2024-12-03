@@ -242,12 +242,3 @@
 		></StackCard>
 	</div>
 </div>
-
-<style>
-	.cards-box > div {
-		flex: 1;
-		flex-wrap: wrap;
-		display: flex;
-		align-items: flex-start;
-	}
-</style>

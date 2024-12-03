@@ -59,8 +59,11 @@
 	export function setPseudoCode(pseudoCode) {
 		cardContent.innerHTML = pseudoCode;
 		card.style.width = `${card.scrollWidth + card.clientWidth - cardContent.clientWidth}px`;
+		setSize();
 	}
 
+	/**@type {()=>void}*/
+	let setSize;
 	onMount(() => {
 		card = /**@type {HTMLElement}*/ (document.querySelector('.pseudo-code-card'));
 		cardContent = /**@type {HTMLElement}*/ (document.querySelector('#pseudocode'));
@@ -68,7 +71,7 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<ResizeWrapper component={FileCodeIcon} id="code" {interaction}>
+<ResizeWrapper bind:setSize component={FileCodeIcon} id="code" {interaction}>
 	<div slot="content" class="pseudo-code-card">
 		<pre style="font-size: 11px;" id="pseudocode"></pre>
 	</div>
