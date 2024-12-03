@@ -122,11 +122,8 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit grid" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div
-		class="unit"
-		style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap"
-	>
+<div class="unit grid" style="padding: 0 5px; flex-direction:column;align-items:stretch">
+	<div class="cards-box unit">
 		<TableCard
 			{rows}
 			{columns}

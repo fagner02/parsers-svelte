@@ -271,44 +271,48 @@
 </script>
 
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit">
-	<PseudoCode bind:this={codeCard}></PseudoCode>
-	<GrammarCard bind:loadGrammar></GrammarCard>
-	<SetsCard
-		setId="follow"
-		useNote={false}
-		set={followSet}
-		setIndexes={followIndexes}
-		hue={colors.blue}
-		label={'follow set'}
-		bind:this={followSetElement}
-		bind:svgLines
-	></SetsCard>
-	<SetsCard
-		setId="first"
-		useNote={false}
-		set={firstSet}
-		setIndexes={followIndexes}
-		hue={colors.blue}
-		label={'first set'}
-		bind:svgLines
-	></SetsCard>
-	<SetsCard
-		setId="join"
-		useNote={false}
-		set={joinSet}
-		setIndexes={joinIndexes}
-		hue={colors.blue}
-		label={'join set'}
-		bind:this={joinSetElement}
-		bind:svgLines
-	></SetsCard>
-	<StackCard
-		stack={joinStack}
-		stackId="join"
-		label="join stack"
-		hue={colors.blue}
-		bind:this={joinStackElement}
-		bind:svgLines
-	></StackCard>
+<div class="grid unit">
+	<div class="unit">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
+	</div>
+	<div class="cards-box unit">
+		<GrammarCard bind:loadGrammar></GrammarCard>
+		<SetsCard
+			setId="follow"
+			useNote={false}
+			set={followSet}
+			setIndexes={followIndexes}
+			hue={colors.blue}
+			label={'follow set'}
+			bind:this={followSetElement}
+			bind:svgLines
+		></SetsCard>
+		<SetsCard
+			setId="first"
+			useNote={false}
+			set={firstSet}
+			setIndexes={followIndexes}
+			hue={colors.blue}
+			label={'first set'}
+			bind:svgLines
+		></SetsCard>
+		<SetsCard
+			setId="join"
+			useNote={false}
+			set={joinSet}
+			setIndexes={joinIndexes}
+			hue={colors.blue}
+			label={'join set'}
+			bind:this={joinSetElement}
+			bind:svgLines
+		></SetsCard>
+		<StackCard
+			stack={joinStack}
+			stackId="join"
+			label="join stack"
+			hue={colors.blue}
+			bind:this={joinStackElement}
+			bind:svgLines
+		></StackCard>
+	</div>
 </div>

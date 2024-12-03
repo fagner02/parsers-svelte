@@ -208,11 +208,11 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit">
-	<div>
+<div class="grid unit">
+	<div class="unit">
 		<PseudoCode bind:this={codeCard}></PseudoCode>
 	</div>
-	<div>
+	<div class="unit cards-box">
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<SetsCard
 			setId="first"

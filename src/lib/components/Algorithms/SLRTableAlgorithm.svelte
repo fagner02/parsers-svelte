@@ -139,9 +139,12 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div style="flex: 0;display:flex;align-items:flex-end;justify-content:center;flex-wrap:wrap">
+<div class="grid unit">
+	<div class="unit">
 		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<Automaton id="slr" bind:this={automatonElem}></Automaton>
+	</div>
+	<div class="cards-box unit">
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<TableCard
 			{rows}
@@ -161,9 +164,6 @@
 			hue={colors.blue}
 			bind:svgLines
 		></StackCard>
-	</div>
-	<div style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
-		<Automaton id="slr" bind:this={automatonElem}></Automaton>
 	</div>
 </div>
 

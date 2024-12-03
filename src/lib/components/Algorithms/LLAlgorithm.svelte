@@ -130,35 +130,39 @@
 </script>
 
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
-<div class="cards-box unit">
-	<PseudoCode bind:this={codeCard}></PseudoCode>
-	<GrammarCard bind:loadGrammar></GrammarCard>
-	<TableCard
-		rows={nt}
-		columns={t}
-		bind:table
-		bind:svgLines
-		bind:this={tableElement}
-		tableId="ll"
-		label="tabela ll(1)"
-		hue={colors.blue}
-	></TableCard>
-	<SetsCard
-		setId="follow"
-		useNote={false}
-		set={followSet}
-		hue={colors.blue}
-		label={'follow set'}
-		bind:this={followCard}
-	></SetsCard>
-	<SetsCard
-		setId="first"
-		useNote={false}
-		set={firstSet}
-		hue={colors.blue}
-		label={'first set'}
-		bind:this={firstCard}
-	></SetsCard>
+<div class="grid unit">
+	<div class="unit">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
+	</div>
+	<div class="cards-box unit">
+		<GrammarCard bind:loadGrammar></GrammarCard>
+		<TableCard
+			rows={nt}
+			columns={t}
+			bind:table
+			bind:svgLines
+			bind:this={tableElement}
+			tableId="ll"
+			label="tabela ll(1)"
+			hue={colors.blue}
+		></TableCard>
+		<SetsCard
+			setId="follow"
+			useNote={false}
+			set={followSet}
+			hue={colors.blue}
+			label={'follow set'}
+			bind:this={followCard}
+		></SetsCard>
+		<SetsCard
+			setId="first"
+			useNote={false}
+			set={firstSet}
+			hue={colors.blue}
+			label={'first set'}
+			bind:this={firstCard}
+		></SetsCard>
+	</div>
 </div>
 
 <style>

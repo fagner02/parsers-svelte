@@ -218,7 +218,7 @@
 </script>
 
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
-<div class=" unit grid">
+<div class="unit grid">
 	<div class="cards-box unit" style="max-width: inherit;">
 		<GrammarCard bind:loadGrammar></GrammarCard>
 		<StateCard
