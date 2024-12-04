@@ -9,6 +9,8 @@
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -109,6 +111,7 @@
 	}
 
 	onMount(async () => {
+		setInfoComponent(SlrParsingInfo);
 		loadGrammar();
 		await parsing();
 	});

@@ -1,10 +1,9 @@
 <h2>O Algoritmo Follow na Análise Sintática</h2>
 <h3>O que é o Algoritmo Follow?</h3>
 <p>
-	Assim como o algoritmo First, o algoritmo Follow é uma ferramenta fundamental na análise
-	sintática, especialmente para a construção de analisadores sintáticos LL(1). Ele é utilizado para
-	determinar o conjunto de terminais que podem aparecer <strong>imediatamente após</strong> um determinado
-	não-terminal em uma cadeia válida da linguagem.
+	O Follow é utilizado para determinar o conjunto de terminais que podem aparecer <strong
+		>imediatamente após</strong
+	> um determinado não-terminal em uma cadeia válida da linguagem.
 </p>
 <h3>Para que serve o Follow?</h3>
 <p>

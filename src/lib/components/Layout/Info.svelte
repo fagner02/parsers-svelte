@@ -15,4 +15,7 @@
 		background: hsl(200, 60%, 100%);
 		box-shadow: 0px 0px 10px 0px hsl(0, 0%, 0%, 20%);
 	}
+	:global(td, th) {
+		border: 1px solid black;
+	}
 </style>

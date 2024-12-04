@@ -4,14 +4,14 @@
 	processo de parsing de uma gramática. Ela é construída com base nos conjuntos First e Follow de
 	cada não-terminal da gramática.
 </p>
-<p><strong>O que é uma tabela LL(1)?</strong></p>
+<h3>O que é uma tabela LL(1)?</h3>
 <p>
 	A tabela LL(1) é uma matriz onde as linhas correspondem aos não-terminais da gramática e as
 	colunas correspondem aos terminais e ao símbolo de fim de entrada ($). Cada célula da tabela
 	contém a produção a ser utilizada quando o não-terminal da linha e o terminal da coluna são
 	encontrados na entrada.
 </p>
-<p><strong>Como construir a tabela LL(1)?</strong></p>
+<h3>Como construir a tabela LL(1)?</h3>
 <ol>
 	<li>
 		<strong>Calcular os conjuntos First e Follow:</strong>
@@ -60,7 +60,7 @@
 		</ul>
 	</li>
 </ol>
-<p><strong>Exemplo:</strong></p>
+<h3>Exemplo:</h3>
 <p>Considere a gramática:</p>
 <pre><code
 		>S -&gt; aA | <span>b</span>
@@ -101,7 +101,7 @@ A -&gt; c | <span>ε</span>
 		</tr>
 	</tbody>
 </table>
-<p><strong>Explicação:</strong></p>
+<h3>Explicação:</h3>
 <ul>
 	<li>
 		<strong>S -&gt; aA:</strong> Como &#39;a&#39; está em First(aA), colocamos S -&gt; aA na célula [S,
@@ -120,13 +120,13 @@ A -&gt; c | <span>ε</span>
 		colocamos A -&gt; ε nas células [A, b] e [A, $].
 	</li>
 </ul>
-<p><strong>Utilizando a tabela LL(1):</strong></p>
+<h3>Utilizando a tabela LL(1):</h3>
 <p>
 	A tabela LL(1) é utilizada pelo analisador sintático para decidir qual produção aplicar em cada
 	passo da análise. Dado um não-terminal na pilha e um terminal na entrada, o analisador consulta a
 	tabela para encontrar a produção a ser utilizada.
 </p>
-<p><strong>Condições para uma gramática ser LL(1):</strong></p>
+<h3>Condições para uma gramática ser LL(1):</h3>
 <ul>
 	<li>Nenhuma célula da tabela deve conter mais de uma produção.</li>
 	<li>

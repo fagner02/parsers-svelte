@@ -11,6 +11,8 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -252,6 +254,7 @@
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
 		targetStateSelection = getSelectionFunctions('destino');
+		setInfoComponent(Lr1AutomatonInfo);
 		buildAutomaton();
 	});
 </script>

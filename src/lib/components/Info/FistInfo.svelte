@@ -2,10 +2,9 @@
 
 <h3>O que é o Algoritmo First?</h3>
 <p>
-	Na análise sintática, o algoritmo First é uma ferramenta fundamental para a construção de
-	analisadores sintáticos. Ele é utilizado para determinar o conjunto de símbolos que podem iniciar
-	uma determinada produção gramatical. Em outras palavras, o First de uma produção indica os
-	possíveis primeiros símbolos de uma cadeia que pode ser derivada a partir dessa produção.
+	O First é utilizado para determinar o conjunto de símbolos que podem iniciar uma determinada
+	produção gramatical. Em outras palavras, o First de uma produção indica os possíveis primeiros
+	símbolos de uma cadeia que pode ser derivada a partir dessa produção.
 </p>
 <h3>Para que serve o First?</h3>
 <p>

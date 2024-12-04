@@ -8,6 +8,8 @@
 	import { getTreeFunctions } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
+	import { setInfoComponent } from '$lib/infoText';
+	import Ll1ParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -106,6 +108,7 @@
 	}
 
 	onMount(async () => {
+		setInfoComponent(Ll1ParsingInfo);
 		await parsing();
 	});
 </script>

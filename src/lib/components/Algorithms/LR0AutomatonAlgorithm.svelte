@@ -11,6 +11,8 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -213,6 +215,7 @@
 		fetch('./lr0automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
+		setInfoComponent(Lr0AutomatonInfo);
 		buildAutomaton();
 	});
 </script>

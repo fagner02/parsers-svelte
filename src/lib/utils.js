@@ -20,11 +20,16 @@ let rules = [];
 let nt = [];
 /** @type {Array<string>}*/
 let t = [];
+export let grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
 
 /**
- * @param {string} grammar
+ * @param {string} text
  */
-export function loadGrammar(grammar) {
+export function setGrammarText(text) {
+	grammar = text;
+}
+
+export function loadGrammar() {
 	let ntSet = new Set();
 	let tSet = new Set();
 	let alphSet = new Set();
@@ -51,11 +56,15 @@ export function loadGrammar(grammar) {
 		if (!ntSet.has(v)) tSet.add(v);
 	}
 
-	t = ['$'].concat(Array.from(tSet));
+	t = Array.from(tSet).concat(['$']);
 	nt = Array.from(ntSet);
 	return { t, nt, rules };
 }
 
 export function getGrammar() {
 	return { t, nt, rules, alphabet: [...t, ...nt], startingSymbol: rules[0].left };
+}
+
+export function isGrammarLoaded() {
+	return rules.length > 0;
 }

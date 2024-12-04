@@ -13,6 +13,8 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -130,6 +132,7 @@
 		fetch('./slrtable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
+		setInfoComponent(SlrTableInfo);
 		symbolsSelection = getSelectionFunctions('symbolList');
 		stateSelection = getSelectionFunctions('origem');
 		tableElem?.resetTable();
