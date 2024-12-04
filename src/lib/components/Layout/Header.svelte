@@ -5,7 +5,10 @@
 {#if getPlatform() === platforms.web}
 	<header>
 		<h1>VANSI</h1>
-		<h2>Visualizador de Analisadores Sintáticos</h2>
+		<!-- <div>
+			<a class="selected">Home</a>
+			<a>About</a>
+		</div> -->
 	</header>
 {/if}
 
@@ -13,24 +16,28 @@
 	header {
 		flex: 0;
 		display: flex;
-		justify-content: space-between;
 		display: flex;
 		justify-content: start;
 		padding: 0px 20px;
 		background: hsl(200, 0%, 100%);
 		flex-direction: column;
-		min-width: 200px;
 		margin: 8px 0px;
 	}
-
-	header > * {
+	a {
+		border-left: 2px solid hsl(200, 50%, 45%);
+		padding-left: 5px;
+	}
+	.selected {
+		border-width: 5px;
+	}
+	header > h1 {
 		color: hsl(200, 50%, 50%);
-		font-size: 14pt;
+		font-size: 16pt;
 		line-height: 18pt;
 		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 		font-weight: normal;
 		text-transform: uppercase;
-		margin: 0;
+		margin: 5px 0;
 	}
 	header > h2 {
 		font-size: 12pt;
