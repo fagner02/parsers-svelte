@@ -4,10 +4,12 @@ async function wait(ms) {
 		setTimeout(resolve, ms);
 	});
 }
-const font = new FontFace('spacemono', 'url(/fonts/SpaceMono-Regular.ttf)');
-document.fonts.add(font);
-font.load();
+
 window.onload = async (_) => {
+	const font = new FontFace('spacemono', 'url(/fonts/SpaceMono-Regular.ttf)');
+	document.fonts.add(font);
+
+	font.load();
 	let div = document.querySelector("div[name='discard']");
 	if (div === null) return;
 
