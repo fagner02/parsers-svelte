@@ -1,5 +1,4 @@
 <script>
-	import { getPlatform, platforms } from '$lib/utils';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import Header from '@/Layout/Header.svelte';
 	import Tabs from '@/Tabs/Tabs.svelte';
@@ -7,13 +6,6 @@
 	AndroidFullScreen.isImmersiveModeSupported()
 		.then(() => AndroidFullScreen.immersiveMode())
 		.catch(console.warn);
-
-	const getLtik = () => {
-		const searchParams = new URLSearchParams(window.location.search);
-		const ltik = searchParams.get('ltik');
-		if (!ltik) throw new Error('Missing lti key.');
-		return ltik;
-	};
 </script>
 
 <svelte:head>
