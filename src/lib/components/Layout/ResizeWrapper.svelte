@@ -79,7 +79,6 @@
 	export function setSize() {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
 		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
-		console.log(content.scrollWidth, content.scrollHeight);
 		width = content.scrollWidth;
 		height = content.scrollHeight;
 	}
