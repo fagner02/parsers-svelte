@@ -28,7 +28,9 @@ export function follow(rules, nt, firstSet) {
 					if (!joinSet.has(symbol)) {
 						joinSet.set(symbol, new Set());
 					}
-					joinSet.get(symbol)?.add(rules[i].left);
+					if (symbol !== rules[i].left) {
+						joinSet.get(symbol)?.add(rules[i].left);
+					}
 					break;
 				}
 				if (nt.includes(followingSymbol)) {

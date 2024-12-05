@@ -13,17 +13,18 @@
 <span>            se <b>seguinte</b> é nulo:</span>
 <span>                se <b>X<sub>k</sub></b> não existe em <b>união</b>:</span>
 <span>                    <b>união</b>(<b>X<sub>k</sub></b>) &lt;- {}</span>
-<span>                adiciona (esquerda de <b>p</b>) a <b>união</b>(<b>X<sub>k</sub></b>)</span>
+<span>                se esquerda de <b>p</b> é diferente de <b>X<sub>k</sub></b>:</span>
+<span>                    adiciona (esquerda de <b>p</b>) a <b>união</b>(<b>X<sub>k</sub></b>)</span>
 <span>                para</span>
 <span>            se <b>seguinte</b> pertence aos não-terminais:</span>
 <span>                <b>vazio</b> &lt;- false</span>
-<span>                para cada item f em first:</span>
-<span>                    se (produção correspondente a f) = <b>seguinte</b>:</span>
-<span>                        se &epsilon; pertence a f:</span>
+<span>                para cada item <b>f</b> em first:</span>
+<span>                    se (produção correspondente a <b>f</b>) = <b>seguinte</b>:</span>
+<span>                        se &epsilon; pertence a <b>f</b>:</span>
 <span>                            <b>vazio</b> &lt;- verdadeiro</span>
 <span>                            continua para próxima iteração</span>
-<span>                        para cada item i em f:</span>
-<span>                            adiciona i a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
+<span>                        para cada item <b>i</b> em <b>f</b>:</span>
+<span>                            adiciona <b>i</b> a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
 <span>                se <b>vazio</b> é verdadeiro:</span>
 <span>                    para</span>
 <span>                <b>seguinte</b> &lt;- X<sub>k+1+<b>pos</b></sub></span>
@@ -42,8 +43,8 @@
 <span>        se <b>união</b>(<b>primeiro</b>) não é vazio:</span>
 <span>            adiciona <b>primeiro</b> ao topo de <b>s</b></span>
 <span>            continua para a próxima iteração</span>
-<span>        para cada item <b>f</b> de <b>follow</b>(<b>primeiro</b>):</span>
-<span>            adiciona <b>f</b> a <b>follow</b>(<b>topo</b>)</span>
+<span>        para cada item <b><b>f</b></b> de <b>follow</b>(<b>primeiro</b>):</span>
+<span>            adiciona <b><b>f</b></b> a <b>follow</b>(<b>topo</b>)</span>
 <span>        remove <b>primeiro</b> de <b>união</b>(<b>topo</b>)</span>
 <span>        se <b>união</b>(<b>topo</b>) é vazio:</span>
 <span>            remove o topo de <b>s</b></span>

@@ -67,7 +67,7 @@
 				const topInput = $inputStack[$inputStack.length - 1].data;
 				if (nt.includes(topSymbol)) {
 					const prodIndex = $table.get(topSymbol)?.get(topInput)?.data;
-					if (prodIndex === undefined) {
+					if (prodIndex == null) {
 						context.setAccept(false);
 						return;
 					}

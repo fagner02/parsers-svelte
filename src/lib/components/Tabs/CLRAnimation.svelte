@@ -1,5 +1,5 @@
 <script>
-	import { getGrammar } from '$lib/utils';
+	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
@@ -12,6 +12,7 @@
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
 	import { lr1Automaton } from '$lib/lr1automaton';
 	import { clrTable } from '$lib/clrTable';
+	import { resolveRoute } from '$app/paths';
 
 	let code = '';
 	/**@type {string}*/
@@ -27,6 +28,7 @@
 	let automaton;
 
 	(() => {
+		if (!isGrammarLoaded()) return;
 		const _first = first(rules, nt);
 		const _mergedFirst = mergedFirst(_first, rules);
 

@@ -6,7 +6,8 @@
 <span>    para cada símbolo <b>X<sub>k</sub></b> na direita da produção <b>p</b>:</span>
 <span>        se <b>X<sub>k</sub></b> pertence aos não-terminais:</span>
 <span>            para cada regra <b>r</b> da forma <b>X<sub>k</sub></b> -&gt; &alpha;</span>
-<span>                adiciona <b>r</b> a <b>união</b>(<b>p</b>)</span>
+<span>                se <b>r</b> é diferente <b>p</b>:</span>
+<span>                    adiciona <b>r</b> a <b>união</b>(<b>p</b>)</span>
 <span>        caso contrário:</span>
 <span>            adiciona <b>X<sub>k</sub></b> a <b>first</b>(<b>p</b>)</span>
 <span>        se <b>X<sub>k</sub></b> não produz &epsilon;:</span>
@@ -14,7 +15,6 @@
 <span>            para</span>
 <span>    se <b>nulo</b> é verdadeiro:</span>
 <span>        adiciona &epsilon; a <b>first</b>(<b>p</b>)</span>
-<span></span>
 <span>para cada chave <b>k</b> de <b>união</b>:</span>
 <span>    se tamanho <b>união</b>(<b>k</b>) é vazio:</span>
 <span>        continua para próxima iteração</span>

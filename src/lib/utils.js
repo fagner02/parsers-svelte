@@ -40,14 +40,14 @@ export function loadGrammar() {
 
 		if (s.length > 1) {
 			rules.push({
-				left: s[0].replaceAll(' ', ''),
+				left: s[0].trim(),
 				right: s[1].trim().split(' '),
 				index: rules.length
 			});
 			for (let item of new Set(s[1].trim().split(' '))) {
 				alphSet.add(item);
 			}
-			ntSet.add(s[0].replaceAll(' ', ''));
+			ntSet.add(s[0].trim());
 		}
 	});
 
@@ -58,11 +58,20 @@ export function loadGrammar() {
 
 	t = Array.from(tSet).concat(['$']);
 	nt = Array.from(ntSet);
+	console.log(t);
+	console.log(nt);
+	console.log(rules);
 	return { t, nt, rules };
 }
 
 export function getGrammar() {
-	return { t, nt, rules, alphabet: [...t, ...nt], startingSymbol: rules[0].left };
+	return {
+		t,
+		nt,
+		rules,
+		alphabet: [...t, ...nt],
+		startingSymbol: rules.length === 0 ? '' : rules[0].left
+	};
 }
 
 export function isGrammarLoaded() {

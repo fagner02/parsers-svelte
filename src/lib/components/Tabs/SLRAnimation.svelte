@@ -1,6 +1,6 @@
 <script>
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { getGrammar } from '$lib/utils';
+	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
@@ -27,6 +27,7 @@
 	let automaton;
 
 	(() => {
+		if (!isGrammarLoaded()) return;
 		const { rules, nt, t } = getGrammar();
 		const _follow = follow(rules, nt, first(rules, nt));
 		followSet.set(

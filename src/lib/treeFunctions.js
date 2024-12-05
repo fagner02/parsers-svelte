@@ -1,4 +1,4 @@
-/**@typedef {{initializeTree: (symbol: string)=>any, addToTree: (data: string[], parent:string)=>any, resetTree: ()=>any }} TreeFunctions*/
+/**@typedef {{initializeTree: (symbol: string)=>Promise<void>, addToTree: (data: string[], parent:string)=>Promise<void>, resetTree: ()=>void }} TreeFunctions*/
 
 let treeFunctions = /**@type {TreeFunctions}*/ ({});
 export function setTreeFunctions(/**@type {TreeFunctions}*/ funcs) {

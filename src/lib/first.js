@@ -54,7 +54,9 @@ export function first(
 				}
 				const matchingRules = rules.filter((x) => x.left === symbol);
 				for (let rule of matchingRules) {
-					joinSet.get(i)?.add(rule.index);
+					if (i !== rule.index) {
+						joinSet.get(i)?.add(rule.index);
+					}
 				}
 			} else {
 				firstSet.get(i)?.add(symbol);

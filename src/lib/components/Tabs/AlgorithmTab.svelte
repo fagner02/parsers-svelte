@@ -25,6 +25,7 @@
 	import InfoIcon from '@icons/InfoIcon.svelte';
 	import ParseView from '@/ParseView.svelte';
 	import ForwardIcon from '@icons/ForwardIcon.svelte';
+	import { isGrammarLoaded } from '$lib/utils';
 
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
@@ -171,51 +172,55 @@
 			</button>
 		</div>
 	</div>
-	<FillSize id="wrapper" class="grid maxWidth">
-		<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
-			{#if parseOn}
-				<ParseView bind:inputString>
-					<slot name="tree" slot="tree"></slot>
-					<slot name="parse" slot="parse"></slot>
-				</ParseView>
-			{:else}
-				<div class="steps {$$props.class ?? ''}" style="position: relative;">
-					<slot name="steps"></slot>
-				</div>
-			{/if}
-		</div>
-		<div
-			class="popup unit"
-			style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
-		>
-			{#if selected === 'code'}
-				<Code {code} onClose={closePopup}></Code>
-			{:else if selected === 'text'}
-				<ResultText onClose={closePopup}></ResultText>
-			{:else if selected === 'info'}
-				<Info onClose={closePopup}></Info>
-			{/if}
-		</div>
-		<div class="unit instruction-box">
+	{#if isGrammarLoaded()}
+		<FillSize id="wrapper" class="grid maxWidth">
+			<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
+				{#if parseOn}
+					<ParseView bind:inputString>
+						<slot name="tree" slot="tree"></slot>
+						<slot name="parse" slot="parse"></slot>
+					</ParseView>
+				{:else}
+					<div class="steps {$$props.class ?? ''}" style="position: relative;">
+						<slot name="steps"></slot>
+					</div>
+				{/if}
+			</div>
 			<div
-				class="instruction"
-				style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
+				class="popup unit"
+				style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
 			>
+				{#if selected === 'code'}
+					<Code {code} onClose={closePopup}></Code>
+				{:else if selected === 'text'}
+					<ResultText onClose={closePopup}></ResultText>
+				{:else if selected === 'info'}
+					<Info onClose={closePopup}></Info>
+				{/if}
+			</div>
+			<div class="unit instruction-box">
 				<div
-					class="instruction-content"
-					style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
+					class="instruction"
+					style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
 				>
-					<InfoIcon
-						color="hsl(200, 70%,40%)"
-						strokeWidth={3}
-						size={18}
-						style="top: 4px;position: relative;"
-					></InfoIcon>
-					<span style="height: 18px;">{instruction}</span>
+					<div
+						class="instruction-content"
+						style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
+					>
+						<InfoIcon
+							color="hsl(200, 70%,40%)"
+							strokeWidth={3}
+							size={18}
+							style="top: 4px;position: relative;"
+						></InfoIcon>
+						<span style="height: 18px;">{instruction}</span>
+					</div>
 				</div>
 			</div>
-		</div>
-	</FillSize>
+		</FillSize>
+	{:else}
+		Nonw
+	{/if}
 </FillSize>
 
 <style>

@@ -91,34 +91,40 @@
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
 
-						await codeCard?.highlightLines([7, 8]);
-						await joinSetElement?.joinSets(
-							matchingRules.map((x) => x.index),
-							matchingRules.map((x) => `${x.left}`),
-							matchingRules.map((x) => `${x.index}`),
-							i,
-							`gr${i}-${j}`
-						);
-						await codeCard?.highlightLines([9]);
+						for (let rule of matchingRules) {
+							await codeCard?.highlightLines([7]);
+							await codeCard?.highlightLines([8]);
+							if (rule.index !== i) {
+								await codeCard?.highlightLines([9]);
+								await joinSetElement?.joinSets(
+									[rule.index],
+									[rule.left],
+									[rule.index.toString()],
+									i,
+									`gr${i}-${j}`
+								);
+							}
+						}
+						await codeCard?.highlightLines([10]);
 					} else {
-						await codeCard?.highlightLines([9]);
+						await codeCard?.highlightLines([10]);
 						await addPause();
 						await selectRSymbol('g', i, j, colors.green, false);
-						await codeCard?.highlightLines([10]);
+						await codeCard?.highlightLines([11]);
 
 						await firstSetElement?.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
 					}
 
-					await codeCard?.highlightLines([11]);
+					await codeCard?.highlightLines([12]);
 					if (!(nullable.get(symbol) ?? false)) {
-						await codeCard?.highlightLines([12, 13]);
+						await codeCard?.highlightLines([14, 13]);
 						isNull = false;
 						break;
 					}
 				}
-				await codeCard?.highlightLines([14]);
+				await codeCard?.highlightLines([15]);
 				if (isNull) {
-					await codeCard?.highlightLines([15]);
+					await codeCard?.highlightLines([16]);
 					if (rules[i].right[0] === '') {
 						await selectRSymbol('g', i, 0, colors.green, false);
 					}

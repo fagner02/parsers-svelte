@@ -10,7 +10,7 @@
 	import { lltable } from '$lib/lltable';
 	import { writable } from 'svelte/store';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
-	import { getGrammar } from '$lib/utils';
+	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import Automaton from '@/Structures/Automaton.svelte';
@@ -31,6 +31,7 @@
 
 	let code = '';
 	onMount(async () => {
+		if (!isGrammarLoaded()) return;
 		code = await (await fetch('./first.js')).text();
 		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);

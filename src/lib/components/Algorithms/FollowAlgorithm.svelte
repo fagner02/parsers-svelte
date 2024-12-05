@@ -116,35 +116,37 @@
 								await joinSetElement?.addSetRow(symbol, symbol, `gr${i}-${j}`);
 							}
 							await codeCard?.highlightLines([15]);
-
-							await joinSetElement?.joinSets(
-								[rules[i].left],
-								[rules[i].left],
-								null,
-								symbol,
-								`gl${i}`
-							);
-							await codeCard?.highlightLines([16]);
+							if (rules[i].left !== symbol) {
+								await codeCard?.highlightLines([16]);
+								await joinSetElement?.joinSets(
+									[rules[i].left],
+									[rules[i].left],
+									null,
+									symbol,
+									`gl${i}`
+								);
+							}
+							await codeCard?.highlightLines([17]);
 							break;
 						}
-						await codeCard?.highlightLines([17]);
+						await codeCard?.highlightLines([18]);
 
 						await selectRSymbol('g', i, j + 1, colors.orange, false);
 						if (nt.includes(followingSymbol)) {
-							await codeCard?.highlightLines([18]);
+							await codeCard?.highlightLines([19]);
 							let empty = false;
 
 							for (let [key, item] of $firstSet.entries()) {
-								await codeCard?.highlightLines([19]);
 								await codeCard?.highlightLines([20]);
+								await codeCard?.highlightLines([21]);
 								if (item.left === followingSymbol) {
-									await codeCard?.highlightLines([21]);
+									await codeCard?.highlightLines([22]);
 									if (item.right.includes('')) {
-										await codeCard?.highlightLines([22, 23]);
+										await codeCard?.highlightLines([23, 24]);
 										empty = true;
 										continue;
 									}
-									await codeCard?.highlightLines([24, 25]);
+									await codeCard?.highlightLines([25, 26]);
 
 									await followSetElement?.joinSets(
 										item.right,
@@ -155,20 +157,20 @@
 									);
 								}
 							}
-							await codeCard?.highlightLines([26]);
+							await codeCard?.highlightLines([27]);
 							if (!empty) {
-								await codeCard?.highlightLines([27]);
+								await codeCard?.highlightLines([28]);
 								break;
 							}
-							await codeCard?.highlightLines([28, 29]);
+							await codeCard?.highlightLines([29, 30]);
 							followingSymbolIndex = j + 1 + pos;
 							followingSymbol =
 								j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
 							pos++;
-							await codeCard?.highlightLines([30]);
-						} else {
-							await codeCard?.highlightLines([30]);
 							await codeCard?.highlightLines([31]);
+						} else {
+							await codeCard?.highlightLines([31]);
+							await codeCard?.highlightLines([32]);
 
 							await followSetElement?.joinSets(
 								[followingSymbol],
@@ -177,7 +179,7 @@
 								symbol,
 								`gr${i}-${followingSymbolIndex}`
 							);
-							await codeCard?.highlightLines([32]);
+							await codeCard?.highlightLines([33]);
 							break;
 						}
 					}
@@ -187,14 +189,14 @@
 			}
 			grammarFuncs?.hideSelect();
 			for (let item of joinIndexes.keys()) {
-				await codeCard?.highlightLines([33]);
 				await codeCard?.highlightLines([34]);
+				await codeCard?.highlightLines([35]);
 				if (joinSetElement?.get(item)?.length === 0) {
-					await codeCard?.highlightLines([35]);
+					await codeCard?.highlightLines([36]);
 					continue;
 				}
-				await codeCard?.highlightLines([36]);
 				await codeCard?.highlightLines([37]);
+				await codeCard?.highlightLines([38]);
 
 				await joinStackElement?.addToStack(
 					item,
@@ -205,15 +207,15 @@
 				await addPause();
 
 				while ($joinStack.length > 0) {
-					await codeCard?.highlightLines([38]);
-					await codeCard?.highlightLines([39, 40]);
+					await codeCard?.highlightLines([39]);
+					await codeCard?.highlightLines([40, 41]);
 					const topKey = $joinStack[$joinStack.length - 1].data;
 					const top = /**@type {Array<string>}*/ (joinSetElement?.get(topKey));
 
-					await codeCard?.highlightLines([41]);
+					await codeCard?.highlightLines([42]);
 					let nextSet = joinSetElement?.get(top[0]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
-						await codeCard?.highlightLines([42]);
+						await codeCard?.highlightLines([43]);
 
 						await joinStackElement?.addToStack(
 							top[0],
@@ -221,7 +223,7 @@
 							'',
 							`${joinSetElement?.getSetId()}l${joinIndexes.get(top[0])}`
 						);
-						await codeCard?.highlightLines([43]);
+						await codeCard?.highlightLines([44]);
 						continue;
 					}
 
@@ -233,7 +235,7 @@
 					);
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement?.get(top[0]));
-					await codeCard?.highlightLines([44, 45]);
+					await codeCard?.highlightLines([45, 46]);
 
 					await followSetElement?.joinSets(
 						setToJoin,
@@ -242,13 +244,13 @@
 						topKey,
 						`${followSetElement.getSetId()}l${followIndexes.get(top[0])}`
 					);
-					await codeCard?.highlightLines([46]);
+					await codeCard?.highlightLines([47]);
 
 					await joinSetElement?.remove(topKey, top[0]);
 
-					await codeCard?.highlightLines([47]);
+					await codeCard?.highlightLines([48]);
 					if (joinSetElement?.get(topKey)?.length === 0) {
-						await codeCard?.highlightLines([48]);
+						await codeCard?.highlightLines([49]);
 
 						await joinStackElement?.removeFromStack($joinStack.length - 1);
 					}

@@ -1,6 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { setTreeFunctions } from '$lib/treeFunctions';
+	import { json } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
 	/** @type {SVGGElement} */
@@ -48,26 +49,28 @@
 	 * @param {number | null} newItemIndex
 	 */
 	function updateLevel(level, newItemIndex = null) {
-		for (let i = 0; i < levels[level].length; i++) {
-			let item = levels[level][i];
+		for (let j = level; j < levels.length; j++) {
+			for (let i = 0; i < levels[j].length; i++) {
+				let item = levels[j][i];
 
-			let parent =
-				level === 0 ? { x: width / 2, y: -vGap / 2, height: vGap } : levels[level - 1][item.parent];
+				let parent =
+					j === 0 ? { x: width / 2, y: -vGap / 2, height: vGap } : levels[j - 1][item.parent];
 
-			const newIndex = newItemIndex === null ? i : i < newItemIndex ? i : i + 1;
+				const newIndex = newItemIndex === null ? i : i < newItemIndex ? i : i + 1;
 
-			item.x = (newIndex + 1) * (width / (levels[level].length + (newItemIndex ? 2 : 1)));
-			item.y = vGap + parent.y + parent.height / 2;
-			const pos = {
-				x: item.x,
-				y: item.y - item.height / 2 - 4
-			};
-			const parentPos = {
-				x: parent.x,
-				y: parent.y + parent.height / 2
-			};
-			item.index = newIndex;
-			item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+				item.x = (newIndex + 1) * (width / (levels[j].length + (newItemIndex ? 2 : 1)));
+				item.y = vGap + parent.y + parent.height / 2;
+				const pos = {
+					x: item.x,
+					y: item.y - item.height / 2 - 4
+				};
+				const parentPos = {
+					x: parent.x,
+					y: parent.y + parent.height / 2
+				};
+				item.index = newIndex;
+				item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+			}
 		}
 		levels = levels;
 	}
