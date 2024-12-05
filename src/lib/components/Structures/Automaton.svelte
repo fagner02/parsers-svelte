@@ -46,12 +46,14 @@
 		}
 		x += selectedElement.diff.x;
 		y += selectedElement.diff.y;
+
 		nodes[selectedElement.index].pos = {
 			x: (x - selectedElement.rect.x - svgInteraction.pos.x) / svgInteraction.scale,
 			y: (y - selectedElement.rect.y - svgInteraction.pos.y) / svgInteraction.scale
 		};
+
 		for (let [i, n] of nodes.entries()) {
-			n.obj.style.transform = `translate(${n.pos.x}px,${n.pos.y}px)`;
+			n.obj.style.transform = `translateX(${n.pos.x}px) translateY(${n.pos.y}px)`;
 
 			for (let [j, c] of n.con.entries()) {
 				if (c !== selectedElement.index && i !== selectedElement.index) continue;
@@ -73,7 +75,7 @@
 				n.lines[j].setAttribute('x2', `${nodes[c].pos.x}`);
 				n.lines[j].setAttribute('y2', `${nodes[c].pos.y}`);
 
-				n.conLabels[j].style.transform = `translate(${middle.x}px,${middle.y}px)`;
+				n.conLabels[j].style.transform = `translateX(${middle.x}px) translateY(${middle.y}px)`;
 
 				n.arrows[j].setAttribute('cx', `${nodes[c].pos.x + arrowPos.x}`);
 				n.arrows[j].setAttribute('cy', `${nodes[c].pos.y + arrowPos.y}`);
@@ -360,6 +362,7 @@
 				let dist = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.y, 2));
 
 				oldPos.push({ x: n.pos.x, y: n.pos.y });
+
 				n.pos.x += dist === 0 ? 0 : 30 * (direction.x / dist);
 				n.pos.y += dist === 0 ? 0 : 30 * (direction.y / dist);
 			}

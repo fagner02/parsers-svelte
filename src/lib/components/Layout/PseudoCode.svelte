@@ -12,7 +12,7 @@
 	/** @type {HTMLElement} */
 	let cardContent;
 	let interaction = new Interaction();
-
+	export let id = '';
 	export function reset() {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
@@ -77,15 +77,15 @@
 	/**@type {()=>void}*/
 	let setSize;
 	onMount(() => {
-		card = /**@type {HTMLElement}*/ (document.querySelector('.pseudo-code-card'));
-		cardContent = /**@type {HTMLElement}*/ (document.querySelector('#pseudocode'));
+		card = /**@type {HTMLElement}*/ (document.querySelector(`#code-card-${id}`));
+		cardContent = /**@type {HTMLElement}*/ (document.querySelector(`#pseudocode-${id}`));
 	});
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<ResizeWrapper bind:setSize component={FileCodeIcon} id="code" {interaction}>
-	<div slot="content" class="pseudo-code-card">
-		<pre style="font-size: 11px;" id="pseudocode"></pre>
+<ResizeWrapper bind:setSize component={FileCodeIcon} id="code-{id}" {interaction}>
+	<div slot="content" class="pseudo-code-card" id="code-card-{id}">
+		<pre style="font-size: 11px;" class="pseudocode" id="pseudocode-{id}"></pre>
 	</div>
 </ResizeWrapper>
 
@@ -101,14 +101,14 @@
 		top: 0;
 		left: 0;
 	}
-	:global(#pseudocode > span) {
+	:global(.pseudocode > span) {
 		padding: 0px 5px;
 		border-radius: 5px;
 		font-family: spacemono;
 		transition: all 0.5s;
 		border: 1px solid transparent;
 	}
-	:global(#pseudocode sub) {
+	:global(.pseudocode sub) {
 		vertical-align: bottom;
 	}
 </style>

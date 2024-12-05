@@ -1,36 +1,38 @@
-Algoritmo closure lr1:
-    filaEstados &lt;- [estado]
-    enquanto tamanho de filaEstados > 0:
-        item &lt;- primeiro de filaEstados
-        b &lt;- símbolo da produção do item na posição do item
-        se b é terminal:
-            remove primeiro de filaEstados
-            continua para próxima iteração
-        lookahead &lt;- {}
-        se posição do item for a ultima posição da produção:
-            lookahead &lt;- lookahead do item
-        caso contrário:
-            firstBeta &lt;- {}
-            nulo &lt;- verdadeiro
-            para cada símbolo beta na produção do item a partir da posição do item:
-                se beta é terminal:
-                    adiciona beta a betaFirst
-                    nulo &lt;- falso
-                    interrompe o loop
-                caso contrário:
-                    adiciona first(beta) sem &epsilon; a betaFirst
-                    se first(beta) não inclui &epsilon;:
-                        nulo &lt;- false
-                        interrompe o loop
-            se nulo é verdadeiro:
-                lookahead &lt;- betaFirst &cup; lookahead do item
-            caso contrário:
-                lookahead &lt;- betaFirst
-        para cada produção r do não terminal b:
-            novoItem &lt;- item da forma {produção: r, posição: 0, lookahead: lookahead}
-            se novoItem não existe em estado:
-                adiciona novoItem a estado
-                adiciona novoItem a filaEstados
-            caso contrário
-                adiciona lookahead em lookahead do item existente
-        remove primeiro de filaEstados
+itensParaVerificar <- itens do estado
+enquanto tamanho de itensParaVerificar > 0:
+    item <- primeiro item de itensParaVerificar
+    b <- símbolo à direita do item na regra
+    se b não pertence aos não_terminais:
+        remove primeiro item de itensParaVerificar
+        continua para a próxima iteração
+    lookahead <- conjunto vazio
+    se posição do item na regra é a última posição da regra:
+        lookahead <- lookahead do item
+    senão:
+        betaFirst <- lista vazia
+        nulo <- verdadeiro
+        para cada símbolo beta na regra, começando do símbolo seguinte ao item:
+            se beta não é um não-terminal:
+                adiciona beta à betaFirst
+                nulo <- falso
+                sai do loop
+            senão:
+                first <- cópia do conjunto first(beta)
+                adiciona elementos de first, exceto ε, à betaFirst
+                se ε não pertence a first:
+                    nulo <- falso
+                    sai do loop
+        se nulo é verdadeiro:
+            lookahead <- união de betaFirst e lookahead do item
+        senão:
+            lookahead <- betaFirst
+    para cada regra r em regras:
+        se lado esquerdo de r é igual a símbolo:
+            existente <- índice do item em estado com regra r e posição 0
+            se existente é -1:
+                adiciona {regra: r, posição: 0, lookahead: lookahead} a estado
+                adiciona {regra: r, posição: 0, lookahead: lookahead} a itensParaVerificar
+                continua para a próxima iteração
+            para cada l em lookahead:
+                adiciona l ao conjunto lookahead do item existente em estado
+    remove primeiro item de itensParaVerificar

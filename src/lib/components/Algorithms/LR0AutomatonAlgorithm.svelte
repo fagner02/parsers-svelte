@@ -24,6 +24,8 @@
 	let automatonElem;
 	/**@type {PseudoCode | undefined}*/
 	let codeCard;
+	/**@type {PseudoCode | undefined}*/
+	let closureCodeCard;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -215,6 +217,9 @@
 		fetch('./lr0automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
+		fetch('./lr0closure.txt').then((data) =>
+			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
+		);
 		setInfoComponent(Lr0AutomatonInfo);
 		buildAutomaton();
 	});
@@ -258,6 +263,7 @@
 		></StackCard>
 	</div>
 	<div class="unit">
+		<PseudoCode bind:this={closureCodeCard} id="closure"></PseudoCode>
 		<PseudoCode bind:this={codeCard}></PseudoCode>
 		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
 	</div>

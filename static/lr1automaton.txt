@@ -1,75 +1,21 @@
-/**
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
- * @param {string[]} t
- * @param {Map<string,Set<string>>} firstSet
- */
-export function lr1Automaton(rules, nt, t, firstSet) {
-    autômato &lt;- &#x3008;estados, transições&#x3009;
-    estado0  &lt;- [item da forma { posição: 0, regra: primeira regra da gramática }]
-
-    closurelr1(estado0)
-	
-    adiciona estado0 ao autômato
-
-    filaEstados &lt;- [estado0]
-    enquanto tamanho de filaEstados > 0:
-        para cada símbolo b do alfabeto:
-            estado1 &lt;- {}
-            para cada item no primeiro estado de filaEstados:
-                se b for diferente do símbolo da produção do item na posição do item:
-                    continua para próxima iteração
-                novoItem &lt;- item da forma {produção: produção do item, posição: posição do item + 1, lookahead: lookahead do item}
-                adiciona novoItem a estado1
-	while (stateStack.length > 0) {
-		for (let symbol of alphabet) {
-			/**@type {import('@/types').LR1StateItem[]} */
-			let state1 = [];
-			for (let prod of automaton.states[stateStack[0]].items) {
-				if (
-					prod.pos >= rules[prod.ruleIndex].right.length ||
-					rules[prod.ruleIndex].right[prod.pos] !== symbol
-				)
-					continue;
-				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) continue;
-				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: prod.lookahead });
-			}
-			if (state1.length === 0) continue;
-			closure(state1, rules, nt, firstSet);
-			let existent = automaton.states.findIndex((x) => {
-				if (x.items.length != state1.length) return false;
-				let eq = true;
-				for (let k = 0; k < x.items.length; k++) {
-					let match = false;
-
-					for (let m = 0; m < state1.length; m++) {
-						match =
-							match ||
-							(x.items[k].pos === state1[m].pos &&
-								x.items[k].ruleIndex === state1[m].ruleIndex &&
-								x.items[k].lookahead.size === state1[m].lookahead?.size &&
-								x.items[k].lookahead.values().every((x) => state1[m].lookahead.has(x)));
-						if (match) break;
-					}
-					eq = match;
-					if (!eq) break;
-				}
-				return eq;
-			});
-
-			if (!automaton.transitions.has(stateStack[0]))
-				automaton.transitions.set(stateStack[0], new Map());
-
-			if (existent === -1) {
-				automaton.states.push({ index: automaton.states.length, items: [...state1] });
-				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
-				stateStack.push(automaton.states.length - 1);
-				continue;
-			}
-
-			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
-		}
-		stateStack.shift();
-	}
-	return automaton;
-}
+Algoritmo autômato lr1:
+autômato <- novo autômato vazio
+estado_inicial <- [{produção: produção_inicial, posição: 0, lookahead: {'$'}}]
+closurelr1(estado_inicial)
+adicionar estado_inicial ao autômato
+pilha_estados <- {estado_inicial}
+enquanto pilha_estados não estiver vazia:
+	estado_atual <- topo da pilha_estados
+	para cada símbolo b em alfabeto:
+		novo_estado <- conjunto vazio
+		para cada item em estado_atual:
+			se b corresponde ao próximo símbolo da produção do item:
+				adicionar {produção: produção do item, posição: posição do item + 1, lookahead: lookahead do item} a novo_estado
+		closurelr1(novo_estado)
+		se novo_estado já existe no autômato:
+			adicionar transição de estado_atual para o estado existente com b
+		senão:
+			adicionar novo_estado ao autômato
+			adicionar novo_estado à pilha_estados
+			adicionar transição de estado_atual para novo_estado com b
+	remover topo da pilha_estados

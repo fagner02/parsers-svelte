@@ -1,0 +1,13 @@
+itensParaVerificar <- itens do estado
+enquanto tamanho de itensParaVerificar > 0:
+    item <- primeiro item de itensParaVerificar
+    símbolo <- símbolo à direita do item na regra
+    se símbolo não pertence aos não_terminais:
+        remove primeiro item de itensParaVerificar
+        continua para a próxima iteração
+    para cada regra r em regras:
+        se lado esquerdo de r é igual a símbolo:
+            se não existe item em estado com regra r e posição 0:
+                adiciona {regra: r, posição: 0 } a estado
+                adiciona {regra: r, posição: 0 } a itensParaVerificar
+    remove primeiro item de itensParaVerificar
