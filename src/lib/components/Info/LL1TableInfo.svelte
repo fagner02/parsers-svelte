@@ -60,66 +60,7 @@
 		</ul>
 	</li>
 </ol>
-<h3>Exemplo:</h3>
-<p>Considere a gramática:</p>
-<pre><code
-		>S -&gt; aA | <span>b</span>
-A -&gt; c | <span>ε</span>
-</code></pre>
-<p>Os conjuntos First e Follow já foram calculados anteriormente:</p>
-<ul>
-	<li>First(S) = {'{(a, b)}'}</li>
-	<li>First(A) = {'{(c, ε)}'}</li>
-	<li>Follow(S) = {'{$}'}</li>
-	<li>Follow(A) = {'{(b, $)}'}</li>
-</ul>
-<p>A tabela LL(1) seria:</p>
-<table>
-	<thead>
-		<tr>
-			<th></th>
-			<th>a</th>
-			<th>b</th>
-			<th>c</th>
-			<th>$</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>S</td>
-			<td>S-&gt;aA</td>
-			<td>S-&gt;b</td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>A</td>
-			<td></td>
-			<td></td>
-			<td>A-&gt;c</td>
-			<td>A-&gt;ε</td>
-		</tr>
-	</tbody>
-</table>
-<h3>Explicação:</h3>
-<ul>
-	<li>
-		<strong>S -&gt; aA:</strong> Como &#39;a&#39; está em First(aA), colocamos S -&gt; aA na célula [S,
-		a].
-	</li>
-	<li>
-		<strong>S -&gt; b:</strong> Como &#39;b&#39; está em First(b), colocamos S -&gt; b na célula [S,
-		b].
-	</li>
-	<li>
-		<strong>A -&gt; c:</strong> Como &#39;c&#39; está em First(c), colocamos A -&gt; c na célula [A,
-		c].
-	</li>
-	<li>
-		<strong>A -&gt; ε:</strong> Como ε está em First(ε) e &#39;b&#39; e &#39;$&#39; estão em Follow(A),
-		colocamos A -&gt; ε nas células [A, b] e [A, $].
-	</li>
-</ul>
+
 <h3>Utilizando a tabela LL(1):</h3>
 <p>
 	A tabela LL(1) é utilizada pelo analisador sintático para decidir qual produção aplicar em cada

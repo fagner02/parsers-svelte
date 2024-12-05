@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
-	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
+	import ResizeWrapper from './ResizeWrapper.svelte';
 	import { Interaction } from '$lib/interactiveElem';
 	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 
@@ -16,6 +16,8 @@
 	export function reset() {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
+			/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
+				'1px solid hsl(110,60%,100%)';
 		}
 	}
 
@@ -28,13 +30,23 @@
 			try {
 				for (let line of highlightedLines) {
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =
-						'hsl(200,0%,100%)';
+						'hsl(200,0%,0%, 0%)';
+					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.boxShadow =
+					// 	'0px 0px 5px hsl(110,60%,60%, 0%)';
+					/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
+						'1px solid transparent';
+					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.color = 'hsl(0,0%,0%)';
 				}
 
 				highlightedLines = lines;
 				for (let line of lines) {
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =
-						'hsl(200,50%,80%)';
+						'hsl(110,50%,90%)';
+					/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
+						'1px solid hsl(110,60%,60%, 100%)';
+					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.boxShadow =
+					// 	'0px 0px 5px hsl(110,60%,60%)';
+					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.color = 'hsl(0,0%,100%)';
 				}
 
 				let line = cardContent.children[lines[0]].getBoundingClientRect();
@@ -93,7 +105,8 @@
 		padding: 0px 5px;
 		border-radius: 5px;
 		font-family: spacemono;
-		transition: background 0.5s;
+		transition: all 0.5s;
+		border: 1px solid transparent;
 	}
 	:global(#pseudocode sub) {
 		vertical-align: bottom;

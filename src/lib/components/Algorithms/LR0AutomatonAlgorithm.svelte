@@ -10,7 +10,7 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
-	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 

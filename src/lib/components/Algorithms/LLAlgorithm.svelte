@@ -9,7 +9,7 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
-	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import LL1TableInfo from '@/Info/LL1TableInfo.svelte';
 

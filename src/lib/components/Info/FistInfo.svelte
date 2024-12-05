@@ -32,16 +32,3 @@
 		de cada símbolo, com algumas adaptações para lidar com a derivação da cadeia vazia.
 	</li>
 </ol>
-<h3>Exemplo:</h3>
-<p>Considere a seguinte gramática:</p>
-<pre>
-    S -&gt; aA | b
-    A -&gt; c | ε
-</pre>
-
-<p>O conjunto First para cada produção seria:</p>
-
-<ul>
-	<li>First(S) = {'{(a, b)}'}</li>
-	<li>First(A) = {'{(c, ε)}'}</li>
-</ul>

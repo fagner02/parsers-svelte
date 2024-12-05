@@ -12,7 +12,7 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
-	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 

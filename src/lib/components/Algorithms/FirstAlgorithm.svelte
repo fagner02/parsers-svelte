@@ -10,7 +10,7 @@
 	import { colors, selectLSymbol, selectRSymbol } from '$lib/selectSymbol';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
-	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import FistInfo from '@/Info/FistInfo.svelte';
 

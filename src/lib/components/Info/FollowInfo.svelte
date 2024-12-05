@@ -36,34 +36,3 @@
 		são adicionados ao Follow(B).
 	</li>
 </ol>
-<h3>Exemplo</h3>
-<p>Considere a seguinte gramática:</p>
-<pre><code
-		>S -&gt; aA | <span>b</span>
-A -&gt; c | <span>ε</span>
-</code></pre>
-<p>O conjunto Follow para cada não-terminal seria:</p>
-<ul>
-	<li>Follow(S) = {'{$}'}</li>
-	<li>Follow(A) = {'{(b, $)}'}</li>
-</ul>
-<p><strong>Explicação:</strong></p>
-<ul>
-	<li>Follow(S) contém apenas o símbolo $ porque S é o não-terminal inicial.</li>
-	<li>
-		Follow(A) contém &#39;b&#39; porque em S -&gt; aA, &#39;b&#39; pode aparecer imediatamente após
-		&#39;A&#39;. Além disso, contém &#39;$&#39; porque &#39;A&#39; pode ser o último símbolo em uma
-		sentença.
-	</li>
-</ul>
-<h3>Aplicações do Follow</h3>
-<ul>
-	<li>
-		<strong>Construção de Tabelas de Parsing:</strong> O conjunto Follow é essencial para resolver conflitos
-		na construção da tabela de parsing, especialmente quando uma produção pode derivar a cadeia vazia.
-	</li>
-	<li>
-		<strong>Verificação de LL(1):</strong> A combinação dos conjuntos First e Follow é utilizada para
-		verificar se uma gramática é LL(1), ou seja, se um analisador LL(1) pode ser construído para ela.
-	</li>
-</ul>

@@ -9,7 +9,7 @@
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getGrammar } from '$lib/utils';
-	import PseudoCode from '@/Structures/PseudoCode.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import FollowInfo from '@/Info/FollowInfo.svelte';
 
