@@ -10,13 +10,12 @@
 	import { getGrammar } from '$lib/utils';
 	import { setInfoComponent } from '$lib/infoText';
 	import Ll1ParsingInfo from '@/Info/LL1ParsingInfo.svelte';
+	import { inputString } from '$lib/parseString';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>} */
 	export let table;
-	/**@type {string}*/
-	export let input = 'aab m';
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
 	let inputStack = writable([]);
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
@@ -58,7 +57,7 @@
 
 			await initializeTree(startingSymbol);
 
-			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
+			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 

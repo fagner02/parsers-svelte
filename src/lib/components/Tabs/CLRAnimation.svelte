@@ -1,5 +1,5 @@
 <script>
-	import { getGrammar, isGrammarLoaded } from '$lib/utils';
+	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
@@ -12,12 +12,11 @@
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
 	import { lr1Automaton } from '$lib/lr1automaton';
 	import { clrTable } from '$lib/clrTable';
-	import { resolveRoute } from '$app/paths';
 
 	let code = '';
 	/**@type {string}*/
 	let inputString;
-	let { rules, nt, t } = getGrammar();
+	let { augRules, nt, t } = getAugGrammar();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
@@ -29,8 +28,8 @@
 
 	(() => {
 		if (!isGrammarLoaded()) return;
-		const _first = first(rules, nt);
-		const _mergedFirst = mergedFirst(_first, rules);
+		const _first = first(augRules, nt);
+		const _mergedFirst = mergedFirst(_first, augRules);
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
@@ -57,9 +56,9 @@
 			)
 		);
 
-		automaton = lr1Automaton(rules, nt, t, _mergedFirst);
+		automaton = lr1Automaton(augRules, nt, t, _mergedFirst);
 
-		const _table = clrTable(automaton, rules, nt, t);
+		const _table = clrTable(automaton, augRules, nt, t);
 
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
@@ -112,10 +111,6 @@
 	</FillSize>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<ClrParse
-			bind:input={inputString}
-			stateList={automaton.states.map((x) => `s${x.index}`)}
-			{table}
-		></ClrParse>
+		<ClrParse stateList={automaton.states.map((x) => `s${x.index}`)} {table}></ClrParse>
 	</div>
 </AlgorithmTab>

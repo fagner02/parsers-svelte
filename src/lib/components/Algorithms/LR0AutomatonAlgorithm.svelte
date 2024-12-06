@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
@@ -33,7 +33,7 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let targetState = writable([]);
-	let { nt, rules, alphabet } = getGrammar();
+	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
@@ -82,13 +82,13 @@
 						(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
 					);
 					await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
-					let symbol = rules[item.ruleIndex].right[item.pos];
+					let symbol = augRules[item.ruleIndex].right[item.pos];
 					if (!nt.includes(symbol)) {
 						itemsToCheck.shift();
 						continue;
 					}
 
-					for (let rule of rules) {
+					for (let rule of augRules) {
 						if (!(rule.left === symbol)) continue;
 						if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
 
@@ -139,8 +139,8 @@
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
 						await stateSelection.selectFor(`state-origem-${prodIndex}`);
 						if (
-							prod.pos >= rules[prod.ruleIndex].right.length ||
-							rules[prod.ruleIndex].right[prod.pos] !== symbol
+							prod.pos >= augRules[prod.ruleIndex].right.length ||
+							augRules[prod.ruleIndex].right[prod.pos] !== symbol
 						) {
 							continue;
 						}
@@ -228,7 +228,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="unit grid">
 	<div class="cards-box unit" style="max-width: inherit;">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 		<StateCard
 			state={targetState}
 			stateId={'destino'}

@@ -1,8 +1,7 @@
 <script>
+	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
 
-	/**@type {string}*/
-	export let inputString;
 	/**@type {boolean | null}*/
 	let accept = null;
 	setContext('parseView', {
@@ -18,7 +17,9 @@
 		<input
 			type="text"
 			name="string a ser analisada"
-			bind:value={inputString}
+			on:input={(v) => {
+				setInputString(v.currentTarget.value);
+			}}
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}
 			placeholder="Digite a entrada aqui"
 		/>

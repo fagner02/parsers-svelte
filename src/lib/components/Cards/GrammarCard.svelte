@@ -1,12 +1,13 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { colors } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar, getGrammar } from '$lib/utils';
 	import CardWrapper from './CardWrapper.svelte';
 
+	export let isAugmented = false;
 	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = getGrammar().rules;
+	let rules = isAugmented ? getAugGrammar().augRules : getGrammar().rules;
 	let opacity = 0;
 
 	export const loadGrammar = async function () {

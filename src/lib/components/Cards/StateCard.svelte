@@ -1,6 +1,6 @@
 <script>
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
@@ -8,7 +8,7 @@
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>}*/
 	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = getGrammar().rules;
+	let rules = getAugGrammar().augRules;
 	/**@type {HTMLElement}*/
 	let container;
 

@@ -20,7 +20,10 @@ let rules = [];
 let nt = [];
 /** @type {Array<string>}*/
 let t = [];
-export let grammar = 'S -> A Bb\nA -> a a\nA -> Bb\nBb -> b m\nBb -> m\nBb -> ';
+export let grammar = ` S'-> S        
+ S-> A A 
+ A->a A      
+ A->b`;
 
 /**
  * @param {string} text
@@ -62,6 +65,25 @@ export function loadGrammar() {
 	console.log(nt);
 	console.log(rules);
 	return { t, nt, rules };
+}
+
+export function getAugGrammar() {
+	let augRules = [{ index: 0, left: `${rules[0]?.left}'`, right: [`${rules[0]?.left}`] }].concat(
+		rules.map((x) => {
+			return {
+				index: x.index + 1,
+				left: x.left,
+				right: x.right
+			};
+		})
+	);
+	return {
+		t,
+		nt,
+		augRules,
+		alphabet: [...t, ...nt],
+		startingSymbol: augRules[0].left
+	};
 }
 
 export function getGrammar() {

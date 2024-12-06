@@ -1,6 +1,6 @@
 <script>
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { getGrammar, isGrammarLoaded } from '$lib/utils';
+	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
@@ -28,8 +28,8 @@
 
 	(() => {
 		if (!isGrammarLoaded()) return;
-		const { rules, nt, t } = getGrammar();
-		const _follow = follow(rules, nt, first(rules, nt));
+		const { augRules, nt, t } = getAugGrammar();
+		const _follow = follow(augRules, nt, first(augRules, nt));
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._follow.entries()].map((x) => {
@@ -55,9 +55,9 @@
 			)
 		);
 
-		automaton = lr0Automaton(rules, nt, t);
+		automaton = lr0Automaton(augRules, nt, t);
 
-		const _table = slrTable(automaton, rules, nt, t, _follow);
+		const _table = slrTable(automaton, augRules, nt, t, _follow);
 
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
@@ -107,10 +107,6 @@
 	</FillSize>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<SlrParse
-			bind:input={inputString}
-			stateList={automaton.states.map((x) => `s${x.index}`)}
-			{table}
-		></SlrParse>
+		<SlrParse stateList={automaton.states.map((x) => `s${x.index}`)} {table}></SlrParse>
 	</div>
 </AlgorithmTab>

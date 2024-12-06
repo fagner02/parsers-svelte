@@ -39,8 +39,6 @@
 	let parseOn = false;
 	/** @type {string} */
 	export let code;
-	/**@type {string}*/
-	export let inputString;
 
 	/** @param {string} name */
 	async function updateSelected(name) {
@@ -176,7 +174,7 @@
 		<FillSize id="wrapper" class="grid maxWidth">
 			<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
 				{#if parseOn}
-					<ParseView bind:inputString>
+					<ParseView>
 						<slot name="tree" slot="tree"></slot>
 						<slot name="parse" slot="parse"></slot>
 					</ParseView>

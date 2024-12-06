@@ -26,9 +26,6 @@
 	let table = writable();
 	// ========== Components ====================
 
-	/**@type {string}*/
-	let inputString;
-
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
@@ -118,7 +115,7 @@
 	let selectedAlgorithm = algos[0];
 </script>
 
-<AlgorithmTab bind:instruction bind:inputString {code}>
+<AlgorithmTab bind:instruction {code}>
 	<div slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
@@ -144,6 +141,6 @@
 	</div>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<LlParse bind:input={inputString} {table}></LlParse>
+		<LlParse {table}></LlParse>
 	</div>
 </AlgorithmTab>

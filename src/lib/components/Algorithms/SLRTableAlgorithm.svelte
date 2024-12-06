@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause, setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -46,7 +46,7 @@
 			id: index
 		}))
 	]);
-	let { nt, rules, alphabet } = getGrammar();
+	let { nt, augRules, alphabet } = getAugGrammar();
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	let columns = [...alphabet];
@@ -81,7 +81,10 @@
 			for (let s of automaton.states) {
 				for (let i of s.items) {
 					await addPause();
-					if (i.pos === rules[i.ruleIndex].right.length || rules[i.ruleIndex].right[0] === '') {
+					if (
+						i.pos === augRules[i.ruleIndex].right.length ||
+						augRules[i.ruleIndex].right[0] === ''
+					) {
 						if (i.ruleIndex === 0) {
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
@@ -91,7 +94,7 @@
 							);
 							continue;
 						}
-						let follow = $followSet.find((x) => x.left === rules[i.ruleIndex].left);
+						let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
 						if (!follow) continue;
 
 						for (let symbol of follow.right) {
@@ -104,21 +107,23 @@
 						}
 						continue;
 					}
-					let transition = automaton.transitions.get(s.index)?.get(rules[i.ruleIndex].right[i.pos]);
+					let transition = automaton.transitions
+						.get(s.index)
+						?.get(augRules[i.ruleIndex].right[i.pos]);
 
-					if (nt.includes(rules[i.ruleIndex].right[i.pos])) {
+					if (nt.includes(augRules[i.ruleIndex].right[i.pos])) {
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
 							`s${s.index}`,
-							`${rules[i.ruleIndex].right[i.pos]}`
+							`${augRules[i.ruleIndex].right[i.pos]}`
 						);
 					} else {
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,
 							`s${s.index}`,
-							`${rules[i.ruleIndex].right[i.pos]}`
+							`${augRules[i.ruleIndex].right[i.pos]}`
 						);
 					}
 				}
@@ -148,7 +153,7 @@
 		<Automaton id="slr" bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 		<TableCard
 			{rows}
 			{columns}

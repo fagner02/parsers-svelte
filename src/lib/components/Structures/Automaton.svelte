@@ -1,6 +1,6 @@
 <script>
 	import { flowActions, getAction } from '$lib/flowControl';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 	import { Interaction } from '$lib/interactiveElem';
@@ -8,7 +8,7 @@
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
 	import HandMoveIcon from '@icons/HandMoveIcon.svelte';
 
-	let rules = getGrammar().rules;
+	let rules = getAugGrammar().augRules;
 
 	/**@type {string}*/
 	export let id;
@@ -26,6 +26,7 @@
 	 * arrows: SVGElement[];
 	 * conLabels: SVGGElement[];
 	 * con: number[];
+	 * selfCon: string[]
 	 * }} Node*/
 	/** @type {Node[]}*/
 	let nodes = [];
@@ -259,13 +260,53 @@
 				conLabels: [],
 				pos: { x: 200, y: 200 },
 				size,
-				con: []
+				con: [],
+				selfCon: []
 			});
 			res.style.transform = `translateX(${nodes[nodes.length - 1].pos.x}px) translateY(${nodes[nodes.length - 1].pos.y}px)`;
 		}
 		if (from !== null) {
 			if (to === nodes.length - 1) {
 				nodes[to].pos = { x: nodes[from].pos.x, y: nodes[from].pos.y };
+			}
+			if (from === to) {
+				let d = 20;
+				let line = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+				line.setAttribute('r', d.toString());
+				line.setAttribute('fill', 'none');
+				line.setAttribute('stroke', 'hsl(0,0%,30%)');
+				line.setAttribute('stroke-width', '7');
+				line.setAttribute('cx', `${nodes[to].size.x}`);
+				nodes[to].obj.prepend(line);
+				let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+				arrow.setAttribute('r', '7');
+				arrow.setAttribute('fill', 'hsl(200,50%,50%)');
+
+				arrow.setAttribute('cx', `${nodes[to].size.x}`);
+				arrow.setAttribute('cy', `${d}`);
+
+				let label = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+				let labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+				labelText.style.dominantBaseline = 'central';
+				labelText.style.alignmentBaseline = 'central';
+				labelText.style.textAnchor = 'middle';
+				labelText.textContent = symbol;
+				let labelBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+				label.append(labelBox);
+				label.append(labelText);
+				nodes[to].obj.append(label);
+				labelBox.setAttribute('rx', '10');
+				let bbox = labelText.getBBox();
+				labelBox.setAttribute('fill', 'hsl(200,50%,90%)');
+				labelBox.setAttribute('stroke', 'hsl(200,50%,50%)');
+				labelBox.setAttribute('height', `${bbox.height + 10}`);
+				labelBox.setAttribute('width', `${bbox.width + 10}`);
+				labelBox.setAttribute('x', `${-(bbox.width + 10) / 2}`);
+				labelBox.setAttribute('y', `${-(bbox.height + 10) / 2}`);
+				label.style.transform = `translateX(${nodes[to].size.x + d}px)`;
+
+				nodes[to].obj.append(arrow);
+				return;
 			}
 			nodes[from].con.push(to);
 
@@ -493,8 +534,9 @@
 			}
 			for (let [symbol, state] of transitions) {
 				addNode(states[0].index, state, automaton.states[state], symbol, false);
-
-				states.push(automaton.states[state]);
+				if (state != states[0].index) {
+					states.push(automaton.states[state]);
+				}
 			}
 			states.shift();
 		}

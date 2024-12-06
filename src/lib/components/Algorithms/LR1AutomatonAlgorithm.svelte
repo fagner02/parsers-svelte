@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
@@ -31,7 +31,7 @@
 	let targetState = writable([]);
 	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
 	export let firstSet;
-	let { nt, rules, alphabet } = getGrammar();
+	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
@@ -78,20 +78,20 @@
 			);
 
 			await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
-			let symbol = rules[item.ruleIndex].right[item.pos];
+			let symbol = augRules[item.ruleIndex].right[item.pos];
 			if (!nt.includes(symbol)) {
 				itemsToCheck.shift();
 				continue;
 			}
 			let lookahead = new Set();
-			if (rules[item.ruleIndex].right.length - 1 === item.pos) {
+			if (augRules[item.ruleIndex].right.length - 1 === item.pos) {
 				lookahead = new Set(item.lookahead);
 			} else {
 				/**@type {string[]}*/
 				let betaFirst = [];
 				let nullable = true;
-				for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-					let beta = rules[item.ruleIndex].right[item.pos + i];
+				for (let i = 1; item.pos + i < augRules[item.ruleIndex].right.length; i++) {
+					let beta = augRules[item.ruleIndex].right[item.pos + i];
 					if (!nt.includes(beta)) {
 						betaFirst.push(beta);
 						nullable = false;
@@ -112,7 +112,7 @@
 					lookahead = new Set(betaFirst);
 				}
 			}
-			for (let rule of rules) {
+			for (let rule of augRules) {
 				if (!(rule.left === symbol)) continue;
 				let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 				await selectSymbol(
@@ -162,8 +162,8 @@
 						await stateSelection.selectFor(`state-origem-${prodIndex}`);
 
 						if (
-							prod.pos >= rules[prod.ruleIndex].right.length ||
-							rules[prod.ruleIndex].right[prod.pos] !== symbol
+							prod.pos >= augRules[prod.ruleIndex].right.length ||
+							augRules[prod.ruleIndex].right[prod.pos] !== symbol
 						) {
 							continue;
 						}
@@ -262,7 +262,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 		<SetsCard set={firstSet} label="first" setId="first" hue={colors.blue}></SetsCard>
 		<StateCard
 			state={targetState}

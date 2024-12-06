@@ -7,17 +7,16 @@
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
+	import { inputString } from '$lib/parseString';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
 	export let table;
-	/**@type {string}*/
-	export let input = 'aabm';
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
 	let inputStack = writable([]);
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
@@ -28,7 +27,7 @@
 	let stateStackElement;
 	/** @type {StackCard}*/
 	let inputStackElement;
-	let { nt, rules, alphabet, startingSymbol } = getGrammar();
+	let { nt, augRules, alphabet, startingSymbol } = getAugGrammar();
 	let context = getContext('parseView');
 	/**
 	 * @type {() => Promise<any>}
@@ -62,7 +61,7 @@
 
 			await initializeTree(startingSymbol);
 
-			for (let i of ['$'].concat(input.replaceAll(' ', '').split('').reverse())) {
+			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 
@@ -86,20 +85,20 @@
 				}
 				if (action.data.startsWith('r')) {
 					let rule = parseInt(action.data.slice(1));
-					if (rules[rule].right[0] !== '') {
-						for (let i = 0; i < rules[rule].right.length; i++) {
+					if (augRules[rule].right[0] !== '') {
+						for (let i = 0; i < augRules[rule].right.length; i++) {
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 						}
 					}
 
-					let goto = $table.get(`s${stateStackElement.top()}`)?.get(rules[rule].left)?.data;
+					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
 					if (!goto) {
 						context.setAccept(false);
 						break;
 					}
 					let gotoState = parseInt(goto?.slice(1));
-					await stateStackElement.addToStack(rules[rule].left, rules[rule].left, '');
+					await stateStackElement.addToStack(augRules[rule].left, augRules[rule].left, '');
 					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
 				}
 				await addPause();
@@ -119,7 +118,7 @@
 
 <SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
 <div class="cards-box unit">
-	<GrammarCard bind:loadGrammar></GrammarCard>
+	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard
 		rows={stateList}
 		columns={alphabet}

@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -11,7 +11,6 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
-	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -30,7 +29,7 @@
 	let table = writable(new Map());
 	/**@type {import('@/types').LR1Automaton}*/
 	export let automaton;
-	let { t, nt, rules, alphabet } = getGrammar();
+	let { t, nt, augRules, alphabet } = getAugGrammar();
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 
@@ -66,7 +65,10 @@
 			for (let s of automaton.states) {
 				for (let i of s.items) {
 					await addPause();
-					if (i.pos === rules[i.ruleIndex].right.length || rules[i.ruleIndex].right[0] === '') {
+					if (
+						i.pos === augRules[i.ruleIndex].right.length ||
+						augRules[i.ruleIndex].right[0] === ''
+					) {
 						if (i.ruleIndex === 0) {
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
@@ -86,21 +88,23 @@
 						}
 						continue;
 					}
-					let transition = automaton.transitions.get(s.index)?.get(rules[i.ruleIndex].right[i.pos]);
+					let transition = automaton.transitions
+						.get(s.index)
+						?.get(augRules[i.ruleIndex].right[i.pos]);
 
-					if (nt.includes(rules[i.ruleIndex].right[i.pos])) {
+					if (nt.includes(augRules[i.ruleIndex].right[i.pos])) {
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
 							`s${s.index}`,
-							`${rules[i.ruleIndex].right[i.pos]}`
+							`${augRules[i.ruleIndex].right[i.pos]}`
 						);
 					} else {
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,
 							`s${s.index}`,
-							`${rules[i.ruleIndex].right[i.pos]}`
+							`${augRules[i.ruleIndex].right[i.pos]}`
 						);
 					}
 				}
