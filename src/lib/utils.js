@@ -60,9 +60,6 @@ export function loadGrammar() {
 
 	t = Array.from(tSet).concat(['$']);
 	nt = Array.from(ntSet);
-	console.log(t);
-	console.log(nt);
-	console.log(rules);
 	return { t, nt, rules };
 }
 

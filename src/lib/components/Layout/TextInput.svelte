@@ -82,6 +82,7 @@
 		width: 100%;
 		outline: none;
 		border: none;
+		padding-left: 5px;
 	}
 
 	:global(.expand-icon) {
