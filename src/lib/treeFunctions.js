@@ -1,4 +1,12 @@
-/**@typedef {{initializeTree: (symbol: string)=>Promise<void>, addToTree: (data: string[], parent:string)=>Promise<void>, resetTree: ()=>void }} TreeFunctions*/
+/**
+ * @typedef {{
+ * initializeTree: (symbol: string)=>Promise<void>,
+ * addToTree: (data: string[], parent:string)=>Promise<void>,
+ * resetTree: ()=>void,
+ * addFloatingToTree: (data: string[])=>Promise<any>,
+ * addParent: (parent: string, children: string[]) => Promise<void>
+ * }} TreeFunctions
+ * */
 
 let treeFunctions = /**@type {TreeFunctions}*/ ({});
 export function setTreeFunctions(/**@type {TreeFunctions}*/ funcs) {

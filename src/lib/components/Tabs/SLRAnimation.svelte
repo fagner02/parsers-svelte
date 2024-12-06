@@ -105,7 +105,7 @@
 			{/if}
 		</FillSize>
 	</FillSize>
-	<SyntaxTree slot="tree"></SyntaxTree>
+	<SyntaxTree slot="tree" floating={true}></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
 		<SlrParse stateList={automaton.states.map((x) => `s${x.index}`)} {table}></SlrParse>
 	</div>

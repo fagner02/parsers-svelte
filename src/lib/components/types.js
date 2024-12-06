@@ -32,15 +32,13 @@
  * number,
  * index: number,
  * parent: number,
- * id: number,
  * opacity: number,
  * x: number,
  * y: number,
  * width: number,
- * height: number,
  * d: string,
  * dashOffset: number,
- * pos: number }} node
+ * parentPos?: number }} node
  */
 
 /** @typedef {{level: number,index: number}} nodeId*/

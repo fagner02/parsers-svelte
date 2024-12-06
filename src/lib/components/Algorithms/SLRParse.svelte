@@ -34,7 +34,7 @@
 	 */
 	let loadGrammar;
 
-	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
+	let { initializeTree, addFloatingToTree, resetTree, addParent } = getTreeFunctions();
 
 	function reset() {
 		stateStack.update(() => []);
@@ -54,12 +54,12 @@
 			if (initializeTree === undefined) {
 				let functions = getTreeFunctions();
 				initializeTree = functions.initializeTree;
-				addToTree = functions.addToTree;
+				addFloatingToTree = functions.addFloatingToTree;
 				resetTree = functions.resetTree;
 			}
 			await stateStackElement.addToStack(0, 's0', '');
 
-			await initializeTree(startingSymbol);
+			// await initializeTree(startingSymbol);
 
 			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
@@ -79,18 +79,22 @@
 				}
 				if (action.data.startsWith('s')) {
 					let state = parseInt(action.data.slice(1));
+					addFloatingToTree([topInput]);
 					await stateStackElement.addToStack(topInput, topInput, '');
 					await stateStackElement.addToStack(state, `s${state}`, '');
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 				}
 				if (action.data.startsWith('r')) {
 					let rule = parseInt(action.data.slice(1));
+					let children = [];
 					if (augRules[rule].right[0] !== '') {
 						for (let i = 0; i < augRules[rule].right.length; i++) {
+							children.push($stateStack[$stateStack.length - 2].data);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 						}
 					}
+					addParent(augRules[rule].left, children);
 
 					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
 					if (!goto) {
@@ -142,6 +146,6 @@
 		bind:this={stateStackElement}
 		stackId="symbols"
 		hue={colors.green}
-		label="pilha de símbolos"
+		label="pilha de estados"
 	></StackCard>
 </div>
