@@ -78,14 +78,22 @@
 			await loadGrammar();
 			await wait(500);
 
+			await codeCard?.highlightLines([0]); // Line 0: Algorithm header
+			await codeCard?.highlightLines([1]); // Line 1: Initialize table
 			for (let s of automaton.states) {
+				await codeCard?.highlightLines([2]); // Line 2: For each state
 				for (let i of s.items) {
+					await codeCard?.highlightLines([3]); // Line 3: For each item
 					await addPause();
+
+					await codeCard?.highlightLines([4]); // Line 4: Last position check
 					if (
 						i.pos === augRules[i.ruleIndex].right.length ||
 						augRules[i.ruleIndex].right[0] === ''
 					) {
+						await codeCard?.highlightLines([5]); // Line 5: Initial production check
 						if (i.ruleIndex === 0) {
+							await codeCard?.highlightLines([6]); // Line 6: Accept action
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
 								`a`,
@@ -94,10 +102,14 @@
 							);
 							continue;
 						}
+
+						await codeCard?.highlightLines([7]); // Line 7: Follow symbols
 						let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
 						if (!follow) continue;
 
 						for (let symbol of follow.right) {
+							await codeCard?.highlightLines([8]); // Line 8: Reduce actions
+							await codeCard?.highlightLines([9]); // Line 9: Add to table
 							await tableElem?.addToTable(
 								{ action: 'r', state: i.ruleIndex },
 								`r${i.ruleIndex}`,
@@ -107,11 +119,15 @@
 						}
 						continue;
 					}
+
+					await codeCard?.highlightLines([10]); // Line 10: Get transition
 					let transition = automaton.transitions
 						.get(s.index)
 						?.get(augRules[i.ruleIndex].right[i.pos]);
 
+					await codeCard?.highlightLines([11, 12]); // Lines 11-12: Non-terminal check
 					if (nt.includes(augRules[i.ruleIndex].right[i.pos])) {
+						await codeCard?.highlightLines([12]); // Line 12: GOTO
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
@@ -119,6 +135,8 @@
 							`${augRules[i.ruleIndex].right[i.pos]}`
 						);
 					} else {
+						await codeCard?.highlightLines([13]); // Line 13: Terminal check
+						await codeCard?.highlightLines([14]); // Line 14: SHIFT
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,

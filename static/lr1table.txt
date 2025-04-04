@@ -1,0 +1,26 @@
+<span><b>function</b> slrTable(automaton, rules, nt, t, followSet):</span>
+<span>    <b>alphabet</b> &lt;- [...t, ...nt]</span>
+<span>    <b>table</b> &lt;- new Map()</span>
+<span>    </span>
+<span>    <b>para cada</b> <b>state</b> em <b>automaton.states</b>:</span>
+<span>        <b>table</b>.set(<b>state.index</b>, new Map(<b>alphabet</b>.map(x => [x, ''])))</span>
+<span>    </span>
+<span>    <b>para cada</b> <b>s</b> em <b>automaton.states</b>:</span>
+<span>        <b>para cada</b> <b>i</b> em <b>s.items</b>:</span>
+<span>            <b>se</b> <b>i.pos</b> === <b>rules[i.ruleIndex].right.length</b> || <b>rules[i.ruleIndex].right[0]</b> === '':</span>
+<span>                <b>follow</b> &lt;- followSet.get(<b>rules[i.ruleIndex].left</b>)</span>
+<span>                <b>se não</b> <b>follow</b>: continua</span>
+<span>                <b>se</b> <b>i.ruleIndex</b> === 0:</span>
+<span>                    <b>table</b>.get(<b>s.index</b>)?.set('$', 'a')</span>
+<span>                    continua</span>
+<span>                <b>para cada</b> <b>symbol</b> em <b>follow</b>:</span>
+<span>                    <b>table</b>.get(<b>s.index</b>)?.set(<b>symbol</b>, 'r' + <b>i.ruleIndex</b>)</span>
+<span>                continua</span>
+<span>            </span>
+<span>            <b>transition</b> &lt;- automaton.transitions.get(<b>s.index</b>)?.get(<b>rules[i.ruleIndex].right[i.pos]</b>)</span>
+<span>            </span>
+<span>            <b>se</b> <b>nt</b>.includes(<b>rules[i.ruleIndex].right[i.pos]</b>):</span>
+<span>                <b>table</b>.get(<b>s.index</b>)?.set(<b>rules[i.ruleIndex].right[i.pos]</b>, 'g' + <b>transition</b>)</span>
+<span>            <b>senão</b>:</span>
+<span>                <b>table</b>.get(<b>s.index</b>)?.set(<b>rules[i.ruleIndex].right[i.pos]</b>, 's' + <b>transition</b>)</span>
+<span>    <b>retorna</b> <b>table</b></span>

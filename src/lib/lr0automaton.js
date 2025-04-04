@@ -53,9 +53,7 @@ export function lr0Automaton(rules, nt, t) {
 					rules[prod.ruleIndex].right[prod.pos] !== symbol
 				)
 					continue;
-				let existent = state1.findIndex(
-					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
-				);
+
 				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) continue;
 				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: null });
 			}

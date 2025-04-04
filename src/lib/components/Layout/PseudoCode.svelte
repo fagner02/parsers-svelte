@@ -38,6 +38,10 @@
 					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.color = 'hsl(0,0%,0%)';
 				}
 
+				if (lines.length === 0) {
+					return resolve();
+				}
+
 				highlightedLines = lines;
 				for (let line of lines) {
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =

@@ -1,50 +1,16 @@
-<span><b>união</b> &lt;- {}</span>
-<span><b>follow</b> &lt;- {}</span>
-<span><b>follow</b>(S) = {$}, onde S é o símbolo inicial</span>
-<span>para cada produção <b>p</b> da forma X<sub>1</sub>,X<sub>2</sub>...X<sub>n</sub> na gramática:</span>
-<span>    para cada símbolo <b>X<sub>k</sub></b> do lado direito de <b>p</b>:</span>
-<span>        <b>seguinte</b> &lt;- X<sub>k+1</sub></span>
-<span>        se <b>X<sub>k</sub></b> não pertence aos não-terminais:</span>
-<span>            continua para próxima iteração</span>
-<span>        se <b>X<sub>k</sub></b> não existe em <b>follow</b>:</span>
-<span>            <b>follow</b>(<b>X<sub>k</sub></b>) &lt;- {}</span>
-<span>        <b>pos</b> &lt;- 1</span>
-<span>        enquanto verdadeiro:</span>
-<span>            se <b>seguinte</b> é nulo:</span>
-<span>                se <b>X<sub>k</sub></b> não existe em <b>união</b>:</span>
-<span>                    <b>união</b>(<b>X<sub>k</sub></b>) &lt;- {}</span>
-<span>                se esquerda de <b>p</b> é diferente de <b>X<sub>k</sub></b>:</span>
-<span>                    adiciona (esquerda de <b>p</b>) a <b>união</b>(<b>X<sub>k</sub></b>)</span>
-<span>                para</span>
-<span>            se <b>seguinte</b> pertence aos não-terminais:</span>
-<span>                <b>vazio</b> &lt;- false</span>
-<span>                para cada item <b>f</b> em first:</span>
-<span>                    se (produção correspondente a <b>f</b>) = <b>seguinte</b>:</span>
-<span>                        se &epsilon; pertence a <b>f</b>:</span>
-<span>                            <b>vazio</b> &lt;- verdadeiro</span>
-<span>                            continua para próxima iteração</span>
-<span>                        para cada item <b>i</b> em <b>f</b>:</span>
-<span>                            adiciona <b>i</b> a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
-<span>                se <b>vazio</b> é verdadeiro:</span>
-<span>                    para</span>
-<span>                <b>seguinte</b> &lt;- X<sub>k+1+<b>pos</b></sub></span>
-<span>                <b>pos</b> &lt; <b>pos</b> + 1</span>
-<span>            caso contrário:</span>
-<span>                adiciona <b>seguinte</b> a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
-<span>                para</span>
-<span>para cada chave <b>k</b> de <b>união</b>:</span>
-<span>    se tamanho <b>união</b>(<b>k</b>) é vazio:</span>
+<span><b>closure</b> <- estado inicial</span>
+<span><b>itens_para_verificar</b> <- cópia de <b>closure</b></span>
+<span>enquanto tamanho de <b>itens_para_verificar</b> > 0:</span>
+<span>    <b>item</b> <- primeiro elemento de <b>itens_para_verificar</b></span>
+<span>    <b>símbolo</b> <- símbolo após a posição do ponto na produção de <b>item</b></span>
+<span>    se <b>símbolo</b> não pertence aos não-terminais:</span>
+<span>        remove <b>item</b> de <b>itens_para_verificar</b></span>
 <span>        continua para próxima iteração</span>
-<span>    pilha <b>s</b></span>
-<span>    adiciona <b>k</b> ao topo de <b>s</b></span>
-<span>    enquanto tamanho de <b>s</b> &gt; 0:</span>
-<span>        <b>topo</b> &lt;- topo de <b>s</b></span>
-<span>        <b>primeiro</b> &lt;- primeiro elemento de <b>união</b>(<b>topo</b>)</span>
-<span>        se <b>união</b>(<b>primeiro</b>) não é vazio:</span>
-<span>            adiciona <b>primeiro</b> ao topo de <b>s</b></span>
-<span>            continua para a próxima iteração</span>
-<span>        para cada item <b>f</b> de <b>follow</b>(<b>primeiro</b>):</span>
-<span>            adiciona <b>f</b> a <b>follow</b>(<b>topo</b>)</span>
-<span>        remove <b>primeiro</b> de <b>união</b>(<b>topo</b>)</span>
-<span>        se <b>união</b>(<b>topo</b>) é vazio:</span>
-<span>            remove o topo de <b>s</b></span>
+<span>    para cada produção <b>p</b> na gramática:</span>
+<span>        se lado esquerdo de <b>p</b> ≠ <b>símbolo</b>:</span>
+<span>            continua para próxima iteração</span>
+<span>        se existe item em <b>closure</b> com mesma produção <b>p</b> e posição 0:</span>
+<span>            continua para próxima iteração</span>
+<span>        adiciona novo item { produção: <b>p</b>, posição: 0 } a <b>closure</b></span>
+<span>        adiciona novo item { produção: <b>p</b>, posição: 0 } a <b>itens_para_verificar</b></span>
+<span>    remove <b>item</b> de <b>itens_para_verificar</b></span>
