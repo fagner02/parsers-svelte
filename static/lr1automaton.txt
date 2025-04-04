@@ -1,21 +1,21 @@
-Algoritmo autômato lr1:
-autômato <- novo autômato vazio
-estado_inicial <- [{produção: produção_inicial, posição: 0, lookahead: {'$'}}]
-closurelr1(estado_inicial)
-adicionar estado_inicial ao autômato
-pilha_estados <- {estado_inicial}
-enquanto pilha_estados não estiver vazia:
-	estado_atual <- topo da pilha_estados
-	para cada símbolo b em alfabeto:
-		novo_estado <- conjunto vazio
-		para cada item em estado_atual:
-			se b corresponde ao próximo símbolo da produção do item:
-				adicionar {produção: produção do item, posição: posição do item + 1, lookahead: lookahead do item} a novo_estado
-		closurelr1(novo_estado)
-		se novo_estado já existe no autômato:
-			adicionar transição de estado_atual para o estado existente com b
-		senão:
-			adicionar novo_estado ao autômato
-			adicionar novo_estado à pilha_estados
-			adicionar transição de estado_atual para novo_estado com b
-	remover topo da pilha_estados
+<span><b>Algoritmo</b> autômato lr1:</span>
+<span><b>autômato</b> &lt;- novo autômato vazio</span>
+<span><b>estado_inicial</b> &lt;- [{produção: <b>produção_inicial</b>, posição: 0, lookahead: {'$'}}]</span>
+<span><b>closurelr1</b>(<b>estado_inicial</b>)</span>
+<span><b>adicionar</b> <b>estado_inicial</b> ao <b>autômato</b></span>
+<span><b>pilha_estados</b> &lt;- {<b>estado_inicial</b>}</span>
+<span><b>enquanto</b> <b>pilha_estados</b> não estiver vazia:</span>
+<span>    <b>estado_atual</b> &lt;- topo da <b>pilha_estados</b></span>
+<span>    <b>para cada</b> símbolo <b>b</b> em <b>alfabeto</b>:</span>
+<span>        <b>novo_estado</b> &lt;- conjunto vazio</span>
+<span>        <b>para cada</b> item em <b>estado_atual</b>:</span>
+<span>            <b>se</b> <b>b</b> corresponde ao próximo símbolo da produção do item:</span>
+<span>                <b>adicionar</b> {produção: produção do <b>item</b>, posição: posição do <b>item</b> + 1, lookahead: lookahead do <b>item</b>} a <b>novo_estado</b></span>
+<span>        <b>closurelr1</b>(<b>novo_estado</b>)</span>
+<span>        <b>se</b> <b>novo_estado</b> já existe no <b>autômato</b>:</span>
+<span>            <b>adicionar</b> transição de <b>estado_atual</b> para o estado existente com <b>b</b></span>
+<span>        <b>senão</b>:</span>
+<span>            <b>adicionar</b> <b>novo_estado</b> ao <b>autômato</b></span>
+<span>            <b>adicionar</b> <b>novo_estado</b> à <b>pilha_estados</b></span>
+<span>            <b>adicionar</b> transição de <b>estado_atual</b> para <b>novo_estado</b> com <b>b</b></span>
+<span>    <b>remover</b> topo da <b>pilha_estados</b></span>

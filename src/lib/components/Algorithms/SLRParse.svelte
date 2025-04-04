@@ -29,9 +29,7 @@
 	let inputStackElement;
 	let { nt, augRules, alphabet, startingSymbol } = getAugGrammar();
 	let context = getContext('parseView');
-	/**
-	 * @type {() => Promise<any>}
-	 */
+	/** @type {() => Promise<any>} */
 	let loadGrammar;
 
 	let { initializeTree, addFloatingToTree, resetTree, addParent } = getTreeFunctions();
@@ -58,8 +56,6 @@
 				resetTree = functions.resetTree;
 			}
 			await stateStackElement.addToStack(0, 's0', '');
-
-			// await initializeTree(startingSymbol);
 
 			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');

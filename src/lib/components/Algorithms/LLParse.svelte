@@ -66,7 +66,7 @@
 				const topInput = $inputStack[$inputStack.length - 1].data;
 				if (nt.includes(topSymbol)) {
 					const prodIndex = $table.get(topSymbol)?.get(topInput)?.data;
-					if (prodIndex == null) {
+					if (prodIndex == null || prodIndex === -1) {
 						context.setAccept(false);
 						return;
 					}
@@ -86,6 +86,7 @@
 				} else {
 					if (topSymbol !== topInput) {
 						context.setAccept(false);
+						limitHit();
 						return;
 					}
 
@@ -93,12 +94,18 @@
 
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 
-					if ($inputStack.length === 0) {
+					if ($inputStack.length === 0 && $symbolStack.length === 0) {
 						context.setAccept(true);
+						break;
 					}
 				}
 
+				console.log($inputStack, $symbolStack);
 				await addPause();
+			}
+
+			if ($inputStack.length > 0 || $symbolStack.length > 0) {
+				context.setAccept(false);
 			}
 
 			limitHit();

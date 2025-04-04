@@ -1,13 +1,50 @@
-itensParaVerificar <- itens do estado
-enquanto tamanho de itensParaVerificar > 0:
-    item <- primeiro item de itensParaVerificar
-    símbolo <- símbolo à direita do item na regra
-    se símbolo não pertence aos não_terminais:
-        remove primeiro item de itensParaVerificar
-        continua para a próxima iteração
-    para cada regra r em regras:
-        se lado esquerdo de r é igual a símbolo:
-            se não existe item em estado com regra r e posição 0:
-                adiciona {regra: r, posição: 0 } a estado
-                adiciona {regra: r, posição: 0 } a itensParaVerificar
-    remove primeiro item de itensParaVerificar
+<span><b>união</b> &lt;- {}</span>
+<span><b>follow</b> &lt;- {}</span>
+<span><b>follow</b>(S) = {$}, onde S é o símbolo inicial</span>
+<span>para cada produção <b>p</b> da forma X<sub>1</sub>,X<sub>2</sub>...X<sub>n</sub> na gramática:</span>
+<span>    para cada símbolo <b>X<sub>k</sub></b> do lado direito de <b>p</b>:</span>
+<span>        <b>seguinte</b> &lt;- X<sub>k+1</sub></span>
+<span>        se <b>X<sub>k</sub></b> não pertence aos não-terminais:</span>
+<span>            continua para próxima iteração</span>
+<span>        se <b>X<sub>k</sub></b> não existe em <b>follow</b>:</span>
+<span>            <b>follow</b>(<b>X<sub>k</sub></b>) &lt;- {}</span>
+<span>        <b>pos</b> &lt;- 1</span>
+<span>        enquanto verdadeiro:</span>
+<span>            se <b>seguinte</b> é nulo:</span>
+<span>                se <b>X<sub>k</sub></b> não existe em <b>união</b>:</span>
+<span>                    <b>união</b>(<b>X<sub>k</sub></b>) &lt;- {}</span>
+<span>                se esquerda de <b>p</b> é diferente de <b>X<sub>k</sub></b>:</span>
+<span>                    adiciona (esquerda de <b>p</b>) a <b>união</b>(<b>X<sub>k</sub></b>)</span>
+<span>                para</span>
+<span>            se <b>seguinte</b> pertence aos não-terminais:</span>
+<span>                <b>vazio</b> &lt;- false</span>
+<span>                para cada item <b>f</b> em first:</span>
+<span>                    se (produção correspondente a <b>f</b>) = <b>seguinte</b>:</span>
+<span>                        se &epsilon; pertence a <b>f</b>:</span>
+<span>                            <b>vazio</b> &lt;- verdadeiro</span>
+<span>                            continua para próxima iteração</span>
+<span>                        para cada item <b>i</b> em <b>f</b>:</span>
+<span>                            adiciona <b>i</b> a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
+<span>                se <b>vazio</b> é verdadeiro:</span>
+<span>                    para</span>
+<span>                <b>seguinte</b> &lt;- X<sub>k+1+<b>pos</b></sub></span>
+<span>                <b>pos</b> &lt; <b>pos</b> + 1</span>
+<span>            caso contrário:</span>
+<span>                adiciona <b>seguinte</b> a <b>follow</b>(<b>X<sub>k</sub></b>)</span>
+<span>                para</span>
+<span>para cada chave <b>k</b> de <b>união</b>:</span>
+<span>    se tamanho <b>união</b>(<b>k</b>) é vazio:</span>
+<span>        continua para próxima iteração</span>
+<span>    pilha <b>s</b></span>
+<span>    adiciona <b>k</b> ao topo de <b>s</b></span>
+<span>    enquanto tamanho de <b>s</b> &gt; 0:</span>
+<span>        <b>topo</b> &lt;- topo de <b>s</b></span>
+<span>        <b>primeiro</b> &lt;- primeiro elemento de <b>união</b>(<b>topo</b>)</span>
+<span>        se <b>união</b>(<b>primeiro</b>) não é vazio:</span>
+<span>            adiciona <b>primeiro</b> ao topo de <b>s</b></span>
+<span>            continua para a próxima iteração</span>
+<span>        para cada item <b>f</b> de <b>follow</b>(<b>primeiro</b>):</span>
+<span>            adiciona <b>f</b> a <b>follow</b>(<b>topo</b>)</span>
+<span>        remove <b>primeiro</b> de <b>união</b>(<b>topo</b>)</span>
+<span>        se <b>união</b>(<b>topo</b>) é vazio:</span>
+<span>            remove o topo de <b>s</b></span>
