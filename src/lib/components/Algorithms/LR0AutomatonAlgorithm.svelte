@@ -210,7 +210,21 @@
 
 					await codeCard?.highlightLines([21]); // Line 21: State existence check
 					let existent = automaton.states.findIndex((x) => {
-						// ... state comparison logic ...
+						if (x.items.length != $targetState.length) return false;
+						let eq = true;
+						for (let k = 0; k < x.items.length; k++) {
+							let match = false;
+							for (let m = 0; m < $targetState.length; m++) {
+								match =
+									match ||
+									(x.items[k].pos === $targetState[m].pos &&
+										x.items[k].ruleIndex === $targetState[m].ruleIndex);
+								if (match) break;
+							}
+							eq = match;
+							if (!eq) break;
+						}
+						return eq;
 					});
 
 					await codeCard?.highlightLines([22]); // Lines 22-26

@@ -229,6 +229,11 @@
 						) {
 							continue;
 						}
+						await selectSymbol(
+							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
+							colors.pink,
+							false
+						);
 
 						await codeCard?.highlightLines([12]); // Line 12: Add advanced item
 						let existent = $targetState.findIndex(
@@ -244,15 +249,34 @@
 						} else {
 							await targetStateElem?.updateLookahead(prod.lookahead, existent);
 						}
-					}
 
+						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
+					}
+					await stateSelection.hideSelect();
 					await codeCard?.highlightLines([13]); // Line 13: Apply closure
 					if ($targetState.length === 0) continue;
 					await closure();
 
 					await codeCard?.highlightLines([14]); // Line 14: State existence check
 					let existent = automaton.states.findIndex((x) => {
-						/*...*/
+						if (x.items.length != $targetState.length) return false;
+						let eq = true;
+						for (let k = 0; k < x.items.length; k++) {
+							let match = false;
+
+							for (let m = 0; m < $targetState.length; m++) {
+								match =
+									match ||
+									(x.items[k].pos === $targetState[m].pos &&
+										x.items[k].ruleIndex === $targetState[m].ruleIndex &&
+										x.items[k].lookahead.size === $targetState[m].lookahead?.size &&
+										x.items[k].lookahead.values().every((x) => $targetState[m].lookahead.has(x)));
+								if (match) break;
+							}
+							eq = match;
+							if (!eq) break;
+						}
+						return eq;
 					});
 
 					if (existent === -1) {
