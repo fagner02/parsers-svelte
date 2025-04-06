@@ -361,7 +361,7 @@
 	/**
 	 * @param {string[]} data
 	 */
-	export async function addFloatingToTree(data) {
+	export async function addFloatingNode(data) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				let levelIndex = levels[levels.length - 1].length;
@@ -446,7 +446,7 @@
 		levels = [[]];
 	}
 
-	setTreeFunctions({ initializeTree, addFloatingToTree, addToTree, addParent, resetTree });
+	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
 </script>
 
 <div class="svg-box" style={$$props.style}>

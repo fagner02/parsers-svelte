@@ -3,7 +3,7 @@
  * initializeTree: (symbol: string)=>Promise<void>,
  * addToTree: (data: string[], parent:string)=>Promise<void>,
  * resetTree: ()=>void,
- * addFloatingToTree: (data: string[])=>Promise<any>,
+ * addFloatingNode: (data: string[])=>Promise<any>,
  * addParent: (parent: string, children: string[]) => Promise<void>
  * }} TreeFunctions
  * */

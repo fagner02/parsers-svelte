@@ -183,7 +183,6 @@
 
 	async function buildAutomaton() {
 		try {
-			await codeCard?.highlightLines([0]); // Line 0: Algorithm header
 			await loadGrammar();
 			await wait(500);
 
