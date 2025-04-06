@@ -1,16 +1,24 @@
 <span>Algoritmo tabela slr:</span>
-<span><b>tabela</b> &lt;- Matriz&#x3008;estado,alfabeto, estado&#x3009;</span>
-<span>para cada estado <b>s</b> nos estados do <b>autômato</b>:</span>
-<span>    para cada item <b>i</b> de <b>s</b>:</span>
-<span>        se posição de <b>i</b> for a última posição:</span>
-<span>            se a produção de <b>i</b> for a produção inicial:</span>
-<span>                <b>tabela</b>[<b>s</b>]['$'] &lt;- ação de aceite</span>
-<span>            caso contrário:</span>
-<span>                para cada símbolo <b>b</b> em follow(lado esquerdo da produção de <b>i</b>):</span>
-<span>                    <b>tabela</b>[<b>s</b>][<b>b</b>] &lt;- reduce para produção de <b>i</b></span>
-<span>            continua para próxima iteração</span>
-<span>        <b>t</b> &lt;- transição do <b>autômato</b> que sai de <b>s</b> com produção de <b>i</b> na posição de <b>i</b></span>
-<span>        se a produção de <b>i</b> na posição de <b>i</b> for não-terminal:</span>
-<span>            <b>tabela</b>[<b>s</b>][produção de <b>i</b> na posição de <b>i</b>] &lt;- goto para estado de <b>t</b></span>
-<span>        caso contrário:</span>
-<span>            <b>tabela</b>[<b>s</b>][produção de <b>i</b> na posição de <b>i</b>] &lt;- shift para estado de <b>t</b></span>
+<span><b>tabela</b> &lt;- Mapa&#x3008;estado, Mapa&#x3008;símbolo, ação&#x3009;&#x3009;</span>
+<span>alfabeto &lt;- [terminais, não-terminais] concatenados</span>
+<span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
+<span>    <b>tabela[s.index]</b> &lt;- novo Mapa contendo todas as entradas de <b>alfabeto</b> inicializadas com ''</span>
+<span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
+<span>    para cada item <b>i</b> em <b>s.items</b>:</span>
+<span>        se <b>i.pos</b> == comprimento da produção <b>OU</b> produção é vazia:</span>
+<span>            <b>follow</b> &lt;- followSet do lado esquerdo da produção de <b>i</b></span>
+<span>            se <b>follow</b> não existe:</span>
+<span>                continua</span>
+<span>            se <b>i.ruleIndex</b> == 0:</span>
+<span>                <b>tabela[s.index]['$']</b> &lt;- 'a'</span>
+<span>                continua</span>
+<span>            para cada <b>símbolo</b> em <b>follow</b>:</span>
+<span>                <b>tabela[s.index][símbolo]</b> &lt;- 'r' + <b>i.ruleIndex</b></span>
+<span>            continua</span>
+<span>        <b>símbolo_atual</b> &lt;- símbolo na posição <b>i.pos</b> da produção de <b>i</b></span>
+<span>        <b>transição</b> &lt;- estado de destino da transição de <b>s.index</b> com <b>símbolo_atual</b></span>
+<span>        se <b>símbolo_atual</b> é não-terminal:</span>
+<span>            <b>tabela[s.index][símbolo_atual]</b> &lt;- 'g' + <b>transição</b></span>
+<span>        senão:</span>
+<span>            <b>tabela[s.index][símbolo_atual]</b> &lt;- 's' + <b>transição</b></span>
+<span>retorna <b>tabela</b></span>

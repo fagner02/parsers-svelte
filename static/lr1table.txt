@@ -1,26 +1,20 @@
-<span><b>function</b> slrTable(automaton, rules, nt, t, followSet):</span>
-<span>    <b>alphabet</b> &lt;- [...t, ...nt]</span>
-<span>    <b>table</b> &lt;- new Map()</span>
-<span>    </span>
-<span>    <b>para cada</b> <b>state</b> em <b>automaton.states</b>:</span>
-<span>        <b>table</b>.set(<b>state.index</b>, new Map(<b>alphabet</b>.map(x => [x, ''])))</span>
-<span>    </span>
-<span>    <b>para cada</b> <b>s</b> em <b>automaton.states</b>:</span>
-<span>        <b>para cada</b> <b>i</b> em <b>s.items</b>:</span>
-<span>            <b>se</b> <b>i.pos</b> === <b>rules[i.ruleIndex].right.length</b> || <b>rules[i.ruleIndex].right[0]</b> === '':</span>
-<span>                <b>follow</b> &lt;- followSet.get(<b>rules[i.ruleIndex].left</b>)</span>
-<span>                <b>se não</b> <b>follow</b>: continua</span>
-<span>                <b>se</b> <b>i.ruleIndex</b> === 0:</span>
-<span>                    <b>table</b>.get(<b>s.index</b>)?.set('$', 'a')</span>
-<span>                    continua</span>
-<span>                <b>para cada</b> <b>symbol</b> em <b>follow</b>:</span>
-<span>                    <b>table</b>.get(<b>s.index</b>)?.set(<b>symbol</b>, 'r' + <b>i.ruleIndex</b>)</span>
-<span>                continua</span>
-<span>            </span>
-<span>            <b>transition</b> &lt;- automaton.transitions.get(<b>s.index</b>)?.get(<b>rules[i.ruleIndex].right[i.pos]</b>)</span>
-<span>            </span>
-<span>            <b>se</b> <b>nt</b>.includes(<b>rules[i.ruleIndex].right[i.pos]</b>):</span>
-<span>                <b>table</b>.get(<b>s.index</b>)?.set(<b>rules[i.ruleIndex].right[i.pos]</b>, 'g' + <b>transition</b>)</span>
-<span>            <b>senão</b>:</span>
-<span>                <b>table</b>.get(<b>s.index</b>)?.set(<b>rules[i.ruleIndex].right[i.pos]</b>, 's' + <b>transition</b>)</span>
-<span>    <b>retorna</b> <b>table</b></span>
+<span>Algoritmo tabela clr:</span>
+<span><b>tabela</b> &lt;- Mapa&#x3008;estado, Mapa&#x3008;símbolo, ação&#x3009;&#x3009;</span>
+<span>alfabeto &lt;- [terminais, não-terminais] concatenados</span>
+<span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
+<span>    inicializar <b>tabela[s]</b> com entradas vazias para todos os símbolos em <b>alfabeto</b></span>
+<span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
+<span>    para cada item <b>i</b> em <b>s.items</b>:</span>
+<span>        se <b>i.pos</b> for o final da produção <b>OU</b> produção de <b>i</b> é vazia:</span>
+<span>            se <b>i</b> for a produção inicial (índice 0):</span>
+<span>                <b>tabela[s]['$']</b> &lt;- 'a' (aceitar)</span>
+<span>            senão:</span>
+<span>                para cada símbolo <b>b</b> em <b>i.lookahead</b>:</span>
+<span>                    <b>tabela[s][b]</b> &lt;- 'r' + índice da produção de <b>i</b></span>
+<span>            continua para próximo item</span>
+<span>        <b>símbolo_atual</b> &lt;- símbolo na posição <b>i.pos</b> da produção de <b>i</b></span>
+<span>        <b>t</b> &lt;- transição de <b>s</b> via <b>símbolo_atual</b> (do autômato)</span>
+<span>        se <b>símbolo_atual</b> é não-terminal:</span>
+<span>            <b>tabela[s][símbolo_atual]</b> &lt;- 'g' + estado <b>t</b></span>
+<span>        senão:</span>
+<span>            <b>tabela[s][símbolo_atual]</b> &lt;- 's' + estado <b>t</b></span>

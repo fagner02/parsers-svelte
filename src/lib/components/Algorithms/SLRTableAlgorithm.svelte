@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, setResetCall, wait, limitHit } from '$lib/flowControl';
 	import { colors } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -78,38 +78,45 @@
 			await loadGrammar();
 			await wait(500);
 
+			// Algorithm header and table initialization
 			await codeCard?.highlightLines([0]); // Line 0: Algorithm header
-			await codeCard?.highlightLines([1]); // Line 1: Initialize table
+			await codeCard?.highlightLines([1]); // Line 1: Table structure
+			await codeCard?.highlightLines([2]); // Line 2: Alphabet definition
+			await codeCard?.highlightLines([3, 4]); // Lines 3-4: State initialization
+
 			for (let s of automaton.states) {
-				await codeCard?.highlightLines([2]); // Line 2: For each state
+				await codeCard?.highlightLines([5]); // Line 5: State loop
 				for (let i of s.items) {
-					await codeCard?.highlightLines([3]); // Line 3: For each item
+					await codeCard?.highlightLines([6]); // Line 6: Item loop
 					await addPause();
 
-					await codeCard?.highlightLines([4]); // Line 4: Last position check
+					await codeCard?.highlightLines([7]); // Line 7: Position check
 					if (
 						i.pos === augRules[i.ruleIndex].right.length ||
 						augRules[i.ruleIndex].right[0] === ''
 					) {
-						await codeCard?.highlightLines([5]); // Line 5: Initial production check
+						await codeCard?.highlightLines([8]); // Line 8: Get follow set
+						let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
+
+						await codeCard?.highlightLines([9]); // Line 9: Follow exists check
+						if (!follow) continue;
+
+						await codeCard?.highlightLines([11]); // Line 11: Initial rule check
 						if (i.ruleIndex === 0) {
-							await codeCard?.highlightLines([6]); // Line 6: Accept action
+							await codeCard?.highlightLines([12]); // Line 12: Accept action
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
 								`a`,
 								`s${s.index}`,
 								'$'
 							);
+							await codeCard?.highlightLines([13]); // Line 13: Continue
 							continue;
 						}
 
-						await codeCard?.highlightLines([7]); // Line 7: Follow symbols
-						let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
-						if (!follow) continue;
-
+						await codeCard?.highlightLines([14]); // Line 14: Follow symbols loop
 						for (let symbol of follow.right) {
-							await codeCard?.highlightLines([8]); // Line 8: Reduce actions
-							await codeCard?.highlightLines([9]); // Line 9: Add to table
+							await codeCard?.highlightLines([15]); // Line 15: Reduce action
 							await tableElem?.addToTable(
 								{ action: 'r', state: i.ruleIndex },
 								`r${i.ruleIndex}`,
@@ -117,40 +124,45 @@
 								symbol
 							);
 						}
+						await codeCard?.highlightLines([16]); // Line 16: Continue
 						continue;
 					}
 
-					await codeCard?.highlightLines([10]); // Line 10: Get transition
-					let transition = automaton.transitions
-						.get(s.index)
-						?.get(augRules[i.ruleIndex].right[i.pos]);
+					await codeCard?.highlightLines([17]); // Line 17: Get current symbol
+					const currentSymbol = augRules[i.ruleIndex].right[i.pos];
 
-					await codeCard?.highlightLines([11, 12]); // Lines 11-12: Non-terminal check
-					if (nt.includes(augRules[i.ruleIndex].right[i.pos])) {
-						await codeCard?.highlightLines([12]); // Line 12: GOTO
+					await codeCard?.highlightLines([18]); // Line 18: Get transition
+					let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
+
+					await codeCard?.highlightLines([19]); // Line 19: Non-terminal check
+					if (nt.includes(currentSymbol)) {
+						await codeCard?.highlightLines([20]); // Line 20: GOTO action
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
 							`s${s.index}`,
-							`${augRules[i.ruleIndex].right[i.pos]}`
+							currentSymbol
 						);
 					} else {
-						await codeCard?.highlightLines([13]); // Line 13: Terminal check
-						await codeCard?.highlightLines([14]); // Line 14: SHIFT
+						await codeCard?.highlightLines([21]); // Line 21: ELSE clause
+						await codeCard?.highlightLines([22]); // Line 22: SHIFT action
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,
 							`s${s.index}`,
-							`${augRules[i.ruleIndex].right[i.pos]}`
+							currentSymbol
 						);
 					}
 				}
 			}
+
+			await codeCard?.highlightLines([23]); // Line 23: Return table
+			limitHit();
+			await addPause();
 		} catch (e) {
 			console.log(e);
 		}
 	}
-
 	onMount(async () => {
 		fetch('./slrtable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
