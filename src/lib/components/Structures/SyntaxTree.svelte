@@ -128,7 +128,7 @@
 					level: parent.level + 1,
 					index: newItemIndex,
 					parentIndex: parent.index,
-					parentLevel: parent.level,
+					parentLevel: -1,
 					opacity: 0,
 					x: (newItemIndex + 1) * (width / (levels[parent.level + 1].length + 2)),
 					y: vGap + parent.y + blockSize / 2,
