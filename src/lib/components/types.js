@@ -31,14 +31,14 @@
  * level:
  * number,
  * index: number,
- * parent: number,
+ * parentIndex: number,
  * opacity: number,
  * x: number,
  * y: number,
  * width: number,
  * d: string,
  * dashOffset: number,
- * parentPos?: number }} node
+ * parentLevel: number }} node
  */
 
 /** @typedef {{level: number,index: number}} nodeId*/
