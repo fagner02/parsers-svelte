@@ -54,9 +54,6 @@
 			await wait(100);
 			resetTree();
 
-			/**@type {string[]}*/
-			let treeTop = [];
-
 			if (initializeTree === undefined) {
 				let functions = getTreeFunctions();
 				initializeTree = functions.initializeTree;
@@ -84,7 +81,7 @@
 				if (action.data.startsWith('s')) {
 					let state = parseInt(action.data.slice(1));
 					addFloatingNode([topInput]);
-					treeTop.push(topInput);
+
 					await stateStackElement.addToStack(topInput, topInput, '');
 					await stateStackElement.addToStack(state, `s${state}`, '');
 					await inputStackElement.removeFromStack($inputStack.length - 1);
@@ -99,25 +96,9 @@
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 						}
 					}
-					// console.log('children: ', children, treeTop);
-					let childrenReverse = children;
-					childrenReverse.reverse();
 
-					for (let i = 0; i < treeTop.length; i++) {
-						let match = true;
-						for (let j = 0; j < childrenReverse.length; j++) {
-							if (treeTop[i - j] !== childrenReverse[j]) {
-								match = false;
-								break;
-							}
-						}
-						if (match) {
-							console.log('match: ', i, augRules[rule].right, treeTop);
-							treeTop.splice(i, children.length, augRules[rule].left);
-							console.log('treeTop: ', treeTop);
-							break;
-						}
-					}
+					children.reverse();
+
 					addParent(augRules[rule].left, children);
 
 					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
