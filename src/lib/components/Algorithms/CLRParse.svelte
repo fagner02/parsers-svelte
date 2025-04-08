@@ -31,8 +31,12 @@
 	 * @type {() => Promise<any>}
 	 */
 	let loadGrammar;
-
-	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
+	let {
+		initializeTree,
+		addFloatingNode: addFloatingNode,
+		resetTree,
+		addParent
+	} = getTreeFunctions();
 
 	function reset() {
 		stateStack.update(() => []);
@@ -49,15 +53,7 @@
 			await wait(100);
 			resetTree();
 
-			if (initializeTree === undefined) {
-				let functions = getTreeFunctions();
-				initializeTree = functions.initializeTree;
-				addToTree = functions.addToTree;
-				resetTree = functions.resetTree;
-			}
 			await stateStackElement.addToStack(0, 's0', '');
-
-			await initializeTree(startingSymbol);
 
 			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
@@ -77,18 +73,24 @@
 				}
 				if (action.data.startsWith('s')) {
 					let state = parseInt(action.data.slice(1));
+					addFloatingNode([topInput]);
 					await stateStackElement.addToStack(topInput, topInput, '');
 					await stateStackElement.addToStack(state, `s${state}`, '');
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 				}
 				if (action.data.startsWith('r')) {
 					let rule = parseInt(action.data.slice(1));
+					let children = [];
 					if (augRules[rule].right[0] !== '') {
 						for (let i = 0; i < augRules[rule].right.length; i++) {
+							children.push($stateStack[$stateStack.length - 2].data);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 						}
 					}
+
+					children.reverse();
+					addParent(augRules[rule].left, children);
 
 					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
 					if (!goto) {
@@ -114,7 +116,7 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
+<SvgLines bind:this={svgLines} svgId="clrparse"></SvgLines>
 <div class="cards-box unit">
 	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard
@@ -122,8 +124,8 @@
 		columns={alphabet}
 		{table}
 		bind:svgLines
-		tableId="ll"
-		label="tabela ll(1)"
+		tableId="clr"
+		label="tabela lr1"
 		hue={colors.blue}
 	></TableCard>
 	<StackCard

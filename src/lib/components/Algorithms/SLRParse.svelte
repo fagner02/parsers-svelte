@@ -125,7 +125,7 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
+<SvgLines bind:this={svgLines} svgId="slrparse"></SvgLines>
 <div class="cards-box unit">
 	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard
@@ -133,8 +133,8 @@
 		columns={alphabet}
 		{table}
 		bind:svgLines
-		tableId="ll"
-		label="tabela ll(1)"
+		tableId="slr"
+		label="tabela slr"
 		hue={colors.blue}
 	></TableCard>
 	<StackCard

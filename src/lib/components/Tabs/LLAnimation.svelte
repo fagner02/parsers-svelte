@@ -13,7 +13,6 @@
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
-	import Automaton from '@/Structures/Automaton.svelte';
 
 	// ========== Components ====================
 	/**@type {string}*/

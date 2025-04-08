@@ -87,7 +87,7 @@
 	let selectedAlgorithm = algos[0];
 </script>
 
-<AlgorithmTab {inputString} {code}>
+<AlgorithmTab {code}>
 	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
