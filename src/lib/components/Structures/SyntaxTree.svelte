@@ -13,7 +13,7 @@
 	let count = 0;
 	let updating = false;
 	let blockSize = 30;
-	/**@type {{level: number, index: number}[]} */
+	/**@type {import('@/types').nodeId[]} */
 	let treeTop = [];
 
 	export let floating = false;
@@ -61,16 +61,8 @@
 
 				item.x = (i + 1) * (width / (levels[j].length + 1));
 				item.y = vGap + parent.y + blockSize / 2;
-				const pos = {
-					x: item.x,
-					y: item.y - blockSize / 2 - 4
-				};
-				const parentPos = {
-					x: parent.x,
-					y: parent.y + blockSize / 2
-				};
 				item.index = i;
-				item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+				setDPath(item, parent);
 			}
 		}
 		levels = levels;
@@ -80,30 +72,16 @@
 	 * @param {number} level
 	 */
 	function updateFloatingLevel(level) {
-		if (level < 0) level = 0;
 		for (let j = level; j < levels.length; j++) {
 			for (let i = 0; i < levels[j].length; i++) {
 				let item = levels[j][i];
-				item.x = (i + 1) * (width / (levels[j].length + 1));
-				//if (item.parentIndex === -1 || item.parentLevel === -1) continue;
 
-				let parent =
-					levels[item.parentLevel === -1 ? levels.length - 1 : item.parentLevel][
-						item.parentIndex === -1 ? 0 : item.parentIndex
-					];
-				console.log('parent: ', parent);
-				const pos = {
-					x: item.x,
-					y: item.y - blockSize / 2 - 4
-				};
-				const parentPos = {
-					x: parent.x,
-					y: parent.y + blockSize / 2
-				};
-				item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+				if (item.parentIndex === -1) continue;
+				let parent = levels[item.parentLevel][item.parentIndex];
+				setDPath(item, parent);
 			}
 		}
-		levels = [...levels];
+		levels = levels;
 	}
 
 	/**
@@ -154,16 +132,7 @@
 				newNode.width = bbox.width;
 				blockSize = bbox.height;
 
-				const pos = {
-					y: newNode.y - blockSize / 2 - 4,
-					x: newNode.x
-				};
-
-				const parentPos = {
-					x: parent.x,
-					y: parent.y + blockSize / 2
-				};
-				newNode.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+				setDPath(newNode, parent);
 
 				newNode.dashOffset = 0;
 				levels = levels;
@@ -186,12 +155,6 @@
 				const index = levels[lastLevel].length;
 
 				addSpaceForNewNode(lastLevel, index);
-				levels = levels;
-				await wait(500);
-
-				// updateFloatingLevel(lastLevel - 1);
-				// levels = [...levels];
-				// await wait(500);
 
 				levels[lastLevel].splice(index, 0, {
 					data: data,
@@ -212,13 +175,12 @@
 					level: lastLevel,
 					index: index
 				});
-				levels = [...levels];
+				levels = levels;
 				await wait(100);
 				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text-${newNode.id}`)
 				)?.getBBox();
-				console.log('bbox: ', bbox);
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
 				newNode.width = bbox.width;
@@ -232,6 +194,7 @@
 			}
 		});
 	}
+
 	/**
 	 * @param {string} data
 	 * @param {number} newItemIndex
@@ -241,7 +204,8 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				addSpaceForNewNode(level, newItemIndex);
-				//updateFloatingLevel(level - 1);
+				updateFloatingLevel(level + 1);
+
 				levels[level].splice(newItemIndex, 0, {
 					data: data,
 					done: false,
@@ -251,7 +215,7 @@
 					parentLevel: -1,
 					opacity: 0,
 					x: (newItemIndex + 1) * (width / (levels[level].length + 2)),
-					y: vGap,
+					y: vGap + vGap * level + (blockSize / 2) * level,
 					width: 0,
 					d: '',
 					dashOffset: 100,
@@ -298,16 +262,27 @@
 	}
 
 	/**
+	 * @param {import('@/types').node} item
+	 * @param {{ x: number; y: number; }} parent
+	 */
+	function setDPath(item, parent) {
+		const pos = {
+			x: item.x,
+			y: item.y - blockSize / 2 - 4
+		};
+		const parentPos = {
+			x: parent.x,
+			y: parent.y + blockSize / 2
+		};
+		item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+	}
+
+	/**
 	 * @param {string} parentData
 	 * @param {string[]} children
 	 */
 	async function addParent(parentData, children) {
 		return new Promise(async (resolve) => {
-			let highestLevel = treeTop[0].level;
-			for (let i = 1; i < treeTop.length; i++) {
-				if (treeTop[i].level < highestLevel) highestLevel = treeTop[i].level;
-			}
-
 			let matchLoc = -1;
 			for (let j = 0; j < treeTop.length; j++) {
 				let match = true;
@@ -328,6 +303,11 @@
 				}
 			}
 
+			let highestLevel = treeTop[matchLoc].level;
+			for (let i = matchLoc + 1; i < matchLoc + children.length; i++) {
+				if (treeTop[i].level < highestLevel) highestLevel = treeTop[i].level;
+			}
+
 			if (highestLevel - 1 < 0) {
 				highestLevel = 1;
 				levels.unshift([]);
@@ -343,18 +323,8 @@
 						}
 						node.y = vGap + vGap * j + (blockSize / 2) * j;
 						if (node.parentIndex === -1) continue;
-						let parent = levels[node.parentLevel][node.parentIndex];
-						const pos = {
-							y: node.y - blockSize / 2 - 4,
-							x: node.x
-						};
 
-						const parentPos = {
-							x: parent.x,
-							y: parent.y + blockSize / 2
-						};
-						levels[j][i].d =
-							`M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+						setDPath(node, levels[node.parentLevel][node.parentIndex]);
 					}
 				}
 			}
@@ -373,24 +343,15 @@
 					neighborLeftmost = getLeftmost(parentLevel, neighborIndex);
 				}
 			}
-			let parentIndex = neighborIndex === 0 ? 0 : neighborIndex - 1;
+			let parentIndex = neighborIndex;
 
 			await addParentToSvg(parentData, parentIndex, parentLevel);
 
 			for (let i = matchLoc; i < matchLoc + children.length; i++) {
 				let loc = treeTop[i];
 				let node = levels[loc.level][loc.index];
-				let parent = levels[parentLevel][parentIndex];
-				const pos = {
-					y: node.y - blockSize / 2 - 4,
-					x: node.x
-				};
+				setDPath(node, levels[parentLevel][parentIndex]);
 
-				const parentPos = {
-					x: parent.x,
-					y: parent.y + blockSize / 2
-				};
-				node.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 				node.parentIndex = parentIndex;
 				node.parentLevel = parentLevel;
 			}
@@ -443,17 +404,17 @@
 			item.index = i < newNodeIndex ? i : i + 1;
 			item.x = (item.index + 1) * (width / (levels[level].length + 2));
 			if (item.parentIndex === -1) continue;
-			let parent = levels[item.parentLevel][item.parentIndex];
-
-			const pos = {
-				x: item.x,
-				y: item.y - blockSize / 2 - 4
-			};
-			const parentPos = {
-				x: parent.x,
-				y: parent.y + blockSize / 2
-			};
-			item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
+			let parentLevel = item.parentLevel === -1 ? level - 1 : levels.length - item.parentLevel - 1;
+			let parent = levels[floating ? item.parentLevel : parentLevel][item.parentIndex];
+			setDPath(item, parent);
+		}
+		level++;
+		if (floating && level < levels.length) {
+			for (let i = 0; i < levels[level].length; i++) {
+				let item = levels[level][i];
+				if (item.parentIndex === -1) continue;
+				setDPath(item, levels[item.parentLevel][item.parentIndex]);
+			}
 		}
 
 		levels = levels;
@@ -545,6 +506,7 @@
 	export function resetTree() {
 		levels = [[]];
 		count = 0;
+		treeTop = [];
 	}
 
 	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
