@@ -27,6 +27,7 @@
 /**
  * @typedef {{
  * data: string,
+ * id: number,
  * done: boolean,
  * level:
  * number,

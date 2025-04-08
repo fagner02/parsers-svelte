@@ -10,6 +10,7 @@
 	let width = 0;
 	let height = 0;
 	let boxWidth = 0;
+	let count = 0;
 	let updating = false;
 	let blockSize = 30;
 	/**@type {{level: number, index: number}[]} */
@@ -84,10 +85,13 @@
 			for (let i = 0; i < levels[j].length; i++) {
 				let item = levels[j][i];
 				item.x = (i + 1) * (width / (levels[j].length + 1));
-				if (item.parentIndex === -1 || item.parentLevel === -1) continue;
+				//if (item.parentIndex === -1 || item.parentLevel === -1) continue;
 
-				let parent = levels[item.parentLevel ?? 0][item.parentIndex];
-
+				let parent =
+					levels[item.parentLevel === -1 ? levels.length - 1 : item.parentLevel][
+						item.parentIndex === -1 ? 0 : item.parentIndex
+					];
+				console.log('parent: ', parent);
 				const pos = {
 					x: item.x,
 					y: item.y - blockSize / 2 - 4
@@ -99,7 +103,7 @@
 				item.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 			}
 		}
-		levels = levels;
+		levels = [...levels];
 	}
 
 	/**
@@ -134,7 +138,8 @@
 					y: vGap + parent.y + blockSize / 2,
 					width: 0,
 					d: '',
-					dashOffset: 100
+					dashOffset: 100,
+					id: count++
 				});
 
 				levels = levels;
@@ -142,7 +147,7 @@
 
 				let newNode = levels[parent.level + 1][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
+					document.querySelector(`#parse-text-${newNode.id}`)
 				)?.getBBox();
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
@@ -173,38 +178,45 @@
 
 	/**
 	 * @param {string} data
-	 * @param {number} newItemIndex
-	 * @param {number} id
 	 */
-	async function addFloatingToSvg(data, newItemIndex, id) {
+	async function addFloatingToSvg(data) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const lastLevel = levels.length - 1;
-				addSpaceForNewNode(lastLevel, levels[lastLevel].length);
-				updateFloatingLevel(lastLevel - 1);
-				levels[lastLevel].splice(newItemIndex, 0, {
+				const index = levels[lastLevel].length;
+
+				addSpaceForNewNode(lastLevel, index);
+				levels = levels;
+				await wait(500);
+
+				// updateFloatingLevel(lastLevel - 1);
+				// levels = [...levels];
+				// await wait(500);
+
+				levels[lastLevel].splice(index, 0, {
 					data: data,
 					done: false,
 					level: lastLevel,
-					index: newItemIndex,
+					index: index,
 					parentIndex: -1,
 					parentLevel: -1,
 					opacity: 0,
-					x: (newItemIndex + 1) * (width / (levels[lastLevel].length + 2)),
+					x: (index + 1) * (width / (levels[lastLevel].length + 2)),
 					y: vGap + vGap * lastLevel + (blockSize / 2) * lastLevel,
 					width: 0,
 					d: '',
-					dashOffset: 100
+					dashOffset: 100,
+					id: count++
 				});
 				treeTop.push({
 					level: lastLevel,
-					index: newItemIndex
+					index: index
 				});
-				levels = levels;
+				levels = [...levels];
 				await wait(100);
-				let newNode = levels[lastLevel][newItemIndex];
+				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
+					document.querySelector(`#parse-text-${newNode.id}`)
 				)?.getBBox();
 				console.log('bbox: ', bbox);
 				if (!bbox) return resolve(null);
@@ -229,7 +241,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				addSpaceForNewNode(level, newItemIndex);
-				updateFloatingLevel(level - 1);
+				//updateFloatingLevel(level - 1);
 				levels[level].splice(newItemIndex, 0, {
 					data: data,
 					done: false,
@@ -242,15 +254,15 @@
 					y: vGap,
 					width: 0,
 					d: '',
-					dashOffset: 100
+					dashOffset: 100,
+					id: count++
 				});
 				levels = levels;
 				await wait(100);
 				let newNode = levels[level][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.level}-${newNode.index}`)
+					document.querySelector(`#parse-text-${newNode.id}`)
 				)?.getBBox();
-				console.log('bbox: ', bbox);
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
 				newNode.width = bbox.width;
@@ -324,14 +336,32 @@
 				}
 				for (let j = 0; j < levels.length; j++) {
 					for (let i = 0; i < levels[j].length; i++) {
-						levels[j][i].level = j;
-						if (levels[j][i]?.parentLevel !== -1) {
-							levels[j][i].parentLevel += 1;
+						let node = levels[j][i];
+						node.level = j;
+						if (node?.parentLevel !== -1) {
+							node.parentLevel += 1;
 						}
-						levels[j][i].y = vGap + vGap * j + (blockSize / 2) * j;
+						node.y = vGap + vGap * j + (blockSize / 2) * j;
+						if (node.parentIndex === -1) continue;
+						let parent = levels[node.parentLevel][node.parentIndex];
+						const pos = {
+							y: node.y - blockSize / 2 - 4,
+							x: node.x
+						};
+
+						const parentPos = {
+							x: parent.x,
+							y: parent.y + blockSize / 2
+						};
+						levels[j][i].d =
+							`M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
 					}
 				}
 			}
+
+			levels = levels;
+			await wait(500);
+
 			let parentLevel = highestLevel - 1;
 			let matchLeftmost = getLeftmost(treeTop[matchLoc].level, treeTop[matchLoc].index);
 			let neighborIndex = 0;
@@ -361,10 +391,15 @@
 					y: parent.y + blockSize / 2
 				};
 				node.d = `M ${parentPos.x} ${parentPos.y} C ${parentPos.x} ${parentPos.y + vGapPoint}, ${pos.x} ${pos.y - vGapPoint}, ${pos.x} ${pos.y}`;
-				await wait(0);
-				node.dashOffset = 0;
 				node.parentIndex = parentIndex;
 				node.parentLevel = parentLevel;
+			}
+			levels = levels;
+			await wait(500);
+			for (let i = matchLoc; i < matchLoc + children.length; i++) {
+				let loc = treeTop[i];
+				let node = levels[loc.level][loc.index];
+				node.dashOffset = 0;
 			}
 			levels = levels;
 			treeTop.splice(matchLoc, children.length, {
@@ -408,8 +443,7 @@
 			item.index = i < newNodeIndex ? i : i + 1;
 			item.x = (item.index + 1) * (width / (levels[level].length + 2));
 			if (item.parentIndex === -1) continue;
-			let parentLevel = item.parentLevel === -1 ? level - 1 : levels.length - item.parentLevel - 1;
-			let parent = levels[parentLevel][item.parentIndex];
+			let parent = levels[item.parentLevel][item.parentIndex];
 
 			const pos = {
 				x: item.x,
@@ -430,10 +464,8 @@
 	export async function addFloatingNode(data) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let levelIndex = levels[levels.length - 1].length;
-
 				for (let i = 0; i < data.length; i++) {
-					await addFloatingToSvg(data[i], levelIndex + i, levelIndex + i);
+					await addFloatingToSvg(data[i]);
 				}
 				resolve(null);
 			} catch (e) {
@@ -512,6 +544,7 @@
 
 	export function resetTree() {
 		levels = [[]];
+		count = 0;
 	}
 
 	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
@@ -521,7 +554,7 @@
 	<svg {height} {width}>
 		<g id="parse-svg">
 			{#each levels as level, id (levels.length - id - 1)}
-				{#each level as item (`${item.level}-${item.index}-${floating ? '' : item.parentIndex}`)}
+				{#each level as item (item.id)}
 					<path
 						d={item.d}
 						stroke="white"
@@ -536,9 +569,9 @@
 					></path>{/each}
 			{/each}
 			{#each levels as level, id (levels.length - id - 1)}
-				{#each level as item (`${item.level}-${item.index}-${floating ? '' : item.parentIndex}`)}
+				{#each level as item (item.id)}
 					<rect
-						id={`${item.level}-${item.index}-${item.parentIndex}`}
+						id={`parse-rect-${item.id}`}
 						width={item.width + 12}
 						height={blockSize + 4}
 						fill="hsl(20, 60%, 60%)"
@@ -549,7 +582,7 @@
 							4}px); opacity: {item.opacity};{updating ? 'transition: none' : ''}"
 					></rect>
 					<text
-						id="parse-text-{item.level}-{item.index}"
+						id="parse-text-{item.id}"
 						class="par-{item.parentIndex}"
 						fill="hsl(0,0%,100%)"
 						dominant-baseline="middle"
