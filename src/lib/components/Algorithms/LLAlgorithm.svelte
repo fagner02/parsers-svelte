@@ -80,6 +80,14 @@
 						);
 						await codeCard?.highlightLines([5]);
 
+						let cell = $table.get(item.left)?.get(follow.right[f]);
+						if (cell?.data !== null) {
+							await tableElement.showConflict(item.left, follow.right[f]);
+							limitHit();
+							await addPause();
+							return;
+						}
+
 						await tableElement.addToTable(
 							i,
 							rules[i].right[0] === ''
@@ -101,6 +109,13 @@
 
 					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, colors.green);
 
+					let cell = $table.get(item.left)?.get(item.right[j]);
+					if (cell?.data !== null) {
+						await tableElement.showConflict(item.left, item.right[j]);
+						limitHit();
+						await addPause();
+						return;
+					}
 					await tableElement.addToTable(
 						parseFloat(/**@type {string}*/ (item.note)),
 						`${item.left} -> ${rules[i].right.join(' ')}`,

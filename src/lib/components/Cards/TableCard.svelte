@@ -2,10 +2,13 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
-	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
+	import AlertIcon from '@icons/AlertIcon.svelte';
 
 	export let label;
 	export let hue;
+	let highlighted = false;
+	let highlightRow = '';
+	let highlightColumn = '';
 
 	/**@type {Array<string>}*/
 	export let columns;
@@ -16,6 +19,9 @@
 	export let table;
 
 	export function resetTable() {
+		highlightColumn = '';
+		highlightRow = '';
+		highlighted = false;
 		table.update((x) => {
 			for (let i = 0; i < rows.length; i++) {
 				x.set(
@@ -83,6 +89,33 @@
 			}
 		});
 	}
+
+	/**
+	 * @param {string} row
+	 * @param {string} column
+	 */
+	export async function showConflict(row, column) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let element = document.querySelector(`#td-${tableId}-${row}-${column}`);
+				if (element === null) return;
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center'
+				});
+				highlightRow = row;
+				highlightColumn = column;
+				highlighted = false;
+				setTimeout(() => {
+					highlighted = true;
+				}, 100);
+				await wait(1000);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
 </script>
 
 <CardWrapper
@@ -98,23 +131,45 @@
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
 				{#each columns as column, index}
-					<th style="background: hsl({hue}, 60%, 40%);"> {column} </th>
+					<th style="background: hsl({column == highlightColumn ? 345 : hue}, 60%, 40%);">
+						{column}
+					</th>
 				{/each}
 			</tr>
 		</thead>
 		<tbody>
 			{#each $table as [rowKey, row]}
 				<tr>
-					<th style="background: hsl({hue}, 60%, 40%);"><span>{rowKey}</span></th>
+					<th style="background: hsl({rowKey == highlightRow ? 345 : hue}, 60%, 40%);"
+						><span>{rowKey}</span></th
+					>
 					{#each row as [colKey, col]}
-						<td>
-							<span
-								id="t-{tableId}-{rowKey}-{colKey}"
-								style="width: {col.text.length * charWidth * col.width}rem;
-									opacity: {col.opacity};top: {col.pos}px;"
-							>
-								{col.text}
-							</span>
+						<td
+							id="td-{tableId}-{rowKey}-{colKey}"
+							style={rowKey == highlightRow || colKey == highlightColumn
+								? 'background: hsl(345, 60%,60%); color: white;'
+								: 'background: white'}
+						>
+							<div class="grid" style="width: 100%;">
+								<span
+									class="unit"
+									id="t-{tableId}-{rowKey}-{colKey}"
+									style="width: {col.text.length * charWidth * col.width}rem;
+										opacity: {col.opacity};top: {col.pos}px;"
+								>
+									{col.text}
+								</span>
+								{#if highlightRow === rowKey && highlightColumn === colKey}
+									<div
+										class="grid unit"
+										style="transition: all 0.5s; color: white;background: hsl(345, 60%, 50%);border-radius: 5px;transform: {highlighted
+											? `translate(0px, 0%)`
+											: `translate(0, -105%)`};"
+									>
+										<AlertIcon color="white" size={18} strokeWidth={3}></AlertIcon>
+									</div>
+								{/if}
+							</div>
 						</td>
 					{/each}
 				</tr>
@@ -129,22 +184,21 @@
 	}
 	th {
 		font-weight: normal;
-	}
-
-	th {
 		color: white;
+		padding: 0 5px;
 	}
 
 	th,
 	td {
+		transition: all 0.5s;
 		border: 1px solid hsl(0, 0%, 80%);
 		border-radius: 5px;
-		padding: 0px 5px;
 		overflow: hidden;
 		text-align: center;
 		text-align: -webkit-center;
 		text-align: -moz-center;
 		vertical-align: center;
+		padding: 0;
 	}
 	span {
 		display: block;
@@ -158,5 +212,13 @@
 	}
 	th {
 		border-color: transparent;
+	}
+
+	div.grid.unit {
+		place-content: center;
+	}
+	th,
+	span {
+		margin: 0px 5px;
 	}
 </style>

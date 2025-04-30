@@ -22,7 +22,8 @@ let nt = [];
 let t = [];
 export let grammar = `S -> A A
 A -> a A
-A -> b`;
+A -> b
+S -> b`;
 
 /**
  * @param {string} text
