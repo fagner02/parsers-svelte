@@ -179,10 +179,7 @@
 			class={`stack-item ${highlighted ? 'block' : ''}`}
 			style="--block-hue: {hue};top: -{lineHeight}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem;"
 		>
-			{stackItem.text}<span
-				style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, 5px)"
-				>{stackItem.note}</span
-			>
+			<span style="font-size: {subFontSize}rem;">{stackItem.note}</span>{stackItem.text}
 		</p>
 	{/each}
 </CardWrapper>

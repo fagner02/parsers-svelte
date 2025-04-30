@@ -229,24 +229,21 @@
 		{#each $set as item, index}
 			<p
 				id="{setId}set{index}"
-				style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content"
+				style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content;height: {lineHeight}rem"
 			>
 				<span
 					id="{setId}l{index}"
 					class="block"
 					style="--block-hue: {hue};width:{charWidth * item.left.length +
 						subCharWidth * (item.note?.length ?? 0)}rem"
-					>{item.left}<span
-						style="font-size: {subFontSize}rem; position: absolute;transform: translate(0px, {0.3 *
-							fontSize}rem)">{item.note ?? ''}</span
-					></span
+					><span style="font-size: {subFontSize}rem;">{item.note ?? ''}</span>{item.left}</span
 				>
 				{#if item.showRight}
 					<span in:setItemIn={{ duration: 500, delay: 0 }}>{':'}</span>
 					<span in:setItemIn={{ duration: 500, delay: 100 }} id="{setId}r{index}--1">{'{'}</span>
 
 					{#each item.rightProps as text, ri (`${index}-${item.right[Math.floor(ri / 2.0)]}-${text.value}`)}
-						<p
+						<span
 							style="transition: opacity 0.5s 0.2s, width 0.5s;width: {subCharWidth *
 								(text.hide ? 0 : text.note?.length) +
 								charWidth *
@@ -259,14 +256,14 @@
 								: ''}"
 							id="{setId}r{index}-{ri}"
 						>
-							<sub style="font-size: {subFontSize}rem;">{text.note}</sub>{#if text.value === ''}
+							<span style="font-size: {subFontSize}rem;">{text.note}</span>{#if text.value === ''}
 								&#x03B5;
 							{:else if text.value != ' '}
 								{text.value}
 							{:else}
 								&nbsp;
 							{/if}
-						</p>
+						</span>
 					{/each}
 
 					<span
