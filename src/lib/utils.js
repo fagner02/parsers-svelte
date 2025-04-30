@@ -41,15 +41,18 @@ export function loadGrammar() {
 		let s = r.split('->');
 
 		if (s.length > 1) {
-			rules.push({
-				left: s[0].trim(),
-				right: s[1].trim().split(' '),
-				index: rules.length
-			});
-			for (let item of new Set(s[1].trim().split(' '))) {
-				alphSet.add(item);
+			let right = s[1].split('|');
+			for (let i = 0; i < right.length; i++) {
+				rules.push({
+					left: s[0].trim(),
+					right: right[i].trim().split(' '),
+					index: rules.length
+				});
+				for (let item of new Set(right[i].trim().split(' '))) {
+					alphSet.add(item);
+				}
+				ntSet.add(s[0].trim());
 			}
-			ntSet.add(s[0].trim());
 		}
 	});
 
