@@ -1,0 +1,19 @@
+<span>Algoritmo de parsing:</span>
+<span><b>pilha_símbolos</b> &lt;- ['$', símbolo_inicial]</span>
+<span><b>pilha_entrada</b> &lt;- entrada invertida (sem espaços) + ['$']</span>
+<span>enquanto <b>pilha_entrada</b> não está vazia:</span>
+<span>    <b>topSymbol</b> &lt;- topo de <b>pilha_símbolos</b></span>
+<span>    <b>topInput</b> &lt;- topo de <b>pilha_entrada</b></span>
+<span>    se <b>topSymbol</b> é não-terminal:</span>
+<span>        <b>produção</b> &lt;- ação de <b>tabela</b> para <b>topSymbol</b> e <b>topInput</b></span>
+<span>        se <b>produção</b> é inválida:</span>
+<span>            retorna falso</span>
+<span>        remove <b>topSymbol</b> de <b>pilha_símbolos</b></span>
+<span>        se produção não é vazia (ε):</span>
+<span>            adiciona símbolos da produção invertidos a <b>pilha_símbolos</b></span>
+<span>    senão:</span>
+<span>        se <b>topSymbol</b> ≠ <b>topInput</b>:</span>
+<span>            retorna falso</span>
+<span>        remove <b>topSymbol</b> de <b>pilha_símbolos</b></span>
+<span>        remove <b>topInput</b> de <b>pilha_entrada</b></span>
+<span>retorna <b>pilha_símbolos</b> e <b>pilha_entrada</b> estão vazias</span>

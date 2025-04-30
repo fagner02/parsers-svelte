@@ -10,6 +10,7 @@
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { inputString } from '$lib/parseString';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
@@ -20,6 +21,8 @@
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
 	let stateStack = writable([]);
 	export let stateList;
+	/**@type {PseudoCode}*/
+	let codeCard;
 
 	/** @type {StackCard}*/
 	let stateStackElement;
@@ -31,12 +34,7 @@
 	 * @type {() => Promise<any>}
 	 */
 	let loadGrammar;
-	let {
-		initializeTree,
-		addFloatingNode: addFloatingNode,
-		resetTree,
-		addParent
-	} = getTreeFunctions();
+	let { addFloatingNode: addFloatingNode, resetTree, addParent } = getTreeFunctions();
 
 	function reset() {
 		stateStack.update(() => []);
@@ -44,47 +42,96 @@
 		svgLines?.setHideOpacity();
 		context.setAccept(null);
 
-		parsing();
+		clrparsing();
 	}
 	setResetCall(reset);
 
-	async function parsing() {
+	async function clrparsing() {
 		try {
+			// Line 0: Algorithm header
+			await codeCard?.highlightLines([0]);
 			await wait(100);
 			resetTree();
 
+			// Line 1: Initialize state stack
+			await codeCard?.highlightLines([1]);
 			await stateStackElement.addToStack(0, 's0', '');
 
+			// Line 2: Initialize input stack
+			await codeCard?.highlightLines([2]);
 			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 
+			// Line 3: Main loop
+			await codeCard?.highlightLines([3]);
 			while (true) {
+				// Line 4: Get current state
+				await codeCard?.highlightLines([4]);
 				const topState = /**@type {number}*/ stateStackElement.top();
+
+				// Line 5: Get lookahead
+				await codeCard?.highlightLines([5]);
 				const topInput = inputStackElement.top();
+
+				// Line 6: Get table action
+				await codeCard?.highlightLines([6]);
 				const action = $table.get(`s${topState}`)?.get(topInput);
+
+				// Lines 7-8: Invalid action check
+				await codeCard?.highlightLines([7]);
 				if (!action || action?.data === '') {
+					await codeCard?.highlightLines([8]);
 					context.setAccept(false);
 					break;
 				}
+
+				// Lines 9-10: Accept action
+				await codeCard?.highlightLines([9]);
 				if (action.data.startsWith('a')) {
+					await codeCard?.highlightLines([10]);
 					context.setAccept(true);
 					break;
 				}
+
+				await codeCard?.highlightLines([11]);
 				if (action.data.startsWith('s')) {
+					// Lines 11-15: Shift action
+					await codeCard?.highlightLines([12]);
 					let state = parseInt(action.data.slice(1));
 					addFloatingNode([topInput]);
+
+					await codeCard?.highlightLines([13]);
 					await stateStackElement.addToStack(topInput, topInput, '');
+
+					await codeCard?.highlightLines([14]);
 					await stateStackElement.addToStack(state, `s${state}`, '');
+
+					await codeCard?.highlightLines([15]);
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 				}
+
+				await codeCard?.highlightLines([16]);
 				if (action.data.startsWith('r')) {
+					// Line 16: Reduce action
 					let rule = parseInt(action.data.slice(1));
 					let children = [];
+
+					// Lines 17-22: Handle production
+					await codeCard?.highlightLines([17]);
+
+					await codeCard?.highlightLines([18]);
+
+					await codeCard?.highlightLines([19]);
 					if (augRules[rule].right[0] !== '') {
 						for (let i = 0; i < augRules[rule].right.length; i++) {
+							await codeCard?.highlightLines([20]);
 							children.push($stateStack[$stateStack.length - 2].data);
+
+							await codeCard?.highlightLines([21]);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
+
+							await codeCard?.highlightLines([22]);
 							await stateStackElement.removeFromStack($stateStack.length - 1);
 						}
 					}
@@ -92,13 +139,22 @@
 					children.reverse();
 					addParent(augRules[rule].left, children);
 
+					await codeCard?.highlightLines([23]);
+
+					await codeCard?.highlightLines([24]);
 					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
+
+					await codeCard?.highlightLines([25]);
 					if (!goto) {
+						await codeCard?.highlightLines([26]);
 						context.setAccept(false);
 						break;
 					}
+
 					let gotoState = parseInt(goto?.slice(1));
+					await codeCard?.highlightLines([27]);
 					await stateStackElement.addToStack(augRules[rule].left, augRules[rule].left, '');
+					await codeCard?.highlightLines([28]);
 					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
 				}
 
@@ -109,39 +165,46 @@
 			await addPause();
 		} catch (e) {}
 	}
-
 	onMount(async () => {
+		fetch('./clrparse.txt').then((data) =>
+			data.text().then((text) => codeCard?.setPseudoCode(text))
+		);
 		loadGrammar();
-		await parsing();
+		await clrparsing();
 	});
 </script>
 
 <SvgLines bind:this={svgLines} svgId="clrparse"></SvgLines>
-<div class="cards-box unit">
-	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
-	<TableCard
-		rows={stateList}
-		columns={alphabet}
-		{table}
-		bind:svgLines
-		tableId="clr"
-		label="tabela lr1"
-		hue={colors.blue}
-	></TableCard>
-	<StackCard
-		bind:svgLines
-		bind:stack={inputStack}
-		bind:this={inputStackElement}
-		stackId="input"
-		hue={colors.green}
-		label="entrada"
-	></StackCard>
-	<StackCard
-		bind:svgLines
-		bind:stack={stateStack}
-		bind:this={stateStackElement}
-		stackId="symbols"
-		hue={colors.green}
-		label="pilha de símbolos"
-	></StackCard>
+<div class="grid unit">
+	<div class="unit">
+		<PseudoCode bind:this={codeCard}></PseudoCode>
+	</div>
+	<div class="cards-box unit">
+		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
+		<TableCard
+			rows={stateList}
+			columns={alphabet}
+			{table}
+			bind:svgLines
+			tableId="clr"
+			label="tabela lr1"
+			hue={colors.blue}
+		></TableCard>
+		<StackCard
+			bind:svgLines
+			bind:stack={inputStack}
+			bind:this={inputStackElement}
+			stackId="input"
+			hue={colors.green}
+			label="entrada"
+		></StackCard>
+		<StackCard
+			bind:svgLines
+			bind:stack={stateStack}
+			bind:this={stateStackElement}
+			stackId="symbols"
+			hue={colors.green}
+			label="pilha de símbolos"
+		></StackCard>
+	</div>
 </div>
