@@ -66,12 +66,14 @@
 			const nullable = calcNullable(rules);
 
 			instruction = 'Since this thing is like that we have add to the stack';
-			await codeCard?.highlightLines([0, 1]);
+			await codeCard?.highlightLines([0]);
+			await codeCard?.highlightLines([1]);
 
 			for (let i = 0; i < rules.length; i++) {
 				await codeCard?.highlightLines([2]);
 				await grammarFuncs?.selectFor(`gset${i}`);
-				await codeCard?.highlightLines([3, 4]);
+				await codeCard?.highlightLines([3]);
+				await codeCard?.highlightLines([4]);
 				await selectLSymbol('g', i, colors.blue);
 				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
 				let isNull = true;
@@ -117,7 +119,8 @@
 
 					await codeCard?.highlightLines([12]);
 					if (!(nullable.get(symbol) ?? false)) {
-						await codeCard?.highlightLines([14, 13]);
+						await codeCard?.highlightLines([13]);
+						await codeCard?.highlightLines([14]);
 						isNull = false;
 						break;
 					}
@@ -147,19 +150,27 @@
 					continue;
 				}
 				await addPause();
-				await codeCard?.highlightLines([20, 21]);
+				await codeCard?.highlightLines([20]);
+				await codeCard?.highlightLines([21]);
+
+				if (!$joinSet[item].note) {
+					continue;
+				}
+				let ruleIndex = parseInt($joinSet[item].note);
 
 				await joinStackElement?.addToStack(
-					item,
-					rules[item].left,
-					'',
-					`${joinSetElement?.getSetId()}l${item}`
+					ruleIndex,
+					rules[ruleIndex].left,
+					$joinSet[item].note,
+					`${joinSetElement?.getSetId()}l${ruleIndex}`
 				);
 				await addPause();
 
 				while ($joinStack.length > 0) {
 					await codeCard?.highlightLines([22]);
-					await codeCard?.highlightLines([23, 24]);
+					await codeCard?.highlightLines([23]);
+					await codeCard?.highlightLines([24]);
+
 					const topKey = $joinStack[$joinStack.length - 1].data;
 					const top = /**@type {Array<number>}*/ (joinSetElement?.get(topKey));
 					const topValue = top[0];
@@ -167,13 +178,15 @@
 					let nextSet = joinSetElement?.get(topValue);
 					await codeCard?.highlightLines([25]);
 					if (nextSet !== undefined && !(nextSet.length === 0)) {
-						await codeCard?.highlightLines([26, 27]);
+						await codeCard?.highlightLines([26]);
+						await codeCard?.highlightLines([27]);
 
 						await joinStackElement?.addToStack(topValue, rules[topValue].left, topValue.toString());
 						await addPause();
 						continue;
 					}
-					await codeCard?.highlightLines([28, 29]);
+					await codeCard?.highlightLines([28]);
+					await codeCard?.highlightLines([29]);
 					const setToJoin = /**@type {Array<String>}*/ (firstSetElement?.get(topValue)).filter(
 						(x) => x !== ''
 					);
