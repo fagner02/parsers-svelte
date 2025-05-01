@@ -11,7 +11,6 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import Ll1ParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 	import { inputString } from '$lib/parseString';
-	import Code from '@/Layout/Code.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
 	/**@type {SvgLines | undefined}*/
@@ -46,9 +45,8 @@
 
 	async function parsing() {
 		try {
-			await codeCard?.highlightLines([0]); // Line 0: Algorithm header
+			await codeCard?.highlightLines([0]);
 			await wait(100);
-			resetTree();
 
 			if (initializeTree === undefined) {
 				let functions = getTreeFunctions();
@@ -56,68 +54,72 @@
 				addToTree = functions.addToTree;
 				resetTree = functions.resetTree;
 			}
-
-			await codeCard?.highlightLines([1]); // Line 1: Initialize symbol stack
+			resetTree();
+			initializeTree(startingSymbol);
+			await codeCard?.highlightLines([1]);
 			for (let i of ['$', startingSymbol]) {
 				await symbolStackElement.addToStack(i, i, '');
 			}
 
-			await codeCard?.highlightLines([2]); // Line 2: Initialize input stack
+			await codeCard?.highlightLines([2]);
 			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 
 			await addPause();
-			await codeCard?.highlightLines([3]); // Line 3: Main loop
+			await codeCard?.highlightLines([3]);
 			while ($inputStack.length > 0) {
-				await codeCard?.highlightLines([4]); // Line 4: Get top symbol
+				await codeCard?.highlightLines([4]);
 				const topSymbol = $symbolStack[$symbolStack.length - 1].data;
-				await codeCard?.highlightLines([5]); // Line 5: Get top input
+				await codeCard?.highlightLines([5]);
 				const topInput = $inputStack[$inputStack.length - 1].data;
 
-				await codeCard?.highlightLines([6]); // Line 6: Non-terminal check
+				await codeCard?.highlightLines([6]);
 				if (nt.includes(topSymbol)) {
-					await codeCard?.highlightLines([7]); // Line 7: Get production
+					await codeCard?.highlightLines([7]);
 					const prodIndex = $table.get(topSymbol)?.get(topInput)?.data;
 
-					await codeCard?.highlightLines([8]); // Line 8: Validate production
+					await codeCard?.highlightLines([8]);
 					if (prodIndex == null || prodIndex === -1) {
-						await codeCard?.highlightLines([9]); // Line 9: Reject
+						await codeCard?.highlightLines([9]);
 						context.setAccept(false);
 						return;
 					}
 
-					await codeCard?.highlightLines([10]); // Line 10: Remove symbol
+					await codeCard?.highlightLines([10]);
 					await symbolStackElement.removeFromStack($symbolStack.length - 1);
 
-					await codeCard?.highlightLines([11]); // Line 11: Empty production check
+					await codeCard?.highlightLines([11]);
 					if (!rules[prodIndex].right.includes('')) {
-						await codeCard?.highlightLines([12]); // Line 12: Push reversed production
+						await codeCard?.highlightLines([12]);
 						const prod = [...rules[prodIndex].right].reverse();
+						addToTree([...rules[prodIndex].right], topSymbol);
 						for (let p of prod) {
 							await symbolStackElement.addToStack(p, p, '');
 						}
+					} else {
+						addToTree(['\u03B5'], topSymbol);
 					}
 				} else {
-					await codeCard?.highlightLines([13]); // Line 13: Terminal case
-					await codeCard?.highlightLines([14]); // Line 14: Match check
+					await codeCard?.highlightLines([13]);
+					await codeCard?.highlightLines([14]);
 					if (topSymbol !== topInput) {
-						await codeCard?.highlightLines([15]); // Line 15: Reject
+						await codeCard?.highlightLines([15]);
 						context.setAccept(false);
 						limitHit();
 						return;
 					}
 
-					await codeCard?.highlightLines([16]); // Line 16: Remove symbol
+					await codeCard?.highlightLines([16]);
 					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-					await codeCard?.highlightLines([17]); // Line 17: Remove input
+					await codeCard?.highlightLines([17]);
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 				}
 
 				await addPause();
 			}
 
-			await codeCard?.highlightLines([18]); // Line 18: Final check
+			await codeCard?.highlightLines([18]);
 			const result = $inputStack.length === 0 && $symbolStack.length === 0;
 			context.setAccept(result);
 			limitHit();
