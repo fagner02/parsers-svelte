@@ -186,6 +186,11 @@
 		font-weight: normal;
 		color: white;
 		padding: 0 5px;
+		border-color: transparent;
+	}
+
+	td {
+		padding: 0;
 	}
 
 	th,
@@ -198,7 +203,6 @@
 		text-align: -webkit-center;
 		text-align: -moz-center;
 		vertical-align: center;
-		padding: 0;
 	}
 	span {
 		display: block;
@@ -210,10 +214,6 @@
 			opacity 0.5s 0.5s;
 		white-space: nowrap;
 	}
-	th {
-		border-color: transparent;
-	}
-
 	div.grid.unit {
 		place-content: center;
 	}
