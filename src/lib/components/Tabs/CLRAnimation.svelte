@@ -14,8 +14,6 @@
 	import { clrTable } from '$lib/clrTable';
 
 	let code = '';
-	/**@type {string}*/
-	let inputString;
 	let { augRules, nt, t } = getAugGrammar();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/

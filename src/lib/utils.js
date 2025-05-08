@@ -20,10 +20,11 @@ let rules = [];
 let nt = [];
 /** @type {Array<string>}*/
 let t = [];
-export let grammar = `S -> A A
-A -> a A
-A -> b
-S -> b`;
+export let grammar = `E -> E + T
+E -> T
+T -> T * F
+T -> F
+F -> id`;
 
 /**
  * @param {string} text
