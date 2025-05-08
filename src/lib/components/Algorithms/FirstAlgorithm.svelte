@@ -177,7 +177,11 @@
 
 					let nextSet = joinSetElement?.get(topValue);
 					await codeCard?.highlightLines([25]);
-					if (nextSet !== undefined && !(nextSet.length === 0)) {
+					if (
+						nextSet !== undefined &&
+						!(nextSet.length === 0) &&
+						!$joinStack.some((x) => x.data === topValue)
+					) {
 						await codeCard?.highlightLines([26]);
 						await codeCard?.highlightLines([27]);
 
@@ -190,7 +194,6 @@
 					const setToJoin = /**@type {Array<String>}*/ (firstSetElement?.get(topValue)).filter(
 						(x) => x !== ''
 					);
-
 					await firstSetElement?.joinSets(
 						setToJoin,
 						setToJoin,

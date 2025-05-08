@@ -71,12 +71,19 @@ export function first(
 		}
 	}
 
+	let addedToStack = joinSet
+		.keys()
+		.toArray()
+		.map((x) => {
+			return false;
+		});
 	for (let item of joinSet.keys()) {
 		if (joinSet.get(item)?.size === 0) {
 			continue;
 		}
 		/** @type {Array<number>} */
 		let joinStack = [item];
+		addedToStack[item] = true;
 
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
@@ -85,8 +92,9 @@ export function first(
 			const topValue = /**@type {number}*/ (top?.values().next().value);
 
 			let nextSet = joinSet.get(topValue);
-			if (nextSet !== undefined && !(nextSet.size === 0)) {
+			if (nextSet !== undefined && !(nextSet.size === 0) && !addedToStack[topValue]) {
 				joinStack.push(topValue);
+				addedToStack[topValue] = true;
 				continue;
 			}
 			const _firstSet = firstSet.get(topKey);

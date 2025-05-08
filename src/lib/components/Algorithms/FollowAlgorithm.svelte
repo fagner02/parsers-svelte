@@ -214,7 +214,11 @@
 
 					await codeCard?.highlightLines([42]);
 					let nextSet = joinSetElement?.get(top[0]);
-					if (nextSet !== undefined && !(nextSet.length === 0)) {
+					if (
+						nextSet !== undefined &&
+						!(nextSet.length === 0) &&
+						!$joinStack.some((x) => x.data === top[0])
+					) {
 						await codeCard?.highlightLines([43]);
 
 						await joinStackElement?.addToStack(

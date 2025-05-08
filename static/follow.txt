@@ -40,7 +40,7 @@
 <span>    enquanto tamanho de <b>s</b> &gt; 0:</span>
 <span>        <b>topo</b> &lt;- topo de <b>s</b></span>
 <span>        <b>primeiro</b> &lt;- primeiro elemento de <b>união</b>(<b>topo</b>)</span>
-<span>        se <b>união</b>(<b>primeiro</b>) não é vazio:</span>
+<span>        se <b>união</b>(<b>primeiro</b>) não é vazio e <b>primeiro</b> ainda não foi adicionado a <b>s</b>:</span>
 <span>            adiciona <b>primeiro</b> ao topo de <b>s</b></span>
 <span>            continua para a próxima iteração</span>
 <span>        para cada item <b><b>f</b></b> de <b>follow</b>(<b>primeiro</b>):</span>

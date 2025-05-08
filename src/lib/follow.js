@@ -64,12 +64,14 @@ export function follow(rules, nt, firstSet) {
 		}
 	}
 
+	let addedToStack = [];
 	for (let item of joinSet.keys()) {
 		if (joinSet.get(item)?.size === 0) {
 			continue;
 		}
 		/** @type {Array<string>} */
 		let joinStack = [item];
+		addedToStack.push(item);
 
 		while (joinStack.length > 0) {
 			const topKey = joinStack[joinStack.length - 1];
@@ -77,8 +79,9 @@ export function follow(rules, nt, firstSet) {
 			const topValue = /**@type {string}*/ (top?.values().next().value);
 
 			let nextSet = joinSet.get(topValue);
-			if (nextSet !== undefined && !(nextSet.size === 0)) {
+			if (nextSet !== undefined && !(nextSet.size === 0) && !addedToStack.includes(item)) {
 				joinStack.push(topValue);
+				addedToStack.push(item);
 				continue;
 			}
 			const _followSet = followSet.get(topKey);
