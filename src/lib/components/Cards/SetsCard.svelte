@@ -76,7 +76,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				const index = /**@type {number}*/ (setIndexes.get(key));
-				if ($set[index].rightProps[0].value === ' ') {
+				if ($set[index].rightProps.length > 0 && $set[index].rightProps[0].value === ' ') {
 					$set[index].rightProps.pop();
 				}
 
