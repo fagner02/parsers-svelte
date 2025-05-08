@@ -34,5 +34,7 @@
 <span>                adiciona {regra: <b>r</b>, posição: 0, lookahead: <b>lookahead</b>} a <b>itensParaVerificar</b></span>
 <span>                continua para a próxima iteração</span>
 <span>            <b>para cada</b> <b>l</b> em <b>lookahead</b>:</span>
-<span>                adiciona <b>l</b> ao conjunto lookahead do item existente em <b>estado</b></span>
+<span>                adiciona <b>l</b> ao conjunto lookahead do <b>item existente</b> em <b>estado</b></span>
+<span>            se conjunto lookahead do <b>item existente</b> mudou:</span>
+<span>                adiciona <b>item existente</b> a <b>itensParaVerificar</b></span>
 <span>    remove primeiro item de <b>itensParaVerificar</b></span>

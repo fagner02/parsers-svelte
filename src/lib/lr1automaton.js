@@ -47,13 +47,23 @@ export function closure(state, rules, nt, firstSet) {
 			let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
 			if (existent === -1) {
-				state.push({ ruleIndex: rule.index, pos: 0, lookahead });
-				itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead });
+				state.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
+				itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
 				continue;
 			}
+			let size = state[existent].lookahead.size;
 			for (let l of lookahead) {
 				state[existent].lookahead.add(l);
 			}
+			if (state[existent].lookahead.size === size) {
+				continue;
+			}
+
+			itemsToCheck.push({
+				ruleIndex: state[existent].ruleIndex,
+				pos: state[existent].pos,
+				lookahead: new Set(state[existent].lookahead)
+			});
 		}
 
 		itemsToCheck.shift();
@@ -79,12 +89,14 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 
 	automaton.states.push({ index: 0, items: [...state0] });
 
+	let count = 0;
 	stateStack.push(0);
-	let alphabet = [...t, ...nt].filter((x) => x !== '');
+	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
 	while (stateStack.length > 0) {
 		for (let symbol of alphabet) {
 			/**@type {import('@/types').LR1StateItem[]} */
 			let state1 = [];
+			count++;
 			for (let prod of automaton.states[stateStack[0]].items) {
 				if (
 					prod.pos >= rules[prod.ruleIndex].right.length ||
@@ -137,5 +149,6 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 		}
 		stateStack.shift();
 	}
+	console.log('eee: ', count);
 	return automaton;
 }
