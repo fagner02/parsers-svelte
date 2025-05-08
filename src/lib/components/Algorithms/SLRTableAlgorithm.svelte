@@ -78,45 +78,45 @@
 			await loadGrammar();
 			await wait(500);
 
-			// Algorithm header and table initialization
-			await codeCard?.highlightLines([0]); // Line 0: Algorithm header
-			await codeCard?.highlightLines([1]); // Line 1: Table structure
-			await codeCard?.highlightLines([2]); // Line 2: Alphabet definition
-			await codeCard?.highlightLines([3, 4]); // Lines 3-4: State initialization
+			await codeCard?.highlightLines([0]);
+			await codeCard?.highlightLines([1]);
+			await codeCard?.highlightLines([2]);
+			await codeCard?.highlightLines([3]);
+			await codeCard?.highlightLines([4]);
 
 			for (let s of automaton.states) {
-				await codeCard?.highlightLines([5]); // Line 5: State loop
+				await codeCard?.highlightLines([5]);
 				for (let i of s.items) {
-					await codeCard?.highlightLines([6]); // Line 6: Item loop
+					await codeCard?.highlightLines([6]);
 					await addPause();
 
-					await codeCard?.highlightLines([7]); // Line 7: Position check
+					await codeCard?.highlightLines([7]);
 					if (
 						i.pos === augRules[i.ruleIndex].right.length ||
 						augRules[i.ruleIndex].right[0] === ''
 					) {
-						await codeCard?.highlightLines([8]); // Line 8: Get follow set
+						await codeCard?.highlightLines([8]);
 						let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
 
-						await codeCard?.highlightLines([9]); // Line 9: Follow exists check
+						await codeCard?.highlightLines([9]);
 						if (!follow) continue;
 
-						await codeCard?.highlightLines([11]); // Line 11: Initial rule check
+						await codeCard?.highlightLines([11]);
 						if (i.ruleIndex === 0) {
-							await codeCard?.highlightLines([12]); // Line 12: Accept action
+							await codeCard?.highlightLines([12]);
 							await tableElem?.addToTable(
 								{ action: 'a', state: i.ruleIndex },
 								`a`,
 								`s${s.index}`,
 								'$'
 							);
-							await codeCard?.highlightLines([13]); // Line 13: Continue
+							await codeCard?.highlightLines([13]);
 							continue;
 						}
 
-						await codeCard?.highlightLines([14]); // Line 14: Follow symbols loop
+						await codeCard?.highlightLines([14]);
 						for (let symbol of follow.right) {
-							await codeCard?.highlightLines([15]); // Line 15: Reduce action
+							await codeCard?.highlightLines([15]);
 							await tableElem?.addToTable(
 								{ action: 'r', state: i.ruleIndex },
 								`r${i.ruleIndex}`,
@@ -124,19 +124,19 @@
 								symbol
 							);
 						}
-						await codeCard?.highlightLines([16]); // Line 16: Continue
+						await codeCard?.highlightLines([16]);
 						continue;
 					}
 
-					await codeCard?.highlightLines([17]); // Line 17: Get current symbol
+					await codeCard?.highlightLines([17]);
 					const currentSymbol = augRules[i.ruleIndex].right[i.pos];
 
-					await codeCard?.highlightLines([18]); // Line 18: Get transition
+					await codeCard?.highlightLines([18]);
 					let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
 
-					await codeCard?.highlightLines([19]); // Line 19: Non-terminal check
+					await codeCard?.highlightLines([19]);
 					if (nt.includes(currentSymbol)) {
-						await codeCard?.highlightLines([20]); // Line 20: GOTO action
+						await codeCard?.highlightLines([20]);
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
@@ -144,8 +144,8 @@
 							currentSymbol
 						);
 					} else {
-						await codeCard?.highlightLines([21]); // Line 21: ELSE clause
-						await codeCard?.highlightLines([22]); // Line 22: SHIFT action
+						await codeCard?.highlightLines([21]);
+						await codeCard?.highlightLines([22]);
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,
@@ -156,7 +156,7 @@
 				}
 			}
 
-			await codeCard?.highlightLines([23]); // Line 23: Return table
+			await codeCard?.highlightLines([23]);
 			limitHit();
 			await addPause();
 		} catch (e) {
