@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { getJumpPause, wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import ResizeWrapper from './ResizeWrapper.svelte';
 	import { Interaction } from '$lib/interactiveElem';
@@ -11,6 +11,9 @@
 	let card;
 	/** @type {HTMLElement} */
 	let cardContent;
+	/** @type {Boolean} */
+	let minimized;
+
 	let interaction = new Interaction();
 	export let id = '';
 	export function reset() {
@@ -31,11 +34,8 @@
 				for (let line of highlightedLines) {
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.background =
 						'hsl(200,0%,0%, 0%)';
-					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.boxShadow =
-					// 	'0px 0px 5px hsl(110,60%,60%, 0%)';
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
 						'1px solid transparent';
-					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.color = 'hsl(0,0%,0%)';
 				}
 
 				if (lines.length === 0) {
@@ -48,9 +48,9 @@
 						'hsl(110,50%,90%)';
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
 						'1px solid hsl(110,60%,60%, 100%)';
-					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.boxShadow =
-					// 	'0px 0px 5px hsl(110,60%,60%)';
-					// /**@type {HTMLElement}*/ (cardContent.children[line]).style.color = 'hsl(0,0%,100%)';
+				}
+				if (minimized || getJumpPause()) {
+					return resolve();
 				}
 
 				let line = cardContent.children[lines[0]].getBoundingClientRect();
@@ -86,8 +86,7 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<ResizeWrapper bind:setSize component={FileCodeIcon} id="code-{id}" {interaction}>
+<ResizeWrapper bind:minimized bind:setSize component={FileCodeIcon} id="code-{id}" {interaction}>
 	<div slot="content" class="pseudo-code-card" id="code-card-{id}">
 		<pre style="font-size: 11px;" class="pseudocode" id="pseudocode-{id}"></pre>
 	</div>

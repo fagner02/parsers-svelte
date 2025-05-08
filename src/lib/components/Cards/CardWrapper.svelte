@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { getJumpPause, wait } from '$lib/flowControl';
 	import { fontSize } from '$lib/globalStyle';
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
 	import { onMount } from 'svelte';
@@ -11,6 +11,7 @@
 	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	const selectionFunctions = {
 		selectFor: async function (/**@type {string}*/ id) {
+			if (getJumpPause()) return;
 			return new Promise(async (resolve, reject) => {
 				try {
 					if (!id.startsWith('#')) {

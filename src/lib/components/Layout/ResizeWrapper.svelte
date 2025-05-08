@@ -9,7 +9,7 @@
 	export let id;
 	/**@type {import("$lib/interactiveElem").Interaction}*/
 	export let interaction;
-	let minimized = true;
+	export let minimized = true;
 	let width = 0;
 	let height = 0;
 	let selected = 'grab';
