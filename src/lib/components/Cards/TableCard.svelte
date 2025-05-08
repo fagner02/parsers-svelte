@@ -150,7 +150,7 @@
 								? 'background: hsl(345, 60%,60%); color: white;'
 								: 'background: white'}
 						>
-							<div class="grid" style="width: 100%;">
+							<div class="grid">
 								<span
 									class="unit"
 									id="t-{tableId}-{rowKey}-{colKey}"
@@ -214,6 +214,7 @@
 			opacity 0.5s 0.5s;
 		white-space: nowrap;
 	}
+	div.grid,
 	div.grid.unit {
 		place-content: center;
 	}
