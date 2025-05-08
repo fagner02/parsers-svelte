@@ -77,83 +77,91 @@
 
 	async function closure() {
 		let itemsToCheck = [...$targetState];
-		await closureCodeCard?.highlightLines([0]); // Line 0: Initialize itemsParaVerificar
-
+		await closureCodeCard?.highlightLines([0]);
 		while (itemsToCheck.length > 0) {
-			await closureCodeCard?.highlightLines([1]); // Line 1: While loop
+			await closureCodeCard?.highlightLines([1]);
 			const item = itemsToCheck[0];
-			await closureCodeCard?.highlightLines([2]); // Line 2: Get first item
+			await closureCodeCard?.highlightLines([2]);
 
 			let index = $targetState.findIndex(
 				(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
 			);
 			await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
 
-			await closureCodeCard?.highlightLines([3]); // Line 3: Get symbol
+			await closureCodeCard?.highlightLines([3]);
 			let symbol = augRules[item.ruleIndex].right[item.pos];
 
-			await closureCodeCard?.highlightLines([4]); // Line 4: Non-terminal check
+			await closureCodeCard?.highlightLines([4]);
 			if (!nt.includes(symbol)) {
-				await closureCodeCard?.highlightLines([5, 6]); // Lines 5-6: Remove item
+				await closureCodeCard?.highlightLines([5]);
+				await closureCodeCard?.highlightLines([6]);
 				itemsToCheck.shift();
 				continue;
 			}
 
-			await closureCodeCard?.highlightLines([7]); // Line 7: Initialize lookahead
+			await closureCodeCard?.highlightLines([7]);
 			let lookahead = new Set();
 
-			await closureCodeCard?.highlightLines([8]); // Line 8: End position check
+			await closureCodeCard?.highlightLines([8]);
 			if (augRules[item.ruleIndex].right.length - 1 === item.pos) {
-				await closureCodeCard?.highlightLines([9]); // Line 9: Copy lookahead
+				await closureCodeCard?.highlightLines([9]);
 				lookahead = new Set(item.lookahead);
+				await closureCodeCard?.highlightLines([10]);
 			} else {
-				await closureCodeCard?.highlightLines([10, 11]); // Lines 10-11: Else clause
+				await closureCodeCard?.highlightLines([10]);
+				await closureCodeCard?.highlightLines([11]);
 				/**@type {string[]}*/
 				let betaFirst = [];
 				let nullable = true;
 
-				await closureCodeCard?.highlightLines([12, 13]); // Lines 12-13: Initialize variables
+				await closureCodeCard?.highlightLines([12, 13]);
 				for (let i = 1; item.pos + i < augRules[item.ruleIndex].right.length; i++) {
-					await closureCodeCard?.highlightLines([14]); // Line 14: Beta loop
+					await closureCodeCard?.highlightLines([14]);
 					let beta = augRules[item.ruleIndex].right[item.pos + i];
 
-					await closureCodeCard?.highlightLines([15]); // Line 15: Terminal check
+					await closureCodeCard?.highlightLines([15]);
 					if (!nt.includes(beta)) {
-						await closureCodeCard?.highlightLines([16, 17, 18]); // Lines 16-18
+						await closureCodeCard?.highlightLines([16]);
+						await closureCodeCard?.highlightLines([17]);
+						await closureCodeCard?.highlightLines([18]);
 						betaFirst.push(beta);
 						nullable = false;
 						break;
 					} else {
-						await closureCodeCard?.highlightLines([19]); // Line 19: Non-terminal case
+						await closureCodeCard?.highlightLines([19]);
 						let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
 
-						await closureCodeCard?.highlightLines([20, 21]); // Lines 20-21
+						await closureCodeCard?.highlightLines([20]);
 						betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
 
-						await closureCodeCard?.highlightLines([22, 23, 24]); // Lines 22-24
+						await closureCodeCard?.highlightLines([21]);
 						if (!first.includes('')) {
+							await closureCodeCard?.highlightLines([22]);
+							await closureCodeCard?.highlightLines([23]);
 							nullable = false;
 							break;
 						}
 					}
 				}
 
-				await closureCodeCard?.highlightLines([25]); // Line 25: Nullable check
+				await closureCodeCard?.highlightLines([24]);
 				if (nullable) {
-					await closureCodeCard?.highlightLines([26]); // Line 26: Union lookaheads
+					await closureCodeCard?.highlightLines([25]);
 					lookahead = new Set([...betaFirst, ...item.lookahead]);
+					await closureCodeCard?.highlightLines([26]);
 				} else {
-					await closureCodeCard?.highlightLines([27]); // Line 27: BetaFirst only
+					await closureCodeCard?.highlightLines([26]);
+					await closureCodeCard?.highlightLines([27]);
 					lookahead = new Set(betaFirst);
 				}
 			}
 
-			await closureCodeCard?.highlightLines([28]); // Line 28: Rule loop
+			await closureCodeCard?.highlightLines([28]);
 			for (let rule of augRules) {
-				await closureCodeCard?.highlightLines([29]); // Line 29: Rule check
+				await closureCodeCard?.highlightLines([29]);
 				if (!(rule.left === symbol)) continue;
 
-				await closureCodeCard?.highlightLines([30]); // Line 30: Find existing
+				await closureCodeCard?.highlightLines([30]);
 				let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
 				await selectSymbol(
@@ -162,19 +170,34 @@
 					false
 				);
 
-				await closureCodeCard?.highlightLines([31]); // Line 31: New item check
+				await closureCodeCard?.highlightLines([31]);
 				if (existent === -1) {
-					await closureCodeCard?.highlightLines([32, 33]); // Lines 32-33
+					await closureCodeCard?.highlightLines([32]);
 					await targetStateElem?.addItem(rule.index, 0, lookahead, `gl${rule.index}`);
+
+					await closureCodeCard?.highlightLines([33]);
+					await closureCodeCard?.highlightLines([34]);
 					itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead });
 					continue;
 				}
 
-				await closureCodeCard?.highlightLines([34, 35]); // Lines 34-35: Update lookahead
+				await closureCodeCard?.highlightLines([35]);
+				await closureCodeCard?.highlightLines([36]);
+				let size = $targetState[existent].lookahead.size;
 				await targetStateElem?.updateLookahead(lookahead, existent);
+
+				await closureCodeCard?.highlightLines([37]);
+				if ($targetState[existent].lookahead.size === size) continue;
+
+				await closureCodeCard?.highlightLines([38]);
+				itemsToCheck.push({
+					ruleIndex: rule.index,
+					pos: 0,
+					lookahead: new Set($targetState[existent].lookahead)
+				});
 			}
 
-			await closureCodeCard?.highlightLines([36]); // Line 36: Remove item
+			await closureCodeCard?.highlightLines([39]);
 			itemsToCheck.shift();
 		}
 
@@ -188,40 +211,44 @@
 
 			/**@type {import('@/types').LR1Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
-			await codeCard?.highlightLines([1]); // Line 1: Initialize automaton
+			await codeCard?.highlightLines([1]);
 
-			await codeCard?.highlightLines([2]); // Line 2: Create initial state
+			await codeCard?.highlightLines([2]);
 			await targetStateElem?.addItem(0, 0, new Set(['$']), `gl0`);
 
-			await codeCard?.highlightLines([3]); // Line 3: Apply closure
+			await codeCard?.highlightLines([3]);
 			await closure();
 
-			await codeCard?.highlightLines([4]); // Line 4: Add to automaton
+			await codeCard?.highlightLines([4]);
 			automaton.states.push({ index: 0, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[0], null);
 
 			await addPause();
 
-			await codeCard?.highlightLines([5]); // Line 5: Initialize stack
+			let count = 0;
+
+			await codeCard?.highlightLines([5]);
 			await stateStackElem?.addToStack(0, 's0', '', `label-${targetStateElem?.getId()}`);
 
-			await codeCard?.highlightLines([6]); // Line 6: While stack not empty
+			await codeCard?.highlightLines([6]);
 			while ($stateStack.length > 0) {
-				await codeCard?.highlightLines([7]); // Line 7: Get current state
+				await codeCard?.highlightLines([7]);
 				await originStateElem?.resetState();
 				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
 
-				await codeCard?.highlightLines([8]); // Line 8: Symbol loop
+				await codeCard?.highlightLines([8]);
 				for (let [symbolIndex, symbol] of alphabet.entries()) {
 					await symbolsSelection.selectFor(`stack-symbolList-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
-					await codeCard?.highlightLines([9]); // Line 9: Initialize new state
-					await codeCard?.highlightLines([10]); // Line 10: Item loop
+					await codeCard?.highlightLines([9]);
+					await codeCard?.highlightLines([10]);
+
+					count++;
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
 						await stateSelection.selectFor(`state-origem-${prodIndex}`);
 
-						await codeCard?.highlightLines([11]); // Line 11: Symbol match check
+						await codeCard?.highlightLines([11]);
 						if (
 							prod.pos >= augRules[prod.ruleIndex].right.length ||
 							augRules[prod.ruleIndex].right[prod.pos] !== symbol
@@ -234,7 +261,7 @@
 							false
 						);
 
-						await codeCard?.highlightLines([12]); // Line 12: Add advanced item
+						await codeCard?.highlightLines([12]);
 						let existent = $targetState.findIndex(
 							(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
 						);
@@ -252,11 +279,10 @@
 						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
 					}
 					await stateSelection.hideSelect();
-					await codeCard?.highlightLines([13]); // Line 13: Apply closure
+					await codeCard?.highlightLines([13]);
 					if ($targetState.length === 0) continue;
 					await closure();
 
-					await codeCard?.highlightLines([14]); // Line 14: State existence check
 					let existent = automaton.states.findIndex((x) => {
 						if (x.items.length != $targetState.length) return false;
 						let eq = true;
@@ -278,8 +304,15 @@
 						return eq;
 					});
 
-					if (existent === -1) {
-						await codeCard?.highlightLines([16, 17, 18]); // Lines 16-18: New state handling
+					await codeCard?.highlightLines([14]);
+					if (existent !== -1) {
+						await codeCard?.highlightLines([15]);
+						await codeCard?.highlightLines([16]);
+					} else {
+						await codeCard?.highlightLines([16]);
+						await codeCard?.highlightLines([17]);
+						await codeCard?.highlightLines([18]);
+
 						automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 						automatonElem?.addNode(
 							stateStackElem?.first(),
@@ -287,6 +320,8 @@
 							automaton.states[automaton.states.length - 1],
 							symbol
 						);
+
+						await codeCard?.highlightLines([19]);
 						await stateStackElem?.addToStack(
 							automaton.states.length - 1,
 							`s${automaton.states.length - 1}`,
@@ -296,20 +331,13 @@
 						await addPause();
 						continue;
 					}
-
-					await codeCard?.highlightLines([15]); // Line 15: Existing transition
-					automatonElem?.addNode(
-						stateStackElem?.first(),
-						existent,
-						automaton.states[automaton.states.length - 1],
-						symbol
-					);
-					await addPause();
 				}
 
-				await codeCard?.highlightLines([20]); // Line 20: Remove state
+				await codeCard?.highlightLines([20]);
+				console.log($stateStack);
 				await stateStackElem?.removeFromStack(0);
 			}
+			console.log('rrr: ', count);
 
 			limitHit();
 			automatonElem?.update(undefined, 10);
