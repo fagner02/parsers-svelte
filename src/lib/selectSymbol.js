@@ -1,4 +1,4 @@
-import { wait } from './flowControl';
+import { getJumpPause, wait } from './flowControl';
 export const colors = {
 	blue: 200,
 	green: 110,
@@ -56,6 +56,7 @@ export async function selectRSymbol(setCardId, index1, index2, hue, padded = tru
  * @param {number} hue
  */
 export async function selectSymbol(id, hue, padded = true) {
+	if (getJumpPause()) return;
 	return new Promise(async (resolve, reject) => {
 		try {
 			if (!id.startsWith('#')) id = '#' + id;

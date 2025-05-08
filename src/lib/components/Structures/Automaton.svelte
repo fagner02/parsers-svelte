@@ -1,5 +1,5 @@
 <script>
-	import { flowActions, getAction } from '$lib/flowControl';
+	import { flowActions, getAction, getJumpPause } from '$lib/flowControl';
 	import { getAugGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
@@ -369,7 +369,7 @@
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? undefined : [/**@type {number}*/ (from), to];
-		if (shouldUpdate && getAction() !== flowActions.skipping) update(ex);
+		if (shouldUpdate && getAction() !== flowActions.skipping && !getJumpPause()) update(ex);
 	}
 
 	/**
@@ -524,6 +524,8 @@
 			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];
 
+		let processed = [states[0].index];
+
 		addNode(null, states[0].index, states[0], null, false);
 
 		while (states.length > 0) {
@@ -533,10 +535,12 @@
 				continue;
 			}
 			for (let [symbol, state] of transitions) {
+				if (processed.includes(state)) continue;
 				addNode(states[0].index, state, automaton.states[state], symbol, false);
 				if (state != states[0].index) {
 					states.push(automaton.states[state]);
 				}
+				processed.push(state);
 			}
 			states.shift();
 		}
