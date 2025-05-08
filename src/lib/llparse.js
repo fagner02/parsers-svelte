@@ -1,13 +1,13 @@
 /**
  * @param {any} startingSymbol
- * @param {string} inputString
+ * @param {string[]} inputString
  * @param {string | any[]} nt
  * @param {{ get: (arg0: any) => { (): any; new (): any; get: { (arg0: any): any; new (): any; }; }; }} table
  * @param {{ [x: string]: { right: any; }; }} rules
  */
 function parsing(startingSymbol, inputString, nt, table, rules) {
 	const symbolStack = ['$', startingSymbol];
-	const inputStack = [...inputString.replaceAll(' ', '').split('').reverse(), '$'];
+	const inputStack = [...inputString.reverse(), '$'];
 
 	while (inputStack.length > 0) {
 		const topSymbol = symbolStack[symbolStack.length - 1];

@@ -28,7 +28,7 @@
 	let stateStackElement;
 	/** @type {StackCard}*/
 	let inputStackElement;
-	let { augRules, alphabet, startingSymbol } = getAugGrammar();
+	let { augRules, alphabet } = getAugGrammar();
 	let context = getContext('parseView');
 	/**
 	 * @type {() => Promise<any>}
@@ -48,37 +48,29 @@
 
 	async function clrparsing() {
 		try {
-			// Line 0: Algorithm header
 			await codeCard?.highlightLines([0]);
 			await wait(100);
 			resetTree();
 
-			// Line 1: Initialize state stack
 			await codeCard?.highlightLines([1]);
 			await stateStackElement.addToStack(0, 's0', '');
 
-			// Line 2: Initialize input stack
 			await codeCard?.highlightLines([2]);
-			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
+			for (let i of ['$'].concat(inputString.reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 
-			// Line 3: Main loop
 			await codeCard?.highlightLines([3]);
 			while (true) {
-				// Line 4: Get current state
 				await codeCard?.highlightLines([4]);
 				const topState = /**@type {number}*/ stateStackElement.top();
 
-				// Line 5: Get lookahead
 				await codeCard?.highlightLines([5]);
 				const topInput = inputStackElement.top();
 
-				// Line 6: Get table action
 				await codeCard?.highlightLines([6]);
 				const action = $table.get(`s${topState}`)?.get(topInput);
 
-				// Lines 7-8: Invalid action check
 				await codeCard?.highlightLines([7]);
 				if (!action || action?.data === '') {
 					await codeCard?.highlightLines([8]);
@@ -86,7 +78,6 @@
 					break;
 				}
 
-				// Lines 9-10: Accept action
 				await codeCard?.highlightLines([9]);
 				if (action.data.startsWith('a')) {
 					await codeCard?.highlightLines([10]);
@@ -96,7 +87,6 @@
 
 				await codeCard?.highlightLines([11]);
 				if (action.data.startsWith('s')) {
-					// Lines 11-15: Shift action
 					await codeCard?.highlightLines([12]);
 					let state = parseInt(action.data.slice(1));
 					addFloatingNode([topInput]);
@@ -113,11 +103,9 @@
 
 				await codeCard?.highlightLines([16]);
 				if (action.data.startsWith('r')) {
-					// Line 16: Reduce action
 					let rule = parseInt(action.data.slice(1));
 					let children = [];
 
-					// Lines 17-22: Handle production
 					await codeCard?.highlightLines([17]);
 
 					await codeCard?.highlightLines([18]);

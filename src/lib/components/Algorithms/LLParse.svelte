@@ -62,7 +62,7 @@
 			}
 
 			await codeCard?.highlightLines([2]);
-			for (let i of ['$'].concat(inputString.replaceAll(' ', '').split('').reverse())) {
+			for (let i of ['$'].concat(inputString.reverse())) {
 				await inputStackElement.addToStack(i, i, '');
 			}
 

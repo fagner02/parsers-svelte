@@ -1,11 +1,11 @@
 /**
- * @param {string} inputString
+ * @param {string[]} inputString
  * @param {any[]} augRules
  * @param {{ get: (arg0: string) => { (): any; new (): any; get: { (arg0: any): { (): any; new (): any; data: any; }; new (): any; }; }; }} table
  */
 function clrparsing(inputString, augRules, table) {
 	const stateStack = ['0']; // Pilha de estados: [estado_atual]
-	const inputStack = [...inputString.replaceAll(' ', '').split('').reverse(), '$'];
+	const inputStack = [...inputString.reverse(), '$'];
 
 	while (true) {
 		const currentState = stateStack[stateStack.length - 1];
