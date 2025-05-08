@@ -26,6 +26,7 @@
 	import ParseView from '@/ParseView.svelte';
 	import ForwardIcon from '@icons/ForwardIcon.svelte';
 	import { isGrammarLoaded } from '$lib/utils';
+	import { setUpTooltip } from '$lib/tooltip.js';
 
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
@@ -109,6 +110,7 @@
 	<div class="controls-box">
 		<div class="controls">
 			<button
+				use:setUpTooltip={'Código'}
 				class="popup-button"
 				on:click={() => updateSelected('code')}
 				disabled={selected == 'code'}

@@ -5,6 +5,7 @@
 	import SLRAnimation from './SLRAnimation.svelte';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRAnimation from './CLRAnimation.svelte';
+	import { setUpTooltip, hideTooltip } from '$lib/tooltip.js';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
@@ -20,12 +21,14 @@
 	<div class="tab-item-list">
 		{#each items as item}
 			<button
+				use:setUpTooltip={item.name}
 				class="tab-item"
 				style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
 				item.name
 					? 'hsl(200,50%,50%)'
 					: 'hsl(200,50%,70%)'};"
 				on:click={() => {
+					hideTooltip();
 					swapAlgorithm();
 					selected = item;
 				}}>{item.name}</button
