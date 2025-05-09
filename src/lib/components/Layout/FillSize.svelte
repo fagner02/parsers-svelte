@@ -38,8 +38,6 @@
 					child.clientHeight +
 					parseFloat(childMap.marginBottom) +
 					parseFloat(childMap.marginTop) +
-					parseFloat(childMap.paddingTop) +
-					parseFloat(childMap.paddingBottom) +
 					gap;
 			}
 		}
