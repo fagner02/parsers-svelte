@@ -582,6 +582,8 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <ResizeWrapper
+	title={'Autômato'}
+	titleLabel={null}
 	bind:setSize
 	{actions}
 	component={AutomatonIcon}
