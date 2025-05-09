@@ -139,7 +139,7 @@
 <SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática LL(1)" bind:this={codeCard}></PseudoCode>
 	</div>
 	<div class="cards-box unit">
 		<TableCard

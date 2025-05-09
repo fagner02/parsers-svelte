@@ -165,7 +165,7 @@
 <SvgLines bind:this={svgLines} svgId="clrparse"></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática LR(1)" bind:this={codeCard}></PseudoCode>
 	</div>
 	<div class="cards-box unit">
 		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>

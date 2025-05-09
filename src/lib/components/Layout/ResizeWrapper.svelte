@@ -5,6 +5,10 @@
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
 
+	/**@type {string?}*/
+	export let titleLabel = 'Algoritmo: ';
+	/**@type {string?}*/
+	export let title = null;
 	/**@type {string}*/
 	export let id;
 	/**@type {import("$lib/interactiveElem").Interaction}*/
@@ -32,6 +36,7 @@
 		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
 		content.style.width = `${width}px`;
 		content.style.height = `${height}px`;
+		content.style.padding = '0px';
 		wrapper.style.overflow = 'unset';
 
 		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '1';
@@ -54,6 +59,8 @@
 	 */
 	async function close(e) {
 		e?.stopImmediatePropagation();
+
+		console.log(document.querySelector('.unit.open-window')?.getBoundingClientRect());
 		minimized = true;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
@@ -62,9 +69,13 @@
 		height = content.scrollHeight;
 		content.style.width = `${content.scrollWidth}px`;
 		content.style.height = `${content.scrollHeight}px`;
+		content.style.padding = '5px';
 		await wait(0);
-		content.style.width = '40px';
-		content.style.height = '40px';
+		let openButton = document
+			.querySelector(`#${id}-resize-wrapper>.open-window`)
+			?.getBoundingClientRect();
+		content.style.width = `${openButton?.width}px`;
+		content.style.height = `${openButton?.height}px`;
 		content.style.overflow = 'hidden';
 		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '0';
 		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
@@ -94,10 +105,18 @@
 			]),
 			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
 		);
-		interaction.setMoveInteraction(/**@type {HTMLElement}*/ (wrapper.firstElementChild));
+		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		interaction.setMoveInteraction(content);
 		interaction.setInteractingCallback(interactingCallback);
 		interaction.removeTransformListeners();
 		interaction.attachMoveListeners();
+
+		let openButton = document
+			.querySelector(`#${id}-resize-wrapper>.open-window`)
+			?.getBoundingClientRect();
+		content.style.width = `${openButton?.width}px`;
+		content.style.height = `${openButton?.height}px`;
+		content.style.padding = '5px';
 	});
 </script>
 
@@ -115,6 +134,9 @@
 			? '0px'
 			: 'fit-content'};pointer-events: {isInteracting ? 'none' : 'all'}"
 	>
+		{#if title}
+			<p style="height: {minimized ? '0px' : 'auto'}">{title}</p>
+		{/if}
 		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
 			disabled={selected === 'move'}
@@ -155,6 +177,12 @@
 	{#if minimized}
 		<button class="unit open-window" on:click={open}>
 			<svelte:component this={component}></svelte:component>
+
+			{#if titleLabel}
+				{titleLabel}
+			{/if}{#if title}
+				{title}
+			{/if}
 		</button>
 	{/if}
 </div>
@@ -171,7 +199,16 @@
 		transition: opacity 0.5s;
 		overflow: hidden;
 	}
-	.action-tray > button {
+	.action-tray > p {
+		border-radius: 5px;
+		padding: 0px 5px;
+		font-size: 0.9rem;
+		align-content: center;
+		background: white;
+		transition: height 0.5s;
+	}
+	.action-tray > button,
+	.action-tray > p {
 		border: 1px solid hsl(0, 0%, 20%);
 	}
 	.action-tray > button:disabled {
@@ -200,10 +237,9 @@
 		background: white;
 		transition:
 			width 0.5s,
-			height 0.5s;
+			height 0.5s,
+			padding 0.5s;
 		z-index: 1;
-		width: 40px;
-		height: 40px;
 		overflow: hidden;
 	}
 	:global(.resize-content > *) {
@@ -211,7 +247,7 @@
 		transition: opacity 0.5s;
 	}
 	.resize-wrapper {
-		position: relative;
+		position: absolute;
 		width: fit-content;
 		height: fit-content;
 		margin: 5px;

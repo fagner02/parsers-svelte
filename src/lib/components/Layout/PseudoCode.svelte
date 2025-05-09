@@ -13,6 +13,8 @@
 	let cardContent;
 	/** @type {Boolean} */
 	let minimized;
+	/**	@type {string} */
+	export let title;
 
 	let interaction = new Interaction();
 	export let id = '';
@@ -86,7 +88,14 @@
 	});
 </script>
 
-<ResizeWrapper bind:minimized bind:setSize component={FileCodeIcon} id="code-{id}" {interaction}>
+<ResizeWrapper
+	{title}
+	bind:minimized
+	bind:setSize
+	component={FileCodeIcon}
+	id="code-{id}"
+	{interaction}
+>
 	<div slot="content" class="pseudo-code-card" id="code-card-{id}">
 		<pre style="font-size: 11px;" class="pseudocode" id="pseudocode-{id}"></pre>
 	</div>

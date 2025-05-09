@@ -170,7 +170,7 @@
 <SvgLines bind:this={svgLines} svgId="slrparse"></SvgLines>
 <div class="cards-box unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática SLR" bind:this={codeCard}></PseudoCode>
 	</div>
 	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard
