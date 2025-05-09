@@ -3,27 +3,16 @@
 	"build": {
 		"beforeBuildCommand": "npm run build",
 		"beforeDevCommand": "npm run dev",
-		"devPath": "http://localhost:5173",
+		"devPath": "http://localhost:8080",
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "Parsers",
+		"productName": "parsers-svelte",
 		"version": "0.1.0"
 	},
 	"tauri": {
 		"allowlist": {
-			"all": false,
-			"window": {
-				"all": false,
-				"close": true,
-				"hide": true,
-				"show": true,
-				"maximize": true,
-				"minimize": true,
-				"unmaximize": true,
-				"unminimize": true,
-				"startDragging": true
-			}
+			"all": false
 		},
 		"bundle": {
 			"active": true,
@@ -40,7 +29,7 @@
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
-			"identifier": "com.parsers.dev",
+			"identifier": "com.parsers.svelte",
 			"longDescription": "",
 			"macOS": {
 				"entitlements": null,
@@ -69,10 +58,8 @@
 				"fullscreen": false,
 				"height": 600,
 				"resizable": true,
-				"title": "Parsers",
-				"width": 800,
-				"decorations": true,
-				"transparent": true
+				"title": "parsers-svelte",
+				"width": 800
 			}
 		]
 	}
