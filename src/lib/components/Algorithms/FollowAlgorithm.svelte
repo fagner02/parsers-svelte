@@ -279,7 +279,7 @@
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Follow" bind:this={codeCard}></PseudoCode>
 	</div>
 	<div class="cards-box unit">
 		<GrammarCard bind:loadGrammar></GrammarCard>

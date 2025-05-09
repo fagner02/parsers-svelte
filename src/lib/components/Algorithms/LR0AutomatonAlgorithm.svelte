@@ -315,8 +315,8 @@
 		></StackCard>
 	</div>
 	<div class="unit">
-		<PseudoCode bind:this={closureCodeCard} id="closure"></PseudoCode>
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="closure"></PseudoCode>
+		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard}></PseudoCode>
 		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
 	</div>
 </div>

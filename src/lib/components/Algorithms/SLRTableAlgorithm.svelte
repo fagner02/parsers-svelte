@@ -179,7 +179,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Tabela SLR" bind:this={codeCard}></PseudoCode>
 		<Automaton id="slr" bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit">

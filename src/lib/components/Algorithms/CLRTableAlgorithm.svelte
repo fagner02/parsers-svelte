@@ -187,7 +187,7 @@
 		></StackCard>
 	</div>
 	<div class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Tabela LR(1)" bind:this={codeCard}></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>
 	</div>
 </div>

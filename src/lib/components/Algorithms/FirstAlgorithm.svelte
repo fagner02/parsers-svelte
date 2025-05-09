@@ -232,7 +232,7 @@
 <SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="First" bind:this={codeCard}></PseudoCode>
 	</div>
 	<div class="unit cards-box">
 		<GrammarCard bind:loadGrammar></GrammarCard>
