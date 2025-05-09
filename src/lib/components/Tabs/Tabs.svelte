@@ -6,13 +6,15 @@
 	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRAnimation from './CLRAnimation.svelte';
 	import { setUpTooltip, hideTooltip } from '$lib/tooltip.js';
+	import AssignmentTab from './AssignmentTab.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
 		{ comp: TextInput, name: 'Entrada' },
 		{ comp: LLAnimation, name: 'LL(1)' },
 		{ comp: SLRAnimation, name: 'SLR' },
-		{ comp: CLRAnimation, name: 'LR(1)' }
+		{ comp: CLRAnimation, name: 'LR(1)' },
+		{ comp: AssignmentTab, name: 'Tarefa' }
 	];
 	let selected = items[0];
 </script>

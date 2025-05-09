@@ -1,3 +1,4 @@
+let margin = 10;
 /**
  * @param {MouseEvent} e
  * @param {string} text
@@ -28,12 +29,12 @@ export async function showTooltip(e, text) {
 	if (y + tooltipRect.height > window.innerHeight) {
 		y = window.innerHeight - tooltipRect.height;
 	}
-	let arrowWidth = arrowRect.width * Math.sqrt(2);
 	tooltip.style.left = `${x}px`;
 	tooltip.style.top = `${y}px`;
-	arrow.style.left = `${tooltipRect.width / 2 - arrowRect.width / 2}px`;
+	let left = tooltipRect.width / 2 - arrowRect.width / 2;
+	arrow.style.left = `${left}px`;
 	arrow.style.top = `${tooltipRect.height / 2 - arrowRect.height / 2}px`;
-	arrow.style.transform = `translate(${0 / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
+	arrow.style.transform = `translate(${rect.left - x - left + rect.width / 2 - arrowRect.width / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
 }
 
 export async function hideTooltip() {

@@ -12,6 +12,7 @@
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
 	import { lr1Automaton } from '$lib/lr1automaton';
 	import { clrTable } from '$lib/clrTable';
+	import { setUpTooltip } from '$lib/tooltip';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
@@ -81,8 +82,11 @@
 		);
 	})();
 
-	const algos = ['autômato', 'tabela'];
-	let selectedAlgorithm = algos[0];
+	const algos = [
+		{ name: 'Autômato', desc: 'Construção de autômato LR(1)' },
+		{ name: 'Tabela', desc: 'Construção da tabela LR(1)' }
+	];
+	let selectedAlgorithm = algos[0].name;
 </script>
 
 <AlgorithmTab {code}>
@@ -90,17 +94,18 @@
 		<div class="algo-buttons">
 			{#each algos as algo}
 				<button
-					disabled={selectedAlgorithm === algo}
+					use:setUpTooltip={algo.desc}
+					disabled={selectedAlgorithm === algo.name}
 					on:click={() => {
 						swapAlgorithm();
 						resetSelectionFunctions();
-						selectedAlgorithm = algo;
-					}}>{algo}</button
+						selectedAlgorithm = algo.name;
+					}}>{algo.name}</button
 				>
 			{/each}
 		</div>
 		<FillSize class="grid">
-			{#if selectedAlgorithm === algos[0]}
+			{#if selectedAlgorithm === algos[0].name}
 				<LR1AutomatonAlgorithm {firstSet}></LR1AutomatonAlgorithm>
 			{:else}
 				<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>

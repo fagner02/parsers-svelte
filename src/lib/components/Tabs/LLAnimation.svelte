@@ -13,6 +13,7 @@
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
+	import { setUpTooltip } from '$lib/tooltip';
 
 	// ========== Components ====================
 	/**@type {string}*/
@@ -110,8 +111,12 @@
 		);
 	});
 
-	const algos = ['first', 'follow', 'tabela'];
-	let selectedAlgorithm = algos[0];
+	const algos = [
+		{ name: 'First', desc: 'Construção do conjunto first' },
+		{ name: 'Follow', desc: 'Construção do conjunto follow' },
+		{ name: 'Tabela', desc: 'Construção da tabela LL(1)' }
+	];
+	let selectedAlgorithm = algos[0].name;
 </script>
 
 <AlgorithmTab bind:instruction {code}>
@@ -119,19 +124,20 @@
 		<div class="algo-buttons">
 			{#each algos as algo}
 				<button
-					disabled={selectedAlgorithm === algo}
+					use:setUpTooltip={algo.desc}
+					disabled={selectedAlgorithm === algo.name}
 					on:click={() => {
 						swapAlgorithm();
 						resetSelectionFunctions();
-						selectedAlgorithm = algo;
-					}}>{algo}</button
+						selectedAlgorithm = algo.name;
+					}}>{algo.name}</button
 				>
 			{/each}
 		</div>
 		<div class="grid">
-			{#if selectedAlgorithm === algos[0]}
+			{#if selectedAlgorithm === algos[0].name}
 				<FirstAlgorithm bind:instruction></FirstAlgorithm>
-			{:else if selectedAlgorithm === algos[1]}
+			{:else if selectedAlgorithm === algos[1].name}
 				<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
 			{:else}
 				<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>

@@ -118,6 +118,7 @@
 				<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 			</button>
 			<button
+				use:setUpTooltip={'Texto'}
 				class="popup-button"
 				on:click={() => updateSelected('text')}
 				disabled={selected == 'text'}
@@ -125,6 +126,7 @@
 				<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
 			</button>
 			<button
+				use:setUpTooltip={'Informações sobre o algoritmo'}
 				class="popup-button"
 				on:click={() => updateSelected('info')}
 				disabled={selected == 'info'}
@@ -132,6 +134,7 @@
 				<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
 			</button>
 			<button
+				use:setUpTooltip={'Analisar string de entrada'}
 				class="view-button"
 				on:click={() => {
 					reset();
@@ -144,6 +147,7 @@
 				<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
 			</button>
 			<button
+				use:setUpTooltip={'Executar construção do parser'}
 				class="view-button"
 				on:click={() => {
 					reset();
@@ -158,16 +162,16 @@
 		</div>
 
 		<div class="flow-controls controls">
-			<button on:click={back}>
+			<button use:setUpTooltip={'Passo Anterior'} on:click={back}>
 				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
-			<button on:click={reset}>
+			<button use:setUpTooltip={'Reiniciar'} on:click={reset}>
 				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 			</button>
-			<button disabled={limit} on:click={forward}>
+			<button use:setUpTooltip={'Próximo passo'} disabled={limit} on:click={forward}>
 				<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
-			<button disabled={limit} on:click={skipToEnd}>
+			<button use:setUpTooltip={'Pular para o final'} disabled={limit} on:click={skipToEnd}>
 				<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
 			</button>
 		</div>
@@ -219,7 +223,7 @@
 			</div>
 		</FillSize>
 	{:else}
-		Nonw
+		None
 	{/if}
 </FillSize>
 
