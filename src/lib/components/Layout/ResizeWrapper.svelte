@@ -95,7 +95,8 @@
 	}
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
-
+		wrapper.style.left = '0px';
+		wrapper.style.top = '0px';
 		interaction.setResizeInteraction(
 			new Map([
 				['lb', document.querySelector(`#${id}-lb-handle`)],
@@ -202,7 +203,7 @@
 	.action-tray > p {
 		border-radius: 5px;
 		padding: 0px 5px;
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 		align-content: center;
 		background: white;
 		transition: height 0.5s;
@@ -230,6 +231,7 @@
 		border: 1px solid black;
 		z-index: 1;
 		animation: forwards appear 0.5s;
+		font-size: 0.8rem;
 	}
 	.resize-content {
 		border: 1px solid hsl(200, 50%, 50%);
