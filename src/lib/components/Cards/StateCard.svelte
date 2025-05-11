@@ -12,6 +12,7 @@
 	/**@type {HTMLElement}*/
 	let container;
 
+	let dotIndex = -1;
 	export let hue;
 	export let label;
 	/** @type {string}*/
@@ -77,6 +78,22 @@
 
 				elem.style.width = `${elem.scrollWidth}px`;
 				await wait(500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+	/**
+	 * @param {number} index
+	 */
+	export async function highlightDot(index) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				dotIndex = index;
+				await wait(200);
+				dotIndex = -1;
+				await wait(200);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -165,14 +182,15 @@
 				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"
 			>
 				<span style="font-size: {subFontSize}rem;margin: 0; padding: 0">{item.ruleIndex}</span
-				>{rules[item.ruleIndex].left}
-				-&gt;
-				{#each rules[item.ruleIndex].right as symbol, index}
-					{#if item.pos === index}
-						<span style="margin: 0;color: hsl(300,60%,45%)">&bull;</span>{/if}<span
-						id="state-{stateId}-{rindex}-{index}">{symbol}</span
-					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}
-					<span style="padding-right: 0px;color: hsl(300,60%,45%)">&bull;</span
+				>{rules[item.ruleIndex].left} -&gt; {#each rules[item.ruleIndex].right as symbol, index}{#if item.pos === index}<span
+							style="margin: 0;transform: {dotIndex === rindex
+								? 'translate(5px, 0) scale(2)'
+								: 'translate(0,0) scale(1)'};color: hsl(300,60%,45%)">&bull;</span
+						>{/if}<span id="state-{stateId}-{rindex}-{index}">{symbol}</span
+					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}<span
+						style="padding-right: 0px; transform: {dotIndex === rindex
+							? 'translate(5px, 0) scale(2)'
+							: 'translate(0,0) scale(1)'};color: hsl(300,60%,45%)">&bull;</span
 					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
 					>&lcub;{#each item.lookahead as l, index}{l}{#if index < item.lookahead.size - 1},{/if}{/each}&rcub;{/if}
 			</p>
@@ -186,9 +204,12 @@
 			width 0.5s,
 			height 0.5s,
 			opacity 0.5s 0.3s;
-		white-space: nowrap;
+		white-space: pre;
+		display: flex;
+		place-items: baseline;
 	}
 	p > span {
 		margin: 0 0.2rem;
+		transition: transform 0.2s;
 	}
 </style>

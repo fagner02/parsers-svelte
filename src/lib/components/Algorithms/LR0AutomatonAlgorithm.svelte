@@ -104,6 +104,7 @@
 						await closureCodeCard?.highlightLines([11]);
 						if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
 
+						await targetStateElem?.highlightDot(index);
 						await selectSymbol(
 							`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
 							colors.pink,
@@ -173,6 +174,8 @@
 							await codeCard?.highlightLines([12]);
 							continue;
 						}
+
+						await originStateElem?.highlightDot(prodIndex);
 						await selectSymbol(
 							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
 							colors.pink,

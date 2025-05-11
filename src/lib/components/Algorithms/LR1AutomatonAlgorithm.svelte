@@ -164,6 +164,7 @@
 				await closureCodeCard?.highlightLines([30]);
 				let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
+				await targetStateElem?.highlightDot(index);
 				await selectSymbol(
 					`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
 					colors.pink,
@@ -255,6 +256,7 @@
 						) {
 							continue;
 						}
+						await originStateElem?.highlightDot(prodIndex);
 						await selectSymbol(
 							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
 							colors.pink,
