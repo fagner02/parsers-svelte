@@ -1,72 +1,95 @@
 <script>
-	import { fontSize } from '$lib/globalStyle';
+	import { appendData, createFile } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
 
-	let totalQuestions = 9;
+	let totalQuestions = 10;
 	let totalAnswers = 0;
+	let started = false;
+
+	let answers = new Set();
+	/**
+	 * @param {Event} e
+	 */
+	function receiveInput(e) {
+		const { name, value } = /**@type {HTMLInputElement}*/ (e.target);
+		appendData(`${new Date()},form ${name},${value}`);
+
+		if (value.trim().length > 0) {
+			answers.add(name);
+		} else {
+			answers.delete(name);
+		}
+		totalAnswers = answers.size;
+	}
 </script>
 
-<FillSize>
+<FillSize class="unit">
 	<div class="form">
 		<div class="form-header">
-			<button>Iniciar</button>
+			<button
+				disabled={started}
+				on:click={() => {
+					createFile();
+					started = true;
+				}}>Iniciar</button
+			>
 			<p style="font-size: 0.9rem;align-content: center">
 				Progresso: {totalAnswers}/{totalQuestions}
 			</p>
 			<button disabled>Finalizar</button>
 		</div>
 		<FillSize class="form-content">
-			<div class="fields">
+			<div class="fields" style={started ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
 				<hr style="margin-top: 0;" />
 				<div class="row">
 					<div class="field">
 						<p>Nome Completo</p>
-						<input name="name" id="name" />
+						<input on:input={receiveInput} name="name" id="name" />
 					</div>
 					<div class="field">
 						<p>Matrícula</p>
-						<input name="ra" id="ra" />
+						<input on:input={receiveInput} name="matricula" id="matricula" />
 					</div>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>1. Dado um conjunto first, forneça uma gramática que gera esse conjunto first</p>
-					<textarea name="algorithm" id="algorithm" rows="4" />
+					<textarea name="q1" id="q1" on:input={receiveInput} rows="4" />
 				</div>
 				<hr />
 				<div class="field col">
 					<p>2. Dado um conjunto follow, forneça uma gramática que gera esse conjunto follow</p>
-					<textarea name="table" id="table" rows="4"></textarea>
+					<textarea name="q2" id="q2" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>3. Dada uma tabela slr, forneça uma gramática que gera essa tabela</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q3" id="q3" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>4. Dada uma tabela lr1, forneça uma gramática que gera essa tabela</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q4" id="q4" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>A gramática é ll1?</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q5" id="q5" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>Construir conjunto First de uma gramática grande</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q6" id="q6" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>Mostre os passos da análise sintática</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q7" id="q7" on:input={receiveInput} rows="4"></textarea>
 				</div>
 				<hr />
 				<div class="field col">
 					<p>Dê uma gramática que aceita essas entradas</p>
-					<textarea name="automaton" id="automaton" rows="4"></textarea>
+					<textarea name="q8" id="q8" on:input={receiveInput} rows="4"></textarea>
 				</div>
 			</div>
 		</FillSize>
@@ -101,6 +124,7 @@
 	}
 	.form-header > button:disabled {
 		color: hsl(200, 50%, 60%);
+		pointer-events: none;
 	}
 	.field {
 		display: flex;
