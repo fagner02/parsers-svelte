@@ -5,6 +5,10 @@
 	import CardWrapper from './CardWrapper.svelte';
 
 	/**
+	 * @type {string}
+	 */
+	export let id;
+	/**
 	 * @template T
 	 * @typedef {import('@/types').StackItem<T>} StackItem*/
 
@@ -30,7 +34,7 @@
 	export async function addToStack(data, text, note, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				await wait(10);
+				await wait(id, 10);
 				if ($stack.length === 0) idCount = 0;
 				stack.update((x) => [
 					...x,
@@ -42,10 +46,10 @@
 					}
 				]);
 				idCount++;
-				await wait(10);
+				await wait(id, 10);
 
 				if (srcId) {
-					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`);
+					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`, id);
 				}
 
 				let elem = /**@type {HTMLElement}*/ (
@@ -57,11 +61,11 @@
 				elem.style.top = '0px';
 
 				if (srcId) {
-					await svgLines?.hideLine();
+					await svgLines?.hideLine(true, id);
 				}
 
 				svgLines?.setHideOpacity();
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -84,10 +88,10 @@
 					});
 					return x;
 				});
-				await wait(0);
+				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${index}`));
 				elem.style.width = `${elem.scrollWidth}px`;
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -119,7 +123,7 @@
 				elem.style.opacity = '0';
 				elem.style.top = `-${lineHeight}rem`;
 
-				await wait(1000);
+				await wait(id, 1000);
 				stack.update((x) => {
 					return [...x.slice(0, index), ...x.slice(index + 1)];
 				});
@@ -138,7 +142,7 @@
 			try {
 				stack.set(items);
 
-				await wait(0);
+				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 				while (elem) {
@@ -172,7 +176,7 @@
 	});
 </script>
 
-<CardWrapper minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
+<CardWrapper {id} minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
 	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="stack-{stackId}-{index}"

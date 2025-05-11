@@ -4,6 +4,10 @@
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
 	import AlertIcon from '@icons/AlertIcon.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	export let label;
 	export let hue;
 	let highlighted = false;
@@ -68,7 +72,7 @@
 					});
 					return x;
 				});
-				await wait(50);
+				await wait(id, 50);
 
 				table.update((x) => {
 					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
@@ -81,7 +85,7 @@
 					return x;
 				});
 				if (srcId) {
-					await svgLines?.hideLine();
+					await svgLines?.hideLine(true, id);
 				}
 				resolve(null);
 			} catch (e) {
@@ -109,7 +113,7 @@
 				setTimeout(() => {
 					highlighted = true;
 				}, 100);
-				await wait(1000);
+				await wait(id, 1000);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -125,6 +129,7 @@
 	{label}
 	cardId={'table'}
 	style="padding: 5px;"
+	{id}
 >
 	<table style="font-size: {fontSize}rem;">
 		<thead>

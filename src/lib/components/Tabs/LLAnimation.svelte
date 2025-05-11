@@ -29,7 +29,7 @@
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
-		code = await (await fetch('./first.js')).text();
+		// code = await (await fetch('./first.js')).text();
 		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
@@ -116,10 +116,11 @@
 		{ name: 'Follow', desc: 'Construção do conjunto follow' },
 		{ name: 'Tabela', desc: 'Construção da tabela LL(1)' }
 	];
+	swapAlgorithm(`llalgo${algos[0].name}`);
 	let selectedAlgorithm = algos[0].name;
 </script>
 
-<AlgorithmTab bind:instruction {code}>
+<AlgorithmTab id="llalgo{algos[0].name}" bind:instruction {code}>
 	<div slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
@@ -127,7 +128,7 @@
 					use:setUpTooltip={algo.desc}
 					disabled={selectedAlgorithm === algo.name}
 					on:click={() => {
-						swapAlgorithm();
+						swapAlgorithm('llalgo' + algo.name);
 						resetSelectionFunctions();
 						selectedAlgorithm = algo.name;
 					}}>{algo.name}</button
@@ -136,16 +137,17 @@
 		</div>
 		<div class="grid">
 			{#if selectedAlgorithm === algos[0].name}
-				<FirstAlgorithm bind:instruction></FirstAlgorithm>
+				<FirstAlgorithm id="llalgo{algos[0].name}" bind:instruction></FirstAlgorithm>
 			{:else if selectedAlgorithm === algos[1].name}
-				<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
+				<FollowAlgorithm id="llalgo{algos[1].name}" {firstSet} bind:instruction></FollowAlgorithm>
 			{:else}
-				<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>
+				<LlAlgorithm id="llalgo{algos[2].name}" {firstSet} {followSet} bind:instruction
+				></LlAlgorithm>
 			{/if}
 		</div>
 	</div>
 	<SyntaxTree slot="tree"></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<LlParse {table}></LlParse>
+		<LlParse id="llalgo{algos[0].name}Parser" {table}></LlParse>
 	</div>
 </AlgorithmTab>

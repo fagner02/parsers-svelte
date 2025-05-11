@@ -34,6 +34,7 @@ export function setGrammarText(text) {
 }
 
 export function loadGrammar() {
+	console.log('Loading grammar', grammar);
 	let ntSet = new Set();
 	let tSet = new Set();
 	let alphSet = new Set();
@@ -65,6 +66,7 @@ export function loadGrammar() {
 
 	t = Array.from(tSet).concat(['$']);
 	nt = Array.from(ntSet);
+	console.log(rules.length);
 	return { t, nt, rules };
 }
 

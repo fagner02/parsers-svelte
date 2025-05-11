@@ -12,6 +12,10 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
@@ -44,12 +48,12 @@
 
 		clrparsing();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function clrparsing() {
 		try {
 			await codeCard?.highlightLines([0]);
-			await wait(100);
+			await wait(id, 100);
 			resetTree();
 
 			await codeCard?.highlightLines([1]);
@@ -146,11 +150,11 @@
 					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
 				}
 
-				await addPause();
+				await addPause(id);
 			}
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {}
 	}
 	onMount(async () => {
@@ -165,32 +169,35 @@
 <SvgLines bind:this={svgLines} svgId="clrparse"></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="Análise sintática LR(1)" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"></PseudoCode>
 	</div>
 	<div class="cards-box unit">
-		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<TableCard
+			{id}
 			rows={stateList}
 			columns={alphabet}
 			{table}
 			bind:svgLines
-			tableId="clr"
+			tableId="clr{id}"
 			label="tabela lr1"
 			hue={colors.blue}
 		></TableCard>
 		<StackCard
+			{id}
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
-			stackId="input"
+			stackId="input{id}"
 			hue={colors.green}
 			label="entrada"
 		></StackCard>
 		<StackCard
+			{id}
 			bind:svgLines
 			bind:stack={stateStack}
 			bind:this={stateStackElement}
-			stackId="symbols"
+			stackId="symbols{id}"
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>

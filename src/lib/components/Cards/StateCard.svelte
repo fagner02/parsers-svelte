@@ -5,6 +5,11 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
+
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>}*/
 	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */
@@ -38,18 +43,18 @@
 						lookahead: lookahead ? new Set(lookahead) : null
 					}
 				]);
-				await wait(0);
+				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (
 					document.querySelector(`#state-${stateId}-${$state.length - 1}`)
 				);
-				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${$state.length - 1}`);
+				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${$state.length - 1}`, id);
 
 				elem.style.width = `${elem.scrollWidth}px`;
 				elem.style.height = `${elem.scrollHeight}px`;
 				elem.style.opacity = '1';
 
-				await wait(1500);
-				await svgLines?.hideLine(false);
+				await wait(id, 1500);
+				await svgLines?.hideLine(false, id);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -71,13 +76,13 @@
 					]);
 					return x;
 				});
-				await wait(0);
+				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (
 					document.querySelector(`#state-${stateId}-${existent}`)
 				);
 
 				elem.style.width = `${elem.scrollWidth}px`;
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -91,9 +96,9 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				dotIndex = index;
-				await wait(200);
+				await wait(id, 200);
 				dotIndex = -1;
-				await wait(200);
+				await wait(id, 200);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -116,7 +121,7 @@
 						});
 					})
 				);
-				await wait(0);
+				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 				while (elem !== null) {
 					elem.style.width = `${elem.scrollWidth}px`;
@@ -126,7 +131,7 @@
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
 
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -143,12 +148,12 @@
 				container.style.maxHeight = `${container.scrollHeight}px`;
 				container.style.maxWidth = `${container.scrollWidth}px`;
 
-				if (shouldWait) await wait(0);
+				if (shouldWait) await wait(id, 0);
 				container.style.maxHeight = '0px';
 				container.style.maxWidth = '0px';
 				container.style.opacity = '0';
 
-				if (shouldWait) await wait(500);
+				if (shouldWait) await wait(id, 500);
 				state.update(() => []);
 
 				container.style.maxHeight = 'unset';
@@ -171,7 +176,7 @@
 	});
 </script>
 
-<CardWrapper minWidth={charWidth} minHeight={lineHeight} {hue} {label} cardId={stateId}>
+<CardWrapper {id} minWidth={charWidth} minHeight={lineHeight} {hue} {label} cardId={stateId}>
 	<div
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"

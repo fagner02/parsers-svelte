@@ -15,13 +15,13 @@
 	import { slrTable } from '$lib/slrtable';
 	import { setUpTooltip } from '$lib/tooltip';
 	let code = '';
-	/**@type {string} */
-	let inputString;
 
 	const algos = [
 		{ name: 'Autômato', desc: 'Construção do autômato LR(0)' },
 		{ name: 'Tabela', desc: 'Construção da tabela SLR' }
 	];
+
+	swapAlgorithm(`slralgo${algos[0].name}`);
 	let selectedAlgorithm = algos[0].name;
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable([]);
@@ -87,7 +87,7 @@
 	})();
 </script>
 
-<AlgorithmTab {code}>
+<AlgorithmTab id="slralgo{algos[0].name}" {code}>
 	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
@@ -95,7 +95,7 @@
 					use:setUpTooltip={algo.desc}
 					disabled={selectedAlgorithm === algo.name}
 					on:click={() => {
-						swapAlgorithm();
+						swapAlgorithm(`slr${algo.name}`);
 						resetSelectionFunctions();
 						selectedAlgorithm = algo.name;
 					}}>{algo.name}</button
@@ -104,14 +104,18 @@
 		</div>
 		<FillSize class="grid">
 			{#if selectedAlgorithm === algos[0].name}
-				<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
+				<LR0AutomatonAlgorithm id="slralgo{algos[0].name}"></LR0AutomatonAlgorithm>
 			{:else}
-				<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
+				<SLRTableAlgorithm id="slralgo{algos[1].name}" {automaton} {followSet}></SLRTableAlgorithm>
 			{/if}
 		</FillSize>
 	</FillSize>
 	<SyntaxTree slot="tree" floating={true}></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<SlrParse stateList={automaton.states.map((x) => `s${x.index}`)} {table}></SlrParse>
+		<SlrParse
+			id="slralgo{algos[0].name}Parser"
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></SlrParse>
 	</div>
 </AlgorithmTab>

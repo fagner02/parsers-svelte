@@ -56,7 +56,7 @@
 	}
 </script>
 
-<div class="grid input-box">
+<div class="grid input-box unit">
 	<div class="input unit {$$props.class ?? ''}" use:setInput>
 		<div class="unit textnumbers" style="width: {numGap}rem;height: {height}rem;">
 			{#each { length: lines } as _, textInputIndex}

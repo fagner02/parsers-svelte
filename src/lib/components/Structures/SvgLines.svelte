@@ -93,8 +93,9 @@
 	/**
 	 * @param {string} srcId
 	 * @param {string} destId
+	 * @param {string} id
 	 */
-	export async function showLine(srcId, destId) {
+	export async function showLine(srcId, destId, id) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				if (!srcId.startsWith('#')) {
@@ -138,7 +139,7 @@
 				li = anime(animeParams);
 				an = anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-				await wait(500);
+				await wait(id, 500);
 
 				inter = setInterval(() => {
 					if (li === null || an === null) return resolve(null);
@@ -180,10 +181,13 @@
 		});
 	}
 
-	export async function hideLine(shouldWait = true) {
+	/**
+	 * @param {string} id
+	 */
+	export async function hideLine(shouldWait = true, id) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				if (shouldWait) await wait(1500);
+				if (shouldWait) await wait(id, 1500);
 				if (inter != null) {
 					if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
@@ -208,9 +212,9 @@
 				anime(animeParams);
 				anime(Object.assign(animeParams, { d: arrowPath, targets: arrow }));
 
-				if (shouldWait) await wait(200);
+				if (shouldWait) await wait(id, 200);
 				opacity = 0;
-				if (shouldWait) await wait(300);
+				if (shouldWait) await wait(id, 300);
 				resolve(null);
 			} catch (e) {
 				reject(e);

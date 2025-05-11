@@ -14,6 +14,10 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import FistInfo from '@/Info/FistInfo.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {StackCard | undefined}*/
 	let joinStackElement;
 	/**@type {SetsCard | undefined}*/
@@ -56,13 +60,13 @@
 		codeCard?.reset();
 		first();
 	};
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function first() {
 		try {
-			await wait(0);
+			await wait(id, 0);
 			await loadGrammar();
-			await addPause();
+			await addPause(id);
 			const nullable = calcNullable(rules);
 
 			instruction = 'Since this thing is like that we have add to the stack';
@@ -71,24 +75,24 @@
 
 			for (let i = 0; i < rules.length; i++) {
 				await codeCard?.highlightLines([2]);
-				await grammarFuncs?.selectFor(`gset${i}`);
+				await grammarFuncs?.selectFor(`${id}gset${i}`);
 				await codeCard?.highlightLines([3]);
 				await codeCard?.highlightLines([4]);
-				await selectLSymbol('g', i, colors.blue);
-				await firstSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
+				await selectLSymbol(`${id}g`, i, colors.blue, id);
+				await firstSetElement?.addSetRow(rules[i].left, i, `${id}gl${i}`);
 				let isNull = true;
-				await addPause();
+				await addPause(id);
 				for (let j = 0; j < rules[i].right.length; j++) {
 					await codeCard?.highlightLines([5]);
 					let symbol = rules[i].right[j];
 					if (symbol === '') break;
 					await codeCard?.highlightLines([6]);
 					if (nt.includes(symbol)) {
-						await selectRSymbol('g', i, j, colors.blue, false);
+						await selectRSymbol(`${id}g`, i, j, colors.blue, id, false);
 						instruction = `Criamos o conjunto join da regra ${i}:${rules[i].left}`;
 
 						if (!joinIndexes.has(i)) {
-							await joinSetElement?.addSetRow(rules[i].left, i, `gl${i}`);
+							await joinSetElement?.addSetRow(rules[i].left, i, `${id}gl${i}`);
 						}
 
 						const matchingRules = rules.filter((x) => x.left === symbol);
@@ -103,18 +107,18 @@
 									[rule.left],
 									[rule.index.toString()],
 									i,
-									`gr${i}-${j}`
+									`${id}gr${i}-${j}`
 								);
 							}
 						}
 						await codeCard?.highlightLines([10]);
 					} else {
 						await codeCard?.highlightLines([10]);
-						await addPause();
-						await selectRSymbol('g', i, j, colors.green, false);
+						await addPause(id);
+						await selectRSymbol(`${id}g`, i, j, colors.green, id, false);
 						await codeCard?.highlightLines([11]);
 
-						await firstSetElement?.joinSets([symbol], [symbol], null, i, `gr${i}-${j}`);
+						await firstSetElement?.joinSets([symbol], [symbol], null, i, `${id}gr${i}-${j}`);
 					}
 
 					await codeCard?.highlightLines([12]);
@@ -129,14 +133,14 @@
 				if (isNull) {
 					await codeCard?.highlightLines([16]);
 					if (rules[i].right[0] === '') {
-						await selectRSymbol('g', i, 0, colors.green, false);
+						await selectRSymbol(`${id}g`, i, 0, colors.green, id, false);
 					}
 					await firstSetElement?.joinSets(
 						[''],
 						[''],
 						null,
 						i,
-						`gr${i}-${rules[i].right.length - 1}`
+						`${id}gr${i}-${rules[i].right.length - 1}`
 					);
 				}
 			}
@@ -149,7 +153,7 @@
 					await codeCard?.highlightLines([19]);
 					continue;
 				}
-				await addPause();
+				await addPause(id);
 				await codeCard?.highlightLines([20]);
 				await codeCard?.highlightLines([21]);
 
@@ -164,7 +168,7 @@
 					$joinSet[item].note,
 					`${joinSetElement?.getSetId()}l${ruleIndex}`
 				);
-				await addPause();
+				await addPause(id);
 
 				while ($joinStack.length > 0) {
 					await codeCard?.highlightLines([22]);
@@ -186,7 +190,7 @@
 						await codeCard?.highlightLines([27]);
 
 						await joinStackElement?.addToStack(topValue, rules[topValue].left, topValue.toString());
-						await addPause();
+						await addPause(id);
 						continue;
 					}
 					await codeCard?.highlightLines([28]);
@@ -201,10 +205,10 @@
 						topKey,
 						`${firstSetElement.getSetId()}l${topValue}`
 					);
-					await addPause();
+					await addPause(id);
 					await codeCard?.highlightLines([30]);
 					await joinSetElement?.remove(topKey, topValue);
-					await addPause();
+					await addPause(id);
 					await codeCard?.highlightLines([31]);
 					if (joinSetElement?.get(topKey)?.length === 0) {
 						await codeCard?.highlightLines([32]);
@@ -213,8 +217,8 @@
 				}
 			}
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
@@ -229,38 +233,41 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="First" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="First" bind:this={codeCard} id="first"></PseudoCode>
 	</div>
 	<div class="unit cards-box">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<SetsCard
-			setId="first"
+			setId="first{id}"
 			set={firstSet}
 			setIndexes={firstIndexes}
 			hue={colors.blue}
 			label={'first set'}
 			bind:this={firstSetElement}
 			bind:svgLines
+			{id}
 		></SetsCard>
 		<SetsCard
-			setId="join"
+			setId="join{id}"
 			set={joinSet}
 			setIndexes={joinIndexes}
 			hue={colors.blue}
 			label={'join set'}
 			bind:this={joinSetElement}
 			bind:svgLines
+			{id}
 		></SetsCard>
 		<StackCard
 			stack={joinStack}
-			stackId="join"
+			stackId="join{id}"
 			label="join stack"
 			hue={colors.blue}
 			bind:this={joinStackElement}
 			bind:svgLines
+			{id}
 		></StackCard>
 	</div>
 </div>

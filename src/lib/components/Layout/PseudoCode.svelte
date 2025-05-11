@@ -17,7 +17,8 @@
 	export let title;
 
 	let interaction = new Interaction();
-	export let id = '';
+	/**@type {string}*/
+	export let id;
 	export function reset() {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
@@ -63,7 +64,7 @@
 					left: 0,
 					top: line.y - content.y - height / 2 + (line.height * lines.length) / 2
 				});
-				await wait(500);
+				await wait(id, 500);
 				return resolve();
 			} catch (e) {
 				reject(e);

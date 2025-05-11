@@ -15,6 +15,10 @@
 	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
 	/**@type {StateCard | undefined}*/
@@ -23,6 +27,8 @@
 	let targetStateElem;
 	/**@type {Automaton | undefined}*/
 	let automatonElem;
+	/**@type {StackCard | undefined}*/
+	let symbolListElem;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -65,7 +71,7 @@
 			stateStack.update(() => []);
 			originStateElem?.resetState(false);
 			targetStateElem?.resetState(false);
-			svgLines?.hideLine(false);
+			svgLines?.hideLine(false, id);
 			automatonElem?.reset();
 			symbolsSelection.hideSelect();
 			stateSelection.hideSelect();
@@ -73,7 +79,7 @@
 		} catch (e) {}
 		buildAutomaton();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function closure() {
 		let itemsToCheck = [...$targetState];
@@ -168,13 +174,14 @@
 				await selectSymbol(
 					`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
 					colors.pink,
+					id,
 					false
 				);
 
 				await closureCodeCard?.highlightLines([31]);
 				if (existent === -1) {
 					await closureCodeCard?.highlightLines([32]);
-					await targetStateElem?.addItem(rule.index, 0, lookahead, `gl${rule.index}`);
+					await targetStateElem?.addItem(rule.index, 0, lookahead, `${id}gl${rule.index}`);
 
 					await closureCodeCard?.highlightLines([33]);
 					await closureCodeCard?.highlightLines([34]);
@@ -208,14 +215,14 @@
 	async function buildAutomaton() {
 		try {
 			await loadGrammar();
-			await wait(500);
+			await wait(id, 500);
 
 			/**@type {import('@/types').LR1Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
 			await codeCard?.highlightLines([1]);
 
 			await codeCard?.highlightLines([2]);
-			await targetStateElem?.addItem(0, 0, new Set(['$']), `gl0`);
+			await targetStateElem?.addItem(0, 0, new Set(['$']), `${id}gl0`);
 
 			await codeCard?.highlightLines([3]);
 			await closure();
@@ -224,7 +231,7 @@
 			automaton.states.push({ index: 0, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[0], null);
 
-			await addPause();
+			await addPause(id);
 
 			let count = 0;
 
@@ -239,7 +246,7 @@
 
 				await codeCard?.highlightLines([8]);
 				for (let [symbolIndex, symbol] of alphabet.entries()) {
-					await symbolsSelection.selectFor(`stack-symbolList-${symbolIndex}`);
+					await symbolsSelection.selectFor(`stack-${symbolListElem?.getId()}-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
 					await codeCard?.highlightLines([9]);
@@ -247,7 +254,7 @@
 
 					count++;
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
-						await stateSelection.selectFor(`state-origem-${prodIndex}`);
+						await stateSelection.selectFor(`state-${originStateElem?.getId()}-${prodIndex}`);
 
 						await codeCard?.highlightLines([11]);
 						if (
@@ -260,6 +267,7 @@
 						await selectSymbol(
 							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
 							colors.pink,
+							id,
 							false
 						);
 
@@ -278,7 +286,7 @@
 							await targetStateElem?.updateLookahead(prod.lookahead, existent);
 						}
 
-						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
+						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
 					}
 					await stateSelection.hideSelect();
 					await codeCard?.highlightLines([13]);
@@ -330,7 +338,7 @@
 							'',
 							`label-${targetStateElem?.getId()}`
 						);
-						await addPause();
+						await addPause(id);
 						continue;
 					}
 				}
@@ -339,20 +347,19 @@
 				console.log($stateStack);
 				await stateStackElem?.removeFromStack(0);
 			}
-			console.log('rrr: ', count);
 
-			limitHit();
+			limitHit(id);
 			automatonElem?.update(undefined, 10);
-			await addPause();
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	onMount(() => {
-		symbolsSelection = getSelectionFunctions('symbolList');
-		stateSelection = getSelectionFunctions('origem');
-		targetStateSelection = getSelectionFunctions('destino');
+		symbolsSelection = getSelectionFunctions(id);
+		stateSelection = getSelectionFunctions('origem' + id);
+		targetStateSelection = getSelectionFunctions('destino' + id);
 
 		fetch('./lr1automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
@@ -366,38 +373,43 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="lr1aut-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit">
-		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
-		<SetsCard set={firstSet} label="first" setId="first" hue={colors.blue}></SetsCard>
+		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<SetsCard {id} set={firstSet} label="first" setId={id} hue={colors.blue}></SetsCard>
 		<StateCard
+			{id}
 			state={targetState}
-			stateId={'destino'}
+			stateId="destino{id}"
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={targetStateElem}
 			bind:svgLines
 		></StateCard>
 		<StateCard
+			{id}
 			state={originState}
-			stateId={'origem'}
+			stateId="origem{id}"
 			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
 			bind:svgLines
 		></StateCard>
 		<StackCard
+			{id}
 			stack={stateStack}
-			stackId="temp"
+			stackId="stateStack{id}"
 			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
 			bind:svgLines
 		></StackCard>
 		<StackCard
+			{id}
+			bind:this={symbolListElem}
 			stack={symbolList}
-			stackId="symbolList"
+			stackId={id}
 			label="alfabeto"
 			hue={colors.green}
 			reversed={false}
@@ -405,8 +417,8 @@
 		></StackCard>
 	</div>
 	<div class="unit">
-		<PseudoCode title="Closure LR(1)" bind:this={closureCodeCard} id="closure"></PseudoCode>
-		<PseudoCode title="Autômato LR(1)" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Closure LR(1)" bind:this={closureCodeCard} id="lr1closure"></PseudoCode>
+		<PseudoCode title="Autômato LR(1)" bind:this={codeCard} id="lr1"></PseudoCode>
 
 		<Automaton id="lr1" bind:this={automatonElem}></Automaton>
 	</div>

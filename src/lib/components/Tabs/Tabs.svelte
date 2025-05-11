@@ -3,19 +3,21 @@
 	import LLAnimation from './LLAnimation.svelte';
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
-	import { swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm, wait } from '$lib/flowControl';
 	import CLRAnimation from './CLRAnimation.svelte';
 	import { setUpTooltip, hideTooltip } from '$lib/tooltip.js';
 	import AssignmentTab from './AssignmentTab.svelte';
 
 	/**@type {Array<import('@/types').TabItem>} */
 	let items = [
-		{ comp: TextInput, name: 'Entrada' },
-		{ comp: LLAnimation, name: 'LL(1)' },
-		{ comp: SLRAnimation, name: 'SLR' },
-		{ comp: CLRAnimation, name: 'LR(1)' },
-		{ comp: AssignmentTab, name: 'Tarefa' }
+		{ comp: TextInput, name: 'Entrada', loaded: true },
+		{ comp: LLAnimation, name: 'LL(1)', loaded: false },
+		{ comp: SLRAnimation, name: 'SLR', loaded: false },
+		{ comp: CLRAnimation, name: 'LR(1)', loaded: false },
+		{ comp: AssignmentTab, name: 'Tarefa', loaded: false }
 	];
+	/**@type {Map<string, Node>} */
+	let saves = new Map();
 	let selected = items[0];
 </script>
 
@@ -29,16 +31,38 @@
 				item.name
 					? 'hsl(200,50%,50%)'
 					: 'hsl(200,50%,70%)'};"
-				on:click={() => {
+				on:click={async () => {
+					// let clone = document.querySelector('.tab-content')?.cloneNode(true);
+					// if (!clone) return;
+					// saves.set(selected.name, clone);
+					items[items.findIndex((i) => i.name === item.name)].loaded = true;
 					hideTooltip();
-					swapAlgorithm();
+					// swapAlgorithm();
 					selected = item;
+					// console.log('selected');
+					// await wait(id,1000);
+					// console.log('selected3');
+					// let save = saves.get(item.name);
+					// if (save) {
+					// }
 				}}>{item.name}</button
 			>
 		{/each}
 	</div>
-	<FillSize class="tab-content">
-		<svelte:component this={selected.comp}></svelte:component>
+	<FillSize class="tab-content grid">
+		{#each items as item}
+			<div
+				class="unit"
+				style="height: inherit;z-index: {selected.name === item.name
+					? 1
+					: 0};opacity: {selected.name === item.name ? '1' : '0'};"
+			>
+				{#if item.loaded}
+					<svelte:component this={item.comp}></svelte:component>
+				{/if}
+			</div>
+		{/each}
+		<!-- <svelte:component this={selected.comp} class="tab-content" /> -->
 	</FillSize>
 </FillSize>
 

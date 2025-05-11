@@ -13,13 +13,13 @@
 	export const loadGrammar = async function () {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const rulesElem = /**@type {HTMLElement}*/ document.querySelector('#rules');
+				const rulesElem = /**@type {HTMLElement}*/ document.querySelector(`#${cardId}rules`);
 				for (let p of rulesElem?.children ?? []) {
 					for (let s of p.children) {
 						s.classList.remove('block', 'empty');
 					}
 				}
-				await wait(200);
+				await wait(id, 200);
 				opacity = 1;
 				resolve(null);
 			} catch (e) {
@@ -28,7 +28,12 @@
 		});
 	};
 
-	const cardId = 'g';
+	/**
+	 * @type {string}
+	 */
+	export let cardId;
+	/** @type {string} */
+	export let id;
 
 	export function getCardId() {
 		return cardId;
@@ -37,20 +42,20 @@
 
 <CardWrapper
 	class="card"
-	id={'grammar'}
 	minHeight={lineHeight}
 	minWidth={charWidth}
 	label={'gramática'}
 	hue={colors.blue}
-	cardId={'g'}
+	{cardId}
+	{id}
 >
-	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="rules">
+	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="{cardId}rules">
 		{#each rules as rule, rulesIndex}
 			<p
 				style="line-height: {lineHeight}rem; font-size: {fontSize}rem; padding: 0px; width: fit-content"
-				id="{cardId}set{rulesIndex}"
+				id="{cardId}gset{rulesIndex}"
 			>
-				<span id="{cardId}l{rulesIndex}"
+				<span id="{cardId}gl{rulesIndex}"
 					><span
 						style="font-size: {subFontSize}rem; position: relative;transform: translate(0px, {0.3 *
 							fontSize}rem)">{rule.index}</span
@@ -58,10 +63,10 @@
 				>
 				<span>{'->'}</span>
 				{#if rule.right[0] === ''}
-					<span id="{cardId}r{rulesIndex}-{0}">&#x03B5;</span>
+					<span id="{cardId}gr{rulesIndex}-{0}">&#x03B5;</span>
 				{:else}
 					{#each rule.right as symbol, si}
-						<span id="{cardId}r{rulesIndex}-{si}">{symbol}</span>
+						<span id="{cardId}gr{rulesIndex}-{si}">{symbol}</span>
 					{/each}
 				{/if}
 			</p>

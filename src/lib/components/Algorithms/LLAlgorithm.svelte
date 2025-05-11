@@ -13,6 +13,10 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import LL1TableInfo from '@/Info/LL1TableInfo.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {PseudoCode | undefined}*/
@@ -41,7 +45,7 @@
 
 		lltable();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	/**@type {SetsCard | undefined}*/
 	let firstCard;
@@ -52,9 +56,9 @@
 
 	async function lltable() {
 		try {
-			await wait(100);
+			await wait(id, 100);
 			await loadGrammar();
-			await addPause();
+			await addPause(id);
 			instruction = 'Since this thing is like that we have add to the stack';
 
 			await codeCard?.highlightLines([0]);
@@ -66,7 +70,7 @@
 				await codeCard?.highlightLines([2]);
 				await codeCard?.highlightLines([3]);
 				if (item.right.includes('')) {
-					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, colors.green);
+					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, colors.green, id);
 					const followIndex = $followSet.findIndex((x) => x.left === item.left);
 					const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
 					for (let f = 0; f < follow.right.length; f++) {
@@ -76,15 +80,16 @@
 							/**@type {string}*/ (followCard?.getSetId()),
 							followIndex,
 							f * 2,
-							colors.green
+							colors.green,
+							id
 						);
 						await codeCard?.highlightLines([5]);
 
 						let cell = $table.get(item.left)?.get(follow.right[f]);
 						if (cell?.data !== null) {
 							await tableElement.showConflict(item.left, follow.right[f]);
-							limitHit();
-							await addPause();
+							limitHit(id);
+							await addPause(id);
 							return;
 						}
 
@@ -96,7 +101,7 @@
 							item.left,
 							follow.right[f]
 						);
-						await addPause();
+						await addPause(id);
 					}
 				}
 				for (let j = 0; j < item.right.length; j++) {
@@ -107,13 +112,19 @@
 					}
 					await codeCard?.highlightLines([8]);
 
-					await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, j * 2, colors.green);
+					await selectRSymbol(
+						/**@type {string}*/ (firstCard?.getSetId()),
+						i,
+						j * 2,
+						colors.green,
+						id
+					);
 
 					let cell = $table.get(item.left)?.get(item.right[j]);
 					if (cell?.data !== null) {
 						await tableElement.showConflict(item.left, item.right[j]);
-						limitHit();
-						await addPause();
+						limitHit(id);
+						await addPause(id);
 						return;
 					}
 					await tableElement.addToTable(
@@ -122,12 +133,12 @@
 						item.left,
 						item.right[j]
 					);
-					await addPause();
+					await addPause(id);
 				}
 			}
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
@@ -144,25 +155,27 @@
 	});
 </script>
 
-<SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="lltable-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="Tabela LL(1)" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Tabela LL(1)" bind:this={codeCard} id="lltable"></PseudoCode>
 	</div>
 	<div class="cards-box unit">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<TableCard
+			{id}
 			rows={nt}
 			columns={t}
 			bind:table
 			bind:svgLines
 			bind:this={tableElement}
-			tableId="ll"
+			tableId={id}
 			label="tabela ll(1)"
 			hue={colors.blue}
 		></TableCard>
 		<SetsCard
-			setId="follow"
+			{id}
+			setId="follow{id}"
 			useNote={false}
 			set={followSet}
 			hue={colors.blue}
@@ -170,7 +183,8 @@
 			bind:this={followCard}
 		></SetsCard>
 		<SetsCard
-			setId="first"
+			{id}
+			setId="first{id}"
 			useNote={false}
 			set={firstSet}
 			hue={colors.blue}

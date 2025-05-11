@@ -121,7 +121,7 @@
 				});
 
 				levels = levels;
-				await wait(0);
+				await wait(id, 0);
 
 				let newNode = levels[parent.level + 1][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
@@ -137,7 +137,7 @@
 				newNode.dashOffset = 0;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -176,7 +176,7 @@
 					index: index
 				});
 				levels = levels;
-				await wait(100);
+				await wait(id, 100);
 				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text-${newNode.id}`)
@@ -187,7 +187,7 @@
 				levels = levels;
 				blockSize = bbox.height;
 				height = svg.getBBox().height + 100;
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -222,7 +222,7 @@
 					id: count++
 				});
 				levels = levels;
-				await wait(100);
+				await wait(id, 100);
 				let newNode = levels[level][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text-${newNode.id}`)
@@ -232,7 +232,7 @@
 				newNode.width = bbox.width;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -330,7 +330,7 @@
 			}
 
 			levels = levels;
-			await wait(500);
+			await wait(id, 500);
 
 			let parentLevel = highestLevel - 1;
 			let matchLeftmost = getLeftmost(treeTop[matchLoc].level, treeTop[matchLoc].index);
@@ -356,7 +356,7 @@
 				node.parentLevel = parentLevel;
 			}
 			levels = levels;
-			await wait(500);
+			await wait(id, 500);
 			for (let i = matchLoc; i < matchLoc + children.length; i++) {
 				let loc = treeTop[i];
 				let node = levels[loc.level][loc.index];
@@ -367,7 +367,7 @@
 				level: parentLevel,
 				index: parentIndex
 			});
-			await wait(500);
+			await wait(id, 500);
 			resolve(null);
 		});
 	}
@@ -385,7 +385,7 @@
 				} else {
 					updateLevel(0);
 				}
-				await wait(10);
+				await wait(id, 10);
 				updating = false;
 				resolve(null);
 			} catch (e) {
@@ -481,7 +481,7 @@
 				boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
 				width = boxWidth;
 
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);

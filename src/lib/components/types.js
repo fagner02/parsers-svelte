@@ -20,7 +20,7 @@
  * @typedef {{left: string, right: Array.<string>, index: number}} GrammarItem
  */
 
-/**@typedef {{comp: ConstructorOfATypedSvelteComponent, name: string}} TabItem*/
+/**@typedef {{comp: ConstructorOfATypedSvelteComponent, name: string, loaded: boolean}} TabItem*/
 
 /**@typedef {{ x: number, y: number }} Vec2*/
 

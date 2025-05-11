@@ -16,6 +16,10 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
 	/**@type {StackCard | undefined}*/
@@ -62,21 +66,21 @@
 	function reset() {
 		try {
 			stateElem?.resetState(false);
-			svgLines?.hideLine(false);
+			svgLines?.hideLine(false, id);
 			symbolsSelection?.hideSelect();
 			stateSelection?.hideSelect();
 			tableElem?.resetTable();
 		} catch (e) {}
 		slrTable();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function slrTable() {
 		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
 		if (symbolListElem) symbolsSelection = getSelectionFunctions(symbolListElem.getId());
 		try {
 			await loadGrammar();
-			await wait(500);
+			await wait(id, 500);
 
 			await codeCard?.highlightLines([0]);
 			await codeCard?.highlightLines([1]);
@@ -88,7 +92,7 @@
 				await codeCard?.highlightLines([5]);
 				for (let i of s.items) {
 					await codeCard?.highlightLines([6]);
-					await addPause();
+					await addPause(id);
 
 					await codeCard?.highlightLines([7]);
 					if (
@@ -157,8 +161,8 @@
 			}
 
 			await codeCard?.highlightLines([23]);
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
@@ -176,28 +180,30 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="Tabela SLR" bind:this={codeCard}></PseudoCode>
-		<Automaton id="slr" bind:this={automatonElem}></Automaton>
+		<PseudoCode title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
+		<Automaton {id} bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit">
-		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId="slr" isAugmented={true} bind:loadGrammar></GrammarCard>
 		<TableCard
+			{id}
 			{rows}
 			{columns}
 			{svgLines}
 			bind:table
 			label="tabela slr"
 			hue={colors.blue}
-			tableId="slrtable"
+			tableId={id}
 			bind:this={tableElem}
 		></TableCard>
-		<SetsCard set={followSet} label="follow" setId="follow" hue={200}></SetsCard>
+		<SetsCard {id} setId={id} set={followSet} label="follow" hue={200}></SetsCard>
 		<StackCard
+			{id}
 			stack={stateList}
-			stackId="statelist"
+			stackId={id}
 			label="estados novos"
 			hue={colors.blue}
 			bind:svgLines

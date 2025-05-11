@@ -30,7 +30,7 @@
 			attributes: true
 		});
 
-		await wait(300);
+		await wait(id, 300);
 		opacity = 1;
 		scale = 1;
 	});

@@ -14,6 +14,10 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
@@ -50,11 +54,11 @@
 
 		parsing();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function parsing() {
 		try {
-			await wait(100);
+			await wait(id, 100);
 			resetTree();
 
 			if (initializeTree === undefined) {
@@ -73,16 +77,16 @@
 			}
 
 			while (true) {
-				await codeCard?.highlightLines([3]); // Line 2: Main loop
-				await codeCard?.highlightLines([4]); // Line 3: Get current state
+				await codeCard?.highlightLines([3]);
+				await codeCard?.highlightLines([4]);
 				const topState = /**@type {number}*/ stateStackElement.top();
-				await codeCard?.highlightLines([5]); // Line 4: Get lookahead
+				await codeCard?.highlightLines([5]);
 				const topInput = inputStackElement.top();
 
-				await codeCard?.highlightLines([6]); // Line 5: Get table action
+				await codeCard?.highlightLines([6]);
 				const action = $table.get(`s${topState}`)?.get(topInput);
 
-				await codeCard?.highlightLines([7]); // Line 6: Handle invalid action
+				await codeCard?.highlightLines([7]);
 				if (!action || action?.data === '') {
 					await codeCard?.highlightLines([8]);
 					context.setAccept(false);
@@ -117,7 +121,7 @@
 					let rule = parseInt(action.data.slice(1));
 					let children = [];
 
-					await codeCard?.highlightLines([19]); // Lines 12-14: Reduce non-empty production
+					await codeCard?.highlightLines([19]);
 					if (augRules[rule].right[0] !== '') {
 						for (let i = 0; i < augRules[rule].right.length; i++) {
 							await codeCard?.highlightLines([20]);
@@ -132,11 +136,11 @@
 					children.reverse();
 					addParent(augRules[rule].left, children);
 
-					await codeCard?.highlightLines([23]); // Line 15: Get base state
-					await codeCard?.highlightLines([24]); // Line 16: Get goto state
+					await codeCard?.highlightLines([23]);
+					await codeCard?.highlightLines([24]);
 					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
 
-					await codeCard?.highlightLines([25]); // Line 17: Validate goto
+					await codeCard?.highlightLines([25]);
 					if (!goto) {
 						await codeCard?.highlightLines([26]);
 						context.setAccept(false);
@@ -150,11 +154,11 @@
 					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
 				}
 
-				await addPause();
+				await addPause(id);
 			}
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {}
 	}
 	onMount(async () => {
@@ -170,31 +174,34 @@
 <SvgLines bind:this={svgLines} svgId="slrparse"></SvgLines>
 <div class="cards-box unit">
 	<div class="unit">
-		<PseudoCode title="Análise sintática SLR" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática SLR" bind:this={codeCard} id="slrparse"></PseudoCode>
 	</div>
-	<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
+	<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard
+		{id}
 		rows={stateList}
 		columns={alphabet}
 		{table}
 		bind:svgLines
-		tableId="slr"
+		tableId={id}
 		label="tabela slr"
 		hue={colors.blue}
 	></TableCard>
 	<StackCard
+		{id}
 		bind:svgLines
 		bind:stack={inputStack}
 		bind:this={inputStackElement}
-		stackId="input"
+		stackId={id}
 		hue={colors.green}
 		label="entrada"
 	></StackCard>
 	<StackCard
+		{id}
 		bind:svgLines
 		bind:stack={stateStack}
 		bind:this={stateStackElement}
-		stackId="symbols"
+		stackId={id}
 		hue={colors.green}
 		label="pilha de estados"
 	></StackCard>

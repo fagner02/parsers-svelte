@@ -3,6 +3,10 @@
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	export let set;
 	/**@type {Map<any, number>}*/
@@ -47,7 +51,7 @@
 					];
 					return x;
 				});
-				await wait(50);
+				await wait(id, 50);
 				set.update((x) => {
 					x[index].rightProps[x[index].rightProps.length - 1] = {
 						value: symbol,
@@ -57,7 +61,7 @@
 					};
 					return x;
 				});
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -86,7 +90,7 @@
 				);
 				if (propIndex === -1) propIndex = $set[index].rightProps.length;
 
-				if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${propIndex}`);
+				if (srcId) svgLines?.showLine(srcId, `${setId}r${index}-${propIndex}`, id);
 
 				for (let i = 0; i < symbols.length; i++) {
 					if ($set[index].right.find((x) => x === symbols[i]) === undefined) {
@@ -108,7 +112,7 @@
 						await addSetItem(index, texts[i], notes !== null ? notes[i] : '');
 					}
 				}
-				await svgLines?.hideLine();
+				await svgLines?.hideLine(true, id);
 				resolve(null);
 			} catch (e) {
 				console.log(e);
@@ -137,15 +141,15 @@
 					}
 				]);
 
-				await wait(0);
-				if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`);
+				await wait(id, 0);
+				if (srcId) svgLines?.showLine(srcId, `${setId}l${setIndexes.get(indexMapIdentifier)}`, id);
 
 				set.update((x) => {
 					x[/**@type {number}*/ (setIndexes.get(indexMapIdentifier))].showRight = true;
 					return x;
 				});
-				await wait(0);
-				if (srcId) await svgLines?.hideLine();
+				await wait(id, 0);
+				if (srcId) await svgLines?.hideLine(true, id);
 				return resolve(null);
 			} catch (e) {
 				console.log(e);
@@ -182,7 +186,7 @@
 					}
 					return x;
 				});
-				await wait(1000);
+				await wait(id, 1000);
 				set.update((x) => {
 					const index = /**@type {number}*/ (setIndexes.get(key));
 					const rIndex = x[index].right.findIndex((i) => i === item) * 2;
@@ -194,7 +198,7 @@
 					}
 					return x;
 				});
-				await wait(500);
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -224,7 +228,15 @@
 	$: maxHeight = lineHeight * Math.max($set.length, 1);
 </script>
 
-<CardWrapper minWidth={charWidth} minHeight={lineHeight} {maxHeight} {hue} {label} cardId={setId}>
+<CardWrapper
+	{id}
+	minWidth={charWidth}
+	minHeight={lineHeight}
+	{maxHeight}
+	{hue}
+	{label}
+	cardId={setId}
+>
 	{#key visible}
 		{#each $set as item, index}
 			<p

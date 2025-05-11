@@ -10,15 +10,16 @@ export const colors = {
  * @param {number} index1
  * @param {number} hue
  * @param {boolean} padded
+ * @param {string} id
  */
-export async function selectLSymbol(card, index1, hue, padded = true) {
+export async function selectLSymbol(card, index1, hue, id, padded = true) {
 	return new Promise(async (resolve, reject) => {
 		try {
 			let symbol = /** @type {HTMLElement} */ (document.querySelector(`#${card}l${index1}`));
 			if (symbol === null) return resolve(null);
 			symbol.classList.add(padded ? 'block' : 'empty');
 			symbol.style.setProperty('--block-hue', hue.toString());
-			await wait(500);
+			await wait(id, 500);
 			resolve(null);
 		} catch (e) {
 			reject(e);
@@ -32,8 +33,9 @@ export async function selectLSymbol(card, index1, hue, padded = true) {
  * @param {number} index2
  * @param {number} hue
  * @param {boolean} padded
+ * @param {string} id
  */
-export async function selectRSymbol(setCardId, index1, index2, hue, padded = true) {
+export async function selectRSymbol(setCardId, index1, index2, hue, id, padded = true) {
 	return new Promise(async (resolve, reject) => {
 		try {
 			let symbol = /** @type {HTMLElement} */ (
@@ -42,7 +44,7 @@ export async function selectRSymbol(setCardId, index1, index2, hue, padded = tru
 			if (symbol === null) return resolve(null);
 			symbol.classList.add(padded ? 'block' : 'empty');
 			symbol.style.setProperty('--block-hue', hue.toString());
-			await wait(500);
+			await wait(id, 500);
 			resolve(null);
 		} catch (e) {
 			reject(e);
@@ -51,20 +53,21 @@ export async function selectRSymbol(setCardId, index1, index2, hue, padded = tru
 }
 
 /**
+ * @param {string} _id
+ * @param {number} hue
  * @param {string} id
  * @param {boolean} padded
- * @param {number} hue
  */
-export async function selectSymbol(id, hue, padded = true) {
-	if (getJumpPause()) return;
+export async function selectSymbol(_id, hue, id, padded = true) {
+	if (getJumpPause(id)) return;
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!id.startsWith('#')) id = '#' + id;
-			let symbol = /** @type {HTMLElement} */ (document.querySelector(id));
+			if (!_id.startsWith('#')) _id = '#' + _id;
+			let symbol = /** @type {HTMLElement} */ (document.querySelector(_id));
 			if (symbol === null) return resolve(null);
 			symbol.classList.add(padded ? 'block' : 'empty');
 			symbol.style.setProperty('--block-hue', hue.toString());
-			await wait(500);
+			await wait(id, 500);
 			resolve(null);
 		} catch (e) {
 			reject(e);
@@ -72,16 +75,17 @@ export async function selectSymbol(id, hue, padded = true) {
 	});
 }
 /**
+ * @param {string} _id
  * @param {string} id
  */
-export function deselectSymbol(id) {
+export function deselectSymbol(_id, id) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!id.startsWith('#')) id = '#' + id;
-			let symbol = /** @type {HTMLElement} */ (document.querySelector(id));
+			if (!_id.startsWith('#')) _id = '#' + _id;
+			let symbol = /** @type {HTMLElement} */ (document.querySelector(_id));
 			if (symbol === null) return resolve(null);
 			symbol.classList.add('block-deselect');
-			await wait(500);
+			await wait(id, 500);
 			symbol.classList.remove('empty', 'block', 'block-deselect');
 			symbol.style.setProperty('--block-hue', '0');
 

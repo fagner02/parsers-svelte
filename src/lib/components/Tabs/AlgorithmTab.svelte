@@ -40,11 +40,13 @@
 	let parseOn = false;
 	/** @type {string} */
 	export let code;
+	/** @type {string} */
+	export let id;
 
 	/** @param {string} name */
 	async function updateSelected(name) {
 		animation = '';
-		await wait(10);
+		await wait(id, 10);
 
 		animation = animIn;
 		selected = name;
@@ -60,7 +62,7 @@
 	async function closePopup() {
 		animation = animOut;
 
-		await wait(500);
+		await wait(id, 500);
 		selected = 'noPopup';
 	}
 
@@ -69,11 +71,11 @@
 			scale = 1;
 			opacity = 1;
 			pos = 0;
-			await wait(200);
+			await wait(id, 200);
 
 			contentOpacity = 1;
 			contentPos = 0;
-			await wait(300);
+			await wait(id, 300);
 		} catch {}
 	}
 
@@ -82,12 +84,12 @@
 			contentOpacity = 0;
 			contentPos = 50;
 
-			await wait(100);
+			await wait(id, 100);
 
 			scale = 0.5;
 			opacity = 0;
 			pos = 50;
-			await wait(300);
+			await wait(id, 300);
 		} catch {}
 	}
 
@@ -106,7 +108,7 @@
 	$: isAnim = selected === 'noPopup';
 </script>
 
-<FillSize class="contents">
+<FillSize class="contents unit">
 	<div class="controls-box">
 		<div class="controls">
 			<button
@@ -137,8 +139,8 @@
 				use:setUpTooltip={'Analisar string de entrada'}
 				class="view-button"
 				on:click={() => {
-					reset();
-					swapAlgorithm();
+					//reset();
+					swapAlgorithm(`${id}Parser`);
 					parseOn = true;
 					closePopup();
 				}}
@@ -150,8 +152,8 @@
 				use:setUpTooltip={'Executar construção do parser'}
 				class="view-button"
 				on:click={() => {
-					reset();
-					swapAlgorithm();
+					// reset();
+					swapAlgorithm(id);
 					parseOn = false;
 					closePopup();
 				}}
@@ -162,16 +164,20 @@
 		</div>
 
 		<div class="flow-controls controls">
-			<button use:setUpTooltip={'Passo Anterior'} on:click={back}>
+			<button use:setUpTooltip={'Passo Anterior'} on:click={back(`${id}`)}>
 				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
-			<button use:setUpTooltip={'Reiniciar'} on:click={reset}>
+			<button use:setUpTooltip={'Reiniciar'} on:click={reset(`${id}`)}>
 				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 			</button>
-			<button use:setUpTooltip={'Próximo passo'} disabled={limit} on:click={forward}>
+			<button use:setUpTooltip={'Próximo passo'} disabled={limit} on:click={forward(`${id}`)}>
 				<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 			</button>
-			<button use:setUpTooltip={'Pular para o final'} disabled={limit} on:click={skipToEnd}>
+			<button
+				use:setUpTooltip={'Pular para o final'}
+				disabled={limit}
+				on:click={skipToEnd(`${id}`)}
+			>
 				<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
 			</button>
 		</div>

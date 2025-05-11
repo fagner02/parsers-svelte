@@ -13,6 +13,10 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
 	/**@type {TableCard | undefined}*/
@@ -50,20 +54,20 @@
 		try {
 			stateStack.update(() => []);
 			stateElem?.resetState(false);
-			svgLines?.hideLine(false);
+			svgLines?.hideLine(false, id);
 			symbolsSelection?.hideSelect();
 			stateSelection?.hideSelect();
 			tableElem?.resetTable();
 		} catch (e) {}
 		clrTable();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function clrTable() {
 		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
 		try {
 			await loadGrammar();
-			await wait(500);
+			await wait(id, 500);
 
 			await codeCard?.highlightLines([1]); // Line 1: Table initialization
 			await codeCard?.highlightLines([2]); // Line 2: Alphabet definition
@@ -73,7 +77,7 @@
 				await codeCard?.highlightLines([5]); // Line 5: State loop
 				for (let i of s.items) {
 					await codeCard?.highlightLines([6]); // Line 6: Item loop
-					await addPause();
+					await addPause(id);
 
 					await codeCard?.highlightLines([7]); // Line 7: End position check
 					if (
@@ -134,8 +138,8 @@
 
 			await codeCard?.highlightLines([]);
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
@@ -155,31 +159,34 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="clr-svg" bind:this={svgLines}></SvgLines>
 <div class="unit grid" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit">
 		<TableCard
+			{id}
 			{rows}
 			{columns}
 			{svgLines}
 			bind:table
 			label="tabela clr"
 			hue={colors.blue}
-			tableId="slrtable"
+			tableId={id}
 			bind:this={tableElem}
 		></TableCard>
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<StateCard
+			{id}
 			{state}
-			stateId={'destino'}
+			stateId="destino{id}"
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={stateElem}
 			bind:svgLines
 		></StateCard>
 		<StackCard
+			{id}
 			stack={stateStack}
-			stackId="temp"
+			stackId="temp{id}"
 			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
@@ -187,7 +194,7 @@
 		></StackCard>
 	</div>
 	<div class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
-		<PseudoCode title="Tabela LR(1)" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Tabela LR(1)" bind:this={codeCard} id="clrtable"></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>
 	</div>
 </div>

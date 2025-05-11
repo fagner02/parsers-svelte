@@ -13,6 +13,10 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import FollowInfo from '@/Info/FollowInfo.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {SetsCard | undefined}*/
 	let followSetElement;
 	/**@type {SetsCard | undefined}*/
@@ -23,6 +27,8 @@
 	let svgLines;
 	/**@type {PseudoCode | undefined}*/
 	let codeCard;
+	/**@type {SetsCard}*/
+	let firstSetElement;
 	/**@type {() => Promise<void>}*/
 	let loadGrammar;
 	/**@type {string}*/
@@ -57,13 +63,13 @@
 		codeCard?.reset();
 		follow();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function follow() {
 		try {
-			await wait(100);
+			await wait(id, 100);
 			await loadGrammar();
-			await addPause();
+			await addPause(id);
 
 			instruction = 'Since this thing is like that we have add to the stack';
 			await codeCard?.highlightLines([0, 1]);
@@ -76,7 +82,7 @@
 			for (let i = 0; i < rules.length; i++) {
 				await codeCard?.highlightLines([3]);
 
-				await grammarFuncs?.selectFor(`gset${i}`);
+				await grammarFuncs?.selectFor(`${id}gset${i}`);
 				for (let j = 0; j < rules[i].right.length; j++) {
 					await codeCard?.highlightLines([4]);
 
@@ -90,17 +96,17 @@
 					if (!nt.includes(symbol)) {
 						await codeCard?.highlightLines([7]);
 
-						await selectRSymbol('g', i, j, colors.green, false);
+						await selectRSymbol(`${id}g`, i, j, colors.green, id, false);
 						continue;
 					}
 					await codeCard?.highlightLines([8]);
 
-					await selectRSymbol('g', i, j, colors.blue, false);
+					await selectRSymbol(`${id}g`, i, j, colors.blue, id, false);
 
 					if (!followIndexes.has(symbol)) {
 						await codeCard?.highlightLines([9]);
 
-						await followSetElement?.addSetRow(symbol, symbol, `gr${i}-${j}`);
+						await followSetElement?.addSetRow(symbol, symbol, `${id}gr${i}-${j}`);
 					}
 
 					await codeCard?.highlightLines([10]);
@@ -113,7 +119,7 @@
 							if (!joinSetElement?.has(symbol)) {
 								await codeCard?.highlightLines([14]);
 
-								await joinSetElement?.addSetRow(symbol, symbol, `gr${i}-${j}`);
+								await joinSetElement?.addSetRow(symbol, symbol, `${id}gr${i}-${j}`);
 							}
 							await codeCard?.highlightLines([15]);
 							if (rules[i].left !== symbol) {
@@ -123,7 +129,7 @@
 									[rules[i].left],
 									null,
 									symbol,
-									`gl${i}`
+									`${id}gl${i}`
 								);
 							}
 							await codeCard?.highlightLines([17]);
@@ -131,7 +137,7 @@
 						}
 						await codeCard?.highlightLines([18]);
 
-						await selectRSymbol('g', i, j + 1, colors.orange, false);
+						await selectRSymbol(`${id}g`, i, j + 1, colors.orange, id, false);
 						if (nt.includes(followingSymbol)) {
 							await codeCard?.highlightLines([19]);
 							let empty = false;
@@ -153,7 +159,7 @@
 										item.right,
 										null,
 										symbol,
-										`firstl${key}`
+										`${firstSetElement.getSetId()}l${key}`
 									);
 								}
 							}
@@ -177,14 +183,14 @@
 								[followingSymbol],
 								null,
 								symbol,
-								`gr${i}-${followingSymbolIndex}`
+								`${id}gr${i}-${followingSymbolIndex}`
 							);
 							await codeCard?.highlightLines([33]);
 							break;
 						}
 					}
 
-					await selectRSymbol('g', i, j, colors.green, false);
+					await selectRSymbol(`${id}g`, i, j, colors.green, id, false);
 				}
 			}
 			grammarFuncs?.hideSelect();
@@ -204,7 +210,7 @@
 					'',
 					`${joinSetElement?.getSetId()}l${joinIndexes.get(item)}`
 				);
-				await addPause();
+				await addPause(id);
 
 				while ($joinStack.length > 0) {
 					await codeCard?.highlightLines([39]);
@@ -235,7 +241,8 @@
 						/**@type {string}*/ (joinSetElement?.getSetId()),
 						/**@type {number}*/ (joinIndexes.get(topKey)),
 						0,
-						colors.green
+						colors.green,
+						id
 					);
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement?.get(top[0]));
@@ -261,15 +268,15 @@
 				}
 			}
 
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	onMount(async () => {
-		grammarFuncs = getSelectionFunctions('g');
+		grammarFuncs = getSelectionFunctions(id);
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 		setInfoComponent(FollowInfo);
 		reset();
@@ -279,12 +286,13 @@
 <SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="Follow" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Follow" bind:this={codeCard} id="follow"></PseudoCode>
 	</div>
 	<div class="cards-box unit">
-		<GrammarCard bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<SetsCard
-			setId="follow"
+			{id}
+			setId="follow{id}"
 			useNote={false}
 			set={followSet}
 			setIndexes={followIndexes}
@@ -294,16 +302,19 @@
 			bind:svgLines
 		></SetsCard>
 		<SetsCard
-			setId="first"
+			{id}
+			setId="first{id}"
 			useNote={false}
 			set={firstSet}
 			setIndexes={followIndexes}
 			hue={colors.blue}
 			label={'first set'}
 			bind:svgLines
+			bind:this={firstSetElement}
 		></SetsCard>
 		<SetsCard
-			setId="join"
+			{id}
+			setId="join{id}"
 			useNote={false}
 			set={joinSet}
 			setIndexes={joinIndexes}
@@ -313,8 +324,9 @@
 			bind:svgLines
 		></SetsCard>
 		<StackCard
+			{id}
 			stack={joinStack}
-			stackId="join"
+			stackId="join{id}"
 			label="join stack"
 			hue={colors.blue}
 			bind:this={joinStackElement}

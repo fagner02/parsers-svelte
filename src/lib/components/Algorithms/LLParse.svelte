@@ -13,6 +13,10 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {SvgLines | undefined}*/
 	let svgLines;
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>} */
@@ -41,12 +45,12 @@
 
 		parsing();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function parsing() {
 		try {
 			await codeCard?.highlightLines([0]);
-			await wait(100);
+			await wait(id, 100);
 
 			if (initializeTree === undefined) {
 				let functions = getTreeFunctions();
@@ -66,7 +70,7 @@
 				await inputStackElement.addToStack(i, i, '');
 			}
 
-			await addPause();
+			await addPause(id);
 			await codeCard?.highlightLines([3]);
 			while ($inputStack.length > 0) {
 				await codeCard?.highlightLines([4]);
@@ -106,7 +110,7 @@
 					if (topSymbol !== topInput) {
 						await codeCard?.highlightLines([15]);
 						context.setAccept(false);
-						limitHit();
+						limitHit(id);
 						return;
 					}
 
@@ -116,14 +120,14 @@
 					await inputStackElement.removeFromStack($inputStack.length - 1);
 				}
 
-				await addPause();
+				await addPause(id);
 			}
 
 			await codeCard?.highlightLines([18]);
 			const result = $inputStack.length === 0 && $symbolStack.length === 0;
 			context.setAccept(result);
-			limitHit();
-			await addPause();
+			limitHit(id);
+			await addPause(id);
 		} catch (e) {}
 	}
 
@@ -139,10 +143,11 @@
 <SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
 <div class="grid unit">
 	<div class="unit">
-		<PseudoCode title="Análise sintática LL(1)" bind:this={codeCard}></PseudoCode>
+		<PseudoCode title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"></PseudoCode>
 	</div>
 	<div class="cards-box unit">
 		<TableCard
+			{id}
 			rows={nt}
 			columns={t}
 			{table}
@@ -152,6 +157,7 @@
 			hue={colors.blue}
 		></TableCard>
 		<StackCard
+			{id}
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
@@ -160,6 +166,7 @@
 			label="entrada"
 		></StackCard>
 		<StackCard
+			{id}
 			bind:svgLines
 			bind:stack={symbolStack}
 			bind:this={symbolStackElement}

@@ -1,57 +1,73 @@
-/** @type {Map<number, (reason?: any) => void>} */
+/** @type {Map<string, Map<number, (reason?: any) => void>>} */
 let pauseResolves = new Map();
-/** @type {Map<number, {error: Error,func:(reason?: any) => void}>} */
+/** @type {Map<string, Map<number, {error: Error,func:(reason?: any) => void}>>} */
 let pauseRejects = new Map();
-/** @type {Map<number, (reason?: any) => void>} */
+/** @type {Map<string, Map<number, (reason?: any) => void>>} */
 let waitRejects = new Map();
-/** @type {Map<number, any>} */
+/** @type {Map<string, Map<number, any>>} */
 let waitRe = new Map();
-/** @type {Map<number, (reason?: any) => void>} */
+/** @type {Map<string, Map<number, (reason?: any) => void>>} */
 let waitResolves = new Map();
 
-let waitCount = 0;
-let pauseCount = 0;
+/**@type {Map<string, number>} */
+let waitCount = new Map(); //0
+/**@type {Map<string, number>} */
+let pauseCount = new Map(); //0
 
-let jumpWait = false;
-let jumpPause = false;
-
-/**
- * @param {boolean} value
- */
-export function setJumpWait(value) {
-	jumpWait = value;
-}
+/**@type {Map<string, boolean>} */
+let jumpWait = new Map(); //false
+/**@type {Map<string, boolean>} */
+let jumpPause = new Map(); //false
 
 /**
  * @param {boolean} value
+ * @param {string} id
  */
-export function setJumpPause(value) {
-	jumpPause = value;
-}
-
-export function getJumpPause() {
-	return jumpPause;
-}
-
-export function getJumpWait() {
-	return jumpWait;
-}
-
-export function getAction() {
-	return action;
+export function setJumpWait(value, id) {
+	jumpWait.set(id, value);
 }
 
 /**
+ * @param {boolean} value
+ * @param {string} id
+ */
+export function setJumpPause(value, id) {
+	jumpPause.set(id, value);
+}
+
+/**
+ * @param {string} id
+ */
+export function getJumpPause(id) {
+	return jumpPause.get(id);
+}
+
+/**
+ * @param {string} id
+ */
+export function getJumpWait(id) {
+	return jumpWait.get(id);
+}
+
+/**
+ * @param {string} id
+ */
+export function getAction(id) {
+	return action.get(id);
+}
+
+/**
+ * @param {string} id
  * @param {number} ms
  */
-export async function wait(ms) {
-	if (jumpWait) return;
+export async function wait(id, ms) {
+	if (jumpWait.get(id)) return;
 	return new Promise((resolve, reject) => {
-		const index = waitCount;
-		waitRejects.set(waitCount, reject);
-		waitRe.set(waitCount, Error('wait rejected'));
-		waitResolves.set(waitCount, resolve);
-		waitCount++;
+		const index = waitCount.get(id) ?? 0;
+		waitRejects.get(id)?.set(index, reject);
+		waitRe.get(id)?.set(index, Error('wait rejected'));
+		waitResolves.get(id)?.set(index, resolve);
+		waitCount.set(id, index + 1);
 		setTimeout(() => {
 			return resolve(index);
 		}, ms);
@@ -67,38 +83,50 @@ export async function noJumpWait(ms) {
 	});
 }
 
-export function resolvePause() {
-	for (let resolve of pauseResolves.values()) {
+/**
+ * @param {string} id
+ */
+export function resolvePause(id) {
+	for (let resolve of pauseResolves.get(id)?.values() ?? []) {
 		resolve();
 	}
-	pauseResolves.clear();
-	pauseRejects.clear();
-	pauseCount = 0;
+	pauseResolves.get(id)?.clear();
+	pauseRejects.get(id)?.clear();
+	pauseCount.set(id, 0);
 }
-export function killPause() {
-	for (let reject of pauseRejects.values()) {
+/**
+ * @param {string} id
+ */
+export function killPause(id) {
+	for (let reject of pauseRejects.get(id)?.values() ?? []) {
 		reject.func(reject.error);
 	}
-	pauseResolves.clear();
-	pauseRejects.clear();
-	pauseCount = 0;
+	pauseResolves.get(id)?.clear();
+	pauseRejects.get(id)?.clear();
+	pauseCount.set(id, 0);
 }
 
-export function resolveAllWaits() {
-	for (let resolve of waitResolves.values()) {
+/**
+ * @param {string} id
+ */
+export function resolveAllWaits(id) {
+	for (let resolve of waitResolves.get(id)?.values() ?? []) {
 		resolve();
 	}
-	waitCount = 0;
-	waitResolves.clear();
-	waitRejects.clear();
+	waitResolves.get(id)?.clear();
+	waitRejects.get(id)?.clear();
+	waitCount.set(id, 0);
 }
-export function killAllWaits() {
-	for (let [i, reject] of waitRejects) {
-		reject(waitRe.get(i));
+/**
+ * @param {string} id
+ */
+export function killAllWaits(id) {
+	for (let [i, reject] of waitRejects.get(id) ?? []) {
+		reject(waitRe.get(id)?.get(i));
 	}
-	waitCount = 0;
-	waitResolves.clear();
-	waitRejects.clear();
+	waitResolves.get(id)?.clear();
+	waitRejects.get(id)?.clear();
+	waitCount.set(id, 0);
 }
 
 /** @type {() => Promise<void>} */
@@ -124,31 +152,40 @@ export function setOpenInstruction(_openInstruction) {
 
 /**
  * @param {() => void} _resetCall
+ * @param {string} id
  */
-export function setResetCall(_resetCall) {
-	limit = false;
-	currentStep = 0;
-	jumpWait = false;
-	jumpPause = false;
-	maxStep = -1;
+export function setResetCall(_resetCall, id) {
+	limit.set(id, false);
+	currentStep.set(id, 0);
+	jumpWait.set(id, false);
+	jumpPause.set(id, false);
+	maxStep.set(id, -1);
 
 	resetCall = _resetCall;
 }
 export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
-let targetStep = -1;
-let currentStep = 0;
-let maxStep = -1;
-let action = flowActions.none;
-let limit = false;
+/**@type {Map<string, number>} */
+let targetStep = new Map(); //-1
+/**@type {Map<string, number>} */
+let currentStep = new Map(); //0
+/**@type {Map<string, number>} */
+let maxStep = new Map(); //-1
+/**@type {Map<string, number>} */
+let action = new Map(); //flowActions.none
+/**@type {Map<string, boolean>} */
+let limit = new Map(); //false
 /**@type {((value: boolean) => void)?}*/
 let limitHitCallback;
-export function limitHit() {
+/**
+ * @param {string} id
+ */
+export function limitHit(id) {
 	limitHitCallback?.(true);
-	limit = true;
-	maxStep = currentStep;
+	limit.set(id, true);
+	maxStep.set(id, currentStep.get(id) ?? 0);
 
-	targetStep = -1;
-	currentStep = 0;
+	targetStep.set(id, -1);
+	currentStep.set(id, 0);
 }
 
 /**
@@ -158,103 +195,148 @@ export function setLimitHitCallback(callback) {
 	limitHitCallback = callback;
 }
 
-export async function addPause() {
+/**
+ * @param {string} id
+ */
+export async function addPause(id) {
 	return new Promise(async (resolve, reject) => {
-		currentStep += 1;
-		if (action === flowActions.skipping && limit) {
-			action = flowActions.none;
-			jumpPause = false;
-			jumpWait = false;
+		currentStep.set(id, (currentStep.get(id) ?? 0) + 1);
+		if (action.get(id) === flowActions.skipping && limit.get(id)) {
+			action.set(id, flowActions.none);
+			jumpPause.set(id, false);
+			jumpWait.set(id, false);
 		}
-		if (action === flowActions.back && (currentStep === targetStep || limit)) {
-			action = flowActions.none;
-			targetStep = -1;
-			jumpPause = false;
-			jumpWait = false;
+		if (
+			action.get(id) === flowActions.back &&
+			(currentStep.get(id) === targetStep.get(id) || limit.get(id))
+		) {
+			action.set(id, flowActions.none);
+			targetStep.set(id, -1);
+			jumpPause.set(id, false);
+			jumpWait.set(id, false);
 		}
-		if (action === flowActions.forward) {
-			action = flowActions.none;
-			jumpWait = false;
+		if (action.get(id) === flowActions.forward) {
+			action.set(id, flowActions.none);
+			jumpWait.set(id, false);
 		}
 
-		if (jumpPause) return resolve(null);
+		if (jumpPause.get(id)) return resolve(null);
 
-		pauseResolves.set(pauseCount, resolve);
-		pauseRejects.set(pauseCount, { func: reject, error: Error('pause rejected') });
-		pauseCount++;
+		pauseResolves.get(id)?.set(pauseCount.get(id) ?? 0, resolve);
+		pauseRejects.get(id)?.set(pauseCount.get(id) ?? 0, {
+			func: reject,
+			error: Error('pause rejected')
+		});
+		pauseCount.set(id, (pauseCount.get(id) ?? 0) + 1);
 	});
 }
 
-export async function forward() {
-	if (limit) return;
-	action = flowActions.forward;
+/**
+ * @param {string} id
+ */
+export async function forward(id) {
+	if (limit.get(id)) return;
+	action.set(id, flowActions.forward);
 
-	if (currentStep > 1) {
+	if ((currentStep.get(id) ?? 0) > 1) {
 		closeInstruction?.();
-		await wait(200);
+		await wait(id, 200);
 	}
-	if (pauseResolves.size > 0) {
-		resolvePause();
+	if ((pauseResolves.get(id)?.size ?? 0) > 0) {
+		resolvePause(id);
 		openInstruction?.();
 		return;
 	}
 
-	jumpWait = true;
-	resolveAllWaits();
+	jumpWait.set(id, true);
+	resolveAllWaits(id);
 }
 
-export async function skipToEnd() {
-	action = flowActions.skipping;
+/**
+ * @param {string} id
+ */
+export async function skipToEnd(id) {
+	action.set(id, flowActions.skipping);
 
-	jumpWait = true;
-	jumpPause = true;
-	if (pauseResolves.size > 0) {
-		resolvePause();
+	jumpPause.set(id, true);
+	jumpWait.set(id, true);
+	if ((pauseResolves.get(id)?.size ?? 0) > 0) {
+		resolvePause(id);
 		openInstruction?.();
 		return;
 	}
 
-	jumpWait = true;
-	resolveAllWaits();
+	jumpWait.set(id, true);
+	resolveAllWaits(id);
 }
 
-export function back() {
-	if (currentStep <= 1 && !limit) return;
-	action = flowActions.back;
-	targetStep = limit ? maxStep : currentStep - 1;
-	limit = false;
+/**
+ * @param {string} id
+ */
+export function back(id) {
+	if ((currentStep.get(id) ?? 0) <= 1 && !limit.get(id)) return;
+	action.set(id, flowActions.back);
+	let newStep = limit.get(id) ? maxStep.get(id) : currentStep.get(id) ?? 0 - 1;
+	targetStep.set(id, /**@type {number}*/ (newStep));
+	limit.set(id, false);
 	limitHitCallback?.(false);
-	jumpWait = true;
-	jumpPause = true;
-	reset();
+
+	jumpPause.set(id, true);
+	jumpWait.set(id, true);
+	reset(id);
 }
 
-export function reset() {
-	limit = false;
+/**
+ * @param {string} id
+ */
+export function reset(id) {
+	limit.set(id, false);
 	limitHitCallback?.(false);
-	currentStep = 0;
-	killAllWaits();
-	killPause();
-	jumpWait = true;
+	currentStep.set(id, 0);
+	killAllWaits(id);
+	killPause(id);
+	jumpWait.set(id, true);
 	closeInstruction?.();
-	if (!(action === flowActions.back)) {
-		targetStep = -1;
-		jumpWait = false;
-		jumpPause = false;
+	if (!(action.get(id) === flowActions.back)) {
+		targetStep.set(id, -1);
+		jumpPause.set(id, false);
+		jumpWait.set(id, false);
 	}
 
 	resetCall();
 }
 
-export function swapAlgorithm() {
-	limit = false;
-	limitHitCallback?.(false);
-	currentStep = 0;
-	killAllWaits();
-	killPause();
-	jumpWait = false;
-	jumpPause = false;
-	targetStep = -1;
-	action = flowActions.none;
-	closeInstruction?.();
+/**
+ * @param {string} id
+ */
+export function swapAlgorithm(id) {
+	// limit.set(id, false);
+	// limitHitCallback?.(false);
+	// currentStep.set(id, 0);
+	// killAllWaits();
+	// killPause();
+
+	// jumpPause.set(id, false);
+	// jumpWait.set(id, false);
+	// targetStep.set(id, -1);
+	// action.set(id, flowActions.none);
+	// closeInstruction?.();
+
+	if (!pauseResolves.has(id)) {
+		waitCount.set(id, 0);
+		waitRe.set(id, new Map());
+		waitResolves.set(id, new Map());
+		waitRejects.set(id, new Map());
+		pauseCount.set(id, 0);
+		pauseResolves.set(id, new Map());
+		pauseRejects.set(id, new Map());
+		limit.set(id, false);
+		limitHitCallback?.(false);
+		currentStep.set(id, 0);
+		maxStep.set(id, -1);
+		action.set(id, flowActions.none);
+		jumpWait.set(id, false);
+		jumpPause.set(id, false);
+	}
+	console.log(pauseResolves, id);
 }

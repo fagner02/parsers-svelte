@@ -10,9 +10,9 @@
 	export let onClose;
 
 	onMount(async () => {
-		await wait(200);
+		await wait(id, 200);
 		flex = 1;
-		await wait(200);
+		await wait(id, 200);
 		opacity = 1;
 		pos = 0;
 	});

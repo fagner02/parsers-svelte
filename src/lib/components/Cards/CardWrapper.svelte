@@ -4,20 +4,22 @@
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
 	import { onMount } from 'svelte';
 
+	/**@type {string}*/
+	export let id;
 	export let cardId;
 	/**@type {HTMLElement}*/
 	let selection;
 
 	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	const selectionFunctions = {
-		selectFor: async function (/**@type {string}*/ id) {
-			if (getJumpPause()) return;
+		selectFor: async function (/**@type {string}*/ _id) {
+			if (getJumpPause(id)) return;
 			return new Promise(async (resolve, reject) => {
 				try {
-					if (!id.startsWith('#')) {
-						id = '#' + id;
+					if (!_id.startsWith('#')) {
+						_id = '#' + _id;
 					}
-					const elem = document.querySelector(id);
+					const elem = document.querySelector(_id);
 					if (elem === null) return resolve();
 					const parent = /**@type {HTMLElement}*/ (selection.parentElement);
 
@@ -28,7 +30,7 @@
 					selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
 					selection.style.width = `${elemRect.width + 17}px`;
 					selection.style.height = `${elemRect.height + 3}px`;
-					await wait(500);
+					await wait(id, 500);
 					return resolve();
 				} catch (e) {
 					reject(e);

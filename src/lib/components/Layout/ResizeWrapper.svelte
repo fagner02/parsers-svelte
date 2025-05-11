@@ -44,7 +44,7 @@
 			/**@type {HTMLElement}*/ (handle).style.opacity = '1';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'all';
 		}
-		await wait(500);
+		await wait(id, 500);
 		content.style.width = 'unset';
 		content.style.height = 'unset';
 		content.style.overflow = 'visible';
@@ -70,7 +70,7 @@
 		content.style.width = `${content.scrollWidth}px`;
 		content.style.height = `${content.scrollHeight}px`;
 		content.style.padding = '5px';
-		await wait(0);
+		await wait(id, 0);
 		let openButton = document
 			.querySelector(`#${id}-resize-wrapper>.open-window`)
 			?.getBoundingClientRect();
@@ -82,7 +82,7 @@
 			/**@type {HTMLElement}*/ (handle).style.opacity = '0';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'none';
 		}
-		await wait(500);
+		await wait(id, 500);
 		wrapper.style.overflow = 'hidden';
 		interaction.removeTransformListeners();
 		interaction.attachMoveListeners();

@@ -86,10 +86,11 @@
 		{ name: 'Autômato', desc: 'Construção de autômato LR(1)' },
 		{ name: 'Tabela', desc: 'Construção da tabela LR(1)' }
 	];
+	swapAlgorithm(`clralgo${algos[0].name}`);
 	let selectedAlgorithm = algos[0].name;
 </script>
 
-<AlgorithmTab {code}>
+<AlgorithmTab id="clralgo{algos[0]}" {code}>
 	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
 		<div class="algo-buttons">
 			{#each algos as algo}
@@ -97,7 +98,7 @@
 					use:setUpTooltip={algo.desc}
 					disabled={selectedAlgorithm === algo.name}
 					on:click={() => {
-						swapAlgorithm();
+						swapAlgorithm(`clr${algo.name}`);
 						resetSelectionFunctions();
 						selectedAlgorithm = algo.name;
 					}}>{algo.name}</button
@@ -106,14 +107,18 @@
 		</div>
 		<FillSize class="grid">
 			{#if selectedAlgorithm === algos[0].name}
-				<LR1AutomatonAlgorithm {firstSet}></LR1AutomatonAlgorithm>
+				<LR1AutomatonAlgorithm id="clralgo{algos[0].name}" {firstSet}></LR1AutomatonAlgorithm>
 			{:else}
-				<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>
+				<CLRTableAlgorithm {automaton} id="clralgo{algos[1].name}"></CLRTableAlgorithm>
 			{/if}
 		</FillSize>
 	</FillSize>
 	<SyntaxTree slot="tree" floating={true}></SyntaxTree>
 	<div slot="parse" class="grid" style="place-items: center;">
-		<ClrParse stateList={automaton.states.map((x) => `s${x.index}`)} {table}></ClrParse>
+		<ClrParse
+			id="clralgo{algos[0].name}Parser"
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></ClrParse>
 	</div>
 </AlgorithmTab>

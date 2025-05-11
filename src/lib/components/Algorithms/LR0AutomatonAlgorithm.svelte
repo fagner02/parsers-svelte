@@ -14,6 +14,10 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 
+	/**
+	 * @type {string}
+	 */
+	export let id;
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
 	/**@type {StateCard | undefined}*/
@@ -26,6 +30,8 @@
 	let codeCard;
 	/**@type {PseudoCode | undefined}*/
 	let closureCodeCard;
+	/**@type {StackCard | undefined}*/
+	let symbolListElem;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -62,7 +68,7 @@
 			stateStack.update(() => []);
 			originStateElem?.resetState(false);
 			targetStateElem?.resetState(false);
-			svgLines?.hideLine(false);
+			svgLines?.hideLine(false, id);
 			automatonElem?.reset();
 			symbolsSelection.hideSelect();
 			stateSelection.hideSelect();
@@ -70,7 +76,7 @@
 		} catch (e) {}
 		buildAutomaton();
 	}
-	setResetCall(reset);
+	setResetCall(reset, id);
 
 	async function closure() {
 		return new Promise(async (resolve, reject) => {
@@ -108,13 +114,14 @@
 						await selectSymbol(
 							`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
 							colors.pink,
+							id,
 							false
 						);
 						await closureCodeCard?.highlightLines([13, 14]);
-						await targetStateElem?.addItem(rule.index, 0, null, `gl${rule.index}`);
+						await targetStateElem?.addItem(rule.index, 0, null, `${id}gl${rule.index}`);
 						itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 					}
-					await deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`);
+					await deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`, id);
 					await closureCodeCard?.highlightLines([15]);
 					itemsToCheck.shift();
 				}
@@ -129,7 +136,7 @@
 	async function buildAutomaton() {
 		try {
 			await loadGrammar();
-			await wait(500);
+			await wait(id, 500);
 
 			await codeCard?.highlightLines([0]);
 			/**@type {import('@/types').LR0Automaton}*/
@@ -137,7 +144,7 @@
 			await codeCard?.highlightLines([1]);
 
 			await codeCard?.highlightLines([2]);
-			await targetStateElem?.addItem(0, 0, null, `gl0`);
+			await targetStateElem?.addItem(0, 0, null, `${id}gl0`);
 
 			await codeCard?.highlightLines([3]);
 
@@ -147,7 +154,7 @@
 			await codeCard?.highlightLines([5, 6]);
 			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1], null);
-			await addPause();
+			await addPause(id);
 			await stateStackElem?.addToStack(0, 's0', '', `label-${targetStateElem?.getId()}`);
 
 			while ($stateStack.length > 0) {
@@ -157,14 +164,14 @@
 
 				for (let [symbolIndex, symbol] of alphabet.entries()) {
 					await codeCard?.highlightLines([8]);
-					await symbolsSelection.selectFor(`stack-symbolList-${symbolIndex}`);
+					await symbolsSelection.selectFor(`stack-${symbolListElem?.getId()}-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
 					await codeCard?.highlightLines([9]);
 
 					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
 						await codeCard?.highlightLines([10]);
-						await stateSelection.selectFor(`state-origem-${prodIndex}`);
+						await stateSelection.selectFor(`state-${originStateElem?.getId()}-${prodIndex}`);
 
 						await codeCard?.highlightLines([11]);
 						if (
@@ -179,6 +186,7 @@
 						await selectSymbol(
 							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
 							colors.pink,
+							id,
 							false
 						);
 						await codeCard?.highlightLines([13]);
@@ -188,10 +196,10 @@
 							$targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)
 						) {
 							await codeCard?.highlightLines([16]);
-							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
+							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
 							continue;
 						}
-						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`);
+						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
 						await codeCard?.highlightLines([17]);
 						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
 					}
@@ -244,31 +252,31 @@
 							`label-${targetStateElem?.getId()}`
 						);
 						await codeCard?.highlightLines([26]);
-						await addPause();
+						await addPause(id);
 						continue;
 					}
 
 					await codeCard?.highlightLines([27, 28]);
 					automatonElem?.addNode(stateStackElem?.first(), existent, null, symbol);
-					await addPause();
+					await addPause(id);
 				}
 
 				await codeCard?.highlightLines([29]);
 				await stateStackElem?.removeFromStack(0);
 			}
 
-			limitHit();
+			limitHit(id);
 			automatonElem?.update(undefined, 10);
-			await addPause();
+			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	onMount(async () => {
-		symbolsSelection = getSelectionFunctions('symbolList');
-		stateSelection = getSelectionFunctions('origem');
-		targetStateSelection = getSelectionFunctions('destino');
+		symbolsSelection = getSelectionFunctions(`symbolList${id}`);
+		stateSelection = getSelectionFunctions('origem' + id);
+		targetStateSelection = getSelectionFunctions('destino' + id);
 		fetch('./lr0automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
@@ -280,37 +288,42 @@
 	});
 </script>
 
-<SvgLines svgId="first-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="lraut-svg" bind:this={svgLines}></SvgLines>
 <div class="unit grid">
 	<div class="cards-box unit" style="max-width: inherit;">
-		<GrammarCard isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<StateCard
+			{id}
 			state={targetState}
-			stateId={'destino'}
+			stateId="destino{id}"
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={targetStateElem}
 			bind:svgLines
 		></StateCard>
 		<StateCard
+			{id}
 			state={originState}
-			stateId={'origem'}
+			stateId="origem{id}"
 			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
 			bind:svgLines
 		></StateCard>
 		<StackCard
+			{id}
 			stack={stateStack}
-			stackId="temp"
+			stackId="temp{id}"
 			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
 			bind:svgLines
 		></StackCard>
 		<StackCard
+			{id}
+			bind:this={symbolListElem}
 			stack={symbolList}
-			stackId="symbolList"
+			stackId="symbolList{id}"
 			label="alfabeto"
 			hue={colors.green}
 			reversed={false}
@@ -318,8 +331,8 @@
 		></StackCard>
 	</div>
 	<div class="unit">
-		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="closure"></PseudoCode>
-		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard}></PseudoCode>
+		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="lr0closure"></PseudoCode>
+		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard} id="lr0"></PseudoCode>
 		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
 	</div>
 </div>
