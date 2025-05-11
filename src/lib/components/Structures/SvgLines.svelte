@@ -1,9 +1,9 @@
 <script>
-	import { noJumpWait, wait } from '$lib/flowControl';
+	import { wait } from '$lib/flowControl';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 
-	let opacity = 0;
+	let opacity = $state(0);
 
 	/** @type {SVGPathElement | null} */
 	let line;
@@ -23,7 +23,8 @@
 	/**@type {null | NodeJS.Timeout}*/
 	let inter = null;
 
-	export let svgId;
+	/** @type {{svgId: string, id: string}} */
+	let { svgId, id } = $props();
 
 	/**
 	 * @param {string} srcId
@@ -40,7 +41,7 @@
 		let destElemRect = /**@type {DOMRect}*/ (destElem.getBoundingClientRect());
 
 		let parentRect = /**@type {DOMRect}*/ (
-			document.querySelector('.cards-box')?.getBoundingClientRect()
+			document.querySelector(`#card-box${id}`)?.getBoundingClientRect()
 		);
 		let d =
 			Math.sqrt(
@@ -193,7 +194,7 @@
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 					window.clearInterval(inter);
 				}
-				const { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
+				const { srcPos, destPos } = calcPos(_srcId, _destId);
 				if (destPos === null || srcPos === null) return resolve(null);
 
 				const linePath = `M ${srcPos.x} ${srcPos.y} C ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}, ${srcPos.x} ${srcPos.y}`;

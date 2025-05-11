@@ -15,20 +15,16 @@
 	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {StackCard | undefined}*/
-	let stateStackElem;
+	let stateStackElem = $state();
 	/**@type {StateCard | undefined}*/
-	let originStateElem;
+	let originStateElem = $state();
 	/**@type {StateCard | undefined}*/
-	let targetStateElem;
+	let targetStateElem = $state();
 	/**@type {Automaton | undefined}*/
-	let automatonElem;
+	let automatonElem = $state();
 	/**@type {StackCard | undefined}*/
-	let symbolListElem;
+	let symbolListElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -36,8 +32,9 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let targetState = writable([]);
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let firstSet;
+
+	/** @type {{id: string, firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
+	let { id, firstSet } = $props();
 	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
@@ -51,14 +48,14 @@
 	);
 
 	/**@type {PseudoCode | undefined}*/
-	let codeCard;
+	let codeCard = $state();
 	/**@type {PseudoCode | undefined}*/
-	let closureCodeCard;
+	let closureCodeCard = $state();
 
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
+	let svgLines = $state();
+
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
@@ -215,7 +212,7 @@
 	async function buildAutomaton() {
 		try {
 			await loadGrammar();
-			await wait(id, 500);
+			await addPause(id);
 
 			/**@type {import('@/types').LR1Automaton}*/
 			let automaton = { states: [], transitions: new Map() };
@@ -373,9 +370,9 @@
 	});
 </script>
 
-<SvgLines svgId="lr1aut-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div class="cards-box unit">
+	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<SetsCard {id} set={firstSet} label="first" setId={id} hue={colors.blue}></SetsCard>
 		<StateCard

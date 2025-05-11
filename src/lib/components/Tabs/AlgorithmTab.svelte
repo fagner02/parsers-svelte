@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import {
 		wait,
@@ -8,7 +9,8 @@
 		setOpenInstruction,
 		swapAlgorithm,
 		setLimitHitCallback,
-		skipToEnd
+		skipToEnd,
+		getLimitHit
 	} from '$lib/flowControl';
 	import Code from '@/Layout/Code.svelte';
 	import FillSize from '@/Layout/FillSize.svelte';
@@ -30,19 +32,19 @@
 
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
-	let animation = animIn;
+	let animation = $state(animIn);
 
 	// ============== flow control ==================================
 	/** @type {boolean} */
-	let limit = false;
+	let limit = $state(false);
 	// ============== flow control ==================================
 
-	let parseOn = false;
-	/** @type {string} */
-	export let code;
-	/** @type {string} */
-	export let id;
+	let parseOn = $state(false);
 
+	/**@type {{code: string, id: string, instruction?: string, class?: string, steps: any, tree: any, parse: any}}*/
+	let { code, id = $bindable(), instruction = $bindable(), ...props } = $props();
+
+	instruction ??= '';
 	/** @param {string} name */
 	async function updateSelected(name) {
 		animation = '';
@@ -52,12 +54,11 @@
 		selected = name;
 	}
 
-	let scale = 0.5;
-	let opacity = 0;
-	let pos = 50;
-	let contentPos = -50;
-	let contentOpacity = 0;
-	export let instruction = '';
+	let scale = $state(0.5);
+	let opacity = $state(0);
+	let pos = $state(50);
+	let contentPos = $state(-50);
+	let contentOpacity = $state(0);
 
 	async function closePopup() {
 		animation = animOut;
@@ -93,144 +94,164 @@
 		} catch {}
 	}
 
-	/**
-	 * @param {boolean} value
-	 */
-	function limitHitCallback(value) {
-		limit = value;
+	function limitHitCallback() {
+		limit = getLimitHit(id);
+		console.log('limt', id, limit);
 	}
 
-	setLimitHitCallback(limitHitCallback);
+	setLimitHitCallback(limitHitCallback, id);
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
 
-	let selected = 'noPopup';
-	$: isAnim = selected === 'noPopup';
+	let selected = $state('noPopup');
+	let isAnim = $state(false);
+	$effect(() => {
+		isAnim = selected === 'noPopup';
+	});
 </script>
 
 <FillSize class="contents unit">
-	<div class="controls-box">
-		<div class="controls">
-			<button
-				use:setUpTooltip={'Código'}
-				class="popup-button"
-				on:click={() => updateSelected('code')}
-				disabled={selected == 'code'}
-			>
-				<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
-			</button>
-			<button
-				use:setUpTooltip={'Texto'}
-				class="popup-button"
-				on:click={() => updateSelected('text')}
-				disabled={selected == 'text'}
-			>
-				<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
-			</button>
-			<button
-				use:setUpTooltip={'Informações sobre o algoritmo'}
-				class="popup-button"
-				on:click={() => updateSelected('info')}
-				disabled={selected == 'info'}
-			>
-				<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
-			</button>
-			<button
-				use:setUpTooltip={'Analisar string de entrada'}
-				class="view-button"
-				on:click={() => {
-					//reset();
-					swapAlgorithm(`${id}Parser`);
-					parseOn = true;
-					closePopup();
-				}}
-				disabled={parseOn}
-			>
-				<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
-			</button>
-			<button
-				use:setUpTooltip={'Executar construção do parser'}
-				class="view-button"
-				on:click={() => {
-					// reset();
-					swapAlgorithm(id);
-					parseOn = false;
-					closePopup();
-				}}
-				disabled={!parseOn}
-			>
-				<PlayIcon color="hsl(100,50%,100%)" strokeWidth={3}></PlayIcon>
-			</button>
-		</div>
-
-		<div class="flow-controls controls">
-			<button use:setUpTooltip={'Passo Anterior'} on:click={back(`${id}`)}>
-				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
-			</button>
-			<button use:setUpTooltip={'Reiniciar'} on:click={reset(`${id}`)}>
-				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
-			</button>
-			<button use:setUpTooltip={'Próximo passo'} disabled={limit} on:click={forward(`${id}`)}>
-				<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
-			</button>
-			<button
-				use:setUpTooltip={'Pular para o final'}
-				disabled={limit}
-				on:click={skipToEnd(`${id}`)}
-			>
-				<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
-			</button>
-		</div>
-	</div>
-	{#if isGrammarLoaded()}
-		<FillSize id="wrapper" class="grid maxWidth">
-			<div class="unit" style="height: inherit;max-width: inherit;z-index: 1">
-				{#if parseOn}
-					<ParseView>
-						<slot name="tree" slot="tree"></slot>
-						<slot name="parse" slot="parse"></slot>
-					</ParseView>
-				{:else}
-					<div class="steps {$$props.class ?? ''}" style="position: relative;">
-						<slot name="steps"></slot>
-					</div>
-				{/if}
-			</div>
-			<div
-				class="popup unit"
-				style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
-			>
-				{#if selected === 'code'}
-					<Code {code} onClose={closePopup}></Code>
-				{:else if selected === 'text'}
-					<ResultText onClose={closePopup}></ResultText>
-				{:else if selected === 'info'}
-					<Info onClose={closePopup}></Info>
-				{/if}
-			</div>
-			<div class="unit instruction-box">
-				<div
-					class="instruction"
-					style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
+	{#snippet content()}
+		<div class="controls-box">
+			<div class="controls">
+				<button
+					use:setUpTooltip={'Código'}
+					class="popup-button"
+					onclick={() => updateSelected('code')}
+					disabled={selected == 'code'}
 				>
-					<div
-						class="instruction-content"
-						style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
-					>
-						<InfoIcon
-							color="hsl(200, 70%,40%)"
-							strokeWidth={3}
-							size={18}
-							style="top: 4px;position: relative;"
-						></InfoIcon>
-						<span style="height: 18px;">{instruction}</span>
-					</div>
-				</div>
+					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
+				</button>
+				<button
+					use:setUpTooltip={'Texto'}
+					class="popup-button"
+					onclick={() => updateSelected('text')}
+					disabled={selected == 'text'}
+				>
+					<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
+				</button>
+				<button
+					use:setUpTooltip={'Informações sobre o algoritmo'}
+					class="popup-button"
+					onclick={() => updateSelected('info')}
+					disabled={selected == 'info'}
+				>
+					<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
+				</button>
+				<button
+					use:setUpTooltip={'Analisar string de entrada'}
+					class="view-button"
+					onclick={() => {
+						//reset();
+						id = `${id}Parser`;
+						console.log('swap', id);
+						setLimitHitCallback(limitHitCallback, id);
+						swapAlgorithm(id);
+						parseOn = true;
+						closePopup();
+					}}
+					disabled={parseOn}
+				>
+					<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
+				</button>
+				<button
+					use:setUpTooltip={'Executar construção do parser'}
+					class="view-button"
+					onclick={() => {
+						// reset();
+						console.log('swap', id);
+
+						setLimitHitCallback(limitHitCallback, id);
+						//swapAlgorithm(id);
+						parseOn = false;
+						closePopup();
+					}}
+					disabled={!parseOn}
+				>
+					<PlayIcon color="hsl(100,50%,100%)" strokeWidth={3}></PlayIcon>
+				</button>
 			</div>
-		</FillSize>
-	{:else}
-		None
-	{/if}
+
+			<div class="flow-controls controls">
+				<button use:setUpTooltip={'Passo Anterior'} onclick={() => back(`${id}`)}>
+					<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+				</button>
+				<button use:setUpTooltip={'Reiniciar'} onclick={() => reset(`${id}`)}>
+					<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
+				</button>
+				<button
+					use:setUpTooltip={'Próximo passo'}
+					disabled={limit}
+					onclick={() => forward(`${id}`)}
+				>
+					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+				</button>
+				<button
+					use:setUpTooltip={'Pular para o final'}
+					disabled={limit}
+					onclick={() => skipToEnd(`${id}`)}
+				>
+					<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
+				</button>
+			</div>
+		</div>
+		{#if isGrammarLoaded()}
+			<FillSize id="wrapper" class="grid maxWidth">
+				{#snippet content()}
+					<div class="grid unit" style="height: inherit;max-width: inherit;z-index: 1">
+						<ParseView class="unit {parseOn ? 'not-hidden' : 'hidden'}">
+							{#snippet tree()}
+								{@render props.tree()}
+							{/snippet}
+							{#snippet parse()}
+								{@render props.parse()}
+							{/snippet}
+						</ParseView>
+
+						<div
+							class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}"
+							style="position: relative;"
+						>
+							{@render props.steps()}
+						</div>
+					</div>
+					<div
+						class="popup unit"
+						style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
+					>
+						{#if selected === 'code'}
+							<Code {code} onClose={closePopup}></Code>
+						{:else if selected === 'text'}
+							<ResultText onClose={closePopup}></ResultText>
+						{:else if selected === 'info'}
+							<Info onClose={closePopup}></Info>
+						{/if}
+					</div>
+					<div class="unit instruction-box">
+						<div
+							class="instruction"
+							style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
+						>
+							<div
+								class="instruction-content"
+								style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
+							>
+								<InfoIcon
+									color="hsl(200, 70%,40%)"
+									strokeWidth={3}
+									size={18}
+									style="top: 4px;position: relative;"
+								></InfoIcon>
+								<span style="height: 18px;">{instruction}</span>
+							</div>
+						</div>
+					</div>
+				{/snippet}
+			</FillSize>
+		{:else}
+			None
+		{/if}
+	{/snippet}
 </FillSize>
 
 <style>

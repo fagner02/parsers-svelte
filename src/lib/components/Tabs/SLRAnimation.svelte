@@ -14,21 +14,28 @@
 	import { lr0Automaton } from '$lib/lr0automaton';
 	import { slrTable } from '$lib/slrtable';
 	import { setUpTooltip } from '$lib/tooltip';
+	import { onMount } from 'svelte';
 	let code = '';
 
-	const algos = [
-		{ name: 'Autômato', desc: 'Construção do autômato LR(0)' },
-		{ name: 'Tabela', desc: 'Construção da tabela SLR' }
-	];
+	let algos = $state([
+		{
+			comp: LR0AutomatonAlgorithm,
+			name: 'Autômato',
+			desc: 'Construção do autômato LR(0)',
+			loaded: false
+		},
+		{ comp: SLRTableAlgorithm, name: 'Tabela', desc: 'Construção da tabela SLR', loaded: false }
+	]);
 
-	swapAlgorithm(`slralgo${algos[0].name}`);
-	let selectedAlgorithm = algos[0].name;
+	let id = $state('');
+
+	let selectedAlgorithm = $state(algos[0].name);
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let followSet = writable([]);
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
 	let table = writable(new Map());
-	/**@type {import('@/types').LR0Automaton}*/
-	let automaton;
+
+	let automaton = /**@type {import('@/types').LR0Automaton}*/ ($state());
 
 	(() => {
 		if (!isGrammarLoaded()) return;
@@ -85,37 +92,64 @@
 			)
 		);
 	})();
+	onMount(() => {
+		id = `slralgo${algos[0].name}`;
+		swapAlgorithm(id);
+		algos[0].loaded = true;
+	});
 </script>
 
-<AlgorithmTab id="slralgo{algos[0].name}" {code}>
-	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
-		<div class="algo-buttons">
-			{#each algos as algo}
-				<button
-					use:setUpTooltip={algo.desc}
-					disabled={selectedAlgorithm === algo.name}
-					on:click={() => {
-						swapAlgorithm(`slr${algo.name}`);
-						resetSelectionFunctions();
-						selectedAlgorithm = algo.name;
-					}}>{algo.name}</button
-				>
-			{/each}
-		</div>
-		<FillSize class="grid">
-			{#if selectedAlgorithm === algos[0].name}
-				<LR0AutomatonAlgorithm id="slralgo{algos[0].name}"></LR0AutomatonAlgorithm>
-			{:else}
-				<SLRTableAlgorithm id="slralgo{algos[1].name}" {automaton} {followSet}></SLRTableAlgorithm>
-			{/if}
+<AlgorithmTab bind:id {code}>
+	{#snippet steps()}
+		<FillSize style="max-width: inherit; width: 100%;">
+			{#snippet content()}
+				<div class="algo-buttons">
+					{#each algos as algo}
+						<button
+							use:setUpTooltip={algo.desc}
+							disabled={selectedAlgorithm === algo.name}
+							onclick={() => {
+								id = `slralgo${algo.name}`;
+								swapAlgorithm(id);
+								algo.loaded = true;
+								resetSelectionFunctions();
+								selectedAlgorithm = algo.name;
+							}}>{algo.name}</button
+						>
+					{/each}
+				</div>
+				<FillSize class="grid">
+					{#snippet content()}
+						{#if algos[0].loaded}
+							<div
+								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
+							>
+								<LR0AutomatonAlgorithm id="slralgo{algos[0].name}"></LR0AutomatonAlgorithm>
+							</div>
+						{/if}
+						{#if algos[1].loaded}
+							<div
+								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
+							>
+								<SLRTableAlgorithm id="slralgo{algos[1].name}" {automaton} {followSet}
+								></SLRTableAlgorithm>
+							</div>
+						{/if}
+					{/snippet}
+				</FillSize>
+			{/snippet}
 		</FillSize>
-	</FillSize>
-	<SyntaxTree slot="tree" floating={true}></SyntaxTree>
-	<div slot="parse" class="grid" style="place-items: center;">
-		<SlrParse
-			id="slralgo{algos[0].name}Parser"
-			stateList={automaton.states.map((x) => `s${x.index}`)}
-			{table}
-		></SlrParse>
-	</div>
+	{/snippet}
+	{#snippet tree()}
+		<SyntaxTree id="slralgo{algos[0].name}" floating={true}></SyntaxTree>
+	{/snippet}
+	{#snippet parse()}
+		<div class="grid" style="place-items: center;">
+			<SlrParse
+				id="slralgo{algos[0].name}Parser"
+				stateList={automaton.states.map((x) => `s${x.index}`)}
+				{table}
+			></SlrParse>
+		</div>
+	{/snippet}
 </AlgorithmTab>

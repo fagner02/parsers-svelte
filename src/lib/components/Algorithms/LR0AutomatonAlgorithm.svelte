@@ -14,24 +14,22 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
+	/** @type {{id: string}} */
+	let { id } = $props();
 	/**@type {StackCard | undefined}*/
-	let stateStackElem;
+	let stateStackElem = $state();
 	/**@type {StateCard | undefined}*/
-	let originStateElem;
+	let originStateElem = $state();
 	/**@type {StateCard | undefined}*/
-	let targetStateElem;
+	let targetStateElem = $state();
 	/**@type {Automaton | undefined}*/
-	let automatonElem;
+	let automatonElem = $state();
 	/**@type {PseudoCode | undefined}*/
-	let codeCard;
+	let codeCard = $state();
 	/**@type {PseudoCode | undefined}*/
-	let closureCodeCard;
+	let closureCodeCard = $state();
 	/**@type {StackCard | undefined}*/
-	let symbolListElem;
+	let symbolListElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -53,9 +51,9 @@
 	);
 
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
+	let svgLines = $state();
+
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
@@ -136,7 +134,7 @@
 	async function buildAutomaton() {
 		try {
 			await loadGrammar();
-			await wait(id, 500);
+			await addPause(id);
 
 			await codeCard?.highlightLines([0]);
 			/**@type {import('@/types').LR0Automaton}*/
@@ -288,9 +286,9 @@
 	});
 </script>
 
-<SvgLines svgId="lraut-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="unit grid">
-	<div class="cards-box unit" style="max-width: inherit;">
+	<div class="cards-box unit" id="card-box{id}" style="max-width: inherit;">
 		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<StateCard
 			{id}

@@ -3,24 +3,19 @@
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
-	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
-	export let set;
-	/**@type {Map<any, number>}*/
-	export let setIndexes = new Map();
-	/**@type {string}*/
-	export let setId;
-	export let useNote = true;
-	/**@type {import('@/Structures/SvgLines.svelte').default | null}*/
-	export let svgLines = null;
+	/** @type {{id: string, set: import('svelte/store').Writable<Array<import('@/types').SetRow>>, setIndexes?: Map<any, number>, setId: string, useNote?: boolean, svgLines?: import('@/Structures/SvgLines.svelte').default | null, hue: any, label: any}} */
+	let {
+		id,
+		set = $bindable(),
+		setIndexes = new Map(),
+		setId,
+		useNote = true,
+		svgLines = $bindable(),
+		hue,
+		label
+	} = $props();
 
-	export let hue;
-	export let label;
-
-	let visible = true;
+	let visible = $state(true);
 
 	/**
 	 * @param {any} _
@@ -225,7 +220,7 @@
 		visible = !visible;
 	}
 
-	$: maxHeight = lineHeight * Math.max($set.length, 1);
+	let maxHeight = $derived(lineHeight * Math.max($set?.length ?? 0, 1));
 </script>
 
 <CardWrapper

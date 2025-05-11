@@ -5,23 +5,20 @@
 	import CardWrapper from './CardWrapper.svelte';
 
 	/**
-	 * @type {string}
-	 */
-	export let id;
-	/**
 	 * @template T
 	 * @typedef {import('@/types').StackItem<T>} StackItem*/
 
-	/** @type {import("svelte/store").Writable<Array<StackItem<any>>>} */
-	export let stack;
-	export let label;
-	export let hue;
-	export let highlighted = true;
-	export let reversed = true;
-	/** @type {string} */
-	export let stackId;
-	/** @type {import('@/Structures/SvgLines.svelte').default | undefined} */
-	export let svgLines;
+	/** @type {{id: string, stack: import("svelte/store").Writable<Array<StackItem<any>>>, label: any, hue: any, highlighted?: boolean, reversed?: boolean, stackId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
+	let {
+		id,
+		stack = $bindable(),
+		label,
+		hue,
+		highlighted = true,
+		reversed = true,
+		stackId,
+		svgLines = $bindable()
+	} = $props();
 	let idCount = 0;
 
 	/**

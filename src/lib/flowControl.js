@@ -133,8 +133,8 @@ export function killAllWaits(id) {
 let closeInstruction;
 /** @type {() => Promise<void>} */
 let openInstruction;
-/** @type {() => void}*/
-let resetCall;
+/** @type {Map<string, () => void>}*/
+let resetCalls = new Map();
 
 /**
  * @param {() => Promise<void>} _closeInstruction
@@ -151,17 +151,17 @@ export function setOpenInstruction(_openInstruction) {
 }
 
 /**
- * @param {() => void} _resetCall
+ * @param {() => void} resetCall
  * @param {string} id
  */
-export function setResetCall(_resetCall, id) {
+export function setResetCall(resetCall, id) {
 	limit.set(id, false);
 	currentStep.set(id, 0);
 	jumpWait.set(id, false);
 	jumpPause.set(id, false);
 	maxStep.set(id, -1);
 
-	resetCall = _resetCall;
+	resetCalls.set(id, resetCall);
 }
 export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
 /**@type {Map<string, number>} */
@@ -174,14 +174,14 @@ let maxStep = new Map(); //-1
 let action = new Map(); //flowActions.none
 /**@type {Map<string, boolean>} */
 let limit = new Map(); //false
-/**@type {((value: boolean) => void)?}*/
-let limitHitCallback;
+/**@type {Map<string, (() => void)?>}*/
+let limitHitCallback = new Map(); //null
 /**
  * @param {string} id
  */
 export function limitHit(id) {
-	limitHitCallback?.(true);
 	limit.set(id, true);
+	limitHitCallback.get(id)?.();
 	maxStep.set(id, currentStep.get(id) ?? 0);
 
 	targetStep.set(id, -1);
@@ -189,10 +189,18 @@ export function limitHit(id) {
 }
 
 /**
- * @param {(value:boolean)=>void} callback
+ * @param {string} id
  */
-export function setLimitHitCallback(callback) {
-	limitHitCallback = callback;
+export function getLimitHit(id) {
+	return limit.get(id) ?? false;
+}
+
+/**
+ * @param {()=>void} callback
+ * @param {string} id
+ */
+export function setLimitHitCallback(callback, id) {
+	limitHitCallback.set(id, callback);
 }
 
 /**
@@ -276,10 +284,10 @@ export async function skipToEnd(id) {
 export function back(id) {
 	if ((currentStep.get(id) ?? 0) <= 1 && !limit.get(id)) return;
 	action.set(id, flowActions.back);
-	let newStep = limit.get(id) ? maxStep.get(id) : currentStep.get(id) ?? 0 - 1;
+	let newStep = limit.get(id) ? maxStep.get(id) : (currentStep.get(id) ?? 0) - 1;
 	targetStep.set(id, /**@type {number}*/ (newStep));
 	limit.set(id, false);
-	limitHitCallback?.(false);
+	limitHitCallback.get(id)?.();
 
 	jumpPause.set(id, true);
 	jumpWait.set(id, true);
@@ -291,7 +299,7 @@ export function back(id) {
  */
 export function reset(id) {
 	limit.set(id, false);
-	limitHitCallback?.(false);
+	limitHitCallback.get(id)?.();
 	currentStep.set(id, 0);
 	killAllWaits(id);
 	killPause(id);
@@ -303,25 +311,14 @@ export function reset(id) {
 		jumpWait.set(id, false);
 	}
 
-	resetCall();
+	resetCalls.get(id)?.();
 }
 
 /**
  * @param {string} id
  */
 export function swapAlgorithm(id) {
-	// limit.set(id, false);
-	// limitHitCallback?.(false);
-	// currentStep.set(id, 0);
-	// killAllWaits();
-	// killPause();
-
-	// jumpPause.set(id, false);
-	// jumpWait.set(id, false);
-	// targetStep.set(id, -1);
-	// action.set(id, flowActions.none);
-	// closeInstruction?.();
-
+	limitHitCallback.get(id)?.();
 	if (!pauseResolves.has(id)) {
 		waitCount.set(id, 0);
 		waitRe.set(id, new Map());
@@ -331,7 +328,7 @@ export function swapAlgorithm(id) {
 		pauseResolves.set(id, new Map());
 		pauseRejects.set(id, new Map());
 		limit.set(id, false);
-		limitHitCallback?.(false);
+		limitHitCallback.get(id)?.();
 		currentStep.set(id, 0);
 		maxStep.set(id, -1);
 		action.set(id, flowActions.none);

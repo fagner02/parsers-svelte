@@ -3,8 +3,8 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 
 	let totalQuestions = 10;
-	let totalAnswers = 0;
-	let started = false;
+	let totalAnswers = $state(0);
+	let started = $state(false);
 
 	let answers = new Set();
 	/**
@@ -24,76 +24,80 @@
 </script>
 
 <FillSize class="unit">
-	<div class="form">
-		<div class="form-header">
-			<button
-				disabled={started}
-				on:click={() => {
-					createFile();
-					started = true;
-				}}>Iniciar</button
-			>
-			<p style="font-size: 0.9rem;align-content: center">
-				Progresso: {totalAnswers}/{totalQuestions}
-			</p>
-			<button disabled>Finalizar</button>
-		</div>
-		<FillSize class="form-content">
-			<div class="fields" style={started ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
-				<hr style="margin-top: 0;" />
-				<div class="row">
-					<div class="field">
-						<p>Nome Completo</p>
-						<input on:input={receiveInput} name="name" id="name" />
-					</div>
-					<div class="field">
-						<p>Matrícula</p>
-						<input on:input={receiveInput} name="matricula" id="matricula" />
-					</div>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>1. Dado um conjunto first, forneça uma gramática que gera esse conjunto first</p>
-					<textarea name="q1" id="q1" on:input={receiveInput} rows="4" />
-				</div>
-				<hr />
-				<div class="field col">
-					<p>2. Dado um conjunto follow, forneça uma gramática que gera esse conjunto follow</p>
-					<textarea name="q2" id="q2" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>3. Dada uma tabela slr, forneça uma gramática que gera essa tabela</p>
-					<textarea name="q3" id="q3" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>4. Dada uma tabela lr1, forneça uma gramática que gera essa tabela</p>
-					<textarea name="q4" id="q4" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>A gramática é ll1?</p>
-					<textarea name="q5" id="q5" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>Construir conjunto First de uma gramática grande</p>
-					<textarea name="q6" id="q6" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>Mostre os passos da análise sintática</p>
-					<textarea name="q7" id="q7" on:input={receiveInput} rows="4"></textarea>
-				</div>
-				<hr />
-				<div class="field col">
-					<p>Dê uma gramática que aceita essas entradas</p>
-					<textarea name="q8" id="q8" on:input={receiveInput} rows="4"></textarea>
-				</div>
+	{#snippet content()}
+		<div class="form">
+			<div class="form-header">
+				<button
+					disabled={started}
+					onclick={() => {
+						createFile();
+						started = true;
+					}}>Iniciar</button
+				>
+				<p style="font-size: 0.9rem;align-content: center">
+					Progresso: {totalAnswers}/{totalQuestions}
+				</p>
+				<button disabled>Finalizar</button>
 			</div>
-		</FillSize>
-	</div>
+			<FillSize class="form-content">
+				{#snippet content()}
+					<div class="fields" style={started ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
+						<hr style="margin-top: 0;" />
+						<div class="row">
+							<div class="field">
+								<p>Nome Completo</p>
+								<input oninput={receiveInput} name="name" id="name" />
+							</div>
+							<div class="field">
+								<p>Matrícula</p>
+								<input oninput={receiveInput} name="matricula" id="matricula" />
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>1. Dado um conjunto first, forneça uma gramática que gera esse conjunto first</p>
+							<textarea name="q1" id="q1" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>2. Dado um conjunto follow, forneça uma gramática que gera esse conjunto follow</p>
+							<textarea name="q2" id="q2" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>3. Dada uma tabela slr, forneça uma gramática que gera essa tabela</p>
+							<textarea name="q3" id="q3" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>4. Dada uma tabela lr1, forneça uma gramática que gera essa tabela</p>
+							<textarea name="q4" id="q4" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>A gramática é ll1?</p>
+							<textarea name="q5" id="q5" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>Construir conjunto First de uma gramática grande</p>
+							<textarea name="q6" id="q6" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>Mostre os passos da análise sintática</p>
+							<textarea name="q7" id="q7" oninput={receiveInput} rows="4"></textarea>
+						</div>
+						<hr />
+						<div class="field col">
+							<p>Dê uma gramática que aceita essas entradas</p>
+							<textarea name="q8" id="q8" oninput={receiveInput} rows="4"></textarea>
+						</div>
+					</div>
+				{/snippet}
+			</FillSize>
+		</div>
+	{/snippet}
 </FillSize>
 
 <style>

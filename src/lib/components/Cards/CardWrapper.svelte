@@ -4,16 +4,27 @@
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
 	import { onMount } from 'svelte';
 
-	/**@type {string}*/
-	export let id;
-	export let cardId;
+	/** @type {{
+	 * id: string,
+	 * cardId: any,
+	 * children?: import('svelte').Snippet,
+	 * class?: string,
+	 * maxHeight?: number,
+	 * minHeight?: number,
+	 * maxWidth?: number,
+	 * minWidth?: number,
+	 * hue: number,
+	 * style?: string,
+	 * label: string,
+	 * transition?: string}} */
+	let { ...props } = $props();
 	/**@type {HTMLElement}*/
 	let selection;
 
 	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	const selectionFunctions = {
 		selectFor: async function (/**@type {string}*/ _id) {
-			if (getJumpPause(id)) return;
+			if (getJumpPause(props.id)) return;
 			return new Promise(async (resolve, reject) => {
 				try {
 					if (!_id.startsWith('#')) {
@@ -30,7 +41,7 @@
 					selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
 					selection.style.width = `${elemRect.width + 17}px`;
 					selection.style.height = `${elemRect.height + 3}px`;
-					await wait(id, 500);
+					await wait(props.id, 500);
 					return resolve();
 				} catch (e) {
 					reject(e);
@@ -41,38 +52,38 @@
 			selection.style.opacity = '0';
 		}
 	};
-	setSelectionFunctions(cardId, selectionFunctions);
+	setSelectionFunctions(props.cardId, selectionFunctions);
 
 	onMount(() => {
-		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${cardId}`));
+		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${props.cardId}`));
 	});
 </script>
 
 <div
 	class="grid card-wrapper"
-	style="animation: rotA 0.5s;border: 1px solid hsl({$$props.hue}, 40%, 50%);"
+	style="animation: rotA 0.5s;border: 1px solid hsl({props.hue}, 40%, 50%);"
 >
 	<div
 		class="border-selection unit"
-		id="select-{cardId}"
-		style="border-color: hsl({$$props.hue}, 40%, 45%);"
+		id="select-{props.cardId}"
+		style="border-color: hsl({props.hue}, 40%, 45%);"
 	></div>
 	<div class="unit" style="display: flex;flex-direction: column;">
 		<div
 			class="card"
-			id={$$props.id}
-			style="min-height: {$$props.minHeight}rem; min-width:{$$props.minWidth}rem;max-width: {$$props.maxWidth}rem; max-height: {$$props.maxHeight}rem;{$$props.transition
-				? `transition: ${$$props.transition}`
-				: ''};{$$props.style}"
+			id={props.id}
+			style="min-height: {props.minHeight}rem; min-width:{props.minWidth}rem;max-width: {props.maxWidth}rem; max-height: {props.maxHeight}rem;{props.transition
+				? `transition: ${props.transition}`
+				: ''};{props.style}"
 		>
-			<slot></slot>
+			{@render props.children?.()}
 		</div>
 		<div
 			class="card-label"
-			id="label-{cardId}"
-			style="background: hsl({$$props.hue},50%,50%);font-size: {fontSize}rem;"
+			id="label-{props.cardId}"
+			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}rem;"
 		>
-			{$$props.label}
+			{props.label}
 		</div>
 	</div>
 </div>

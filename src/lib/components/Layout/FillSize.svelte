@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	const config = { attributes: true, childList: true, subtree: false };
 
@@ -5,11 +6,12 @@
 	let component;
 	/** @type {Element} */
 	let parent;
-	export let fillHeight = true;
-	export let fillWidth = true;
 
 	const observer = new MutationObserver(setSize);
 	const resize = new ResizeObserver(setSize);
+
+	/**@type {{class?: string, style?: string,id?: string, fillHeight?: boolean, fillWidth?: boolean, content: any}}*/
+	let { fillHeight = true, fillWidth = true, id = 'resize-wrapper', ...props } = $props();
 
 	function setHeight() {
 		parent = /**@type {HTMLElement}*/ (component.parentElement);
@@ -106,8 +108,8 @@
 	}
 </script>
 
-<div use:setup class="filled {$$props.class ?? ''}" style={$$props.style} id={$$props.id}>
-	<slot></slot>
+<div use:setup class="filled {props.class ?? ''}" style={props.style} {id}>
+	{@render props.content()}
 </div>
 
 <style>

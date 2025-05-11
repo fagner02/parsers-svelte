@@ -11,14 +11,13 @@
 	let card;
 	/** @type {HTMLElement} */
 	let cardContent;
-	/** @type {Boolean} */
-	let minimized;
-	/**	@type {string} */
-	export let title;
+
+	let minimized = /** @type {Boolean} */ ($state(true));
 
 	let interaction = new Interaction();
-	/**@type {string}*/
-	export let id;
+
+	/** @type {{title: string, id: string}} */
+	let { title, id } = $props();
 	export function reset() {
 		for (let line of highlightedLines) {
 			/**@type {HTMLElement}*/ (cardContent.children[line]).style.background = 'hsl(200,0%,100%)';
@@ -52,7 +51,7 @@
 					/**@type {HTMLElement}*/ (cardContent.children[line]).style.border =
 						'1px solid hsl(110,60%,60%, 100%)';
 				}
-				if (minimized || getJumpPause()) {
+				if (minimized || getJumpPause(id)) {
 					return resolve();
 				}
 
@@ -81,8 +80,7 @@
 		setSize();
 	}
 
-	/**@type {()=>void}*/
-	let setSize;
+	let setSize = /**@type {()=>void}*/ ($state(() => {}));
 	onMount(() => {
 		card = /**@type {HTMLElement}*/ (document.querySelector(`#code-card-${id}`));
 		cardContent = /**@type {HTMLElement}*/ (document.querySelector(`#pseudocode-${id}`));
@@ -97,9 +95,11 @@
 	id="code-{id}"
 	{interaction}
 >
-	<div slot="content" class="pseudo-code-card" id="code-card-{id}">
-		<pre style="font-size: 11px;" class="pseudocode" id="pseudocode-{id}"></pre>
-	</div>
+	{#snippet content()}
+		<div class="pseudo-code-card" id="code-card-{id}">
+			<pre style="font-size: 11px;" class="pseudocode" id="pseudocode-{id}"></pre>
+		</div>
+	{/snippet}
 </ResizeWrapper>
 
 <style>

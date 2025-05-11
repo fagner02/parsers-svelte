@@ -14,30 +14,26 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
-	export let table;
-	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
-	let inputStack = writable([]);
-	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
-	let stateStack = writable([]);
-	export let stateList;
-	/**@type {PseudoCode}*/
-	let codeCard;
+	let svgLines = $state();
 
-	/** @type {StackCard}*/
-	let stateStackElement;
-	/** @type {StackCard}*/
-	let inputStackElement;
-	let { nt, augRules, alphabet, startingSymbol } = getAugGrammar();
+	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
+	let inputStack = $state(writable([]));
+	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
+	let stateStack = $state(writable([]));
+	/** @type {{id: string, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>, stateList: any}} */
+	let { id, table, stateList } = $props();
+
+	let codeCard = /**@type {PseudoCode}*/ ($state());
+
+	let stateStackElement = /** @type {StackCard}*/ ($state());
+
+	let inputStackElement = /** @type {StackCard}*/ ($state());
+
+	let { augRules, alphabet } = getAugGrammar();
 	let context = getContext('parseView');
-	/** @type {() => Promise<any>} */
-	let loadGrammar;
+
+	let loadGrammar = /** @type {() => Promise<any>} */ ($state());
 
 	let {
 		initializeTree,
@@ -58,7 +54,7 @@
 
 	async function parsing() {
 		try {
-			await wait(id, 100);
+			await addPause(id);
 			resetTree();
 
 			if (initializeTree === undefined) {
@@ -171,8 +167,8 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="slrparse"></SvgLines>
-<div class="cards-box unit">
+<SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
+<div class="cards-box unit" id="card-box{id}">
 	<div class="unit">
 		<PseudoCode title="Análise sintática SLR" bind:this={codeCard} id="slrparse"></PseudoCode>
 	</div>

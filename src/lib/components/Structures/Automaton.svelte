@@ -9,9 +9,9 @@
 	import HandMoveIcon from '@icons/HandMoveIcon.svelte';
 
 	let rules = getAugGrammar().augRules;
+	/** @type {{id: string}} */
+	let props = $props();
 
-	/**@type {string}*/
-	export let id;
 	/**@type {SVGGElement}*/
 	let groupElem;
 	/**@type {SVGGElement}*/
@@ -31,7 +31,7 @@
 	/** @type {Node[]}*/
 	let nodes = [];
 	/**@type {Interaction}*/
-	let svgInteraction = new Interaction();
+	let svgInteraction = $state(new Interaction());
 	let moveElements = false;
 	let selectedElement = { index: -1, rect: { x: 0, y: 0 }, diff: { x: 0, y: 0 } };
 	function move(/**@type {MouseEvent|TouchEvent}*/ e) {
@@ -92,12 +92,12 @@
 		nodes = [];
 		groupElem.remove();
 		groupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-		groupElem.id = 'nodes';
+		groupElem.id = `${props.id}nodes`;
 		selectGroupElem.remove();
 		selectGroupElem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		selectGroupElem.id = 'selected-node';
-		document.querySelector(`#${id}-svg`)?.append(groupElem);
-		document.querySelector(`#${id}-svg`)?.append(selectGroupElem);
+		document.querySelector(`#automato-${props.id}-svg`)?.append(groupElem);
+		document.querySelector(`#automato-${props.id}-svg`)?.append(selectGroupElem);
 		svgInteraction.updateTargets([groupElem, selectGroupElem]);
 		setSize();
 	}
@@ -369,7 +369,8 @@
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? undefined : [/**@type {number}*/ (from), to];
-		if (shouldUpdate && getAction() !== flowActions.skipping && !getJumpPause()) update(ex);
+		if (shouldUpdate && getAction(props.id) !== flowActions.skipping && !getJumpPause(props.id))
+			update(ex);
 	}
 
 	/**
@@ -547,13 +548,15 @@
 
 		update([-1, -1], 10);
 	}
-	/**@type {()=>void}*/
-	let setSize;
+
+	let setSize = /**@type {()=>void}*/ ($state());
 	onMount(() => {
-		svgElem = /**@type {SVGElement}*/ (document.querySelector(`#${id}-svg`));
-		groupElem = /**@type {SVGGElement}*/ (document.querySelector(`#${id}-svg>#nodes`));
+		svgElem = /**@type {SVGElement}*/ (document.querySelector(`#automato-${props.id}-svg`));
+		groupElem = /**@type {SVGGElement}*/ (
+			document.querySelector(`#automato-${props.id}-svg>#${props.id}nodes`)
+		);
 		selectGroupElem = /**@type {SVGGElement}*/ (
-			document.querySelector(`#${id}-svg>#selected-node`)
+			document.querySelector(`#automato-${props.id}-svg>#${props.id}selected-node`)
 		);
 		svgInteraction.setTransformInteraction(svgElem, [groupElem, selectGroupElem]);
 
@@ -580,20 +583,22 @@
 	];
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <ResizeWrapper
 	title={'Autômato'}
 	titleLabel={null}
 	bind:setSize
 	{actions}
 	component={AutomatonIcon}
-	{id}
+	id={props.id}
 	bind:interaction={svgInteraction}
 >
-	<svg slot="content" class="unit border" id="{id}-svg">
-		<g id="nodes"></g>
-		<g id="selected-node"></g>
-	</svg>
+	{#snippet content()}
+		<svg class="unit border" id="automato-{props.id}-svg">
+			<g id="{props.id}nodes"></g>
+			<g id="{props.id}selected-node"></g>
+		</svg>
+	{/snippet}
 </ResizeWrapper>
 
 <style>

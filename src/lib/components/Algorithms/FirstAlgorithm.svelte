@@ -14,32 +14,25 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import FistInfo from '@/Info/FistInfo.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {StackCard | undefined}*/
-	let joinStackElement;
+	let joinStackElement = $state();
 	/**@type {SetsCard | undefined}*/
-	let firstSetElement;
+	let firstSetElement = $state();
 	/**@type {SetsCard | undefined}*/
-	let joinSetElement;
+	let joinSetElement = $state();
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
-	/**@type {PseudoCode | undefined}*/
-	let codeCard;
+	let svgLines = $state();
 
-	/**@type {string}*/
-	export let instruction;
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
+	/**@type {PseudoCode | undefined}*/
+	let codeCard = $state();
+
 	let { nt, rules } = getGrammar();
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let joinStack = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
-	export let firstSet = writable([]);
-	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>} */
-	export let joinSet = writable([]);
+
+	/** @type {{id: string, instruction: string, firstSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>, joinSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>}} */
+	let { id, instruction = $bindable(), firstSet = writable([]), joinSet = writable([]) } = $props();
 
 	/**@type {Map<number,number>}*/
 	let firstIndexes = new Map();
@@ -64,7 +57,6 @@
 
 	async function first() {
 		try {
-			await wait(id, 0);
 			await loadGrammar();
 			await addPause(id);
 			const nullable = calcNullable(rules);
@@ -233,12 +225,12 @@
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
 		<PseudoCode title="First" bind:this={codeCard} id="first"></PseudoCode>
 	</div>
-	<div class="unit cards-box">
+	<div class="unit cards-box" id="card-box{id}">
 		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<SetsCard
 			setId="first{id}"

@@ -16,31 +16,26 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
 	/**@type {StackCard | undefined}*/
 	let symbolListElem;
 	/**@type {TableCard | undefined}*/
-	let tableElem;
+	let tableElem = $state();
 	/**@type {StateCard | undefined}*/
 	let stateElem;
 	/**@type {Automaton | undefined}*/
-	let automatonElem;
+	let automatonElem = $state();
 	/**@type {PseudoCode | undefined}*/
-	let codeCard;
+	let codeCard = $state();
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
-	let state = writable([]);
+	let slrState = writable([]);
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>}*/
-	let table = writable(new Map());
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let followSet;
-	/**@type {import('@/types').LR0Automaton}*/
-	export let automaton;
+	let table = $state(writable(new Map()));
+
+	/** @type {{id: string, followSet: import('svelte/store').Writable<import('@/types').SetRow[]>, automaton: import('@/types').LR0Automaton}} */
+	let { id, followSet, automaton } = $props();
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<any>>>} */
 	let stateList = writable([
 		...automaton.states.map((x, index) => ({
@@ -55,9 +50,9 @@
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	let columns = [...alphabet];
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
+	let svgLines = $state();
+
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
@@ -80,7 +75,7 @@
 		if (symbolListElem) symbolsSelection = getSelectionFunctions(symbolListElem.getId());
 		try {
 			await loadGrammar();
-			await wait(id, 500);
+			await addPause(id);
 
 			await codeCard?.highlightLines([0]);
 			await codeCard?.highlightLines([1]);
@@ -180,13 +175,13 @@
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
 		<PseudoCode title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
 		<Automaton {id} bind:this={automatonElem}></Automaton>
 	</div>
-	<div class="cards-box unit">
+	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId="slr" isAugmented={true} bind:loadGrammar></GrammarCard>
 		<TableCard
 			{id}

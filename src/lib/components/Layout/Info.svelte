@@ -1,13 +1,17 @@
 <script>
 	import Popup from './Popup.svelte';
 	import { component } from '$lib/infoText';
-	export let onClose;
+	/** @type {{onClose: any}} */
+	let { onClose } = $props();
 </script>
 
-<Popup let:style let:contentClass id="info" {onClose}>
-	<div id="info-content" class={contentClass} style={`padding: 0px 10px;${style}`}>
-		<svelte:component this={component}></svelte:component>
-	</div>
+<Popup id="info" {onClose}>
+	{#snippet children(/**@type {{ style:string, contentClass:string }}*/ params)}
+		{@const SvelteComponent = component}
+		<div id="info-content" class={params.contentClass} style={`padding: 0px 10px;${params.style}`}>
+			<SvelteComponent></SvelteComponent>
+		</div>
+	{/snippet}
 </Popup>
 
 <style>

@@ -1,20 +1,23 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import FillSize from './FillSize.svelte';
 	import CloseButton from './CloseButton.svelte';
 
-	export let flex = 0.1;
-	export let opacity = 0;
-	export let pos = -50;
-	export let onClose;
+	/**@type {{flex?: number, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
+	let { ...props } = $props();
+
+	props.flex = 0.1;
+	props.opacity = 0;
+	props.pos = -50;
 
 	onMount(async () => {
-		await wait(id, 200);
-		flex = 1;
-		await wait(id, 200);
-		opacity = 1;
-		pos = 0;
+		await noJumpWait(200);
+		props.flex = 1;
+		await noJumpWait(200);
+		props.opacity = 1;
+		props.pos = 0;
 	});
 </script>
 
@@ -23,20 +26,22 @@
 	class="maxWidth"
 	fillWidth={false}
 >
-	<CloseButton {onClose}></CloseButton>
-	<div
-		id={$$props.id}
-		class="popup-box maxWidth"
-		style="transform: scale({flex}, 1);height: inherit;"
-	>
-		<slot
-			maxWidth={flex}
-			{opacity}
-			{pos}
-			contentClass="popup-content"
-			style="opacity: {opacity};transform: translate(0px, {pos}px)"
-		></slot>
-	</div>
+	{#snippet content()}
+		<CloseButton onClose={props.onClose}></CloseButton>
+		<div
+			id={props.id}
+			class="popup-box maxWidth"
+			style="transform: scale({props.flex}, 1);height: inherit;"
+		>
+			{@render props.children({
+				contentClass: 'popup-content',
+				style: 'opacity: {props.opacity};transform: translate(0px, {pos}px)',
+				opacity: props.opacity,
+				maxWidth: props.flex,
+				pos: props.pos
+			})}
+		</div>
+	{/snippet}
 </FillSize>
 
 <style>

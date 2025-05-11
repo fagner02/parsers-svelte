@@ -20,7 +20,9 @@
 	<Header></Header>
 	<Tooltip></Tooltip>
 	<FillSize fillWidth={false} id="app-content" class="grid borders maxWidth">
-		<Tabs class="unit "></Tabs>
+		{#snippet content()}
+			<Tabs class="unit "></Tabs>
+		{/snippet}
 	</FillSize>
 </div>
 

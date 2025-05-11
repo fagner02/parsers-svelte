@@ -13,25 +13,20 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>} */
-	export let table;
-	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
-	let inputStack = writable([]);
-	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
-	let symbolStack = writable([]);
-	/**@type {PseudoCode}*/
-	let codeCard;
+	let svgLines = $state();
 
-	/** @type {StackCard}*/
-	let symbolStackElement;
-	/** @type {StackCard}*/
-	let inputStackElement;
+	/** @type {{id: string, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>}} */
+	let { id, table } = $props();
+	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
+	let inputStack = $state(writable([]));
+	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
+	let symbolStack = $state(writable([]));
+
+	let codeCard = /**@type {PseudoCode}*/ ($state());
+
+	let symbolStackElement = /** @type {StackCard}*/ ($state());
+	let inputStackElement = /** @type {StackCard}*/ ($state());
 	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
 
@@ -49,15 +44,14 @@
 
 	async function parsing() {
 		try {
-			await codeCard?.highlightLines([0]);
-			await wait(id, 100);
-
 			if (initializeTree === undefined) {
 				let functions = getTreeFunctions();
 				initializeTree = functions.initializeTree;
 				addToTree = functions.addToTree;
 				resetTree = functions.resetTree;
 			}
+			await addPause(id);
+			await codeCard?.highlightLines([0]);
 			resetTree();
 			initializeTree(startingSymbol);
 			await codeCard?.highlightLines([1]);
@@ -140,12 +134,12 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="llparse"></SvgLines>
+<SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
 		<PseudoCode title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"></PseudoCode>
 	</div>
-	<div class="cards-box unit">
+	<div class="cards-box unit" id="card-box{id}">
 		<TableCard
 			{id}
 			rows={nt}

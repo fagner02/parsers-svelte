@@ -13,42 +13,34 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import FollowInfo from '@/Info/FollowInfo.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {SetsCard | undefined}*/
-	let followSetElement;
+	let followSetElement = $state();
 	/**@type {SetsCard | undefined}*/
-	let joinSetElement;
+	let joinSetElement = $state();
 	/**@type {StackCard | undefined}*/
-	let joinStackElement;
+	let joinStackElement = $state();
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
+	let svgLines = $state();
 	/**@type {PseudoCode | undefined}*/
-	let codeCard;
-	/**@type {SetsCard}*/
-	let firstSetElement;
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
-	/**@type {string}*/
-	export let instruction;
+	let codeCard = $state();
+
+	let firstSetElement = /**@type {SetsCard}*/ ($state());
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
 	let { nt, rules } = getGrammar();
-	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
-	export let followSet = writable([]);
+
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	let joinSet = writable([]);
 	/**@type {Map<string, number>}*/
-	let joinIndexes = new Map();
+	let joinIndexes = $state(new Map());
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let joinStack = writable([]);
 
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let firstSet;
+	/** @type {{id: string, instruction: string, followSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>, firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
+	let { id, instruction = $bindable(), followSet = writable([]), firstSet } = $props();
 
 	/**@type {Map<string, number>}*/
-	let followIndexes = new Map();
+	let followIndexes = $state(new Map());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions|undefined}*/
 	let grammarFuncs;
 
@@ -67,7 +59,6 @@
 
 	async function follow() {
 		try {
-			await wait(id, 100);
 			await loadGrammar();
 			await addPause(id);
 
@@ -283,12 +274,12 @@
 	});
 </script>
 
-<SvgLines svgId="follow-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
 		<PseudoCode title="Follow" bind:this={codeCard} id="follow"></PseudoCode>
 	</div>
-	<div class="cards-box unit">
+	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<SetsCard
 			{id}

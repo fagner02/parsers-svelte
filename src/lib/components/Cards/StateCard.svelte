@@ -6,24 +6,15 @@
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
-	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>}*/
-	export let state;
 	/** @type {Array<import('@/types').GrammarItem>} */
 	let rules = getAugGrammar().augRules;
 	/**@type {HTMLElement}*/
 	let container;
 
-	let dotIndex = -1;
-	export let hue;
-	export let label;
-	/** @type {string}*/
-	export let stateId;
-	/**@type {SvgLines | undefined}*/
-	export let svgLines;
+	let dotIndex = $state(-1);
+
+	/** @type {{id: string, state: import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>, hue: any, label: any, stateId: string, svgLines: SvgLines | undefined}} */
+	let { id, state: cardState, hue, label, stateId, svgLines = $bindable() } = $props();
 
 	/**
 	 * @param {number} ruleIndex
@@ -34,7 +25,7 @@
 	export async function addItem(ruleIndex, pos, lookahead = null, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				state.update((x) => [
+				cardState.update((x) => [
 					...x,
 					{
 						ruleIndex: ruleIndex,
@@ -45,9 +36,10 @@
 				]);
 				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#state-${stateId}-${$state.length - 1}`)
+					document.querySelector(`#state-${stateId}-${$cardState.length - 1}`)
 				);
-				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${$state.length - 1}`, id);
+				if (srcId)
+					await svgLines?.showLine(srcId, `#state-${stateId}-${$cardState.length - 1}`, id);
 
 				elem.style.width = `${elem.scrollWidth}px`;
 				elem.style.height = `${elem.scrollHeight}px`;
@@ -69,7 +61,7 @@
 	export async function updateLookahead(lookahead, existent) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				state.update((x) => {
+				cardState.update((x) => {
 					x[existent].lookahead = new Set([
 						.../**@type {Set<string>}*/ (x[existent].lookahead),
 						...lookahead.values()
@@ -112,7 +104,7 @@
 	export async function loadState(stateToLoad) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				state.update(() =>
+				cardState.update(() =>
 					stateToLoad.items.map((x) => {
 						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
@@ -142,7 +134,7 @@
 	export async function resetState(shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				if ($state.length === 0) {
+				if ($cardState.length === 0) {
 					return resolve(null);
 				}
 				container.style.maxHeight = `${container.scrollHeight}px`;
@@ -154,7 +146,7 @@
 				container.style.opacity = '0';
 
 				if (shouldWait) await wait(id, 500);
-				state.update(() => []);
+				cardState.update(() => []);
 
 				container.style.maxHeight = 'unset';
 				container.style.maxWidth = 'unset';
@@ -181,7 +173,7 @@
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
-		{#each $state as item, rindex}
+		{#each $cardState as item, rindex}
 			<p
 				id="state-{stateId}-{rindex}"
 				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"

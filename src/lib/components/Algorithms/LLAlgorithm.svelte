@@ -13,28 +13,24 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import LL1TableInfo from '@/Info/LL1TableInfo.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
 	/**@type {SvgLines | undefined}*/
-	let svgLines;
+	let svgLines = $state();
 	/**@type {PseudoCode | undefined}*/
-	let codeCard;
-	/**@type {TableCard}*/
-	let tableElement;
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>} */
-	export let table = writable(new Map());
-	/**@type {() => Promise<void>}*/
-	let loadGrammar;
-	/**@type {string}*/
-	export let instruction;
+	let codeCard = $state();
+
+	let tableElement = /**@type {TableCard}*/ ($state());
+	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
 	let { nt, t, rules } = getGrammar();
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let firstSet;
-	/**@type {import('svelte/store').Writable<import('@/types').SetRow[]>}*/
-	export let followSet;
+
+	/** @type {{id: string, table?: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>, instruction: string, firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>, followSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
+	let {
+		id,
+		table = $bindable(writable(new Map())),
+		instruction = $bindable(),
+		firstSet,
+		followSet
+	} = $props();
 
 	function reset() {
 		tableElement.resetTable();
@@ -48,15 +44,14 @@
 	setResetCall(reset, id);
 
 	/**@type {SetsCard | undefined}*/
-	let firstCard;
+	let firstCard = $state();
 	/**@type {SetsCard | undefined}*/
-	let followCard;
+	let followCard = $state();
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let firstFuncs;
 
 	async function lltable() {
 		try {
-			await wait(id, 100);
 			await loadGrammar();
 			await addPause(id);
 			instruction = 'Since this thing is like that we have add to the stack';
@@ -155,12 +150,12 @@
 	});
 </script>
 
-<SvgLines svgId="lltable-svg" bind:this={svgLines}></SvgLines>
+<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit">
 		<PseudoCode title="Tabela LL(1)" bind:this={codeCard} id="lltable"></PseudoCode>
 	</div>
-	<div class="cards-box unit">
+	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId={id} bind:loadGrammar></GrammarCard>
 		<TableCard
 			{id}

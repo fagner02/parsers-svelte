@@ -1,7 +1,6 @@
 <script>
-	export let color = 'black';
-	export let size = 15;
-	export let strokeWidth = 2;
+	/** @type {{color?: string, size?: number, strokeWidth?: number}} */
+	let { color = 'black', size = 15, strokeWidth = 2 } = $props();
 </script>
 
 <svg

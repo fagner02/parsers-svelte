@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import { wait } from '$lib/flowControl';
 	import HandIcon from '@icons/HandIcon.svelte';
@@ -5,34 +6,58 @@
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
 
-	/**@type {string?}*/
-	export let titleLabel = 'Algoritmo: ';
-	/**@type {string?}*/
-	export let title = null;
-	/**@type {string}*/
-	export let id;
-	/**@type {import("$lib/interactiveElem").Interaction}*/
-	export let interaction;
-	export let minimized = true;
+	// /**@type {string?}*/
+	// export let titleLabel = 'Algoritmo: ';
+	// /**@type {string?}*/
+	// export let title = null;
+	// /**@type {string}*/
+	// export let id;
+	// /**@type {import("$lib/interactiveElem").Interaction}*/
+	// export let interaction;
+	// export let minimized = true;
+	/**@type {{
+	 * titleLabel?:string?,
+	 * title: string?,
+	 * id: string,
+	 * interaction: import("$lib/interactiveElem").Interaction,
+	 * minimized?: boolean,
+	 * actions?: any[],
+	 * component: any,
+	 * content: import('svelte').Snippet,
+	 * setSize?: () => void,
+	 * style?: string }}*/
+	let {
+		titleLabel = 'Algoritmo: ',
+		actions = [],
+		minimized = $bindable(),
+		setSize = $bindable(),
+		title = null,
+		content,
+		interaction = $bindable(),
+		...props
+	} = $props();
+	minimized ??= true;
 	let width = 0;
 	let height = 0;
-	let selected = 'grab';
-	let isInteracting = false;
+	let selected = $state('grab');
+	let isInteracting = $state(false);
 	/**@type {(()=>void)?}*/
 	let removeCallback = null;
 	let interactingCallback = (/**@type {boolean}*/ value) => {
 		isInteracting = value;
 	};
 
-	/** @type {any[]} */
-	export let actions = [];
-
-	export let component;
+	setSize = function () {
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
+		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		width = content.scrollWidth;
+		height = content.scrollHeight;
+	};
 
 	async function open() {
 		minimized = false;
 
-		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
 		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
 		content.style.width = `${width}px`;
 		content.style.height = `${height}px`;
@@ -44,7 +69,7 @@
 			/**@type {HTMLElement}*/ (handle).style.opacity = '1';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'all';
 		}
-		await wait(id, 500);
+		await wait(props.id, 500);
 		content.style.width = 'unset';
 		content.style.height = 'unset';
 		content.style.overflow = 'visible';
@@ -63,16 +88,16 @@
 		console.log(document.querySelector('.unit.open-window')?.getBoundingClientRect());
 		minimized = true;
 
-		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
 		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
 		width = content.scrollWidth;
 		height = content.scrollHeight;
 		content.style.width = `${content.scrollWidth}px`;
 		content.style.height = `${content.scrollHeight}px`;
 		content.style.padding = '5px';
-		await wait(id, 0);
+		await wait(props.id, 0);
 		let openButton = document
-			.querySelector(`#${id}-resize-wrapper>.open-window`)
+			.querySelector(`#${props.id}-resize-wrapper>.open-window`)
 			?.getBoundingClientRect();
 		content.style.width = `${openButton?.width}px`;
 		content.style.height = `${openButton?.height}px`;
@@ -82,27 +107,22 @@
 			/**@type {HTMLElement}*/ (handle).style.opacity = '0';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'none';
 		}
-		await wait(id, 500);
+		await wait(props.id, 500);
 		wrapper.style.overflow = 'hidden';
 		interaction.removeTransformListeners();
 		interaction.attachMoveListeners();
 	}
-	export function setSize() {
-		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
-		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
-		width = content.scrollWidth;
-		height = content.scrollHeight;
-	}
+
 	onMount(() => {
-		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${id}-resize-wrapper`));
+		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
 		wrapper.style.left = '0px';
 		wrapper.style.top = '0px';
 		interaction.setResizeInteraction(
 			new Map([
-				['lb', document.querySelector(`#${id}-lb-handle`)],
-				['lt', document.querySelector(`#${id}-lt-handle`)],
-				['rb', document.querySelector(`#${id}-rb-handle`)],
-				['rt', document.querySelector(`#${id}-rt-handle`)]
+				['lb', document.querySelector(`#${props.id}-lb-handle`)],
+				['lt', document.querySelector(`#${props.id}-lt-handle`)],
+				['rb', document.querySelector(`#${props.id}-rb-handle`)],
+				['rt', document.querySelector(`#${props.id}-rt-handle`)]
 			]),
 			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
 		);
@@ -113,7 +133,7 @@
 		interaction.attachMoveListeners();
 
 		let openButton = document
-			.querySelector(`#${id}-resize-wrapper>.open-window`)
+			.querySelector(`#${props.id}-resize-wrapper>.open-window`)
 			?.getBoundingClientRect();
 		content.style.width = `${openButton?.width}px`;
 		content.style.height = `${openButton?.height}px`;
@@ -121,14 +141,14 @@
 	});
 </script>
 
-<div class="grid resize-wrapper" style={$$props.style} id="{id}-resize-wrapper">
+<div class="grid resize-wrapper" style={props.style} id="{props.id}-resize-wrapper">
 	<div class="unit resize-content">
-		<slot name="content"></slot>
+		{@render content()}
 	</div>
-	<div class="unit resize-handle lb-handle" id="{id}-lb-handle"></div>
-	<div class="unit resize-handle lt-handle" id="{id}-lt-handle"></div>
-	<div class="unit resize-handle rb-handle" id="{id}-rb-handle"></div>
-	<div class="unit resize-handle rt-handle" id="{id}-rt-handle"></div>
+	<div class="unit resize-handle lb-handle" id="{props.id}-lb-handle"></div>
+	<div class="unit resize-handle lt-handle" id="{props.id}-lt-handle"></div>
+	<div class="unit resize-handle rb-handle" id="{props.id}-rb-handle"></div>
+	<div class="unit resize-handle rt-handle" id="{props.id}-rt-handle"></div>
 	<div
 		class="unit action-tray"
 		style="opacity: {minimized ? 0 : 1};width: {minimized
@@ -138,10 +158,10 @@
 		{#if title}
 			<p style="height: {minimized ? '0px' : 'auto'}">{title}</p>
 		{/if}
-		<button on:click={close}><MinimizeIcon></MinimizeIcon></button>
+		<button onclick={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
 			disabled={selected === 'move'}
-			on:click={(e) => {
+			onclick={(e) => {
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
@@ -152,7 +172,7 @@
 		>
 		<button
 			disabled={selected === 'grab'}
-			on:click={(e) => {
+			onclick={(e) => {
 				e.stopImmediatePropagation();
 				selected = 'grab';
 				removeCallback?.();
@@ -164,20 +184,20 @@
 		{#each actions as action}
 			<button
 				disabled={selected === action.name}
-				on:click={() => {
+				onclick={() => {
 					removeCallback?.();
 					interaction.removeTransformListeners();
 					interaction.removeMoveListeners();
 					selected = action.name;
 					action.callback();
 					removeCallback = action.removeCallback;
-				}}><svelte:component this={action.icon}></svelte:component></button
+				}}><action.icon /></button
 			>
 		{/each}
 	</div>
 	{#if minimized}
-		<button class="unit open-window" on:click={open}>
-			<svelte:component this={component}></svelte:component>
+		<button class="unit open-window" onclick={open}>
+			<props.component />
 
 			{#if titleLabel}
 				{titleLabel}

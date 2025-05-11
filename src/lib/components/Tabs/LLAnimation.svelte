@@ -16,8 +16,7 @@
 	import { setUpTooltip } from '$lib/tooltip';
 
 	// ========== Components ====================
-	/**@type {string}*/
-	let instruction;
+	let instruction = /**@type {string}*/ ($state());
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
@@ -26,6 +25,7 @@
 	let table = writable();
 	// ========== Components ====================
 
+	let id = $state('');
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
@@ -112,42 +112,71 @@
 	});
 
 	const algos = [
-		{ name: 'First', desc: 'Construção do conjunto first' },
-		{ name: 'Follow', desc: 'Construção do conjunto follow' },
-		{ name: 'Tabela', desc: 'Construção da tabela LL(1)' }
+		{ comp: FirstAlgorithm, name: 'First', desc: 'Construção do conjunto first', loaded: true },
+		{ comp: FollowAlgorithm, name: 'Follow', desc: 'Construção do conjunto follow', loaded: true },
+		{ comp: LlAlgorithm, name: 'Tabela', desc: 'Construção da tabela LL(1)', loaded: true }
 	];
-	swapAlgorithm(`llalgo${algos[0].name}`);
-	let selectedAlgorithm = algos[0].name;
+	onMount(() => {
+		id = `llalgo${algos[0].name}`;
+		swapAlgorithm(id);
+		algos[0].loaded = true;
+	});
+	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab id="llalgo{algos[0].name}" bind:instruction {code}>
-	<div slot="steps" style="max-width: inherit; width: 100%;">
-		<div class="algo-buttons">
-			{#each algos as algo}
-				<button
-					use:setUpTooltip={algo.desc}
-					disabled={selectedAlgorithm === algo.name}
-					on:click={() => {
-						swapAlgorithm('llalgo' + algo.name);
-						resetSelectionFunctions();
-						selectedAlgorithm = algo.name;
-					}}>{algo.name}</button
-				>
-			{/each}
+<AlgorithmTab bind:id bind:instruction {code}>
+	{#snippet steps()}
+		<div style="max-width: inherit; width: 100%;">
+			<div class="algo-buttons">
+				{#each algos as algo}
+					<button
+						use:setUpTooltip={algo.desc}
+						disabled={selectedAlgorithm === algo.name}
+						onclick={() => {
+							id = `llalgo${algo.name}`;
+							swapAlgorithm(id);
+							resetSelectionFunctions();
+							selectedAlgorithm = algo.name;
+						}}>{algo.name}</button
+					>
+				{/each}
+			</div>
+			<div class="grid">
+				{#if algos[0].loaded}
+					<div
+						class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
+						style="height: inherit;"
+					>
+						<FirstAlgorithm id="llalgo{algos[0].name}" bind:instruction></FirstAlgorithm>
+					</div>
+				{/if}
+				{#if algos[1].loaded}
+					<div
+						class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
+						style="height: inherit;"
+					>
+						<FollowAlgorithm id="llalgo{algos[1].name}" {firstSet} bind:instruction
+						></FollowAlgorithm>
+					</div>
+				{/if}
+				{#if algos[2].loaded}
+					<div
+						class="unit grid {selectedAlgorithm === algos[2].name ? 'not-hidden' : 'hidden'}"
+						style="height: inherit;"
+					>
+						<LlAlgorithm id="llalgo{algos[2].name}" {firstSet} {followSet} bind:instruction
+						></LlAlgorithm>
+					</div>
+				{/if}
+			</div>
 		</div>
-		<div class="grid">
-			{#if selectedAlgorithm === algos[0].name}
-				<FirstAlgorithm id="llalgo{algos[0].name}" bind:instruction></FirstAlgorithm>
-			{:else if selectedAlgorithm === algos[1].name}
-				<FollowAlgorithm id="llalgo{algos[1].name}" {firstSet} bind:instruction></FollowAlgorithm>
-			{:else}
-				<LlAlgorithm id="llalgo{algos[2].name}" {firstSet} {followSet} bind:instruction
-				></LlAlgorithm>
-			{/if}
+	{/snippet}
+	{#snippet tree()}
+		<SyntaxTree id="llalgo{algos[0].name}"></SyntaxTree>
+	{/snippet}
+	{#snippet parse()}
+		<div class="grid" style="place-items: center;">
+			<LlParse id="llalgo{algos[0].name}Parser" {table}></LlParse>
 		</div>
-	</div>
-	<SyntaxTree slot="tree"></SyntaxTree>
-	<div slot="parse" class="grid" style="place-items: center;">
-		<LlParse id="llalgo{algos[0].name}Parser" {table}></LlParse>
-	</div>
+	{/snippet}
 </AlgorithmTab>

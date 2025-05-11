@@ -1,9 +1,11 @@
 <script>
 	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
+	/** @type {{tree?: import('svelte').Snippet, parse?: import('svelte').Snippet, class?: string}} */
+	let { tree, parse, ...props } = $props();
 
 	/**@type {boolean | null}*/
-	let accept = null;
+	let accept = $state(null);
 	setContext('parseView', {
 		setAccept: (/** @type {boolean | null} */ value) => {
 			accept = value;
@@ -11,20 +13,20 @@
 	});
 </script>
 
-<div class="parse-tab">
-	<slot name="tree"></slot>
+<div class="parse-tab {props.class ?? ''}">
+	{@render tree?.()}
 	<div class="parse">
 		<input
 			type="text"
 			name="string a ser analisada"
-			on:input={(v) => {
+			oninput={(v) => {
 				setInputString(v.currentTarget.value);
 			}}
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}
 			placeholder="Digite a entrada aqui"
 		/>
 		<div class="parse-view">
-			<slot name="parse"></slot>
+			{@render parse?.()}
 		</div>
 	</div>
 </div>

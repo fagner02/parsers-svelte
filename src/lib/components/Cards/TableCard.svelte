@@ -4,23 +4,9 @@
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
 	import AlertIcon from '@icons/AlertIcon.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let id;
-	export let label;
-	export let hue;
-	let highlighted = false;
-	let highlightRow = '';
-	let highlightColumn = '';
-
-	/**@type {Array<string>}*/
-	export let columns;
-	/**@type {Array<string>}*/
-	export let rows;
-
-	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>} */
-	export let table;
+	let highlighted = $state(false);
+	let highlightRow = $state('');
+	let highlightColumn = $state('');
 
 	export function resetTable() {
 		highlightColumn = '';
@@ -47,10 +33,18 @@
 			return x;
 		});
 	}
-	/** @type {string} */
-	export let tableId;
-	/**@type {import('@/Structures/SvgLines.svelte').default | undefined}*/
-	export let svgLines;
+
+	/** @type {{id: string, label: any, hue: any, columns: Array<string>, rows: Array<string>, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>, tableId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
+	let {
+		id,
+		label,
+		hue,
+		columns,
+		rows,
+		table = $bindable(),
+		tableId,
+		svgLines = $bindable()
+	} = $props();
 
 	/**
 	 * @param {any} data

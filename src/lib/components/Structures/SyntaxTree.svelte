@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import { wait } from '$lib/flowControl';
 	import { setTreeFunctions } from '$lib/treeFunctions';
@@ -7,21 +8,23 @@
 	let svg;
 	/** @type {Element} */
 	let parentElement;
-	let width = 0;
-	let height = 0;
+	let width = $state(0);
+	let height = $state(0);
 	let boxWidth = 0;
 	let count = 0;
-	let updating = false;
-	let blockSize = 30;
+	let updating = $state(false);
+	let blockSize = $state(30);
 	/**@type {import('@/types').nodeId[]} */
 	let treeTop = [];
 
-	export let floating = false;
+	/**@type {{id: string, style?: string, floating?: boolean}}*/
+	let { floating = false, style = '', ...props } = $props();
+
 	const vGap = 30;
 	const vGapPoint = vGap / 1.9;
 
 	/**@type {import('@/types').node[][]}*/
-	let levels = [[]];
+	let levels = $state([[]]);
 
 	/**
 	 * @param {string} data
@@ -88,15 +91,15 @@
 	 * @param {{level: number, index: number, y: number, x: number}} parent
 	 * @param {string} data
 	 * @param {number} newItemIndex
-	 * @param {number} id
+	 * @param {number} nodeId
 	 */
-	async function addToSvg(parent, data, newItemIndex, id) {
+	async function addToSvg(parent, data, newItemIndex, nodeId) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				if (
 					parent.level === -1 &&
 					levels[parent.level + 1].length === 1 &&
-					levels[parent.level + 1][0].index === id
+					levels[parent.level + 1][0].index === nodeId
 				) {
 					return resolve(null);
 				}
@@ -121,7 +124,7 @@
 				});
 
 				levels = levels;
-				await wait(id, 0);
+				await wait(props.id, 0);
 
 				let newNode = levels[parent.level + 1][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
@@ -137,7 +140,7 @@
 				newNode.dashOffset = 0;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(id, 500);
+				await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -176,7 +179,7 @@
 					index: index
 				});
 				levels = levels;
-				await wait(id, 100);
+				await wait(props.id, 100);
 				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text-${newNode.id}`)
@@ -187,7 +190,7 @@
 				levels = levels;
 				blockSize = bbox.height;
 				height = svg.getBBox().height + 100;
-				await wait(id, 500);
+				await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -222,7 +225,7 @@
 					id: count++
 				});
 				levels = levels;
-				await wait(id, 100);
+				await wait(props.id, 100);
 				let newNode = levels[level][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text-${newNode.id}`)
@@ -232,7 +235,7 @@
 				newNode.width = bbox.width;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(id, 500);
+				await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -330,7 +333,7 @@
 			}
 
 			levels = levels;
-			await wait(id, 500);
+			await wait(props.id, 500);
 
 			let parentLevel = highestLevel - 1;
 			let matchLeftmost = getLeftmost(treeTop[matchLoc].level, treeTop[matchLoc].index);
@@ -356,7 +359,7 @@
 				node.parentLevel = parentLevel;
 			}
 			levels = levels;
-			await wait(id, 500);
+			await wait(props.id, 500);
 			for (let i = matchLoc; i < matchLoc + children.length; i++) {
 				let loc = treeTop[i];
 				let node = levels[loc.level][loc.index];
@@ -367,7 +370,7 @@
 				level: parentLevel,
 				index: parentIndex
 			});
-			await wait(id, 500);
+			await wait(props.id, 500);
 			resolve(null);
 		});
 	}
@@ -385,7 +388,7 @@
 				} else {
 					updateLevel(0);
 				}
-				await wait(id, 10);
+				await wait(props.id, 10);
 				updating = false;
 				resolve(null);
 			} catch (e) {
@@ -481,7 +484,7 @@
 				boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
 				width = boxWidth;
 
-				await wait(id, 500);
+				await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -512,7 +515,7 @@
 	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
 </script>
 
-<div class="svg-box" style={$$props.style}>
+<div class="svg-box" {style}>
 	<svg {height} {width}>
 		<g id="parse-svg">
 			{#each levels as level, id (levels.length - id - 1)}

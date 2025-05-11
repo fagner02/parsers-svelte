@@ -13,17 +13,20 @@
 	import { lr1Automaton } from '$lib/lr1automaton';
 	import { clrTable } from '$lib/clrTable';
 	import { setUpTooltip } from '$lib/tooltip';
+	import { onMount } from 'svelte';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
+	/**@type {string} */
+	let id = $state('');
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
 	let table = writable(new Map());
 
-	/**@type {import('@/types').LR1Automaton}*/
-	let automaton;
+	/**@type {import('svelte/store').Writable<import('@/types').LR1Automaton> }*/
+	let automaton = writable({ states: [], transitions: new Map() });
 
 	(() => {
 		if (!isGrammarLoaded()) return;
@@ -55,9 +58,9 @@
 			)
 		);
 
-		automaton = lr1Automaton(augRules, nt, t, _mergedFirst);
+		automaton.set(lr1Automaton(augRules, nt, t, _mergedFirst));
 
-		const _table = clrTable(automaton, augRules, nt, t);
+		const _table = clrTable($automaton, augRules, nt, t);
 
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
@@ -82,43 +85,81 @@
 		);
 	})();
 
-	const algos = [
-		{ name: 'Autômato', desc: 'Construção de autômato LR(1)' },
-		{ name: 'Tabela', desc: 'Construção da tabela LR(1)' }
-	];
-	swapAlgorithm(`clralgo${algos[0].name}`);
-	let selectedAlgorithm = algos[0].name;
+	let algos = $state([
+		{
+			comp: LR1AutomatonAlgorithm,
+			name: 'Autômato',
+			desc: 'Construção de autômato LR(1)',
+			loaded: false
+		},
+		{
+			comp: CLRTableAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela LR(1)',
+			loaded: false
+		}
+	]);
+
+	onMount(() => {
+		id = `clralgo${algos[0].name}`;
+		swapAlgorithm(id);
+		algos[0].loaded = true;
+	});
+	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab id="clralgo{algos[0]}" {code}>
-	<FillSize slot="steps" style="max-width: inherit; width: 100%;">
-		<div class="algo-buttons">
-			{#each algos as algo}
-				<button
-					use:setUpTooltip={algo.desc}
-					disabled={selectedAlgorithm === algo.name}
-					on:click={() => {
-						swapAlgorithm(`clr${algo.name}`);
-						resetSelectionFunctions();
-						selectedAlgorithm = algo.name;
-					}}>{algo.name}</button
-				>
-			{/each}
-		</div>
-		<FillSize class="grid">
-			{#if selectedAlgorithm === algos[0].name}
-				<LR1AutomatonAlgorithm id="clralgo{algos[0].name}" {firstSet}></LR1AutomatonAlgorithm>
-			{:else}
-				<CLRTableAlgorithm {automaton} id="clralgo{algos[1].name}"></CLRTableAlgorithm>
-			{/if}
+<AlgorithmTab {code} bind:id>
+	{#snippet steps()}
+		<FillSize style="max-width: inherit; width: 100%;">
+			{#snippet content()}
+				<div class="algo-buttons">
+					{#each algos as algo}
+						<button
+							use:setUpTooltip={algo.desc}
+							disabled={selectedAlgorithm === algo.name}
+							onclick={() => {
+								id = `clralgo${algo.name}`;
+								algo.loaded = true;
+								swapAlgorithm(id);
+								resetSelectionFunctions();
+								selectedAlgorithm = algo.name;
+							}}>{algo.name}</button
+						>
+					{/each}
+				</div>
+				<FillSize class="grid">
+					{#snippet content()}
+						{#if algos[0].loaded}
+							<div
+								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
+							>
+								<LR1AutomatonAlgorithm id="clralgo{algos[0].name}" {firstSet}
+								></LR1AutomatonAlgorithm>
+							</div>
+						{/if}
+						{#if algos[1].loaded}
+							<div
+								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
+							>
+								<CLRTableAlgorithm automaton={$automaton} id="clralgo{algos[1].name}"
+								></CLRTableAlgorithm>
+							</div>
+						{/if}
+					{/snippet}
+				</FillSize>
+			{/snippet}
 		</FillSize>
-	</FillSize>
-	<SyntaxTree slot="tree" floating={true}></SyntaxTree>
-	<div slot="parse" class="grid" style="place-items: center;">
-		<ClrParse
-			id="clralgo{algos[0].name}Parser"
-			stateList={automaton.states.map((x) => `s${x.index}`)}
-			{table}
-		></ClrParse>
-	</div>
+	{/snippet}
+	{#snippet tree()}
+		<SyntaxTree id="clralgo{algos[0].name}" floating={true}></SyntaxTree>
+	{/snippet}
+	{#snippet parse()}
+		<div class="grid" style="place-items: center;">
+			<ClrParse
+				id="clralgo{algos[0].name}Parser"
+				stateList={$automaton.states.map((x) => `s${x.index}`)}
+				{table}
+			></ClrParse>
+		</div>
+	{/snippet}
 </AlgorithmTab>

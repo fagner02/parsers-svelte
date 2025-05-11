@@ -2,18 +2,20 @@
 	import hljs from 'highlight.js';
 	import 'highlight.js/styles/atom-one-light.min.css';
 	import Popup from './Popup.svelte';
-	export let code;
-	export let onClose;
+	/** @type {{code: any, onClose: any}} */
+	let { code, onClose } = $props();
 </script>
 
-<Popup let:style let:contentClass id="code" {onClose}>
-	<pre id="pre-code" class={contentClass} {style}><code
-			>{@html hljs
-				.highlight(code, {
-					language: 'javascript'
-				})
-				.value.replaceAll('\t', '    ')}</code
-		></pre>
+<Popup id="code" {onClose}>
+	{#snippet children(/**@type {{style:string, contentClass: string}}*/ params)}
+		<pre id="pre-code" class={params.contentClass} style={params.style}><code
+				>{@html hljs
+					.highlight(code, {
+						language: 'javascript'
+					})
+					.value.replaceAll('\t', '    ')}</code
+			></pre>
+	{/snippet}
 </Popup>
 
 <style>

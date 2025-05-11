@@ -16,13 +16,13 @@
 	<div data-tauri-drag-region class="titlebar">
 		<div style="margin-left: 10px;display: grid; place-content: center">Parsers</div>
 		<div style="display: flex;">
-			<button class="titlebar-button" id="titlebar-minimize" on:click={appWindow.minimize}>
+			<button class="titlebar-button" id="titlebar-minimize" onclick={appWindow.minimize}>
 				<img width="15px" src="minus.svg" alt="minimize" />
 			</button>
-			<button class="titlebar-button" id="titlebar-maximize" on:click={appWindow.toggleMaximize}>
+			<button class="titlebar-button" id="titlebar-maximize" onclick={appWindow.toggleMaximize}>
 				<img width="15px" src="square.svg" alt="maximize" />
 			</button>
-			<button class="titlebar-button" id="titlebar-close" on:click={appWindow.close}>
+			<button class="titlebar-button" id="titlebar-close" onclick={appWindow.close}>
 				<img width="15px" src="square-x.svg" alt="close" />
 			</button>
 		</div>

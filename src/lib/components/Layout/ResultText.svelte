@@ -1,11 +1,14 @@
 <script>
 	import Popup from './Popup.svelte';
 
-	export let onClose;
+	/** @type {{onClose: any}} */
+	let { onClose } = $props();
 </script>
 
-<Popup let:style let:contentClass id="result-text" {onClose}>
-	<div class="result-text-content {contentClass}" {style}>Text</div>
+<Popup id="result-text" {onClose}>
+	{#snippet children(/**@type {{ style:string, contentClass:string }}*/ params)}
+		<div class="result-text-content {params.contentClass}" style={params.style}>Text</div>
+	{/snippet}
 </Popup>
 
 <style>
