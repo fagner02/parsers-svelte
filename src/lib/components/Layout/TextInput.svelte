@@ -1,15 +1,24 @@
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/globalStyle';
 	import { grammar, isGrammarLoaded, loadGrammar, setGrammarText } from '$lib/utils';
 
 	/**@type {number}*/
-	let height;
+	let height = $state(0);
 	/** @type {HTMLElement} */
 	let input;
 	/** @type {HTMLElement} */
 	let text;
+
+	/**@type {{id: string, class?: string, numGap: number, fontSize: number, lineHeight: number, lines: number}}*/
+	let {
+		id = $bindable(),
+		numGap = 0,
+		fontSize = 0.8,
+		lineHeight = fontSize + 0.5,
+		lines = 1,
+		...props
+	} = $props();
 
 	function updateSize() {
 		lines = Math.max(
@@ -21,10 +30,7 @@
 	}
 
 	let charWidth = 0;
-	export let numGap = 0;
-	export const fontSize = 0.8;
-	export const lineHeight = fontSize + 0.5;
-	export let lines = 1;
+
 	onMount(() => {
 		charWidth = getTextWidth('0', fontSize);
 		/**@type {HTMLElement}*/ (document.querySelector('.input>.text')).innerText = grammar;
@@ -58,7 +64,7 @@
 </script>
 
 <div class="grid input-box unit">
-	<div class="input unit {$$props.class ?? ''}" use:setInput>
+	<div class="input unit {props.class ?? ''}" use:setInput>
 		<div class="unit textnumbers" style="width: {numGap}rem;height: {height}rem;">
 			{#each { length: lines } as _, textInputIndex}
 				<div class="grid">
@@ -69,7 +75,7 @@
 		<div
 			use:setText
 			contenteditable="true"
-			on:input={clearInput}
+			oninput={clearInput}
 			class="text"
 			style="font-size: {fontSize}rem;line-height: {lineHeight}rem;"
 		></div>

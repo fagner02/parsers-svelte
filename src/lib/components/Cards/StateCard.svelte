@@ -5,6 +5,7 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
+	import { colors } from '$lib/selectSymbol';
 
 	/** @type {Array<import('@/types').GrammarItem>} */
 	let rules = getAugGrammar().augRules;
@@ -13,8 +14,15 @@
 
 	let dotIndex = $state(-1);
 
-	/** @type {{id: string, state: import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>, hue: any, label: any, stateId: string, svgLines: SvgLines | undefined}} */
-	let { id, state: cardState, hue, label, stateId, svgLines = $bindable() } = $props();
+	/** @type {{
+	 * id: string,
+	 * state: import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>,
+	 * hue: number,
+	 * label: string,
+	 * stateId: string,
+	 * svgLines: SvgLines | undefined
+	 * stateName: string}} */
+	let { id, state: cardState, hue, label, stateId, svgLines = $bindable(), ...props } = $props();
 
 	/**
 	 * @param {number} ruleIndex
@@ -140,18 +148,19 @@
 				container.style.maxHeight = `${container.scrollHeight}px`;
 				container.style.maxWidth = `${container.scrollWidth}px`;
 
-				if (shouldWait) await wait(id, 0);
+				if (shouldWait) await wait(id, 100);
 				container.style.maxHeight = '0px';
 				container.style.maxWidth = '0px';
 				container.style.opacity = '0';
 
-				if (shouldWait) await wait(id, 500);
+				if (shouldWait) await wait(id, 600);
 				cardState.update(() => []);
 
 				container.style.maxHeight = 'unset';
 				container.style.maxWidth = 'unset';
 
 				container.style.opacity = '1';
+				await wait(id, 100);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -173,6 +182,11 @@
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
+		{#if $cardState.length > 0}
+			<p id="state-{stateId}-title" class="block" style="width: fit-content;--block-hue: {hue};">
+				{props.stateName}
+			</p>
+		{/if}
 		{#each $cardState as item, rindex}
 			<p
 				id="state-{stateId}-{rindex}"
@@ -182,12 +196,12 @@
 				>{rules[item.ruleIndex].left} -&gt; {#each rules[item.ruleIndex].right as symbol, index}{#if item.pos === index}<span
 							style="margin: 0;transform: {dotIndex === rindex
 								? 'translate(5px, 0) scale(2)'
-								: 'translate(0,0) scale(1)'};color: hsl(300,60%,45%)">&bull;</span
+								: 'translate(0,0) scale(1)'};color: hsl({hue}, 65%,45%)">&bull;</span
 						>{/if}<span id="state-{stateId}-{rindex}-{index}">{symbol}</span
 					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}<span
 						style="padding-right: 0px; transform: {dotIndex === rindex
 							? 'translate(5px, 0) scale(2)'
-							: 'translate(0,0) scale(1)'};color: hsl(300,60%,45%)">&bull;</span
+							: 'translate(0,0) scale(1)'};color: hsl({hue},65%,45%);">&bull;</span
 					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
 					>&lcub;{#each item.lookahead as l, index}{l}{#if index < item.lookahead.size - 1},{/if}{/each}&rcub;{/if}
 			</p>

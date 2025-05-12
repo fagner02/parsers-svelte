@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
-	import { colors, selectRSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, selectRSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
@@ -25,14 +25,16 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable(
-		automaton.states.map((s, i) => {
-			return {
-				data: i,
-				text: `s${s.index}`,
-				note: '',
-				id: i
-			};
-		})
+		automaton.states
+			.map((s, i) => {
+				return {
+					data: i,
+					text: `s${s.index}`,
+					note: '',
+					id: i
+				};
+			})
+			.toReversed()
 	);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let clrState = writable([]);
@@ -43,6 +45,7 @@
 
 	let columns = [...alphabet];
 
+	let stateName = $state('');
 	let svgLines = /**@type {SvgLines | undefined}*/ ($state());
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
@@ -60,6 +63,7 @@
 			stateSelection?.hideSelect();
 			stateStackSelection?.hideSelect();
 			tableElem?.resetTable();
+			stateName = '';
 		} catch (e) {}
 		clrTable();
 	}
@@ -80,6 +84,8 @@
 			await codeCard?.highlightLines([4]);
 			for (let [sindex, s] of automaton.states.entries()) {
 				await stateStackSelection?.selectFor(`stack-${stateStackElem?.getId()}-${sindex}`);
+				await stateElem?.resetState(true);
+				stateName = `s${sindex}`;
 				await stateElem?.loadState(s);
 				await codeCard?.highlightLines([5]);
 				for (let i of s.items) {
@@ -101,7 +107,7 @@
 							);
 							await addPause(id);
 							await codeCard?.highlightLines([13]);
-							stateSelection?.hideSelect();
+							await stateSelection?.hideSelect();
 							continue;
 						}
 
@@ -118,7 +124,7 @@
 						}
 						await addPause(id);
 						await codeCard?.highlightLines([13]);
-						stateSelection?.hideSelect();
+						await stateSelection?.hideSelect();
 						continue;
 					}
 
@@ -155,9 +161,10 @@
 						);
 						await addPause(id);
 					}
-					stateSelection?.hideSelect();
+					await deselectSymbol(`state-${stateElem?.getId()}-${i.ruleIndex}-${i.pos}`, id);
+					await stateSelection?.hideSelect();
 				}
-				stateStackSelection?.hideSelect();
+				await stateStackSelection?.hideSelect();
 			}
 
 			await codeCard?.highlightLines([]);
@@ -206,6 +213,7 @@
 			hue={colors.pink}
 			bind:this={stateElem}
 			bind:svgLines
+			{stateName}
 		></StateCard>
 		<StackCard
 			{id}

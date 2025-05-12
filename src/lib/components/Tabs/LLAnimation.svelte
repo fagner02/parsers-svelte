@@ -12,7 +12,7 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
-	import { swapAlgorithm } from '$lib/flowControl';
+	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
 
 	// ========== Components ====================
@@ -26,10 +26,10 @@
 	// ========== Components ====================
 
 	let id = $state('');
+	let limit = $state();
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
-		// code = await (await fetch('./first.js')).text();
 		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
@@ -111,20 +111,24 @@
 		);
 	});
 
-	const algos = [
-		{ comp: FirstAlgorithm, name: 'First', desc: 'Construção do conjunto first', loaded: true },
-		{ comp: FollowAlgorithm, name: 'Follow', desc: 'Construção do conjunto follow', loaded: true },
-		{ comp: LlAlgorithm, name: 'Tabela', desc: 'Construção da tabela LL(1)', loaded: true }
-	];
+	const algos = $state([
+		{ comp: FirstAlgorithm, name: 'First', desc: 'Construção do conjunto first', loaded: false },
+		{ comp: FollowAlgorithm, name: 'Follow', desc: 'Construção do conjunto follow', loaded: false },
+		{ comp: LlAlgorithm, name: 'Tabela', desc: 'Construção da tabela LL(1)', loaded: false }
+	]);
+	const limitHitCallback = () => {
+		limit = getLimitHit(id);
+	};
 	onMount(() => {
 		id = `llalgo${algos[0].name}`;
 		swapAlgorithm(id);
+		setLimitHitCallback(limitHitCallback, id);
 		algos[0].loaded = true;
 	});
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab bind:id bind:instruction {code}>
+<AlgorithmTab bind:limit bind:id bind:instruction {code}>
 	{#snippet steps()}
 		<div style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
@@ -134,6 +138,8 @@
 						disabled={selectedAlgorithm === algo.name}
 						onclick={() => {
 							id = `llalgo${algo.name}`;
+							algo.loaded = true;
+							setLimitHitCallback(limitHitCallback, id);
 							swapAlgorithm(id);
 							resetSelectionFunctions();
 							selectedAlgorithm = algo.name;
@@ -172,7 +178,7 @@
 		</div>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="llalgo{algos[0].name}"></SyntaxTree>
+		<SyntaxTree id="llalgo{algos[0].name}Parser"></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">

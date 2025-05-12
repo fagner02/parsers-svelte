@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import {
 		wait,
@@ -33,16 +32,26 @@
 	let animIn = 'rotA 0.5s';
 	let animOut = 'rotD 0.5s forwards';
 	let animation = $state(animIn);
-
-	// ============== flow control ==================================
-	/** @type {boolean} */
-	let limit = $state(false);
-	// ============== flow control ==================================
-
 	let parseOn = $state(false);
 
-	/**@type {{code: string, id: string, instruction?: string, class?: string, steps: any, tree: any, parse: any}}*/
-	let { code, id = $bindable(), instruction = $bindable(), ...props } = $props();
+	/**@type {{
+	 * code: string,
+	 * id: string, instruction?:
+	 * string,
+	 * class?: string,
+	 * limit?: boolean,
+	 * steps: any,
+	 * tree: any,
+	 * parse: any}}*/
+	let {
+		code,
+		id = $bindable(),
+		instruction = $bindable(),
+		limit = $bindable(),
+		...props
+	} = $props();
+
+	limit ??= false;
 
 	instruction ??= '';
 	/** @param {string} name */
@@ -108,6 +117,7 @@
 	$effect(() => {
 		isAnim = selected === 'noPopup';
 	});
+	let parseLoaded = $state(false);
 </script>
 
 <FillSize class="contents unit">
@@ -142,8 +152,8 @@
 					use:setUpTooltip={'Analisar string de entrada'}
 					class="view-button"
 					onclick={() => {
-						//reset();
 						id = `${id}Parser`;
+						parseLoaded = true;
 						console.log('swap', id);
 						setLimitHitCallback(limitHitCallback, id);
 						swapAlgorithm(id);
@@ -158,12 +168,12 @@
 					use:setUpTooltip={'Executar construção do parser'}
 					class="view-button"
 					onclick={() => {
-						// reset();
+						parseOn = false;
+						id = id.replace('Parser', '');
 						console.log('swap', id);
 
 						setLimitHitCallback(limitHitCallback, id);
-						//swapAlgorithm(id);
-						parseOn = false;
+						swapAlgorithm(id);
 						closePopup();
 					}}
 					disabled={!parseOn}
@@ -199,14 +209,16 @@
 			<FillSize id="wrapper" class="grid maxWidth">
 				{#snippet content()}
 					<div class="grid unit" style="height: inherit;max-width: inherit;z-index: 1">
-						<ParseView class="unit {parseOn ? 'not-hidden' : 'hidden'}">
-							{#snippet tree()}
-								{@render props.tree()}
-							{/snippet}
-							{#snippet parse()}
-								{@render props.parse()}
-							{/snippet}
-						</ParseView>
+						{#if parseLoaded}
+							<ParseView {id} class="unit {parseOn ? 'not-hidden' : 'hidden'}">
+								{#snippet tree()}
+									{@render props.tree()}
+								{/snippet}
+								{#snippet parse()}
+									{@render props.parse()}
+								{/snippet}
+							</ParseView>
+						{/if}
 
 						<div
 							class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}"

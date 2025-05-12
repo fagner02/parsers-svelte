@@ -37,6 +37,10 @@
 	let { id, firstSet } = $props();
 	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
+
+	let originStateName = $state('');
+	let targetStateName = $state('s?');
+
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
 		alphabet.map((x, index) => ({
@@ -73,6 +77,7 @@
 			symbolsSelection.hideSelect();
 			stateSelection.hideSelect();
 			targetStateSelection.hideSelect();
+			originStateName = '';
 		} catch (e) {}
 		buildAutomaton();
 	}
@@ -225,6 +230,7 @@
 			await closure();
 
 			await codeCard?.highlightLines([4]);
+			originStateName = 's0';
 			automaton.states.push({ index: 0, items: [...$targetState] });
 			automatonElem?.addNode(null, 0, automaton.states[0], null);
 
@@ -239,6 +245,7 @@
 			while ($stateStack.length > 0) {
 				await codeCard?.highlightLines([7]);
 				await originStateElem?.resetState();
+				originStateName = `s${$stateStack[0].data}`;
 				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
 
 				await codeCard?.highlightLines([8]);
@@ -341,7 +348,6 @@
 				}
 
 				await codeCard?.highlightLines([20]);
-				console.log($stateStack);
 				await stateStackElem?.removeFromStack(0);
 			}
 
@@ -383,6 +389,7 @@
 			hue={colors.pink}
 			bind:this={targetStateElem}
 			bind:svgLines
+			stateName={targetStateName}
 		></StateCard>
 		<StateCard
 			{id}
@@ -392,6 +399,7 @@
 			hue={colors.pink}
 			bind:this={originStateElem}
 			bind:svgLines
+			stateName={originStateName}
 		></StateCard>
 		<StackCard
 			{id}
@@ -406,7 +414,7 @@
 			{id}
 			bind:this={symbolListElem}
 			stack={symbolList}
-			stackId={id}
+			stackId="symbollist{id}"
 			label="alfabeto"
 			hue={colors.green}
 			reversed={false}

@@ -6,7 +6,7 @@
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 	import { first, mergedFirst } from '$lib/first';
 	import { writable } from 'svelte/store';
-	import { swapAlgorithm } from '$lib/flowControl';
+	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
@@ -17,8 +17,9 @@
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
-	/**@type {string} */
+
 	let id = $state('');
+	let limit = $state();
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
@@ -99,9 +100,12 @@
 			loaded: false
 		}
 	]);
-
+	const limitHitCallback = () => {
+		limit = getLimitHit(id);
+	};
 	onMount(() => {
 		id = `clralgo${algos[0].name}`;
+		setLimitHitCallback(limitHitCallback, id);
 		swapAlgorithm(id);
 		algos[0].loaded = true;
 	});
@@ -120,6 +124,7 @@
 							onclick={() => {
 								id = `clralgo${algo.name}`;
 								algo.loaded = true;
+								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id);
 								resetSelectionFunctions();
 								selectedAlgorithm = algo.name;
@@ -151,7 +156,7 @@
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="clralgo{algos[0].name}" floating={true}></SyntaxTree>
+		<SyntaxTree id="clralgo{algos[0].name}Parser" floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">

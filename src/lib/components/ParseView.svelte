@@ -1,7 +1,11 @@
 <script>
 	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
-	/** @type {{tree?: import('svelte').Snippet, parse?: import('svelte').Snippet, class?: string}} */
+	/** @type {{
+	 * tree?: import('svelte').Snippet<[{id: string}]>,
+	 * parse?: import('svelte').Snippet,
+	 * class?: string,
+	 * id: string}} */
 	let { tree, parse, ...props } = $props();
 
 	/**@type {boolean | null}*/
@@ -14,7 +18,7 @@
 </script>
 
 <div class="parse-tab {props.class ?? ''}">
-	{@render tree?.()}
+	{@render tree?.({ id: props.id })}
 	<div class="parse">
 		<input
 			type="text"

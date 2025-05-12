@@ -6,15 +6,6 @@
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
 
-	// /**@type {string?}*/
-	// export let titleLabel = 'Algoritmo: ';
-	// /**@type {string?}*/
-	// export let title = null;
-	// /**@type {string}*/
-	// export let id;
-	// /**@type {import("$lib/interactiveElem").Interaction}*/
-	// export let interaction;
-	// export let minimized = true;
 	/**@type {{
 	 * titleLabel?:string?,
 	 * title: string?,
@@ -85,7 +76,6 @@
 	async function close(e) {
 		e?.stopImmediatePropagation();
 
-		console.log(document.querySelector('.unit.open-window')?.getBoundingClientRect());
 		minimized = true;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));

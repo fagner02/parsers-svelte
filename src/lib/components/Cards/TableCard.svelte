@@ -4,9 +4,24 @@
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
 	import AlertIcon from '@icons/AlertIcon.svelte';
 
+	/** @type {{id: string, label: any, hue: any, columns: Array<string>, rows: Array<string>, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>, tableId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
+	let {
+		id,
+		label,
+		hue,
+		columns,
+		rows,
+		table = $bindable(),
+		tableId,
+		svgLines = $bindable()
+	} = $props();
+
 	let highlighted = $state(false);
 	let highlightRow = $state('');
 	let highlightColumn = $state('');
+	let highlightHue = $state(hue);
+	let conflictHue = $state(345);
+	let conflict = $state(false);
 
 	export function resetTable() {
 		highlightColumn = '';
@@ -33,18 +48,6 @@
 			return x;
 		});
 	}
-
-	/** @type {{id: string, label: any, hue: any, columns: Array<string>, rows: Array<string>, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>, tableId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
-	let {
-		id,
-		label,
-		hue,
-		columns,
-		rows,
-		table = $bindable(),
-		tableId,
-		svgLines = $bindable()
-	} = $props();
 
 	/**
 	 * @param {any} data
@@ -92,7 +95,7 @@
 	 * @param {string} row
 	 * @param {string} column
 	 */
-	export async function showConflict(row, column) {
+	export async function highlightCell(row, column) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				let element = document.querySelector(`#td-${tableId}-${row}-${column}`);
@@ -104,10 +107,26 @@
 				highlightRow = row;
 				highlightColumn = column;
 				highlighted = false;
-				setTimeout(() => {
-					highlighted = true;
-				}, 100);
+				await wait(id, 100);
+				highlighted = true;
+
 				await wait(id, 1000);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
+	/**
+	 * @param {string} row
+	 * @param {string} column
+	 */
+	export async function showConflict(row, column) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				conflict = true;
+				await highlightCell(row, column);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -130,7 +149,7 @@
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
 				{#each columns as column, index}
-					<th style="background: hsl({column == highlightColumn ? 345 : hue}, 60%, 40%);">
+					<th style="background: hsl({column == highlightColumn ? highlightHue : hue}, 60%, 40%);">
 						{column}
 					</th>
 				{/each}
@@ -139,14 +158,18 @@
 		<tbody>
 			{#each $table as [rowKey, row]}
 				<tr>
-					<th style="background: hsl({rowKey == highlightRow ? 345 : hue}, 60%, 40%);"
-						><span>{rowKey}</span></th
+					<th
+						style="background: hsl({rowKey == highlightRow
+							? conflict
+								? conflictHue
+								: highlightHue
+							: hue}, 60%, 40%);"><span>{rowKey}</span></th
 					>
 					{#each row as [colKey, col]}
 						<td
 							id="td-{tableId}-{rowKey}-{colKey}"
 							style={rowKey == highlightRow || colKey == highlightColumn
-								? 'background: hsl(345, 60%,60%); color: white;'
+								? `background: hsl(${conflict ? conflictHue : highlightHue}, 60%,60%); color: white;`
 								: 'background: white'}
 						>
 							<div class="grid">
@@ -158,10 +181,10 @@
 								>
 									{col.text}
 								</span>
-								{#if highlightRow === rowKey && highlightColumn === colKey}
+								{#if conflict && highlightRow === rowKey && highlightColumn === colKey}
 									<div
 										class="grid unit"
-										style="transition: all 0.5s; color: white;background: hsl(345, 60%, 50%);border-radius: 5px;transform: {highlighted
+										style="transition: all 0.5s; color: white;background: hsl({conflictHue}, 60%, 50%);border-radius: 5px;transform: {highlighted
 											? `translate(0px, 0%)`
 											: `translate(0, -105%)`};"
 									>

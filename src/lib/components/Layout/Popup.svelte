@@ -6,18 +6,14 @@
 	import CloseButton from './CloseButton.svelte';
 
 	/**@type {{flex?: number, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
-	let { ...props } = $props();
-
-	props.flex = 0.1;
-	props.opacity = 0;
-	props.pos = -50;
+	let { flex = 0.1, opacity = 0, pos = -50, ...props } = $props();
 
 	onMount(async () => {
 		await noJumpWait(200);
-		props.flex = 1;
+		flex = 1;
 		await noJumpWait(200);
-		props.opacity = 1;
-		props.pos = 0;
+		opacity = 1;
+		pos = 0;
 	});
 </script>
 
@@ -31,14 +27,11 @@
 		<div
 			id={props.id}
 			class="popup-box maxWidth"
-			style="transform: scale({props.flex}, 1);height: inherit;"
+			style="transform: scale({flex}, 1);height: inherit;"
 		>
 			{@render props.children({
 				contentClass: 'popup-content',
-				style: 'opacity: {props.opacity};transform: translate(0px, {pos}px)',
-				opacity: props.opacity,
-				maxWidth: props.flex,
-				pos: props.pos
+				style: `opacity: ${opacity};transform: translate(0px, ${pos}px)`
 			})}
 		</div>
 	{/snippet}

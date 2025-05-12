@@ -198,7 +198,7 @@
 		<StackCard
 			{id}
 			stack={stateList}
-			stackId={id}
+			stackId="states{id}"
 			label="estados novos"
 			hue={colors.blue}
 			bind:svgLines

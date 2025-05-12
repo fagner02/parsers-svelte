@@ -1,5 +1,5 @@
 <script>
-	import { swapAlgorithm } from '$lib/flowControl';
+	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
@@ -27,7 +27,8 @@
 		{ comp: SLRTableAlgorithm, name: 'Tabela', desc: 'Construção da tabela SLR', loaded: false }
 	]);
 
-	let id = $state('');
+	let id = $state();
+	let limit = $state();
 
 	let selectedAlgorithm = $state(algos[0].name);
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
@@ -92,14 +93,18 @@
 			)
 		);
 	})();
+	const limitHitCallback = () => {
+		limit = getLimitHit(id);
+	};
 	onMount(() => {
 		id = `slralgo${algos[0].name}`;
+		setLimitHitCallback(limitHitCallback, id);
 		swapAlgorithm(id);
 		algos[0].loaded = true;
 	});
 </script>
 
-<AlgorithmTab bind:id {code}>
+<AlgorithmTab bind:limit bind:id {code}>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -110,6 +115,7 @@
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
 								id = `slralgo${algo.name}`;
+								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id);
 								algo.loaded = true;
 								resetSelectionFunctions();
@@ -141,7 +147,7 @@
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="slralgo{algos[0].name}" floating={true}></SyntaxTree>
+		<SyntaxTree id="slralgo{algos[0].name}Parser" floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">

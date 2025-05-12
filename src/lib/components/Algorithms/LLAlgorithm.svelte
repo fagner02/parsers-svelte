@@ -83,6 +83,7 @@
 						let cell = $table.get(item.left)?.get(follow.right[f]);
 						if (cell?.data !== null) {
 							await tableElement.showConflict(item.left, follow.right[f]);
+							await addPause(id);
 							limitHit(id);
 							await addPause(id);
 							return;

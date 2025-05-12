@@ -10,14 +10,14 @@ let waitRe = new Map();
 let waitResolves = new Map();
 
 /**@type {Map<string, number>} */
-let waitCount = new Map(); //0
+let waitCount = new Map();
 /**@type {Map<string, number>} */
-let pauseCount = new Map(); //0
+let pauseCount = new Map();
 
 /**@type {Map<string, boolean>} */
-let jumpWait = new Map(); //false
+let jumpWait = new Map();
 /**@type {Map<string, boolean>} */
-let jumpPause = new Map(); //false
+let jumpPause = new Map();
 
 /**
  * @param {boolean} value
@@ -79,7 +79,9 @@ export async function wait(id, ms) {
  */
 export async function noJumpWait(ms) {
 	return new Promise((resolve, reject) => {
-		setTimeout(() => resolve, ms);
+		setTimeout(() => {
+			return resolve(null);
+		}, ms);
 	});
 }
 
@@ -165,17 +167,17 @@ export function setResetCall(resetCall, id) {
 }
 export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
 /**@type {Map<string, number>} */
-let targetStep = new Map(); //-1
+let targetStep = new Map();
 /**@type {Map<string, number>} */
-let currentStep = new Map(); //0
+let currentStep = new Map();
 /**@type {Map<string, number>} */
-let maxStep = new Map(); //-1
+let maxStep = new Map();
 /**@type {Map<string, number>} */
-let action = new Map(); //flowActions.none
+let action = new Map();
 /**@type {Map<string, boolean>} */
-let limit = new Map(); //false
+let limit = new Map();
 /**@type {Map<string, (() => void)?>}*/
-let limitHitCallback = new Map(); //null
+let limitHitCallback = new Map();
 /**
  * @param {string} id
  */
@@ -335,5 +337,4 @@ export function swapAlgorithm(id) {
 		jumpWait.set(id, false);
 		jumpPause.set(id, false);
 	}
-	console.log(pauseResolves, id);
 }

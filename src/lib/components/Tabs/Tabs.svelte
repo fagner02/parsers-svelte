@@ -18,8 +18,6 @@
 			{ comp: AssignmentTab, name: 'Tarefa', loaded: false }
 		])
 	);
-	/**@type {Map<string, Node>} */
-	let saves = new Map();
 	let selected = $state(items[0]);
 </script>
 
@@ -35,18 +33,9 @@
 						? 'hsl(200,50%,50%)'
 						: 'hsl(200,50%,70%)'};"
 					onclick={async () => {
-						// let clone = document.querySelector('.tab-content')?.cloneNode(true);
-						// if (!clone) return;
-						// saves.set(selected.name, clone);
 						items[items.findIndex((i) => i.name === item.name)].loaded = true;
 						hideTooltip();
 						selected = item;
-						// console.log('selected');
-						// await wait(id,1000);
-						// console.log('selected3');
-						// let save = saves.get(item.name);
-						// if (save) {
-						// }
 					}}>{item.name}</button
 				>
 			{/each}
@@ -63,7 +52,6 @@
 						{/if}
 					</div>
 				{/each}
-				<!-- <svelte:component this={selected.comp} class="tab-content" /> -->
 			{/snippet}
 		</FillSize>
 	{/snippet}
@@ -89,7 +77,6 @@
 
 	.tab-item-list {
 		height: 38px;
-		/* border-top: 1px solid hsl(200, 50%, 100%); */
 		display: flex;
 		gap: 0px;
 		width: fit-content;
