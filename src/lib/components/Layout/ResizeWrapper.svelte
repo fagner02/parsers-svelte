@@ -1,18 +1,20 @@
 <!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import { wait } from '$lib/flowControl';
+	import { setUpTooltip } from '$lib/tooltip';
 	import HandIcon from '@icons/HandIcon.svelte';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
 
+	/**@typedef {{icon: import("svelte").Component, desc: string, name: string, callback: ()=>void, removeCallback: ()=>void}} ResizeWrapperAction*/
 	/**@type {{
 	 * titleLabel?:string?,
 	 * title: string?,
 	 * id: string,
 	 * interaction: import("$lib/interactiveElem").Interaction,
 	 * minimized?: boolean,
-	 * actions?: any[],
+	 * actions?: ResizeWrapperAction[],
 	 * component: any,
 	 * content: import('svelte').Snippet,
 	 * setSize?: () => void,
@@ -148,10 +150,11 @@
 		{#if title}
 			<p style="height: {minimized ? '0px' : 'auto'}">{title}</p>
 		{/if}
-		<button onclick={close}><MinimizeIcon></MinimizeIcon></button>
+		<button use:setUpTooltip={'Minimizar'} onclick={close}><MinimizeIcon></MinimizeIcon></button>
 		<button
+			use:setUpTooltip={'Mover janela flutuante'}
 			disabled={selected === 'move'}
-			onclick={(e) => {
+			onclick={() => {
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
@@ -161,8 +164,9 @@
 			<MoveIcon></MoveIcon></button
 		>
 		<button
+			use:setUpTooltip={'Habilitar interação'}
 			disabled={selected === 'grab'}
-			onclick={(e) => {
+			onclick={(/**@type {PointerEvent}*/ e) => {
 				e.stopImmediatePropagation();
 				selected = 'grab';
 				removeCallback?.();
@@ -173,6 +177,7 @@
 		</button>
 		{#each actions as action}
 			<button
+				use:setUpTooltip={action.desc}
 				disabled={selected === action.name}
 				onclick={() => {
 					removeCallback?.();

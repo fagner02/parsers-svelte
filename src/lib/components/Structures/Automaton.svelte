@@ -578,7 +578,8 @@
 			removeCallback: () => {
 				moveElements = false;
 			},
-			name: 'move-elements'
+			name: 'move-elements',
+			desc: 'Mover estados'
 		}
 	];
 </script>

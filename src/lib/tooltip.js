@@ -14,7 +14,7 @@ export async function showTooltip(e, text) {
 	if (!arrow || !tooltipText || !tooltip) return;
 	let id = crypto.randomUUID();
 	activeTooltip = id;
-	await noJumpWait(500);
+	await noJumpWait(0);
 	if (activeTooltip !== id) return;
 
 	tooltip.style.opacity = '1';
