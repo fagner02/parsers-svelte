@@ -95,10 +95,11 @@
 	 * @param {string} row
 	 * @param {string} column
 	 */
-	export async function highlightCell(row, column) {
+	export async function highlightOn(row, column) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let element = document.querySelector(`#td-${tableId}-${row}-${column}`);
+				let colIndex = $table.get(row)?.keys().toArray().indexOf(column);
+				let element = document.querySelector(`#td-${tableId}-${row}-${colIndex}`);
 				if (element === null) return;
 				element.scrollIntoView({
 					behavior: 'smooth',
@@ -110,7 +111,20 @@
 				await wait(id, 100);
 				highlighted = true;
 
+				await wait(id, 200);
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
+	export async function highlightOff() {
+		return new Promise(async (resolve, reject) => {
+			try {
 				await wait(id, 1000);
+				highlighted = false;
+				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -126,7 +140,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				conflict = true;
-				await highlightCell(row, column);
+				await highlightOn(row, column);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -165,17 +179,19 @@
 								: highlightHue
 							: hue}, 60%, 40%);"><span>{rowKey}</span></th
 					>
-					{#each row as [colKey, col]}
+					{#each row as [colKey, col], colIndex}
 						<td
-							id="td-{tableId}-{rowKey}-{colKey}"
-							style={rowKey == highlightRow || colKey == highlightColumn
-								? `background: hsl(${conflict ? conflictHue : highlightHue}, 60%,60%); color: white;`
+							id="td-{tableId}-{rowKey}-{colIndex}"
+							style={highlighted && (rowKey == highlightRow || colKey == highlightColumn)
+								? rowKey == highlightRow && colKey == highlightColumn
+									? `background: hsl(${conflict ? conflictHue : highlightHue}, 50%,50%); color: white;`
+									: `background: hsl(${conflict ? conflictHue : highlightHue}, 50%, 70%); color: white;`
 								: 'background: white'}
 						>
 							<div class="grid">
 								<span
 									class="unit"
-									id="t-{tableId}-{rowKey}-{colKey}"
+									id="t-{tableId}-{rowKey}-{colIndex}"
 									style="width: {col.text.length * charWidth * col.width}rem;
 										opacity: {col.opacity};top: {col.pos}px;"
 								>

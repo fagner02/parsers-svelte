@@ -112,7 +112,7 @@
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {code} bind:id>
+<AlgorithmTab bind:limit {code} bind:id>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}

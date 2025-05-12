@@ -27,7 +27,7 @@
 		{ comp: SLRTableAlgorithm, name: 'Tabela', desc: 'Construção da tabela SLR', loaded: false }
 	]);
 
-	let id = $state();
+	let id = $state('');
 	let limit = $state();
 
 	let selectedAlgorithm = $state(algos[0].name);

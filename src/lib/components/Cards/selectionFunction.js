@@ -1,4 +1,4 @@
-/** @typedef {{hideSelect: ()=>any, selectFor: (id:string)=>Promise<void>}} SelectionFunctions*/
+/** @typedef {{hideSelect: ()=>void, selectFor: (id:string)=>Promise<void>}} SelectionFunctions*/
 
 /** @type {Map<string, SelectionFunctions>} */
 let selectionFunctions = new Map();

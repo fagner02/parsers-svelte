@@ -88,51 +88,59 @@
 				stateName = `s${sindex}`;
 				await stateElem?.loadState(s);
 				await codeCard?.highlightLines([5]);
-				for (let i of s.items) {
-					stateSelection?.selectFor(`state-${stateElem?.getId()}-${i.ruleIndex}`);
+				for (let [index, item] of s.items.entries()) {
+					await stateSelection?.selectFor(`state-${stateElem?.getId()}-${index}`);
 					await codeCard?.highlightLines([6]);
 					await codeCard?.highlightLines([7]);
+
 					if (
-						i.pos === augRules[i.ruleIndex].right.length ||
-						augRules[i.ruleIndex].right[0] === ''
+						item.pos === augRules[item.ruleIndex].right.length ||
+						augRules[item.ruleIndex].right[0] === ''
 					) {
+						await stateElem?.highlightDot(item.ruleIndex);
 						await codeCard?.highlightLines([8]);
-						if (i.ruleIndex === 0) {
+						if (item.ruleIndex === 0) {
 							await codeCard?.highlightLines([9]);
+							await tableElem?.highlightOn(`s${s.index}`, '$');
 							await tableElem?.addToTable(
-								{ action: 'a', state: i.ruleIndex },
+								{ action: 'a', state: item.ruleIndex },
 								`a`,
 								`s${s.index}`,
 								'$'
 							);
+							await tableElem?.highlightOff();
 							await addPause(id);
 							await codeCard?.highlightLines([13]);
-							await stateSelection?.hideSelect();
+							stateSelection?.hideSelect();
 							continue;
 						}
 
 						await codeCard?.highlightLines([10]);
-						for (let symbol of i.lookahead) {
+						for (let symbol of item.lookahead) {
 							await codeCard?.highlightLines([11]);
 							await codeCard?.highlightLines([12]);
-							await tableElem?.addToTable(
-								{ action: 'r', state: i.ruleIndex },
-								`r${i.ruleIndex}`,
+
+							await tableElem?.highlightOn(`s${s.index}`, symbol);
+							await await tableElem?.addToTable(
+								{ action: 'r', state: item.ruleIndex },
+								`r${item.ruleIndex}`,
 								`s${s.index}`,
 								symbol
 							);
+							await tableElem?.highlightOff();
+							await addPause(id);
 						}
 						await addPause(id);
 						await codeCard?.highlightLines([13]);
-						await stateSelection?.hideSelect();
+						stateSelection?.hideSelect();
 						continue;
 					}
 
 					await codeCard?.highlightLines([14]);
-					const currentSymbol = augRules[i.ruleIndex].right[i.pos];
+					const currentSymbol = augRules[item.ruleIndex].right[item.pos];
 
 					await selectSymbol(
-						`state-${stateElem?.getId()}-${i.ruleIndex}-${i.pos}`,
+						`state-${stateElem?.getId()}-${item.ruleIndex}-${item.pos}`,
 						colors.pink,
 						id
 					);
@@ -142,30 +150,37 @@
 					await codeCard?.highlightLines([16]);
 					if (nt.includes(currentSymbol)) {
 						await codeCard?.highlightLines([17]);
+
+						await tableElem?.highlightOn(`s${s.index}`, currentSymbol);
 						await tableElem?.addToTable(
 							{ action: 'g', state: transition },
 							`g${transition}`,
 							`s${s.index}`,
 							currentSymbol
 						);
+						await tableElem?.highlightOff();
 						await addPause(id);
 						await codeCard?.highlightLines([18]);
 					} else {
 						await codeCard?.highlightLines([18]);
 						await codeCard?.highlightLines([19]);
+						await tableElem?.highlightOn(`s${s.index}`, currentSymbol);
 						await tableElem?.addToTable(
 							{ action: 's', state: transition },
 							`s${transition}`,
 							`s${s.index}`,
 							currentSymbol
 						);
+						await tableElem?.highlightOff();
 						await addPause(id);
 					}
-					await deselectSymbol(`state-${stateElem?.getId()}-${i.ruleIndex}-${i.pos}`, id);
-					await stateSelection?.hideSelect();
+					await deselectSymbol(`state-${stateElem?.getId()}-${item.ruleIndex}-${item.pos}`, id);
+					stateSelection?.hideSelect();
 				}
-				await stateStackSelection?.hideSelect();
+				stateSelection?.hideSelect();
+				stateStackSelection?.hideSelect();
 			}
+			stateStackSelection?.hideSelect();
 
 			await codeCard?.highlightLines([]);
 
