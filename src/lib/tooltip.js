@@ -1,4 +1,7 @@
-let margin = 10;
+import { noJumpWait } from './flowControl';
+
+let activeTooltip = null;
+
 /**
  * @param {MouseEvent} e
  * @param {string} text
@@ -9,6 +12,10 @@ export async function showTooltip(e, text) {
 	let arrow = /**@type {HTMLElement}*/ (tooltip.querySelector('.arrow'));
 
 	if (!arrow || !tooltipText || !tooltip) return;
+	let id = crypto.randomUUID();
+	activeTooltip = id;
+	await noJumpWait(500);
+	if (activeTooltip !== id) return;
 
 	tooltip.style.opacity = '1';
 	tooltipText.innerText = text;
@@ -38,6 +45,7 @@ export async function showTooltip(e, text) {
 }
 
 export async function hideTooltip() {
+	activeTooltip = null;
 	let tooltip = /**@type {HTMLElement}*/ (document.querySelector('.tooltip'));
 	if (!tooltip) return;
 	tooltip.style.opacity = '0';

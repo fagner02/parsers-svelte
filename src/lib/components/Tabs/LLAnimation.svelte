@@ -14,6 +14,7 @@
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
+	import { firstToString, followToString, tableToString } from './dataToString';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -27,6 +28,8 @@
 
 	let id = $state('');
 	let limit = $state();
+	/**@type {import('@/types').ResultsTabItem[]} */
+	let results = $state([]);
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
@@ -34,6 +37,26 @@
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first);
 		const _table = lltable(rules, nt, t, _first, _follow);
+
+		results.push({
+			title: 'Conjunto First',
+			content: firstToString(_first, rules)
+		});
+
+		results.push({
+			title: 'Conjunto Follow',
+			content: followToString(_follow)
+		});
+
+		results.push({
+			title: 'Tabela LL(1)',
+			content: tableToString(_table, ' ', {
+				cell: (a) => {
+					if (a === -1) return ' ';
+					return `${rules[a].left} -> ${rules[a].right[0] === '' ? 'ε' : rules[a].right.join(' ')}`;
+				}
+			})
+		});
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
@@ -128,7 +151,7 @@
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab bind:limit bind:id bind:instruction {code}>
+<AlgorithmTab {results} bind:limit bind:id bind:instruction {code}>
 	{#snippet steps()}
 		<div style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">

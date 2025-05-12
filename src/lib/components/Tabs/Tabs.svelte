@@ -11,11 +11,11 @@
 
 	let items = /**@type {Array<import('@/types').TabItem>} */ (
 		$state([
-			{ comp: TextInput, name: 'Entrada', loaded: true },
-			{ comp: LLAnimation, name: 'LL(1)', loaded: false },
-			{ comp: SLRAnimation, name: 'SLR', loaded: false },
-			{ comp: CLRAnimation, name: 'LR(1)', loaded: false },
-			{ comp: AssignmentTab, name: 'Tarefa', loaded: false }
+			{ comp: TextInput, name: 'Gramática', loaded: true, desc: 'Digitar gramática de entrada' },
+			{ comp: LLAnimation, name: 'LL(1)', loaded: false, desc: 'Visualização do parser LL(1)' },
+			{ comp: SLRAnimation, name: 'SLR', loaded: false, desc: 'Visualização do parser SLR' },
+			{ comp: CLRAnimation, name: 'LR(1)', loaded: false, desc: 'Visualização do parser LR(1)' },
+			{ comp: AssignmentTab, name: 'Tarefa', loaded: false, desc: 'Tarefa' }
 		])
 	);
 	let selected = $state(items[0]);
@@ -26,7 +26,7 @@
 		<div class="tab-item-list">
 			{#each items as item}
 				<button
-					use:setUpTooltip={item.name}
+					use:setUpTooltip={item.desc}
 					class="tab-item"
 					style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
 					item.name

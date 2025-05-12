@@ -40,6 +40,7 @@
 	 * string,
 	 * class?: string,
 	 * limit?: boolean,
+	 * results: import('@/types').ResultsTabItem[],
 	 * steps: any,
 	 * tree: any,
 	 * parse: any}}*/
@@ -105,7 +106,6 @@
 
 	function limitHitCallback() {
 		limit = getLimitHit(id);
-		console.log('limt', id, limit);
 	}
 
 	setLimitHitCallback(limitHitCallback, id);
@@ -133,7 +133,7 @@
 					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Texto'}
+					use:setUpTooltip={'Copiar resultados como texto'}
 					class="popup-button"
 					onclick={() => updateSelected('text')}
 					disabled={selected == 'text'}
@@ -234,7 +234,7 @@
 						{#if selected === 'code'}
 							<Code {code} onClose={closePopup}></Code>
 						{:else if selected === 'text'}
-							<ResultText onClose={closePopup}></ResultText>
+							<ResultText results={props.results} onClose={closePopup}></ResultText>
 						{:else if selected === 'info'}
 							<Info onClose={closePopup}></Info>
 						{/if}

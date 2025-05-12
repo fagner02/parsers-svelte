@@ -20,7 +20,7 @@
  * @typedef {{left: string, right: Array.<string>, index: number}} GrammarItem
  */
 
-/**@typedef {{comp: import("svelte").Component, name: string, loaded: boolean}} TabItem*/
+/**@typedef {{comp: import("svelte").Component, name: string, desc: string, loaded: boolean}} TabItem*/
 
 /**@typedef {{ x: number, y: number }} Vec2*/
 
@@ -60,5 +60,9 @@
 
 /** @typedef {{states: LR0State[], transitions: Map<number, Map<string, number>>}} LR0Automaton*/
 /** @typedef {{states: LR1State[], transitions: Map<number, Map<string, number>>}} LR1Automaton*/
+
+/**
+ * @typedef {{title: string, content: string}} ResultsTabItem
+ */
 
 export const unused = {};

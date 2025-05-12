@@ -5,7 +5,6 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { colors } from '$lib/selectSymbol';
 
 	/** @type {Array<import('@/types').GrammarItem>} */
 	let rules = getAugGrammar().augRules;
@@ -145,6 +144,7 @@
 				if ($cardState.length === 0) {
 					return resolve(null);
 				}
+
 				container.style.maxHeight = `${container.scrollHeight}px`;
 				container.style.maxWidth = `${container.scrollWidth}px`;
 

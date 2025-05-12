@@ -15,6 +15,7 @@
 	import { slrTable } from '$lib/slrtable';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
+	import { automatonToString, followToString, tableToString } from './dataToString';
 	let code = '';
 
 	let algos = $state([
@@ -29,6 +30,8 @@
 
 	let id = $state('');
 	let limit = $state();
+	/**@type {import('@/types').ResultsTabItem[]} */
+	let results = $state([]);
 
 	let selectedAlgorithm = $state(algos[0].name);
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
@@ -92,6 +95,21 @@
 				)
 			)
 		);
+
+		results.push({
+			title: 'Conjunto Follow',
+			content: followToString(_follow)
+		});
+
+		results.push({
+			title: 'Autômato LR(0)',
+			content: automatonToString(automaton.states, augRules)
+		});
+
+		results.push({
+			title: 'Tabela SLR(1)',
+			content: tableToString(_table, 'estados', { key: (a) => `s${a}` })
+		});
 	})();
 	const limitHitCallback = () => {
 		limit = getLimitHit(id);
@@ -104,7 +122,7 @@
 	});
 </script>
 
-<AlgorithmTab bind:limit bind:id {code}>
+<AlgorithmTab {results} bind:limit bind:id {code}>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}

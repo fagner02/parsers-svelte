@@ -14,12 +14,15 @@
 	import { clrTable } from '$lib/clrTable';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
+	import { automatonToString, firstToString, tableToString } from './dataToString';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
 
 	let id = $state('');
 	let limit = $state();
+	/**@type {import('@/types').ResultsTabItem[]} */
+	let results = $state([]);
 
 	/**@type {import('svelte/store').Writable<import('../types').SetRow[]>}*/
 	let firstSet = writable();
@@ -59,10 +62,24 @@
 			)
 		);
 
+		results.push({
+			title: 'Conjunto First',
+			content: firstToString(_first, augRules)
+		});
+
 		automaton.set(lr1Automaton(augRules, nt, t, _mergedFirst));
+
+		results.push({
+			title: 'Autômato LR(1)',
+			content: automatonToString($automaton.states, augRules)
+		});
 
 		const _table = clrTable($automaton, augRules, nt, t);
 
+		results.push({
+			title: 'Tabela CLR(1)',
+			content: tableToString(_table, 'estados', { key: (a) => `s${a}` })
+		});
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
@@ -112,7 +129,7 @@
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab bind:limit {code} bind:id>
+<AlgorithmTab {results} bind:limit {code} bind:id>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
