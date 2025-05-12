@@ -1,15 +1,5 @@
 <script>
 	import { appWindow } from '@tauri-apps/api/window';
-
-	// onMount(() => {
-	// 	document
-	// 		.getElementById('titlebar-minimize')
-	// 		?.addEventListener('click', () => appWindow.minimize());
-	// 	document
-	// 		.getElementById('titlebar-maximize')
-	// 		?.addEventListener('click', () => appWindow.toggleMaximize());
-	// 	document.getElementById('titlebar-close')?.addEventListener('click', () => appWindow.close());
-	// });
 </script>
 
 {#if /**@type {any}*/ (/**@type {any}*/ (window))?.__TAURI__ !== undefined}

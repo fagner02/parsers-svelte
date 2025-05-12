@@ -149,6 +149,5 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 		}
 		stateStack.shift();
 	}
-	console.log('eee: ', count);
 	return automaton;
 }
