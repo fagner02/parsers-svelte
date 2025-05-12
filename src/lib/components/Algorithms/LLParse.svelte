@@ -37,6 +37,7 @@
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
 		context.setAccept(null);
+		resetTree();
 
 		parsing();
 	}
@@ -155,7 +156,7 @@
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
-			stackId="input"
+			stackId="input{id}"
 			hue={colors.green}
 			label="entrada"
 		></StackCard>
@@ -164,7 +165,7 @@
 			bind:svgLines
 			bind:stack={symbolStack}
 			bind:this={symbolStackElement}
-			stackId="symbols"
+			stackId="symbols{id}"
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>

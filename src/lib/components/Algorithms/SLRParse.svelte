@@ -47,6 +47,7 @@
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
 		context.setAccept(null);
+		resetTree();
 
 		parsing();
 	}
@@ -179,7 +180,7 @@
 		columns={alphabet}
 		{table}
 		bind:svgLines
-		tableId={id}
+		tableId="slr{id}"
 		label="tabela slr"
 		hue={colors.blue}
 	></TableCard>
@@ -188,7 +189,7 @@
 		bind:svgLines
 		bind:stack={inputStack}
 		bind:this={inputStackElement}
-		stackId={id}
+		stackId="input{id}"
 		hue={colors.green}
 		label="entrada"
 	></StackCard>
@@ -197,7 +198,7 @@
 		bind:svgLines
 		bind:stack={stateStack}
 		bind:this={stateStackElement}
-		stackId={id}
+		stackId="states{id}"
 		hue={colors.green}
 		label="pilha de estados"
 	></StackCard>

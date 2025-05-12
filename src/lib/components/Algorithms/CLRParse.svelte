@@ -37,6 +37,7 @@
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
 		context.setAccept(null);
+		resetTree();
 
 		clrparsing();
 	}
