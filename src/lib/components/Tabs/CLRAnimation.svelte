@@ -15,6 +15,7 @@
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, firstToString, tableToString } from './dataToString';
+	import { appendData } from '$lib/log';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
@@ -144,6 +145,9 @@
 								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id);
 								resetSelectionFunctions();
+								appendData(
+									`${new Date()},algorithm change,from ${selectedAlgorithm} to ${algo.name}`
+								);
 								selectedAlgorithm = algo.name;
 							}}>{algo.name}</button
 						>

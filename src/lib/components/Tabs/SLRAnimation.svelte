@@ -16,6 +16,7 @@
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, followToString, tableToString } from './dataToString';
+	import { appendData } from '$lib/log';
 	let code = '';
 
 	let algos = $state([
@@ -137,6 +138,9 @@
 								swapAlgorithm(id);
 								algo.loaded = true;
 								resetSelectionFunctions();
+								appendData(
+									`${new Date()},algorithm change,from ${selectedAlgorithm} to ${algo.name}`
+								);
 								selectedAlgorithm = algo.name;
 							}}>{algo.name}</button
 						>

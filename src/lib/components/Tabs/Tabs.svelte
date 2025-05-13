@@ -6,6 +6,7 @@
 	import CLRAnimation from './CLRAnimation.svelte';
 	import { setUpTooltip } from '$lib/tooltip.js';
 	import AssignmentTab from './AssignmentTab.svelte';
+	import { appendData } from '$lib/log';
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
 
@@ -35,6 +36,7 @@
 					onclick={async () => {
 						items[items.findIndex((i) => i.name === item.name)].loaded = true;
 						selected = item;
+						appendData(`${new Date()},tab change,${item.name}`);
 					}}>{item.name}</button
 				>
 			{/each}

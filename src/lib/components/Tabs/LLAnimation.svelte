@@ -15,6 +15,7 @@
 	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { firstToString, followToString, tableToString } from './dataToString';
+	import { appendData } from '$lib/log';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -165,6 +166,9 @@
 							setLimitHitCallback(limitHitCallback, id);
 							swapAlgorithm(id);
 							resetSelectionFunctions();
+							appendData(
+								`${new Date()},algorithm change,from ${selectedAlgorithm} to ${algo.name}`
+							);
 							selectedAlgorithm = algo.name;
 						}}>{algo.name}</button
 					>
