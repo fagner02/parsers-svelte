@@ -128,7 +128,7 @@
 
 				let newNode = levels[parent.level + 1][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.id}`)
+					document.querySelector(`#parse-text${props.id}-${newNode.id}`)
 				)?.getBBox();
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
@@ -182,7 +182,7 @@
 				await wait(props.id, 100);
 				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.id}`)
+					document.querySelector(`#parse-text${props.id}-${newNode.id}`)
 				)?.getBBox();
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
@@ -228,7 +228,7 @@
 				await wait(props.id, 100);
 				let newNode = levels[level][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
-					document.querySelector(`#parse-text-${newNode.id}`)
+					document.querySelector(`#parse-text${props.id}-${newNode.id}`)
 				)?.getBBox();
 				if (!bbox) return resolve(null);
 				newNode.opacity = 1;
@@ -467,10 +467,10 @@
 
 	onMount(async () => {
 		new ResizeObserver(updateSize).observe(
-			/**@type {Element}*/ (document.querySelector('.svg-box'))
+			/**@type {Element}*/ (document.querySelector(`#svg-box${props.id}`))
 		);
 
-		await setSvg(/**@type {SVGGElement}*/ (document.querySelector('#parse-svg')));
+		await setSvg(/**@type {SVGGElement}*/ (document.querySelector(`#parse-svg${props.id}`)));
 	});
 
 	/**
@@ -480,7 +480,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				svg = comp;
-				parentElement = /**@type {Element}*/ (document.querySelector('.svg-box'));
+				parentElement = /**@type {Element}*/ (document.querySelector(`#svg-box${props.id}`));
 				boxWidth = /**@type {number}*/ (parentElement?.clientWidth);
 				width = boxWidth;
 
@@ -515,10 +515,10 @@
 	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
 </script>
 
-<div class="svg-box" {style}>
+<div class="svg-box" id="svg-box{props.id}" {style}>
 	<svg {height} {width}>
-		<g id="parse-svg">
-			{#each levels as level, id (levels.length - id - 1)}
+		<g id="parse-svg{props.id}">
+			{#each levels as level, index (levels.length - index - 1)}
 				{#each level as item (item.id)}
 					<path
 						d={item.d}
@@ -533,10 +533,10 @@
 							: ''}"
 					></path>{/each}
 			{/each}
-			{#each levels as level, id (levels.length - id - 1)}
+			{#each levels as level, index (levels.length - index - 1)}
 				{#each level as item (item.id)}
 					<rect
-						id={`parse-rect-${item.id}`}
+						id="parse-rect{props.id}-{item.id}"
 						width={item.width + 12}
 						height={blockSize + 4}
 						fill="hsl(20, 60%, 60%)"
@@ -547,7 +547,7 @@
 							4}px); opacity: {item.opacity};{updating ? 'transition: none' : ''}"
 					></rect>
 					<text
-						id="parse-text-{item.id}"
+						id="parse-text{props.id}-{item.id}"
 						class="par-{item.parentIndex}"
 						fill="hsl(0,0%,100%)"
 						dominant-baseline="middle"
