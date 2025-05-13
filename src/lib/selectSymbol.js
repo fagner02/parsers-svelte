@@ -3,7 +3,8 @@ export const colors = {
 	blue: 200,
 	green: 110,
 	orange: 30,
-	pink: 300
+	pink: 300,
+	cyan: 150
 };
 /**
  * @param {string} card

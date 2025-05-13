@@ -30,6 +30,8 @@
 	let grammarElem = $state();
 	/**@type {SetsCard | undefined}*/
 	let firstElem = $state();
+	/**@type {StackCard | undefined}*/
+	let alphabetElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -42,6 +44,15 @@
 	let { id, firstSet } = $props();
 	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
+	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
+	let alphabetStack = writable(
+		alphabet.toReversed().map((x, i) => ({
+			data: x,
+			text: x,
+			note: '',
+			id: i
+		}))
+	);
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
@@ -64,6 +75,8 @@
 	let stateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let targetStateSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let alphabetSelection;
 
 	function reset() {
 		try {
@@ -75,6 +88,7 @@
 			grammarSelection.hideSelect();
 			stateSelection.hideSelect();
 			targetStateSelection.hideSelect();
+			alphabetSelection.hideSelect();
 			originStateName = '';
 		} catch (e) {}
 		buildAutomaton();
@@ -84,6 +98,7 @@
 	async function closure() {
 		let itemsToCheck = [...$targetState.keys()];
 		await closureCodeCard?.highlightLines([0]);
+		let itemSymbolId = '';
 		while (itemsToCheck.length > 0) {
 			if ($lookaheadStack.length > 0) await lookaheadElem?.removeAll();
 			await closureCodeCard?.highlightLines([1]);
@@ -97,12 +112,8 @@
 
 			await closureCodeCard?.highlightLines([3]);
 			let symbol = augRules[item.ruleIndex].right[item.pos];
-			await selectSymbol(
-				`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
-				colors.pink,
-				id,
-				false
-			);
+			itemSymbolId = `state-${targetStateElem?.getId()}-${index}-${item.pos}`;
+			await selectSymbol(itemSymbolId, colors.pink, id, false);
 
 			await closureCodeCard?.highlightLines([4]);
 			if (!nt.includes(symbol)) {
@@ -232,7 +243,7 @@
 				await closureCodeCard?.highlightLines([32]);
 				await closureCodeCard?.highlightLines([33]);
 				let size = $targetState[existent].lookahead.size;
-				await targetStateElem?.updateLookahead(lookahead, existent);
+				await targetStateElem?.updateLookahead(lookahead, existent, index === existent);
 
 				await deselectSymbol(ruleId, id);
 				await closureCodeCard?.highlightLines([34]);
@@ -245,8 +256,9 @@
 
 			await closureCodeCard?.highlightLines([36]);
 			itemsToCheck.shift();
-			deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`, id);
+			deselectSymbol(itemSymbolId, id);
 		}
+		deselectSymbol(itemSymbolId, id);
 		if ($lookaheadStack.length > 0) await lookaheadElem?.removeAll();
 		targetStateSelection.hideSelect();
 	}
@@ -287,7 +299,7 @@
 
 				await codeCard?.highlightLines([8]);
 				for (let [symbolIndex, symbol] of alphabet.entries()) {
-					await grammarSelection.selectFor(`stack-${lookaheadElem?.getId()}-${symbolIndex}`);
+					await alphabetSelection.selectFor(`stack-${alphabetElem?.getId()}-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
 					await codeCard?.highlightLines([9]);
@@ -329,7 +341,7 @@
 
 						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
 					}
-					await stateSelection.hideSelect();
+					stateSelection.hideSelect();
 					await codeCard?.highlightLines([13]);
 					if ($targetState.length === 0) continue;
 					await closure();
@@ -383,6 +395,7 @@
 						continue;
 					}
 				}
+				alphabetSelection.hideSelect();
 
 				await codeCard?.highlightLines([20]);
 				await stateStackElem?.removeFromStack(0);
@@ -397,9 +410,10 @@
 	}
 
 	onMount(() => {
-		grammarSelection = getSelectionFunctions(`g${id}`);
-		stateSelection = getSelectionFunctions('origem' + id);
-		targetStateSelection = getSelectionFunctions('destino' + id);
+		grammarSelection = getSelectionFunctions(grammarElem?.getCardId() ?? '');
+		stateSelection = getSelectionFunctions(originStateElem?.getId() ?? '');
+		targetStateSelection = getSelectionFunctions(targetStateElem?.getId() ?? '');
+		alphabetSelection = getSelectionFunctions(alphabetElem?.getId() ?? '');
 
 		fetch('./lr1automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
@@ -463,6 +477,16 @@
 			label="lookahead"
 			hue={colors.green}
 			bind:svgLines
+		></StackCard>
+		<StackCard
+			{id}
+			bind:this={alphabetElem}
+			stack={alphabetStack}
+			stackId="alphabet{id}"
+			label="alfabeto"
+			hue={colors.cyan}
+			bind:svgLines
+			horizontal={true}
 		></StackCard>
 	</div>
 	<div class="unit" use:stackFloatingWindows>

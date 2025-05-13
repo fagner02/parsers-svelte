@@ -16,13 +16,13 @@
 	 * hue: number,
 	 * style?: string,
 	 * label: string,
-	 * transition?: string}} */
-	let { ...props } = $props();
+	 * transition?: string,
+	 * selectionFunctions?: import('@/Cards/selectionFunction').SelectionFunctions}} */
+	let { selectionFunctions = $bindable(), ...props } = $props();
 	/**@type {HTMLElement}*/
 	let selection;
 
-	/** @type {import('@/Cards/selectionFunction').SelectionFunctions}*/
-	const selectionFunctions = {
+	selectionFunctions = {
 		selectFor: async function (/**@type {string}*/ _id) {
 			if (getJumpPause(props.id)) return;
 			return new Promise(async (resolve, reject) => {
@@ -50,6 +50,11 @@
 		},
 		hideSelect: function () {
 			selection.style.opacity = '0';
+		},
+
+		updateWidth: async function (width) {
+			selection.style.width = `${width + 17}px`;
+			await wait(props.id, 500);
 		}
 	};
 	setSelectionFunctions(props.cardId, selectionFunctions);

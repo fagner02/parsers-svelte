@@ -12,6 +12,8 @@
 	let container;
 
 	let dotIndex = $state(-1);
+	/** @type {import('@/Cards/selectionFunction').SelectionFunctions|undefined} */
+	let selectionFunctions = $state();
 
 	/** @type {{
 	 * id: string,
@@ -19,7 +21,7 @@
 	 * hue: number,
 	 * label: string,
 	 * stateId: string,
-	 * svgLines: SvgLines | undefined
+	 * svgLines: SvgLines | undefined,
 	 * stateName: string}} */
 	let { id, state: cardState, hue, label, stateId, svgLines = $bindable(), ...props } = $props();
 
@@ -42,17 +44,30 @@
 					}
 				]);
 				await wait(id, 0);
-				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#state-${stateId}-${$cardState.length - 1}`)
-				);
-				if (srcId)
-					await svgLines?.showLine(srcId, `#state-${stateId}-${$cardState.length - 1}`, id);
+				let index = $cardState.length - 1;
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-${index}`));
+				elem.style.width = '0px';
+				elem.style.height = '0px';
+				let elemWidth = elem.scrollWidth;
+				for (let i = 0; i < (lookahead?.size ?? 0); i++) {
+					let look = /**@type {HTMLElement}*/ (
+						document.querySelector(`#look-${stateId}-${index}-${i}`)
+					);
+					console.log(look.style.maxWidth, look, look.scrollWidth);
+					look.style.maxWidth = `${look.scrollWidth}px`;
+					look.style.opacity = '1';
+					elemWidth += look.scrollWidth;
+				}
 
-				elem.style.width = `${elem.scrollWidth}px`;
-				elem.style.height = `${elem.scrollHeight}px`;
+				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${index}`, id);
+
 				elem.style.opacity = '1';
+				elem.style.width = `${elemWidth}px`;
+				elem.style.height = `${elem.scrollHeight}px`;
 
 				await wait(id, 1500);
+				elem.style.width = `fit-content`;
+				elem.style.height = `fit-content`;
 				await svgLines?.hideLine(false, id);
 				resolve(null);
 			} catch (e) {
@@ -64,10 +79,15 @@
 	/**
 	 * @param {Set<string>} lookahead
 	 * @param {number} existent
+	 * @param {boolean} updateSelection
 	 */
-	export async function updateLookahead(lookahead, existent) {
+	export async function updateLookahead(lookahead, existent, updateSelection = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				let elem = /**@type {HTMLElement}*/ (
+					document.querySelector(`#state-${stateId}-${existent}`)
+				);
+				let elemWidth = elem.scrollWidth;
 				cardState.update((x) => {
 					x[existent].lookahead = new Set([
 						.../**@type {Set<string>}*/ (x[existent].lookahead),
@@ -76,11 +96,22 @@
 					return x;
 				});
 				await wait(id, 0);
-				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#state-${stateId}-${existent}`)
-				);
 
-				elem.style.width = `${elem.scrollWidth}px`;
+				console.log('in', elem.scrollWidth, elem.style.width, elem);
+
+				let oldWidth = 0;
+				let newWidth = 0;
+				for (let i = 0; i < ($cardState[existent].lookahead?.size ?? 0); i++) {
+					let look = /**@type {HTMLElement}*/ (
+						document.querySelector(`#look-${stateId}-${existent}-${i}`)
+					);
+					oldWidth += look.clientWidth;
+					newWidth += look.scrollWidth;
+					look.style.maxWidth = `${look.scrollWidth}px`;
+					look.style.opacity = '1';
+				}
+				if (updateSelection && selectionFunctions)
+					await selectionFunctions.updateWidth(elem.scrollWidth - oldWidth + newWidth);
 				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
@@ -177,13 +208,21 @@
 	});
 </script>
 
-<CardWrapper {id} minWidth={charWidth} minHeight={lineHeight} {hue} {label} cardId={stateId}>
+<CardWrapper
+	bind:selectionFunctions
+	{id}
+	minWidth={charWidth}
+	minHeight={lineHeight}
+	{hue}
+	{label}
+	cardId={stateId}
+>
 	<div
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
 	>
 		{#if $cardState.length > 0}
-			<p id="state-{stateId}-title" class="block" style="width: fit-content;--block-hue: {hue};">
+			<p id="state-{stateId}-title" class="block" style="--block-hue: {hue};">
 				{props.stateName}
 			</p>
 		{/if}
@@ -192,20 +231,35 @@
 				id="state-{stateId}-{rindex}"
 				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"
 			>
-				<span style="font-size: {subFontSize}rem;margin: 0; padding: 0">{item.ruleIndex}</span
-				>{rules[item.ruleIndex].left} -&gt; {#each rules[item.ruleIndex].right as symbol, index}{#if item.pos === index}<span
-							style="margin: 0;transform: {dotIndex === rindex
+				<span style="font-size: {subFontSize}rem;">{item.ruleIndex}</span>
+				<span>{rules[item.ruleIndex].left} -&gt;&nbsp;</span>
+				{#each rules[item.ruleIndex].right as symbol, index}
+					{#if item.pos === index}
+						<span
+							style="transform: {dotIndex === rindex
 								? 'translate(5px, 0) scale(2)'
 								: 'translate(0,0) scale(1)'};color: hsl({hue}, 65%,45%)">&bull;</span
-						>{/if}<span id="state-{stateId}-{rindex}-{index}">{symbol}</span
-					>{/each}{#if item.pos === rules[item.ruleIndex].right.length}<span
-						style="padding-right: 0px; transform: {dotIndex === rindex
+						>
+					{/if}
+					<span style="margin: 0px 3px" id="state-{stateId}-{rindex}-{index}">{symbol}</span>
+				{/each}
+				{#if item.pos === rules[item.ruleIndex].right.length}
+					<span
+						style="transform: {dotIndex === rindex
 							? 'translate(5px, 0) scale(2)'
 							: 'translate(0,0) scale(1)'};color: hsl({hue},65%,45%);">&bull;</span
-					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
-					>&lcub;{#each item.lookahead as l, index}<span id="look-{stateId}-{rindex}"
-							>{l}{#if index < item.lookahead.size - 1},{/if}</span
-						>{/each}&rcub;{/if}
+					>
+				{/if}
+				{#if item.lookahead != null}
+					<span>,&lcub;</span>
+
+					{#each item.lookahead as l, index (l)}
+						<span class="look-item" id="look-{stateId}-{rindex}-{index}">
+							{l}{#if index < item.lookahead.size - 1},{/if}
+						</span>
+					{/each}
+					<span>&rcub;</span>
+				{/if}
 			</p>
 		{/each}
 	</div>
@@ -216,13 +270,22 @@
 		transition:
 			width 0.5s,
 			height 0.5s,
+			max-width 0.5s,
 			opacity 0.5s 0.3s;
 		white-space: pre;
 		display: flex;
 		place-items: baseline;
+		width: fit-content;
 	}
 	p > span {
-		margin: 0 0.2rem;
+		margin: 0;
 		transition: transform 0.2s;
+	}
+	.look-item {
+		transition:
+			max-width 0.5s,
+			opacity 0.5s;
+		max-width: 0px;
+		opacity: 0;
 	}
 </style>

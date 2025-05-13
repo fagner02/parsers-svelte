@@ -8,8 +8,18 @@
 	 * @template T
 	 * @typedef {import('@/types').StackItem<T>} StackItem*/
 
-	/** @type {{id: string, stack: import("svelte/store").Writable<Array<StackItem<any>>>, label: any, hue: any, highlighted?: boolean, reversed?: boolean, stackId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
+	/** @type {{
+	 * id: string,
+	 * stack: import("svelte/store").Writable<Array<StackItem<any>>>,
+	 * label: any,
+	 * hue: any,
+	 * highlighted?: boolean,
+	 * reversed?: boolean,
+	 * stackId: string,
+	 * svgLines: import('@/Structures/SvgLines.svelte').default
+	 * horizontal?: boolean }}*/
 	let {
+		horizontal = false,
 		id,
 		stack = $bindable(),
 		label,
@@ -193,12 +203,22 @@
 	});
 </script>
 
-<CardWrapper {id} minHeight={lineHeight} minWidth={charWidth} {hue} {label} cardId={stackId}>
+<CardWrapper
+	style={horizontal ? 'flex-direction: row; gap: 8px' : ''}
+	{id}
+	minHeight={lineHeight}
+	minWidth={charWidth}
+	{hue}
+	{label}
+	cardId={stackId}
+>
 	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
 		<p
 			id="stack-{stackId}-{index}"
-			class={`stack-item ${highlighted ? 'block' : ''}`}
-			style="--block-hue: {hue};top: -{lineHeight}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem;"
+			class={`stack-item ${highlighted ? (horizontal ? 'empty' : 'block') : ''}`}
+			style="{horizontal
+				? 'padding: 0 2px'
+				: ''};--block-hue: {hue};top: -{lineHeight}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem;"
 		>
 			<span style="font-size: {subFontSize}rem;">{stackItem.note}</span>{stackItem.text}
 		</p>
@@ -214,10 +234,12 @@
 			width 0.5s,
 			opacity 0.5s 0.5s;
 		white-space: nowrap;
+		justify-content: center;
+		display: flex;
 	}
 	.stack-item {
-		height: 0;
-		width: 0;
+		height: fit-content;
+		width: fit-content;
 		opacity: 0;
 		padding: 0;
 		transition:
