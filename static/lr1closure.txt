@@ -28,7 +28,7 @@
 <span>            <b>existente</b> &lt;- índice do item em <b>estado</b> com regra <b>r</b> e posição 0</span>
 <span>            <b>se</b> <b>existente</b> é -1:</span>
 <span>                adiciona {regra: <b>r</b>, posição: 0, lookahead: <b>lookahead</b>} a <b>estado</b></span>
-<span>                adiciona {regra: <b>r</b>, posição: 0, lookahead: <b>lookahead</b>} a <b>itensParaVerificar</b></span>
+<span>                adiciona o item novo a <b>itensParaVerificar</b></span>
 <span>                continua para a próxima iteração</span>
 <span>            <b>para cada</b> <b>l</b> em <b>lookahead</b>:</span>
 <span>                adiciona <b>l</b> ao conjunto lookahead do <b>item existente</b> em <b>estado</b></span>

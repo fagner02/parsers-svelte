@@ -88,11 +88,11 @@
 				await closureCodeCard?.highlightLines([1]);
 				await closureCodeCard?.highlightLines([2]);
 
-				let itemsToCheck = [...$targetState];
+				let itemsToCheck = [...$targetState.keys()];
 				while (itemsToCheck.length > 0) {
 					await closureCodeCard?.highlightLines([3]);
 					await closureCodeCard?.highlightLines([4]);
-					let item = itemsToCheck[0];
+					let item = $targetState[itemsToCheck[0]];
 					let index = $targetState.findIndex(
 						(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
 					);
@@ -122,7 +122,7 @@
 						);
 						await closureCodeCard?.highlightLines([13, 14]);
 						await targetStateElem?.addItem(rule.index, 0, null, `${id}gl${rule.index}`);
-						itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+						itemsToCheck.push($targetState.length - 1);
 					}
 					await deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`, id);
 					await closureCodeCard?.highlightLines([15]);

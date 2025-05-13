@@ -1,7 +1,7 @@
 <span><b>closure</b> <- estado inicial</span>
 <span><b>itens_para_verificar</b> <- cópia de <b>closure</b></span>
 <span>enquanto tamanho de <b>itens_para_verificar</b> > 0:</span>
-<span>    <b>item</b> <- primeiro elemento de <b>itens_para_verificar</b></span>
+<span>    <b>item</b> <- primeiro item de <b>itens_para_verificar</b></span>
 <span>    <b>símbolo</b> <- símbolo após a posição do ponto na produção de <b>item</b></span>
 <span>    se <b>símbolo</b> não pertence aos não-terminais:</span>
 <span>        remove <b>item</b> de <b>itens_para_verificar</b></span>
@@ -12,5 +12,5 @@
 <span>        se existe item em <b>closure</b> com mesma produção <b>p</b> e posição 0:</span>
 <span>            continua para próxima iteração</span>
 <span>        adiciona novo item { produção: <b>p</b>, posição: 0 } a <b>closure</b></span>
-<span>        adiciona novo item { produção: <b>p</b>, posição: 0 } a <b>itens_para_verificar</b></span>
+<span>        adiciona o novo item a <b>itens_para_verificar</b></span>
 <span>    remove <b>item</b> de <b>itens_para_verificar</b></span>

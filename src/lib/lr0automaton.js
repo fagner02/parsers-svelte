@@ -4,9 +4,9 @@
  * @param {string[]} nt
  */
 export function closure(state, rules, nt) {
-	let itemsToCheck = [...state];
+	let itemsToCheck = [...state.keys()];
 	while (itemsToCheck.length > 0) {
-		let item = itemsToCheck[0];
+		let item = state[itemsToCheck[0]];
 		let symbol = rules[item.ruleIndex].right[item.pos];
 		if (!nt.includes(symbol)) {
 			itemsToCheck.shift();
@@ -17,7 +17,7 @@ export function closure(state, rules, nt) {
 			if (!(rule.left === symbol)) continue;
 			if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
 			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
-			itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+			itemsToCheck.push(state.length - 1);
 		}
 
 		itemsToCheck.shift();
