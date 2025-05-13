@@ -13,6 +13,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import FistInfo from '@/Info/FistInfo.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -227,7 +228,7 @@
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title="First" bind:this={codeCard} id="first"></PseudoCode>
 	</div>
 	<div class="unit cards-box" id="card-box{id}">

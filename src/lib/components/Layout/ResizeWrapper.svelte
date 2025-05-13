@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
 	import { wait } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
@@ -107,8 +106,7 @@
 
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
-		wrapper.style.left = '0px';
-		wrapper.style.top = '0px';
+
 		interaction.setResizeInteraction(
 			new Map([
 				['lb', document.querySelector(`#${props.id}-lb-handle`)],
@@ -270,6 +268,8 @@
 		margin: 5px;
 		z-index: 1;
 		overflow: hidden;
+		opacity: 0;
+		transition: opacity 0.5s;
 	}
 	.lb-handle {
 		cursor: sw-resize;

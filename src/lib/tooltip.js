@@ -62,4 +62,7 @@ export function setUpTooltip(elem, text) {
 	elem.addEventListener('mouseleave', () => {
 		hideTooltip();
 	});
+	elem.addEventListener('click', () => {
+		hideTooltip();
+	});
 }

@@ -12,6 +12,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import LL1TableInfo from '@/Info/LL1TableInfo.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -153,7 +154,7 @@
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title="Tabela LL(1)" bind:this={codeCard} id="lltable"></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">

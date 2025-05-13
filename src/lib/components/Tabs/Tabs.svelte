@@ -4,7 +4,7 @@
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
 	import CLRAnimation from './CLRAnimation.svelte';
-	import { setUpTooltip, hideTooltip } from '$lib/tooltip.js';
+	import { setUpTooltip } from '$lib/tooltip.js';
 	import AssignmentTab from './AssignmentTab.svelte';
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
@@ -34,7 +34,6 @@
 						: 'hsl(200,50%,70%)'};"
 					onclick={async () => {
 						items[items.findIndex((i) => i.name === item.name)].loaded = true;
-						hideTooltip();
 						selected = item;
 					}}>{item.name}</button
 				>

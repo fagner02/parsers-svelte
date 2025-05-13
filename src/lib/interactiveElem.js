@@ -1,3 +1,27 @@
+/**@param {HTMLElement} elem*/
+export function stackFloatingWindows(elem) {
+	setTimeout(() => {
+		let boundingBox = document.querySelector('#wrapper>.grid>.not-hidden');
+		console.log(boundingBox);
+		if (!boundingBox) return;
+		let boundingBoxRect = boundingBox.getBoundingClientRect();
+		let parentRect = elem.getBoundingClientRect();
+		console.log(boundingBoxRect, parentRect);
+		const pad = 10;
+		let top = pad + 10;
+		for (let item of elem.children) {
+			let margin = item.computedStyleMap().get('margin-bottom')?.toString() ?? '0';
+			let rect = item.getBoundingClientRect();
+			console.log(item, rect);
+			/**@type {HTMLElement}*/ (item).style.left = `${pad}px`;
+			/**@type {HTMLElement}*/ (item).style.top =
+				`${boundingBoxRect.bottom - parseFloat(margin) - rect.height - top - boundingBoxRect.top}px`;
+			top += rect.height + pad;
+			/**@type {HTMLElement}*/ (item).style.opacity = '1';
+		}
+	}, 500);
+}
+
 /**@typedef {HTMLElement | SVGElement} Elem*/
 export class Interaction {
 	scale = 0.7;
@@ -108,6 +132,14 @@ export class Interaction {
 			y = e.touches[0].clientY;
 		}
 		this.dragPos = { x: x, y: y };
+
+		let parent = this.moveTarget?.parentElement;
+		if (!parent) return;
+
+		this.movePos = {
+			x: parseFloat(parent.style.left) || 0,
+			y: parseFloat(parent.style.top) || 0
+		};
 	}
 
 	/**

@@ -14,6 +14,7 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -421,7 +422,7 @@
 			bind:svgLines
 		></StackCard>
 	</div>
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title="Closure LR(1)" bind:this={closureCodeCard} id="lr1closure"></PseudoCode>
 		<PseudoCode title="Autômato LR(1)" bind:this={codeCard} id="lr1"></PseudoCode>
 

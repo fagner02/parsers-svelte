@@ -13,6 +13,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/** @type {{id: string}} */
 	let { id } = $props();
@@ -336,7 +337,7 @@
 			bind:svgLines
 		></StackCard>
 	</div>
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="lr0closure"></PseudoCode>
 		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard} id="lr0"></PseudoCode>
 		<Automaton id="lr0" bind:this={automatonElem}></Automaton>

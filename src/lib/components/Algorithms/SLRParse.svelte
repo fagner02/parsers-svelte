@@ -13,6 +13,7 @@
 	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -170,7 +171,7 @@
 
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="cards-box unit" id="card-box{id}">
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title="Análise sintática SLR" bind:this={codeCard} id="slrparse"></PseudoCode>
 	</div>
 	<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>

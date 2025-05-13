@@ -12,6 +12,7 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	let stateStackElem = /**@type {StackCard | undefined}*/ ($state());
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
@@ -240,7 +241,7 @@
 			bind:svgLines
 		></StackCard>
 	</div>
-	<div class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; height: 100%;">
+	<div use:stackFloatingWindows class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; ">
 		<PseudoCode title="Tabela LR(1)" bind:this={codeCard} id="clrtable"></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>
 	</div>

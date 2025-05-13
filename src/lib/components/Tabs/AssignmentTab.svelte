@@ -1,8 +1,9 @@
 <script>
 	import { appendData, createFile } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
+	import { onMount } from 'svelte';
 
-	let totalQuestions = 10;
+	let totalQuestions = $state(0);
 	let totalAnswers = $state(0);
 	let started = $state(false);
 
@@ -21,6 +22,12 @@
 		}
 		totalAnswers = answers.size;
 	}
+
+	onMount(() => {
+		console.log('mounted');
+		totalQuestions =
+			document.querySelector('.form')?.querySelectorAll('input,textarea').length ?? 0;
+	});
 </script>
 
 <FillSize class="unit">
@@ -37,7 +44,7 @@
 				<p style="font-size: 0.9rem;align-content: center">
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
-				<button disabled>Finalizar</button>
+				<button disabled={totalQuestions === totalAnswers}>Finalizar</button>
 			</div>
 			<FillSize class="form-content">
 				{#snippet content()}

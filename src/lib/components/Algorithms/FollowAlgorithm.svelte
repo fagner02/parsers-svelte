@@ -12,6 +12,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import FollowInfo from '@/Info/FollowInfo.svelte';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement = $state();
@@ -276,7 +277,7 @@
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit">
+	<div class="unit" use:stackFloatingWindows>
 		<PseudoCode title="Follow" bind:this={codeCard} id="follow"></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">

@@ -220,10 +220,7 @@
 							</ParseView>
 						{/if}
 
-						<div
-							class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}"
-							style="position: relative;"
-						>
+						<div class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}">
 							{@render props.steps()}
 						</div>
 					</div>
@@ -337,6 +334,10 @@
 		border: 1px solid hsl(0, 0%, 0%, 20%);
 		border-radius: 10px;
 		overflow: auto;
+	}
+
+	:global(#wrapper > .grid > div) {
+		position: relative;
 	}
 
 	:global(.steps > div) {

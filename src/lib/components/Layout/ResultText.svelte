@@ -1,8 +1,7 @@
 <script>
 	import CopyIcon from '@icons/CopyIcon.svelte';
 	import Popup from './Popup.svelte';
-	import { noJumpWait, wait } from '$lib/flowControl';
-	import { hideTooltip, setUpTooltip } from '$lib/tooltip';
+	import { wait } from '$lib/flowControl';
 
 	/** @type {{onClose: any, results: import("@/types").ResultsTabItem[]}} */
 	let { onClose, ...props } = $props();
