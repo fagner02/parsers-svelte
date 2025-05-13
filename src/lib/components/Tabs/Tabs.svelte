@@ -7,6 +7,7 @@
 	import { setUpTooltip } from '$lib/tooltip.js';
 	import AssignmentTab from './AssignmentTab.svelte';
 	import { appendData } from '$lib/log';
+	import { setGrammarChangeCallback } from '$lib/utils';
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
 
@@ -19,6 +20,13 @@
 			{ comp: AssignmentTab, name: 'Tarefa', loaded: false, desc: 'Tarefa' }
 		])
 	);
+	const algoTabs = [1, 2, 3];
+	function resetLoadedItems() {
+		for (let i = 0; i < algoTabs.length; i++) {
+			items[algoTabs[i]].loaded = false;
+		}
+	}
+	setGrammarChangeCallback(resetLoadedItems);
 	let selected = $state(items[0]);
 </script>
 

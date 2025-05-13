@@ -20,6 +20,14 @@ let rules = [];
 let nt = [];
 /** @type {Array<string>}*/
 let t = [];
+/**@type {(()=>void)?} */
+let grammarChangeCallback = null;
+/**
+ * @param {()=>void} value
+ */
+export function setGrammarChangeCallback(value) {
+	grammarChangeCallback = value;
+}
 export let grammar = `E -> E + T
 E -> T
 T -> T * F
@@ -31,6 +39,7 @@ F -> id`;
  */
 export function setGrammarText(text) {
 	grammar = text;
+	grammarChangeCallback?.();
 }
 
 export function loadGrammar() {
