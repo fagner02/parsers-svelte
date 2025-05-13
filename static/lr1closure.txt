@@ -9,23 +9,20 @@
 <span>    <b>se</b> posição do <b>item</b> na regra é a última posição da regra:</span>
 <span>        <b>lookahead</b> &lt;- lookahead do <b>item</b></span>
 <span>    <b>senão</b>:</span>
-<span>        <b>betaFirst</b> &lt;- lista vazia</span>
 <span>        <b>nulo</b> &lt;- verdadeiro</span>
 <span>        <b>para cada</b> símbolo <b>beta</b> na regra, começando do símbolo seguinte ao <b>item</b>:</span>
 <span>            <b>se</b> <b>beta</b> não é um <b>não-terminal</b>:</span>
-<span>                adiciona <b>beta</b> à <b>betaFirst</b></span>
+<span>                adiciona <b>beta</b> à <b>lookahead</b></span>
 <span>                <b>nulo</b> &lt;- falso</span>
 <span>                sai do loop</span>
 <span>            <b>senão</b>:</span>
 <span>                <b>first</b> &lt;- cópia do conjunto <b>first</b>(<b>beta</b>)</span>
-<span>                adiciona elementos de <b>first</b>, exceto &epsilon;, à <b>betaFirst</b></span>
+<span>                adiciona elementos de <b>first</b>, exceto &epsilon;, à <b>lookahead</b></span>
 <span>                <b>se</b> &epsilon; não pertence a <b>first</b>:</span>
 <span>                    <b>nulo</b> &lt;- falso</span>
 <span>                    sai do loop</span>
 <span>        <b>se</b> <b>nulo</b> é verdadeiro:</span>
-<span>            <b>lookahead</b> &lt;- união de <b>betaFirst</b> e lookahead do <b>item</b></span>
-<span>        <b>senão</b>:</span>
-<span>            <b>lookahead</b> &lt;- <b>betaFirst</b></span>
+<span>            <b>lookahead</b> &lt;- união de <b>lookahead</b> e lookahead do <b>item</b></span>
 <span>    <b>para cada</b> regra <b>r</b> em <b>regras</b>:</span>
 <span>        <b>se</b> lado esquerdo de <b>r</b> é igual a <b>símbolo</b>:</span>
 <span>            <b>existente</b> &lt;- índice do item em <b>estado</b> com regra <b>r</b> e posição 0</span>

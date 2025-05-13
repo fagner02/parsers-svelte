@@ -46,6 +46,7 @@
 				await wait(id, 10);
 
 				if (srcId) {
+					console.log(document.querySelector('#' + srcId));
 					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`, id);
 				}
 
@@ -124,6 +125,26 @@
 				stack.update((x) => {
 					return [...x.slice(0, index), ...x.slice(index + 1)];
 				});
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
+	export async function removeAll() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let elem = /**@type {HTMLElement?}*/ (document.querySelector(`#stack-${stackId}-${0}`));
+				while (elem) {
+					elem.style.width = '0px';
+					elem.style.height = '0px';
+					elem.style.opacity = '0';
+					elem.style.top = `-${lineHeight}rem`;
+					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
+				}
+				await wait(id, 1000);
+				stack.set([]);
 				resolve(null);
 			} catch (e) {
 				reject(e);

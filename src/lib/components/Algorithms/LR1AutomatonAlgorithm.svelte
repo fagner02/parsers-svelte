@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, limitHit, setResetCall } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -25,7 +25,11 @@
 	/**@type {Automaton | undefined}*/
 	let automatonElem = $state();
 	/**@type {StackCard | undefined}*/
-	let symbolListElem = $state();
+	let lookaheadElem = $state();
+	/**@type {GrammarCard | undefined}*/
+	let grammarElem = $state();
+	/**@type {SetsCard | undefined}*/
+	let firstElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -43,14 +47,7 @@
 	let targetStateName = $state('s?');
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
-	let symbolList = writable(
-		alphabet.map((x, index) => ({
-			data: x,
-			text: x,
-			note: '',
-			id: index
-		}))
-	);
+	let lookaheadStack = writable([]);
 
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
@@ -62,7 +59,7 @@
 
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
-	let symbolsSelection;
+	let grammarSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let stateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
@@ -75,7 +72,7 @@
 			targetStateElem?.resetState(false);
 			svgLines?.hideLine(false, id);
 			automatonElem?.reset();
-			symbolsSelection.hideSelect();
+			grammarSelection.hideSelect();
 			stateSelection.hideSelect();
 			targetStateSelection.hideSelect();
 			originStateName = '';
@@ -85,11 +82,12 @@
 	setResetCall(reset, id);
 
 	async function closure() {
-		let itemsToCheck = [...$targetState];
+		let itemsToCheck = [...$targetState.keys()];
 		await closureCodeCard?.highlightLines([0]);
 		while (itemsToCheck.length > 0) {
+			if ($lookaheadStack.length > 0) await lookaheadElem?.removeAll();
 			await closureCodeCard?.highlightLines([1]);
-			const item = itemsToCheck[0];
+			const item = $targetState[itemsToCheck[0]];
 			await closureCodeCard?.highlightLines([2]);
 
 			let index = $targetState.findIndex(
@@ -99,6 +97,12 @@
 
 			await closureCodeCard?.highlightLines([3]);
 			let symbol = augRules[item.ruleIndex].right[item.pos];
+			await selectSymbol(
+				`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
+				colors.pink,
+				id,
+				false
+			);
 
 			await closureCodeCard?.highlightLines([4]);
 			if (!nt.includes(symbol)) {
@@ -109,109 +113,141 @@
 			}
 
 			await closureCodeCard?.highlightLines([7]);
+			/**@type {Set<string>}*/
 			let lookahead = new Set();
 
 			await closureCodeCard?.highlightLines([8]);
 			if (augRules[item.ruleIndex].right.length - 1 === item.pos) {
 				await closureCodeCard?.highlightLines([9]);
+				await targetStateElem?.highlightDot(index);
+				for (let l of item.lookahead) {
+					if ($lookaheadStack.findIndex((x) => x.data === l) === -1) {
+						await lookaheadElem?.addToStack(l, l, '', `look-${targetStateElem?.getId()}-${index}`);
+					}
+				}
 				lookahead = new Set(item.lookahead);
 				await closureCodeCard?.highlightLines([10]);
 			} else {
 				await closureCodeCard?.highlightLines([10]);
 				await closureCodeCard?.highlightLines([11]);
-				/**@type {string[]}*/
-				let betaFirst = [];
 				let nullable = true;
-
-				await closureCodeCard?.highlightLines([12, 13]);
+				let betaId = null;
 				for (let i = 1; item.pos + i < augRules[item.ruleIndex].right.length; i++) {
-					await closureCodeCard?.highlightLines([14]);
-					let beta = augRules[item.ruleIndex].right[item.pos + i];
-
-					await closureCodeCard?.highlightLines([15]);
+					await closureCodeCard?.highlightLines([12]);
+					const beta = augRules[item.ruleIndex].right[item.pos + i];
+					betaId = `state-${targetStateElem?.getId()}-${index}-${item.pos + i}`;
+					await selectSymbol(betaId, colors.pink, id, false);
+					await closureCodeCard?.highlightLines([13]);
 					if (!nt.includes(beta)) {
+						await closureCodeCard?.highlightLines([14]);
+						await closureCodeCard?.highlightLines([15]);
 						await closureCodeCard?.highlightLines([16]);
-						await closureCodeCard?.highlightLines([17]);
-						await closureCodeCard?.highlightLines([18]);
-						betaFirst.push(beta);
+						lookahead.add(beta);
+
+						if ($lookaheadStack.findIndex((x) => x.data === beta) === -1) {
+							await lookaheadElem?.addToStack(beta, beta, '', betaId);
+						}
 						nullable = false;
 						break;
 					} else {
+						await closureCodeCard?.highlightLines([17]);
+						await closureCodeCard?.highlightLines([18]);
 						await closureCodeCard?.highlightLines([19]);
-						let first = /**@type {string[]}*/ ($firstSet.find((x) => x.left === beta)?.right);
+						let firstIndex = $firstSet.findIndex((x) => x.left === beta);
+						let first = /**@type {string[]}*/ ($firstSet[firstIndex].right);
+						for (let [i, l] of first.entries()) {
+							if (l === '') continue;
+							if ($lookaheadStack.findIndex((x) => x.data === l) === -1) {
+								await lookaheadElem?.addToStack(
+									l,
+									l,
+									'',
+									`${firstElem?.getSetId()}-${firstIndex}-${i}`
+								);
+							}
+						}
+						lookahead.union(new Set(first.filter((x) => x !== '')));
 
 						await closureCodeCard?.highlightLines([20]);
-						betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
-
-						await closureCodeCard?.highlightLines([21]);
 						if (!first.includes('')) {
+							await closureCodeCard?.highlightLines([21]);
 							await closureCodeCard?.highlightLines([22]);
-							await closureCodeCard?.highlightLines([23]);
 							nullable = false;
 							break;
 						}
 					}
+					await deselectSymbol(betaId, id);
 				}
+				if (betaId) await deselectSymbol(betaId, id);
 
-				await closureCodeCard?.highlightLines([24]);
+				await closureCodeCard?.highlightLines([23]);
 				if (nullable) {
-					await closureCodeCard?.highlightLines([25]);
-					lookahead = new Set([...betaFirst, ...item.lookahead]);
-					await closureCodeCard?.highlightLines([26]);
-				} else {
-					await closureCodeCard?.highlightLines([26]);
-					await closureCodeCard?.highlightLines([27]);
-					lookahead = new Set(betaFirst);
+					await closureCodeCard?.highlightLines([24]);
+					for (let l of item.lookahead) {
+						if ($lookaheadStack.findIndex((x) => x.data === l) === -1) {
+							await lookaheadElem?.addToStack(
+								l,
+								l,
+								'',
+								`look-${targetStateElem?.getId()}-${index}`
+							);
+						}
+					}
+					lookahead.union(item.lookahead);
 				}
 			}
 
-			await closureCodeCard?.highlightLines([28]);
 			for (let rule of augRules) {
-				await closureCodeCard?.highlightLines([29]);
+				await closureCodeCard?.highlightLines([25]);
+				await grammarSelection.selectFor(`${grammarElem?.getCardId()}gset${rule.index}`);
+
+				await closureCodeCard?.highlightLines([26]);
 				if (!(rule.left === symbol)) continue;
 
-				await closureCodeCard?.highlightLines([30]);
+				await targetStateElem?.highlightDot(index);
+				let ruleId = `${grammarElem?.getCardId()}gl${rule.index}`;
+				await selectSymbol(ruleId, colors.blue, id, false);
+
+				await closureCodeCard?.highlightLines([27]);
 				let existent = $targetState.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
-				await targetStateElem?.highlightDot(index);
-				await selectSymbol(
-					`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
-					colors.pink,
-					id,
-					false
-				);
-
-				await closureCodeCard?.highlightLines([31]);
+				await closureCodeCard?.highlightLines([28]);
 				if (existent === -1) {
-					await closureCodeCard?.highlightLines([32]);
-					await targetStateElem?.addItem(rule.index, 0, lookahead, `${id}gl${rule.index}`);
+					await closureCodeCard?.highlightLines([29]);
+					await targetStateElem?.addItem(
+						rule.index,
+						0,
+						lookahead,
+						`${grammarElem?.getCardId()}gl${rule.index}`
+					);
 
-					await closureCodeCard?.highlightLines([33]);
-					await closureCodeCard?.highlightLines([34]);
-					itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead });
+					await closureCodeCard?.highlightLines([30]);
+					await closureCodeCard?.highlightLines([31]);
+					itemsToCheck.push($targetState.length - 1);
+					await addPause(id);
+					await deselectSymbol(ruleId, id);
 					continue;
 				}
 
-				await closureCodeCard?.highlightLines([35]);
-				await closureCodeCard?.highlightLines([36]);
+				await closureCodeCard?.highlightLines([32]);
+				await closureCodeCard?.highlightLines([33]);
 				let size = $targetState[existent].lookahead.size;
 				await targetStateElem?.updateLookahead(lookahead, existent);
 
-				await closureCodeCard?.highlightLines([37]);
+				await deselectSymbol(ruleId, id);
+				await closureCodeCard?.highlightLines([34]);
 				if ($targetState[existent].lookahead.size === size) continue;
 
-				await closureCodeCard?.highlightLines([38]);
-				itemsToCheck.push({
-					ruleIndex: rule.index,
-					pos: 0,
-					lookahead: new Set($targetState[existent].lookahead)
-				});
+				await closureCodeCard?.highlightLines([35]);
+				itemsToCheck.push(existent);
 			}
+			grammarSelection.hideSelect();
 
-			await closureCodeCard?.highlightLines([39]);
+			await closureCodeCard?.highlightLines([36]);
 			itemsToCheck.shift();
+			deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`, id);
 		}
-
+		if ($lookaheadStack.length > 0) await lookaheadElem?.removeAll();
 		targetStateSelection.hideSelect();
 	}
 
@@ -251,7 +287,7 @@
 
 				await codeCard?.highlightLines([8]);
 				for (let [symbolIndex, symbol] of alphabet.entries()) {
-					await symbolsSelection.selectFor(`stack-${symbolListElem?.getId()}-${symbolIndex}`);
+					await grammarSelection.selectFor(`stack-${lookaheadElem?.getId()}-${symbolIndex}`);
 					await targetStateElem?.resetState();
 
 					await codeCard?.highlightLines([9]);
@@ -361,7 +397,7 @@
 	}
 
 	onMount(() => {
-		symbolsSelection = getSelectionFunctions(id);
+		grammarSelection = getSelectionFunctions(`g${id}`);
 		stateSelection = getSelectionFunctions('origem' + id);
 		targetStateSelection = getSelectionFunctions('destino' + id);
 
@@ -380,8 +416,16 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
-		<SetsCard {id} set={firstSet} label="first" setId={id} hue={colors.blue}></SetsCard>
+		<GrammarCard bind:this={grammarElem} {id} cardId="g{id}" isAugmented={true} bind:loadGrammar
+		></GrammarCard>
+		<SetsCard
+			bind:this={firstElem}
+			{id}
+			set={firstSet}
+			label="first"
+			setId="first{id}"
+			hue={colors.blue}
+		></SetsCard>
 		<StateCard
 			{id}
 			state={targetState}
@@ -413,12 +457,11 @@
 		></StackCard>
 		<StackCard
 			{id}
-			bind:this={symbolListElem}
-			stack={symbolList}
-			stackId="symbollist{id}"
-			label="alfabeto"
+			bind:this={lookaheadElem}
+			stack={lookaheadStack}
+			stackId="lookahead{id}"
+			label="lookahead"
 			hue={colors.green}
-			reversed={false}
 			bind:svgLines
 		></StackCard>
 	</div>

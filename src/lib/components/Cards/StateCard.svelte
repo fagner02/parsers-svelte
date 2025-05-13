@@ -203,7 +203,9 @@
 							? 'translate(5px, 0) scale(2)'
 							: 'translate(0,0) scale(1)'};color: hsl({hue},65%,45%);">&bull;</span
 					>{/if}{#if item.lookahead != null}<span style="letter-spacing: 0px;">,</span
-					>&lcub;{#each item.lookahead as l, index}{l}{#if index < item.lookahead.size - 1},{/if}{/each}&rcub;{/if}
+					>&lcub;{#each item.lookahead as l, index}<span id="look-{stateId}-{rindex}"
+							>{l}{#if index < item.lookahead.size - 1},{/if}</span
+						>{/each}&rcub;{/if}
 			</p>
 		{/each}
 	</div>

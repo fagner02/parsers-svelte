@@ -5,9 +5,9 @@
  * @param {Map<string, Set<string>>} firstSet
  */
 export function closure(state, rules, nt, firstSet) {
-	let itemsToCheck = [...state];
+	let itemsToCheck = [...state.keys()];
 	while (itemsToCheck.length > 0) {
-		let item = itemsToCheck[0];
+		let item = state[itemsToCheck[0]];
 		let symbol = rules[item.ruleIndex].right[item.pos];
 		if (!nt.includes(symbol)) {
 			itemsToCheck.shift();
@@ -17,18 +17,16 @@ export function closure(state, rules, nt, firstSet) {
 		if (rules[item.ruleIndex].right.length - 1 === item.pos) {
 			lookahead = new Set(item.lookahead);
 		} else {
-			/**@type {string[]}*/
-			let betaFirst = [];
 			let nullable = true;
 			for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
 				let beta = rules[item.ruleIndex].right[item.pos + i];
 				if (!nt.includes(beta)) {
-					betaFirst.push(beta);
+					lookahead.add(beta);
 					nullable = false;
 					break;
 				} else {
 					let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
-					betaFirst = betaFirst.concat(first.filter((x) => x !== ''));
+					lookahead.union(new Set(first.filter((x) => x !== '')));
 
 					if (!first.includes('')) {
 						nullable = false;
@@ -37,9 +35,7 @@ export function closure(state, rules, nt, firstSet) {
 				}
 			}
 			if (nullable) {
-				lookahead = new Set([...betaFirst, ...item.lookahead]);
-			} else {
-				lookahead = new Set(betaFirst);
+				lookahead.union(item.lookahead);
 			}
 		}
 		for (let rule of rules) {
@@ -48,7 +44,7 @@ export function closure(state, rules, nt, firstSet) {
 
 			if (existent === -1) {
 				state.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
-				itemsToCheck.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
+				itemsToCheck.push(state.length - 1);
 				continue;
 			}
 			let size = state[existent].lookahead.size;
@@ -59,11 +55,7 @@ export function closure(state, rules, nt, firstSet) {
 				continue;
 			}
 
-			itemsToCheck.push({
-				ruleIndex: state[existent].ruleIndex,
-				pos: state[existent].pos,
-				lookahead: new Set(state[existent].lookahead)
-			});
+			itemsToCheck.push(existent);
 		}
 
 		itemsToCheck.shift();

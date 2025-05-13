@@ -42,7 +42,7 @@
 	label={'gramática'}
 	hue={colors.blue}
 	cardId={props.cardId}
-	id={props.id}
+	id="g{props.id}"
 >
 	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="{props.cardId}rules">
 		{#each rules as rule, rulesIndex}
