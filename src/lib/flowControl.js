@@ -247,7 +247,7 @@ export async function addPause(id) {
  * @param {string} id
  */
 export async function forward(id) {
-	appendData(`${new Date()},control flow,forward`);
+	appendData(`control flow,forward`);
 	if (limit.get(id)) return;
 	action.set(id, flowActions.forward);
 
@@ -269,7 +269,7 @@ export async function forward(id) {
  * @param {string} id
  */
 export async function skipToEnd(id) {
-	appendData(`${new Date()},control flow,skip to end`);
+	appendData(`control flow,skip to end`);
 	action.set(id, flowActions.skipping);
 
 	jumpPause.set(id, true);
@@ -288,7 +288,7 @@ export async function skipToEnd(id) {
  * @param {string} id
  */
 export function back(id) {
-	appendData(`${new Date()},control flow,back`);
+	appendData(`control flow,back`);
 	if ((currentStep.get(id) ?? 0) <= 1 && !limit.get(id)) return;
 	action.set(id, flowActions.back);
 	let newStep = limit.get(id) ? maxStep.get(id) : (currentStep.get(id) ?? 0) - 1;
@@ -305,7 +305,7 @@ export function back(id) {
  * @param {string} id
  */
 export function reset(id) {
-	appendData(`${new Date()},control flow,reset`);
+	appendData(`control flow,reset`);
 	limit.set(id, false);
 	limitHitCallback.get(id)?.();
 	currentStep.set(id, 0);

@@ -58,7 +58,7 @@
 	instruction ??= '';
 	/** @param {string} name */
 	async function updateSelected(name) {
-		appendData(`${new Date()},open popup, ${name}`);
+		appendData(`open popup, ${name}`);
 		animation = '';
 		await wait(id, 10);
 
@@ -73,7 +73,7 @@
 	let contentOpacity = $state(0);
 
 	async function closePopup() {
-		appendData(`${new Date()},close popup, ${selected}`);
+		appendData(`close popup, ${selected}`);
 		animation = animOut;
 
 		await wait(id, 500);
@@ -158,7 +158,7 @@
 						parseLoaded = true;
 						console.log('swap', id);
 						setLimitHitCallback(limitHitCallback, id);
-						appendData(`${new Date()},open parse,${id}`);
+						appendData(`open parse,${id}`);
 						swapAlgorithm(id);
 						parseOn = true;
 						closePopup();
@@ -174,7 +174,7 @@
 						parseOn = false;
 						id = id.replace('Parser', '');
 						console.log('swap', id);
-						appendData(`${new Date()},close parse,${id}`);
+						appendData(`close parse,${id}`);
 						setLimitHitCallback(limitHitCallback, id);
 						swapAlgorithm(id);
 						closePopup();

@@ -1,5 +1,5 @@
 <script>
-	import { appendData, createFile } from '$lib/log';
+	import { appendData, createFile, getFile } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import { onMount } from 'svelte';
 
@@ -13,7 +13,7 @@
 	 */
 	function receiveInput(e) {
 		const { name, value } = /**@type {HTMLInputElement}*/ (e.target);
-		appendData(`${new Date()},form ${name},${value}`);
+		appendData(`form ${name},${value}`);
 
 		if (value.trim().length > 0) {
 			answers.add(name);
@@ -44,7 +44,12 @@
 				<p style="font-size: 0.9rem;align-content: center">
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
-				<button disabled={totalQuestions === totalAnswers}>Finalizar</button>
+				<button
+					disabled={totalQuestions === totalAnswers}
+					onclick={() => {
+						getFile();
+					}}>Finalizar</button
+				>
 			</div>
 			<FillSize class="form-content">
 				{#snippet content()}

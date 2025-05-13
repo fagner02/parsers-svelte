@@ -36,7 +36,7 @@
 					onclick={async () => {
 						items[items.findIndex((i) => i.name === item.name)].loaded = true;
 						selected = item;
-						appendData(`${new Date()},tab change,${item.name}`);
+						appendData(`tab change,${item.name}`);
 					}}>{item.name}</button
 				>
 			{/each}

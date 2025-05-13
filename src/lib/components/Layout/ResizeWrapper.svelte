@@ -1,5 +1,6 @@
 <script>
 	import { wait } from '$lib/flowControl';
+	import { appendData } from '$lib/log';
 	import { setUpTooltip } from '$lib/tooltip';
 	import HandIcon from '@icons/HandIcon.svelte';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
@@ -47,6 +48,7 @@
 	};
 
 	async function open() {
+		appendData(`open float, ${props.id}`);
 		minimized = false;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
@@ -76,7 +78,7 @@
 	 */
 	async function close(e) {
 		e?.stopImmediatePropagation();
-
+		appendData(`close float, ${props.id}`);
 		minimized = true;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
@@ -153,6 +155,7 @@
 			use:setUpTooltip={'Mover janela flutuante'}
 			disabled={selected === 'move'}
 			onclick={() => {
+				appendData(`move float, ${props.id}`);
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
@@ -165,6 +168,7 @@
 			use:setUpTooltip={'Habilitar interação'}
 			disabled={selected === 'grab'}
 			onclick={(/**@type {PointerEvent}*/ e) => {
+				appendData(`grab float, ${props.id}`);
 				e.stopImmediatePropagation();
 				selected = 'grab';
 				removeCallback?.();

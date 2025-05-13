@@ -55,14 +55,14 @@ export async function appendData(data) {
 			console.error('File not found');
 			return;
 		}
-		file.content += '\n' + data;
+		file.content += `\n${new Date().toISOString()},${data}`;
 		store.put(file).onerror = (event) => {
 			console.error('Error updating file:', event);
 		};
 	};
 }
 
-async function getFile() {
+export async function getFile() {
 	let db = await getIDB();
 	if (!db) {
 		console.error('Error opening IndexedDB');
@@ -81,7 +81,7 @@ async function getFile() {
 }
 window.addEventListener('click', (event) => {
 	appendData(
-		`${new Date()},w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
+		`w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
 	);
 });
 window.addEventListener('mousemove', (event) => {
@@ -89,10 +89,8 @@ window.addEventListener('mousemove', (event) => {
 	mousePos.y = event.clientY;
 });
 window.setInterval(() => {
-	appendData(
-		`${new Date()},mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`
-	);
-}, 1000);
+	appendData(`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`);
+}, 500);
 
 const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } = import.meta.env;
 const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

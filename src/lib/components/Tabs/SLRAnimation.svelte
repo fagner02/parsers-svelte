@@ -138,9 +138,7 @@
 								swapAlgorithm(id);
 								algo.loaded = true;
 								resetSelectionFunctions();
-								appendData(
-									`${new Date()},algorithm change,from ${selectedAlgorithm} to ${algo.name}`
-								);
+								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
 								selectedAlgorithm = algo.name;
 							}}>{algo.name}</button
 						>
