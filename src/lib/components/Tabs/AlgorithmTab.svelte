@@ -24,7 +24,7 @@
 	import Info from '@/Layout/Info.svelte';
 	import InputStringIcon from '@icons/InputStringIcon.svelte';
 	import InfoIcon from '@icons/InfoIcon.svelte';
-	import ParseView from '@/ParseView.svelte';
+	import ParseView from '@/Tabs/ParseView.svelte';
 	import ForwardIcon from '@icons/ForwardIcon.svelte';
 	import { isGrammarLoaded } from '$lib/utils';
 	import { setUpTooltip } from '$lib/tooltip.js';

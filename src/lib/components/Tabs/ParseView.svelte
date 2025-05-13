@@ -1,4 +1,5 @@
 <script>
+	import { reset } from '$lib/flowControl';
 	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
 	/** @type {{
@@ -17,7 +18,7 @@
 	});
 </script>
 
-<div class="parse-tab {props.class ?? ''}">
+<div class="parse-tab {props.class ?? ''}" id="parse-view{props.id}">
 	{@render tree?.({ id: props.id })}
 	<div class="parse">
 		<input
@@ -25,6 +26,8 @@
 			name="string a ser analisada"
 			oninput={(v) => {
 				setInputString(v.currentTarget.value);
+				reset(props.id);
+				accept = null;
 			}}
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}
 			placeholder="Digite a entrada aqui"
