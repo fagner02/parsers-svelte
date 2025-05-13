@@ -70,7 +70,7 @@
 			await codeCard?.highlightLines([2]);
 
 			await followSetElement?.joinSets(['$'], ['$'], null, rules[0].left);
-
+			await addPause(id);
 			for (let i = 0; i < rules.length; i++) {
 				await codeCard?.highlightLines([3]);
 
@@ -89,6 +89,7 @@
 						await codeCard?.highlightLines([7]);
 
 						await selectRSymbol(`${id}g`, i, j, colors.green, id, false);
+						await addPause(id);
 						continue;
 					}
 					await codeCard?.highlightLines([8]);
@@ -99,6 +100,7 @@
 						await codeCard?.highlightLines([9]);
 
 						await followSetElement?.addSetRow(symbol, symbol, `${id}gr${i}-${j}`);
+						await addPause(id);
 					}
 
 					await codeCard?.highlightLines([10]);
@@ -112,6 +114,7 @@
 								await codeCard?.highlightLines([14]);
 
 								await joinSetElement?.addSetRow(symbol, symbol, `${id}gr${i}-${j}`);
+								await addPause(id);
 							}
 							await codeCard?.highlightLines([15]);
 							if (rules[i].left !== symbol) {
@@ -123,6 +126,7 @@
 									symbol,
 									`${id}gl${i}`
 								);
+								await addPause(id);
 							}
 							await codeCard?.highlightLines([17]);
 							break;
@@ -140,11 +144,13 @@
 								if (item.left === followingSymbol) {
 									await codeCard?.highlightLines([22]);
 									if (item.right.includes('')) {
-										await codeCard?.highlightLines([23, 24]);
+										await codeCard?.highlightLines([23]);
+										await codeCard?.highlightLines([24]);
 										empty = true;
 										continue;
 									}
-									await codeCard?.highlightLines([25, 26]);
+									await codeCard?.highlightLines([25]);
+									await codeCard?.highlightLines([26]);
 
 									await followSetElement?.joinSets(
 										item.right,
@@ -153,6 +159,7 @@
 										symbol,
 										`${firstSetElement.getSetId()}l${key}`
 									);
+									await addPause(id);
 								}
 							}
 							await codeCard?.highlightLines([27]);
@@ -160,7 +167,8 @@
 								await codeCard?.highlightLines([28]);
 								break;
 							}
-							await codeCard?.highlightLines([29, 30]);
+							await codeCard?.highlightLines([29]);
+							await codeCard?.highlightLines([30]);
 							followingSymbolIndex = j + 1 + pos;
 							followingSymbol =
 								j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
@@ -177,6 +185,7 @@
 								symbol,
 								`${id}gr${i}-${followingSymbolIndex}`
 							);
+							await addPause(id);
 							await codeCard?.highlightLines([33]);
 							break;
 						}
@@ -225,6 +234,7 @@
 							'',
 							`${joinSetElement?.getSetId()}l${joinIndexes.get(top[0])}`
 						);
+						await addPause(id);
 						await codeCard?.highlightLines([44]);
 						continue;
 					}
@@ -238,7 +248,8 @@
 					);
 
 					const setToJoin = /**@type {Array<string>}*/ (followSetElement?.get(top[0]));
-					await codeCard?.highlightLines([45, 46]);
+					await codeCard?.highlightLines([45]);
+					await codeCard?.highlightLines([46]);
 
 					await followSetElement?.joinSets(
 						setToJoin,
@@ -247,6 +258,7 @@
 						topKey,
 						`${followSetElement.getSetId()}l${followIndexes.get(top[0])}`
 					);
+					await addPause(id);
 					await codeCard?.highlightLines([47]);
 
 					await joinSetElement?.remove(topKey, top[0]);
@@ -256,6 +268,7 @@
 						await codeCard?.highlightLines([49]);
 
 						await joinStackElement?.removeFromStack($joinStack.length - 1);
+						await addPause(id);
 					}
 				}
 			}
