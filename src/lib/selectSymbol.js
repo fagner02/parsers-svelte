@@ -9,8 +9,8 @@ export const colors = {
  * @param {string} card
  * @param {number} index1
  * @param {number} hue
- * @param {boolean} padded
  * @param {string} id
+ * @param {boolean} padded
  */
 export async function selectLSymbol(card, index1, hue, id, padded = true) {
 	return new Promise(async (resolve, reject) => {

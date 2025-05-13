@@ -2,22 +2,19 @@
 export function stackFloatingWindows(elem) {
 	setTimeout(() => {
 		let boundingBox = document.querySelector('#wrapper>.grid>.not-hidden');
-		console.log(boundingBox);
 		if (!boundingBox) return;
 		let boundingBoxRect = boundingBox.getBoundingClientRect();
 		let parentRect = elem.getBoundingClientRect();
-		console.log(boundingBoxRect, parentRect);
 		const pad = 10;
 		let top = pad + 10;
 		for (let item of elem.children) {
 			let margin = item.computedStyleMap().get('margin-bottom')?.toString() ?? '0';
 			let rect = item.getBoundingClientRect();
-			console.log(item, rect);
 			/**@type {HTMLElement}*/ (item).style.left = `${pad}px`;
 			/**@type {HTMLElement}*/ (item).style.top =
 				`${boundingBoxRect.bottom - parseFloat(margin) - rect.height - top - boundingBoxRect.top}px`;
-			top += rect.height + pad;
 			/**@type {HTMLElement}*/ (item).style.opacity = '1';
+			top += rect.height + pad;
 		}
 	}, 500);
 }

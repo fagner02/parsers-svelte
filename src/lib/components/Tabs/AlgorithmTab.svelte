@@ -156,7 +156,6 @@
 					onclick={() => {
 						id = `${id}Parser`;
 						parseLoaded = true;
-						console.log('swap', id);
 						setLimitHitCallback(limitHitCallback, id);
 						appendData(`open parse,${id}`);
 						swapAlgorithm(id);
@@ -173,7 +172,6 @@
 					onclick={() => {
 						parseOn = false;
 						id = id.replace('Parser', '');
-						console.log('swap', id);
 						appendData(`close parse,${id}`);
 						setLimitHitCallback(limitHitCallback, id);
 						swapAlgorithm(id);

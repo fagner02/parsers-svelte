@@ -24,7 +24,6 @@
 	}
 
 	onMount(() => {
-		console.log('mounted');
 		totalQuestions =
 			document.querySelector('.form')?.querySelectorAll('input,textarea').length ?? 0;
 	});
