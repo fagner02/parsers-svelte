@@ -344,3 +344,24 @@ export function swapAlgorithm(id) {
 		jumpPause.set(id, false);
 	}
 }
+
+export function clearControlFlow() {
+	for (let id of resetCalls.keys()) {
+		killAllWaits(id);
+		killPause(id);
+	}
+	waitCount.clear();
+	waitRe.clear();
+	waitResolves.clear();
+	waitRejects.clear();
+	pauseCount.clear();
+	pauseResolves.clear();
+	pauseRejects.clear();
+	limit.clear();
+	limitHitCallback.clear();
+	currentStep.clear();
+	maxStep.clear();
+	action.clear();
+	jumpWait.clear();
+	jumpPause.clear();
+}

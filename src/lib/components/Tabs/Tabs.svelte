@@ -8,6 +8,7 @@
 	import AssignmentTab from './AssignmentTab.svelte';
 	import { appendData } from '$lib/log';
 	import { setGrammarChangeCallback } from '$lib/utils';
+	import { clearControlFlow } from '$lib/flowControl';
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
 
@@ -25,6 +26,7 @@
 		for (let i = 0; i < algoTabs.length; i++) {
 			items[algoTabs[i]].loaded = false;
 		}
+		clearControlFlow();
 	}
 	setGrammarChangeCallback(resetLoadedItems);
 	let selected = $state(items[0]);

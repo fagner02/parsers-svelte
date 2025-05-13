@@ -46,7 +46,6 @@
 				await wait(id, 10);
 
 				if (srcId) {
-					console.log(document.querySelector('#' + srcId));
 					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`, id);
 				}
 
