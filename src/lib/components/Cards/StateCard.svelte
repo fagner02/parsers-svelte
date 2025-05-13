@@ -53,7 +53,6 @@
 					let look = /**@type {HTMLElement}*/ (
 						document.querySelector(`#look-${stateId}-${index}-${i}`)
 					);
-					console.log(look.style.maxWidth, look, look.scrollWidth);
 					look.style.maxWidth = `${look.scrollWidth}px`;
 					look.style.opacity = '1';
 					elemWidth += look.scrollWidth;
@@ -96,8 +95,6 @@
 					return x;
 				});
 				await wait(id, 0);
-
-				console.log('in', elem.scrollWidth, elem.style.width, elem);
 
 				let oldWidth = 0;
 				let newWidth = 0;
