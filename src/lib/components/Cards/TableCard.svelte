@@ -223,7 +223,7 @@
 									<div
 										bind:this={conflictElem}
 										class="grid unit"
-										style="transition: all 0.5s; color: white;border-radius: 5px;transform: {highlighted
+										style="transition: all 0.5s;height: 100%; color: white;border-radius: 5px;transform: {highlighted
 											? `translate(0px, 0%)`
 											: `translate(0, -105%)`};"
 									></div>
