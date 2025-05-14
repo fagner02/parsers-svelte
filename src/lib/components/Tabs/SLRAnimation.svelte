@@ -130,7 +130,7 @@
 				<div class="algo-buttons">
 					{#each algos as algo}
 						<button
-							use:setUpTooltip={algo.desc}
+							use:setUpTooltip={{ text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
 								id = `slralgo${algo.name}`;

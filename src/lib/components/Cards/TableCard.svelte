@@ -3,8 +3,17 @@
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
 	import AlertIcon from '@icons/AlertIcon.svelte';
+	import { setUpTooltip } from '$lib/tooltip';
 
-	/** @type {{id: string, label: any, hue: any, columns: Array<string>, rows: Array<string>, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>, tableId: string, svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
+	/** @type {{
+	 * id: string,
+	 * label: any,
+	 * hue: any,
+	 * columns: Array<string>,
+	 * rows: Array<string>,
+	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>,
+	 * tableId: string,
+	 * svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
 	let {
 		id,
 		label,
@@ -147,6 +156,22 @@
 			}
 		});
 	}
+
+	/**
+	 * @param {string} value
+	 */
+	export function setConflictTooltip(value) {
+		console.log(conflictElem, value);
+		if (!conflictElem) return;
+		setUpTooltip(conflictElem, {
+			text: value,
+			willRemove: true,
+			hue: conflictHue
+		});
+	}
+
+	/** @type {HTMLElement?} */
+	let conflictElem = $state(null);
 </script>
 
 <CardWrapper
@@ -162,7 +187,7 @@
 		<thead>
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
-				{#each columns as column, index}
+				{#each columns as column}
 					<th style="background: hsl({column == highlightColumn ? highlightHue : hue}, 60%, 40%);">
 						{column}
 					</th>
@@ -199,13 +224,12 @@
 								</span>
 								{#if conflict && highlightRow === rowKey && highlightColumn === colKey}
 									<div
+										bind:this={conflictElem}
 										class="grid unit"
-										style="transition: all 0.5s; color: white;background: hsl({conflictHue}, 60%, 50%);border-radius: 5px;transform: {highlighted
+										style="transition: all 0.5s; color: white;border-radius: 5px;transform: {highlighted
 											? `translate(0px, 0%)`
 											: `translate(0, -105%)`};"
-									>
-										<AlertIcon color="white" size={18} strokeWidth={3}></AlertIcon>
-									</div>
+									></div>
 								{/if}
 							</div>
 						</td>
@@ -253,9 +277,6 @@
 		white-space: nowrap;
 	}
 	div.grid,
-	div.grid.unit {
-		place-content: center;
-	}
 	th,
 	span {
 		margin: 0px 5px;

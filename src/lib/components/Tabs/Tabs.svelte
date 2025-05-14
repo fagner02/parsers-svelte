@@ -37,7 +37,7 @@
 		<div class="tab-item-list">
 			{#each items as item}
 				<button
-					use:setUpTooltip={item.desc}
+					use:setUpTooltip={{ text: item.desc }}
 					class="tab-item"
 					style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
 					item.name

@@ -150,9 +150,11 @@
 		{#if title}
 			<p style="height: {minimized ? '0px' : 'auto'}">{title}</p>
 		{/if}
-		<button use:setUpTooltip={'Minimizar'} onclick={close}><MinimizeIcon></MinimizeIcon></button>
+		<button use:setUpTooltip={{ text: 'Minimizar' }} onclick={close}
+			><MinimizeIcon></MinimizeIcon></button
+		>
 		<button
-			use:setUpTooltip={'Mover janela flutuante'}
+			use:setUpTooltip={{ text: 'Mover janela flutuante' }}
 			disabled={selected === 'move'}
 			onclick={() => {
 				appendData(`move float, ${props.id}`);
@@ -165,7 +167,7 @@
 			<MoveIcon></MoveIcon></button
 		>
 		<button
-			use:setUpTooltip={'Habilitar interação'}
+			use:setUpTooltip={{ text: 'Habilitar interação' }}
 			disabled={selected === 'grab'}
 			onclick={(/**@type {PointerEvent}*/ e) => {
 				appendData(`grab float, ${props.id}`);
@@ -179,7 +181,7 @@
 		</button>
 		{#each actions as action}
 			<button
-				use:setUpTooltip={action.desc}
+				use:setUpTooltip={{ text: action.desc }}
 				disabled={selected === action.name}
 				onclick={() => {
 					removeCallback?.();

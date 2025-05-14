@@ -127,7 +127,7 @@
 		<div class="controls-box">
 			<div class="controls">
 				<button
-					use:setUpTooltip={'Código'}
+					use:setUpTooltip={{ text: 'Código' }}
 					class="popup-button"
 					onclick={() => updateSelected('code')}
 					disabled={selected == 'code'}
@@ -135,7 +135,7 @@
 					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Copiar resultados como texto'}
+					use:setUpTooltip={{ text: 'Copiar resultados como texto' }}
 					class="popup-button"
 					onclick={() => updateSelected('text')}
 					disabled={selected == 'text'}
@@ -143,7 +143,7 @@
 					<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Informações sobre o algoritmo'}
+					use:setUpTooltip={{ text: 'Informações sobre o algoritmo' }}
 					class="popup-button"
 					onclick={() => updateSelected('info')}
 					disabled={selected == 'info'}
@@ -151,7 +151,7 @@
 					<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Analisar string de entrada'}
+					use:setUpTooltip={{ text: 'Analisar string de entrada' }}
 					class="view-button"
 					onclick={() => {
 						id = `${id}Parser`;
@@ -167,7 +167,7 @@
 					<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Executar construção do parser'}
+					use:setUpTooltip={{ text: 'Executar construção do parser' }}
 					class="view-button"
 					onclick={() => {
 						parseOn = false;
@@ -184,21 +184,21 @@
 			</div>
 
 			<div class="flow-controls controls">
-				<button use:setUpTooltip={'Passo Anterior'} onclick={() => back(`${id}`)}>
+				<button use:setUpTooltip={{ text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
 					<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
-				<button use:setUpTooltip={'Reiniciar'} onclick={() => reset(`${id}`)}>
+				<button use:setUpTooltip={{ text: 'Reiniciar' }} onclick={() => reset(`${id}`)}>
 					<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 				</button>
 				<button
-					use:setUpTooltip={'Próximo passo'}
+					use:setUpTooltip={{ text: 'Próximo passo' }}
 					disabled={limit}
 					onclick={() => forward(`${id}`)}
 				>
 					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
 				<button
-					use:setUpTooltip={'Pular para o final'}
+					use:setUpTooltip={{ text: 'Pular para o final' }}
 					disabled={limit}
 					onclick={() => skipToEnd(`${id}`)}
 				>

@@ -86,7 +86,6 @@
 				let elem = /**@type {HTMLElement}*/ (
 					document.querySelector(`#state-${stateId}-${existent}`)
 				);
-				let elemWidth = elem.scrollWidth;
 				cardState.update((x) => {
 					x[existent].lookahead = new Set([
 						.../**@type {Set<string>}*/ (x[existent].lookahead),

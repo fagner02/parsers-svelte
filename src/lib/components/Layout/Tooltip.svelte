@@ -14,16 +14,17 @@
 
 <style>
 	.tooltip {
+		--hue: 200;
 		z-index: 2;
 		position: absolute;
 		pointer-events: none;
-		background: hsl(200, 50%, 50%);
+		background: hsl(var(--hue), 50%, 50%);
 		color: white;
 		border-radius: 5px;
 		padding: 2px 4px;
 		opacity: 0;
 		transition: all 0.2s;
-		border: 2px solid hsl(200, 50%, 30%);
+		border: 2px solid hsl(var(--hue), 50%, 30%);
 		max-width: 250px;
 		display: flex;
 	}
@@ -37,8 +38,8 @@
 		top: 0px;
 		left: 0px;
 		clip-path: inset(0px 0px 8px 0px);
-		stroke: hsl(200, 50%, 30%);
+		stroke: hsl(var(--hue), 50%, 30%);
 		stroke-width: 4px;
-		fill: hsl(200, 50%, 50%);
+		fill: hsl(var(--hue), 50%, 50%);
 	}
 </style>

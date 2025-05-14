@@ -84,6 +84,10 @@
 						let cell = $table.get(item.left)?.get(follow.right[f]);
 						if (cell?.data !== null) {
 							await tableElement.showConflict(item.left, follow.right[f]);
+							let rule = `${item.left} -> ${rules[i].right[0] === '' ? 'ε' : rules[i].right.join(' ')}`;
+							tableElement.setConflictTooltip(
+								`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cell?.text}]`
+							);
 							await addPause(id);
 							limitHit(id);
 							await addPause(id);
@@ -120,6 +124,10 @@
 					let cell = $table.get(item.left)?.get(item.right[j]);
 					if (cell?.data !== null) {
 						await tableElement.showConflict(item.left, item.right[j]);
+						let rule = `${item.left} -> ${rules[i].right[0] === '' ? 'ε' : rules[i].right.join(' ')}`;
+						tableElement.setConflictTooltip(
+							`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cell?.text}]`
+						);
 						limitHit(id);
 						await addPause(id);
 						return;

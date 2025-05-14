@@ -5,12 +5,13 @@ let activeTooltip = null;
 /**
  * @param {MouseEvent} e
  * @param {string} text
+ * @param {number} hue
  */
-export async function showTooltip(e, text) {
+export async function showTooltip(e, text, hue) {
 	let tooltip = /**@type {HTMLElement}*/ (document.querySelector('.tooltip'));
 	let tooltipText = /**@type {HTMLElement}*/ (tooltip.querySelector('#tooltip'));
 	let arrow = /**@type {HTMLElement}*/ (tooltip.querySelector('.arrow'));
-
+	tooltip.style.setProperty('--hue', `${hue}`);
 	if (!arrow || !tooltipText || !tooltip) return;
 	let id = crypto.randomUUID();
 	activeTooltip = id;
@@ -40,7 +41,7 @@ export async function showTooltip(e, text) {
 	tooltip.style.top = `${y}px`;
 	let left = tooltipRect.width / 2 - arrowRect.width / 2;
 	arrow.style.left = `${left}px`;
-	arrow.style.top = `${tooltipRect.height / 2 - arrowRect.height / 2}px`;
+	arrow.style.top = `${0.1 + (tooltipRect.height / 2 - arrowRect.height / 2)}px`;
 	arrow.style.transform = `translate(${rect.left - x - left + rect.width / 2 - arrowRect.width / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
 }
 
@@ -51,18 +52,35 @@ export async function hideTooltip() {
 	tooltip.style.opacity = '0';
 }
 
+let map = new Map();
+
 /**
  * @param {HTMLElement} elem
- * @param {string} text
+ * @param {{text: string, willRemove?: boolean, hue?: number}} data
  */
-export function setUpTooltip(elem, text) {
-	elem.addEventListener('mouseenter', (e) => {
-		showTooltip(e, text);
-	});
-	elem.addEventListener('mouseleave', () => {
+export function setUpTooltip(elem, { text, willRemove = false, hue = 200 }) {
+	let show = (/**@type {MouseEvent}*/ e) => {
+		console.log(text);
+		showTooltip(e, text, hue);
+	};
+	let hide = () => {
 		hideTooltip();
-	});
-	elem.addEventListener('click', () => {
-		hideTooltip();
-	});
+	};
+	elem.addEventListener('mouseenter', show);
+	elem.addEventListener('mouseleave', hide);
+	elem.addEventListener('click', hide);
+	if (willRemove) {
+		let id = elem.getAttribute('tooltip-id');
+		if (id) {
+			map.get(id)?.();
+		} else {
+			id = crypto.randomUUID();
+			elem.setAttribute('tooltip-id', id);
+		}
+		map.set(id, () => {
+			elem.removeEventListener('mouseenter', show);
+			elem.removeEventListener('mouseleave', hide);
+			elem.removeEventListener('click', hide);
+		});
+	}
 }
