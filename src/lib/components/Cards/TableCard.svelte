@@ -110,10 +110,7 @@
 				let colIndex = $table.get(row)?.keys().toArray().indexOf(column);
 				let element = document.querySelector(`#td-${tableId}-${row}-${colIndex}`);
 				if (element === null) return;
-				element.scrollIntoView({
-					behavior: 'smooth',
-					block: 'center'
-				});
+
 				highlightRow = row;
 				highlightColumn = column;
 				highlighted = false;

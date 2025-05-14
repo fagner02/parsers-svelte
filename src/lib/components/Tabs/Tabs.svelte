@@ -92,6 +92,5 @@
 		gap: 0px;
 		width: fit-content;
 		align-items: flex-start;
-		z-index: -1;
 	}
 </style>
