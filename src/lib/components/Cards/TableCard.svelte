@@ -261,7 +261,11 @@
 		text-align: center;
 		text-align: -webkit-center;
 		text-align: -moz-center;
-		vertical-align: center;
+	}
+	th,
+	td > div {
+		align-items: center;
+		justify-content: center;
 	}
 	span {
 		display: block;
