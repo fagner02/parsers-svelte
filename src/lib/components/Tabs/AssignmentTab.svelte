@@ -66,7 +66,15 @@
 						</div>
 						<hr />
 						<div class="field col">
-							<p>1. Dado um conjunto first, forneça uma gramática que gera esse conjunto first</p>
+							<p>
+								1. Dado o conjunto first a seguir, forneça uma gramática que gera esse conjunto
+								first:
+								{`{(,id}	
+{+,''}
+{(,id}
+{*,''}
+{(,id}`}
+							</p>
 							<textarea name="q1" id="q1" oninput={receiveInput} rows="4"></textarea>
 						</div>
 						<hr />
@@ -146,6 +154,9 @@
 		gap: 20px;
 		margin: 10px;
 		align-items: center;
+	}
+	.field > p {
+		white-space: pre-wrap;
 	}
 	.field > textarea,
 	.field > input {
