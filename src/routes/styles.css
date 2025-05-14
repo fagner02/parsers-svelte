@@ -90,7 +90,8 @@ section {
 	z-index: 1;
 }
 
-p {
+p,
+pre {
 	margin: 0;
 	font-size: 0.9rem;
 }

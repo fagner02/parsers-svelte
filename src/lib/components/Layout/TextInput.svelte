@@ -109,6 +109,7 @@
 		overflow: auto;
 		height: 100px;
 		display: flex;
+		font-family: monospace;
 	}
 
 	.textnumbers {

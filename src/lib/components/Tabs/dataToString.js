@@ -8,7 +8,7 @@ export function tableToString(data, title, convert) {
 	const innerKeysArray = data.values().next().value?.keys().toArray() || [];
 
 	const outerKeysArray = Array.from(data.keys()).map((key) =>
-		convert.key ? convert.key(key) : key
+		convert.key ? convert.key(key) : key.toString()
 	);
 	const outerKeyWidth = Math.max(title.length, ...outerKeysArray.map((k) => k.toString().length));
 
@@ -17,7 +17,9 @@ export function tableToString(data, title, convert) {
 			innerKey.length,
 			...Array.from(data.values()).map((innerMap) => {
 				let value = innerMap.get(innerKey);
-				return convert.cell ? convert.cell(value).length : (value ?? '').toString().length;
+				return convert.cell
+					? convert.cell(value).replaceAll('->', '>').length
+					: (value ?? '').toString().replaceAll('->', '>').length;
 			})
 		)
 	);
@@ -40,7 +42,8 @@ export function tableToString(data, title, convert) {
 		innerKeysArray.forEach((innerKey, i) => {
 			let value = innerMap.get(innerKey);
 			value = convert.cell ? convert.cell(value) : value ?? '';
-			row += ' | ' + value.padEnd(innerKeyWidths[i]);
+			value = value.replaceAll('->', '>').padEnd(innerKeyWidths[i]);
+			row += ' | ' + value.replaceAll('>', '->');
 		});
 		result += row + '\n';
 	}

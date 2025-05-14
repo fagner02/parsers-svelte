@@ -60,7 +60,6 @@ let map = new Map();
  */
 export function setUpTooltip(elem, { text, willRemove = false, hue = 200 }) {
 	let show = (/**@type {MouseEvent}*/ e) => {
-		console.log(text);
 		showTooltip(e, text, hue);
 	};
 	let hide = () => {
