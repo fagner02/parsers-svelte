@@ -144,6 +144,10 @@
 	export async function removeAll() {
 		return new Promise(async (resolve, reject) => {
 			try {
+				if ($stack.length === 0) {
+					resolve(null);
+					return;
+				}
 				let elem = /**@type {HTMLElement?}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 				while (elem) {
 					elem.style.width = '0px';

@@ -31,7 +31,10 @@
 						_id = '#' + _id;
 					}
 					const elem = document.querySelector(_id);
-					if (elem === null) return resolve();
+					if (elem === null) {
+						console.error(`Element ${_id} not found`);
+						return resolve();
+					}
 					const parent = /**@type {HTMLElement}*/ (selection.parentElement);
 
 					const elemRect = elem.getBoundingClientRect();
