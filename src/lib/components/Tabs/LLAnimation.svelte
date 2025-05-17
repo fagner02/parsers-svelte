@@ -16,6 +16,7 @@
 	import { setUpTooltip } from '$lib/tooltip';
 	import { firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
+	import { id as parseId } from '$lib/llparse';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -27,6 +28,8 @@
 	let table = writable();
 	// ========== Components ====================
 
+	/**@type {Map<string, Map<string, number>>}*/
+	let tableData = $state(new Map());
 	let id = $state('');
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
@@ -34,10 +37,11 @@
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
-		let { rules, nt, t } = getGrammar();
+		let { rules, nt, t, startingSymbol } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first.firstSet);
 		const _table = lltable(rules, nt, t, _first.firstSet, _follow.followSet);
+		tableData = _table.table;
 
 		results.push({
 			title: 'Conjunto First',
@@ -167,7 +171,7 @@
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {results} bind:limit bind:id bind:instruction {code}>
+<AlgorithmTab {parseId} {results} bind:limit bind:id bind:instruction {code}>
 	{#snippet steps()}
 		<div style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
@@ -220,7 +224,7 @@
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">
-			<LlParse id="llalgo{algos[0].name}Parser" {table}></LlParse>
+			<LlParse {tableData} {table}></LlParse>
 		</div>
 	{/snippet}
 </AlgorithmTab>

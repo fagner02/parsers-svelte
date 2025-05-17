@@ -19,9 +19,8 @@ export let saves = [];
  * @param {string[]} t
  * @param {Map<number, Set<string>>} firstSet
  * @param {Map<string, Set<string>>} followSet
- * @param {Map<string, number>} followIndexes
  */
-export function lltable(rules, nt, t, firstSet, followSet, followIndexes) {
+export function lltable(rules, nt, t, firstSet, followSet) {
 	/**@type {Map<string, Map<string, number>>} */
 	let table = new Map();
 

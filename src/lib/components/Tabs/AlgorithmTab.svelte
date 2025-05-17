@@ -37,8 +37,9 @@
 
 	/**@type {{
 	 * code: string,
-	 * id: string, instruction?:
-	 * string,
+	 * id: string,
+	 * parseId: string,
+	 * instruction?: string,
 	 * class?: string,
 	 * limit?: boolean,
 	 * results: import('@/types').ResultsTabItem[],
@@ -48,11 +49,13 @@
 	let {
 		code,
 		id = $bindable(),
+		parseId,
 		instruction = $bindable(),
 		limit = $bindable(),
 		...props
 	} = $props();
 
+	let currentId = $state(id);
 	limit ??= false;
 
 	instruction ??= '';
@@ -154,7 +157,8 @@
 					use:setUpTooltip={{ text: 'Analisar string de entrada' }}
 					class="view-button"
 					onclick={() => {
-						id = `${id}Parser`;
+						currentId = id;
+						id = parseId;
 						parseLoaded = true;
 						setLimitHitCallback(limitHitCallback, id);
 						appendData(`open parse,${id}`);
@@ -171,7 +175,7 @@
 					class="view-button"
 					onclick={() => {
 						parseOn = false;
-						id = id.replace('Parser', '');
+						id = currentId;
 						appendData(`close parse,${id}`);
 						setLimitHitCallback(limitHitCallback, id);
 						swapAlgorithm(id);

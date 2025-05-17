@@ -13,12 +13,15 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { id, elemIds, saves, functionCalls, llParsing } from '$lib/llparse';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	/** @type {{id: string, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>}} */
-	let { id, table } = $props();
+	/** @type {{
+	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>
+	 * tableData: Map<string, Map<string, number>>}} */
+	let { table, tableData } = $props();
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
 	let inputStack = $state(writable([]));
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
@@ -34,6 +37,7 @@
 	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
 
 	function reset() {
+		llParsing(startingSymbol, inputString, nt, tableData, rules);
 		symbolStack.update(() => []);
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
@@ -44,86 +48,33 @@
 	}
 	setResetCall(reset, id);
 
+	/**@type {any}*/
+	const obj = {
+		highlightLines: () => codeCard?.highlightLines,
+		addToStackSymbols: () => symbolStackElement.addToStack,
+		removeFromStackSymbols: () => symbolStackElement.removeFromStack,
+		addToStackInput: () => inputStackElement.addToStack,
+		removeFromStackInput: () => inputStackElement.removeFromStack,
+		addToTree: () => addToTree,
+		resetTree: () => resetTree,
+		initializeTree: () => initializeTree,
+		addPause: () => addPause,
+		setAccept: () => context.setAccept
+	};
+
 	async function parsing() {
 		try {
-			if (initializeTree === undefined) {
-				let functions = getTreeFunctions();
-				initializeTree = functions.initializeTree;
-				addToTree = functions.addToTree;
-				resetTree = functions.resetTree;
-			}
-			await addPause(id);
-			await codeCard?.highlightLines([0]);
-			resetTree();
-			initializeTree(startingSymbol);
-			await codeCard?.highlightLines([1]);
-			for (let i of ['$', startingSymbol]) {
-				await symbolStackElement.addToStack(i, i, '');
-			}
-
-			await codeCard?.highlightLines([2]);
-			for (let i of ['$'].concat(inputString.reverse())) {
-				await inputStackElement.addToStack(i, i, '');
-			}
-
-			await addPause(id);
-			await codeCard?.highlightLines([3]);
-			while ($inputStack.length > 0) {
-				await codeCard?.highlightLines([4]);
-				const topSymbol = $symbolStack[$symbolStack.length - 1].data;
-				await codeCard?.highlightLines([5]);
-				const topInput = $inputStack[$inputStack.length - 1].data;
-
-				await codeCard?.highlightLines([6]);
-				if (nt.includes(topSymbol)) {
-					await codeCard?.highlightLines([7]);
-					const prodIndex = $table.get(topSymbol)?.get(topInput)?.data;
-
-					await codeCard?.highlightLines([8]);
-					if (prodIndex == null || prodIndex === -1) {
-						await codeCard?.highlightLines([9]);
-						context.setAccept(false);
-						return;
-					}
-
-					await codeCard?.highlightLines([10]);
-					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-
-					await codeCard?.highlightLines([11]);
-					if (!rules[prodIndex].right.includes('')) {
-						await codeCard?.highlightLines([12]);
-						const prod = [...rules[prodIndex].right].reverse();
-						addToTree([...rules[prodIndex].right], topSymbol);
-						for (let p of prod) {
-							await symbolStackElement.addToStack(p, p, '');
-						}
-					} else {
-						addToTree(['\u03B5'], topSymbol);
-					}
-				} else {
-					await codeCard?.highlightLines([13]);
-					await codeCard?.highlightLines([14]);
-					if (topSymbol !== topInput) {
-						await codeCard?.highlightLines([15]);
-						context.setAccept(false);
-						limitHit(id);
-						return;
-					}
-
-					await codeCard?.highlightLines([16]);
-					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-					await codeCard?.highlightLines([17]);
-					await inputStackElement.removeFromStack($inputStack.length - 1);
+			for (let call of functionCalls) {
+				if (!obj[call.name]) {
+					console.error(`Function ${call.name} not found in map`);
+					continue;
 				}
-
-				await addPause(id);
+				try {
+					await obj[call.name]()(...call.args);
+				} catch (e) {
+					console.error(`Error calling function ${call.name}:`, call.trace, e);
+				}
 			}
-
-			await codeCard?.highlightLines([18]);
-			const result = $inputStack.length === 0 && $symbolStack.length === 0;
-			context.setAccept(result);
-			limitHit(id);
-			await addPause(id);
 		} catch (e) {}
 	}
 
