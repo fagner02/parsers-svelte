@@ -2,7 +2,6 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
-	import AlertIcon from '@icons/AlertIcon.svelte';
 	import { setUpTooltip } from '$lib/tooltip';
 
 	/** @type {{
@@ -184,7 +183,13 @@
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
 				{#each columns as column}
-					<th style="background: hsl({column == highlightColumn ? highlightHue : hue}, 60%, 40%);">
+					<th
+						style="background: hsl({column == highlightColumn
+							? conflict
+								? conflictHue
+								: highlightHue
+							: hue}, 60%, 40%);"
+					>
 						{column}
 					</th>
 				{/each}
