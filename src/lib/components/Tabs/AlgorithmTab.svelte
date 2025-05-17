@@ -45,7 +45,9 @@
 	 * results: import('@/types').ResultsTabItem[],
 	 * steps: any,
 	 * tree: any,
-	 * parse: any}}*/
+	 * parse: any,
+	 * currentInfo: ConstructorOfATypedSvelteComponent,
+	 * parseInfo: ConstructorOfATypedSvelteComponent}}*/
 	let {
 		code,
 		id = $bindable(),
@@ -162,7 +164,7 @@
 						parseLoaded = true;
 						setLimitHitCallback(limitHitCallback, id);
 						appendData(`open parse,${id}`);
-						swapAlgorithm(id);
+						swapAlgorithm(id, props.parseInfo);
 						parseOn = true;
 						closePopup();
 					}}
@@ -178,7 +180,7 @@
 						id = currentId;
 						appendData(`close parse,${id}`);
 						setLimitHitCallback(limitHitCallback, id);
-						swapAlgorithm(id);
+						swapAlgorithm(id, props.currentInfo);
 						closePopup();
 					}}
 					disabled={!parseOn}

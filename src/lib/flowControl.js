@@ -1,3 +1,4 @@
+import { setInfoComponent } from './infoText';
 import { appendData } from './log';
 
 /** @type {Map<string, Map<number, (reason?: any) => void>>} */
@@ -324,8 +325,10 @@ export function reset(id) {
 
 /**
  * @param {string} id
+ * @param {ConstructorOfATypedSvelteComponent} infoComp
  */
-export function swapAlgorithm(id) {
+export function swapAlgorithm(id, infoComp) {
+	setInfoComponent(infoComp);
 	limitHitCallback.get(id)?.();
 	if (!pauseResolves.has(id)) {
 		waitCount.set(id, 0);

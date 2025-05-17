@@ -110,7 +110,7 @@ export function lr0Automaton(rules, nt, t) {
 	/**@type {import('@/types').LR0Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
 
-	// Initial state setup
+	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });

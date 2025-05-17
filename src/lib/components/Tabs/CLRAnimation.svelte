@@ -17,6 +17,9 @@
 	import { automatonToString, firstToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
 	import { id as parseId } from '$lib/clrparse';
+	import LR1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
+	import CLRTableInfo from '@/Info/CLRTableInfo.svelte';
+	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
@@ -41,16 +44,21 @@
 			name: 'Autômato',
 			desc: 'Construção de autômato LR(1)',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: LR1AutomatonInfo
 		},
 		{
 			comp: CLRTableAlgorithm,
 			name: 'Tabela',
 			desc: 'Construção da tabela LR(1)',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: CLRTableInfo
 		}
 	]);
+
+	let currentInfo = $state(algos[0].infoComp);
+
 	(() => {
 		if (!isGrammarLoaded()) return;
 		const _first = firstDataOnly(augRules, nt);
@@ -61,7 +69,7 @@
 		tableData = _table.table;
 		automaton = _automaton.automaton;
 
-		algos[0].id = id;
+		algos[0].id = _automaton.id;
 		algos[1].id = _table.id;
 
 		results.push({
@@ -127,15 +135,23 @@
 		limit = getLimitHit(id);
 	};
 	onMount(() => {
-		id = algos[0].id === '' ? `clralgo${algos[0].name}` : algos[0].id;
+		id = algos[0].id;
 		setLimitHitCallback(limitHitCallback, id);
-		swapAlgorithm(id);
+		swapAlgorithm(id, currentInfo);
 		algos[0].loaded = true;
 	});
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {parseId} {results} bind:limit {code} bind:id>
+<AlgorithmTab
+	{currentInfo}
+	parseInfo={ClrParsingInfo}
+	{parseId}
+	{results}
+	bind:limit
+	{code}
+	bind:id
+>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -145,11 +161,10 @@
 							use:setUpTooltip={{ text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
-								id = algo.id === '' ? `clralgo${algo.name}` : algo.id;
-
+								id = algo.id;
 								algo.loaded = true;
 								setLimitHitCallback(limitHitCallback, id);
-								swapAlgorithm(id);
+								swapAlgorithm(id, algo.infoComp);
 								resetSelectionFunctions();
 								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
 								selectedAlgorithm = algo.name;

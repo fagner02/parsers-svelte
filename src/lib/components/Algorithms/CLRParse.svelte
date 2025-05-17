@@ -71,7 +71,8 @@
 					continue;
 				}
 				try {
-					await obj[call.name]()(...call.args);
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
 				} catch (e) {
 					console.error(`Error calling function ${call.name}:`, call.trace, e);
 				}

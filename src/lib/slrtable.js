@@ -10,9 +10,9 @@ export let elemIds = {
 };
 /** @type {any}*/
 export let saves = [];
-
 /** @type {any}*/
 export let functionCalls = [];
+
 /**
  * @param {import('@/types').LR0Automaton} automaton
  * @param {Array<import('@/types').GrammarItem>} rules
@@ -193,7 +193,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	functionCalls.push({ trace: Error().stack, name: 'hideSelectStack', args: [] });
 
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [] });
+	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[]] });
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
 	return { table, functionCalls, id };

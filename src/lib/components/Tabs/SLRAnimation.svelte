@@ -18,6 +18,9 @@
 	import { automatonToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
 	import { id as parseId } from '$lib/slrparse';
+	import LR0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
+	import SLRTableInfo from '@/Info/SLRTableInfo.svelte';
+	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 
 	let code = '';
 	let tableData = $state(new Map());
@@ -27,18 +30,21 @@
 			name: 'Autômato',
 			desc: 'Construção do autômato LR(0)',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: LR0AutomatonInfo
 		},
 		{
 			comp: SLRTableAlgorithm,
 			name: 'Tabela',
 			desc: 'Construção da tabela SLR',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: SLRTableInfo
 		}
 	]);
 
 	let id = $state('');
+	let currentInfo = $state(algos[0].infoComp);
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -61,8 +67,8 @@
 		tableData = _table.table;
 		automaton = _automaton.automaton;
 
-		algos[1].id = _table.id;
 		algos[0].id = _automaton.id;
+		algos[1].id = _table.id;
 
 		results.push({
 			title: 'Conjunto Follow',
@@ -129,12 +135,20 @@
 	onMount(() => {
 		id = algos[0].id;
 		setLimitHitCallback(limitHitCallback, id);
-		swapAlgorithm(id);
+		swapAlgorithm(id, currentInfo);
 		algos[0].loaded = true;
 	});
 </script>
 
-<AlgorithmTab {parseId} {results} bind:limit bind:id {code}>
+<AlgorithmTab
+	{currentInfo}
+	parseInfo={SlrParsingInfo}
+	{parseId}
+	{results}
+	bind:limit
+	bind:id
+	{code}
+>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -146,7 +160,7 @@
 							onclick={() => {
 								id = algo.id;
 								setLimitHitCallback(limitHitCallback, id);
-								swapAlgorithm(id);
+								swapAlgorithm(id, algo.infoComp);
 								algo.loaded = true;
 								resetSelectionFunctions();
 								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);

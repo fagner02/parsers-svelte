@@ -16,7 +16,7 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
-	import FistInfo from '@/Info/FistInfo.svelte';
+	import FistInfo from '@/Info/FirstInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/first';
 

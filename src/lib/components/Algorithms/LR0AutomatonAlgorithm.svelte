@@ -125,7 +125,8 @@
 					console.error(`Function ${call.name} not found in map`);
 					continue;
 				}
-				await obj[call.name]()(...call.args);
+				if (call.skip) obj[call.name]()(...call.args);
+				else await obj[call.name]()(...call.args);
 			}
 		} catch (e) {
 			console.log(e);

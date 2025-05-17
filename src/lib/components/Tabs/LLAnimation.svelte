@@ -17,6 +17,10 @@
 	import { firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
 	import { id as parseId } from '$lib/llparse';
+	import FirstInfo from '@/Info/FirstInfo.svelte';
+	import FollowInfo from '@/Info/FollowInfo.svelte';
+	import Ll1TableInfo from '@/Info/LL1TableInfo.svelte';
+	import LlParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -148,30 +152,50 @@
 			name: 'First',
 			desc: 'Construção do conjunto first',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: FirstInfo
 		},
 		{
 			comp: FollowAlgorithm,
 			name: 'Follow',
 			desc: 'Construção do conjunto follow',
 			loaded: false,
-			id: ''
+			id: '',
+			infoComp: FollowInfo
 		},
-		{ comp: LlAlgorithm, name: 'Tabela', desc: 'Construção da tabela LL(1)', loaded: false, id: '' }
+		{
+			comp: LlAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela LL(1)',
+			loaded: false,
+			id: '',
+			infoComp: Ll1TableInfo
+		}
 	]);
+
+	let currentInfo = $state(algos[0].infoComp);
 	const limitHitCallback = () => {
 		limit = getLimitHit(id);
 	};
 	onMount(() => {
 		id = algos[0].id;
-		swapAlgorithm(id);
+		swapAlgorithm(id, algos[0].infoComp);
 		setLimitHitCallback(limitHitCallback, id);
 		algos[0].loaded = true;
 	});
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {parseId} {results} bind:limit bind:id bind:instruction {code}>
+<AlgorithmTab
+	{currentInfo}
+	parseInfo={LlParsingInfo}
+	{parseId}
+	{results}
+	bind:limit
+	bind:id
+	bind:instruction
+	{code}
+>
 	{#snippet steps()}
 		<div style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
@@ -183,7 +207,7 @@
 							id = algo.id;
 							algo.loaded = true;
 							setLimitHitCallback(limitHitCallback, id);
-							swapAlgorithm(id);
+							swapAlgorithm(id, algo.infoComp);
 							resetSelectionFunctions();
 							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
 							selectedAlgorithm = algo.name;

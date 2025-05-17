@@ -11,6 +11,7 @@ export const elemIds = {
 	originState: `${id}-originalState`,
 	targetState: `${id}-targetState`,
 	stateStack: `${id}-stateStack`,
+	lookahead: `${id}-lookahead`,
 	firstSet: `${id}-firstSet`
 };
 /**
