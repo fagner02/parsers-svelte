@@ -6,47 +6,52 @@ export let functionCalls = [];
 export let saves = [];
 /**
  * @param {string[]} inputString
- * @param {any[]} augRules
+ * @param {import('@/types').GrammarItem[]} augRules
  * @param {Map<number, Map<string, string>>} table
  */
 export function slrparsing(inputString, augRules, table) {
-	const stateStack = [0];
-	const inputStack = [...inputString.reverse(), '$'];
+	functionCalls = [];
+	const stateStack = ['s0'];
+	const inputStack = ['$', ...inputString.reverse()];
 
 	// Initial setup
-	functionCalls.push({ trace: Error().stack, name: 'addPauseParse', args: [id] });
+	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({
 		trace: Error().stack,
-		name: 'addToStack',
-		args: [0, 's0', '', 'state-stack']
+		name: 'addToStackState',
+		args: [0, 's0', '']
 	});
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
-	inputString.reverse().forEach((char, i) => {
+	['$'].concat(inputString.reverse()).forEach((char, i) => {
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
 		functionCalls.push({
 			trace: Error().stack,
-			name: 'addToStack',
-			args: [char, char, '', `input-stack-${i}`]
+			name: 'addToStackInput',
+			args: [char, char, '']
 		});
 	});
 
 	while (true) {
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3, 4]] });
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
 		const currentState = stateStack[stateStack.length - 1];
 		const lookahead = inputStack[inputStack.length - 1];
 
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5, 6]] });
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
 
-		const action = table.get(currentState)?.get(lookahead);
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
+		const action = table.get(parseInt(currentState.slice(1)))?.get(lookahead);
 
 		// Handle invalid/missing action
-		if (!action) {
+		if (!action || action === '') {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
 			functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
 			break;
 		}
 
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
 		// Accept action
 		if (action === 'a') {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[10]] });
@@ -54,6 +59,7 @@ export function slrparsing(inputString, augRules, table) {
 			break;
 		}
 
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[11]] });
 		// Shift action
 		if (action.startsWith('s')) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[12]] });
@@ -62,55 +68,74 @@ export function slrparsing(inputString, augRules, table) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'addFloatingNode',
-				args: [[lookahead], `node-${Date.now()}`]
+				args: [[lookahead]]
 			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
 			functionCalls.push({
 				trace: Error().stack,
-				name: 'addToStack',
-				args: [lookahead, lookahead, '', 'state-stack']
+				name: 'addToStackState',
+				args: [lookahead, lookahead, '']
 			});
+			stateStack.push(lookahead);
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[14]] });
 			functionCalls.push({
 				trace: Error().stack,
-				name: 'addToStack',
-				args: [newState, `s${newState}`, '', 'state-stack']
+				name: 'addToStackState',
+				args: [newState, `s${newState}`, '']
 			});
+			stateStack.push(`s${newState}`);
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[15]] });
 			functionCalls.push({
 				trace: Error().stack,
-				name: 'removeFromStack',
-				args: [inputStack.length - 1, 'input-stack']
+				name: 'removeFromStackInput',
+				args: [inputStack.length - 1]
 			});
+			inputStack.pop();
 		}
 
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
 		// Reduce action
 		if (action.startsWith('r')) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[17, 18]] });
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[17]] });
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
 			const ruleIndex = parseInt(action.slice(1));
 			const production = augRules[ruleIndex];
-
+			/**@type {string[]} */
+			let children = [];
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[19]] });
 			if (production.right[0] !== '') {
 				for (let i = 0; i < production.right.length; i++) {
 					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[20]] });
-					functionCalls.push({
-						trace: Error().stack,
-						name: 'removeFromStack',
-						args: [stateStack.length - 1, 'state-stack']
-					});
+					children.push(stateStack[stateStack.length - 2]);
 					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[21]] });
 					functionCalls.push({
 						trace: Error().stack,
-						name: 'removeFromStack',
-						args: [stateStack.length - 2, 'state-stack']
+						name: 'removeFromStackState',
+						args: [stateStack.length - 1]
 					});
+					stateStack.pop();
+					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[22]] });
+					functionCalls.push({
+						trace: Error().stack,
+						name: 'removeFromStackState',
+						args: [stateStack.length - 1]
+					});
+					stateStack.pop();
 				}
 			}
+			children.reverse();
+			functionCalls.push({
+				trace: Error().stack,
+				name: 'addParent',
+				args: [production.left, children]
+			});
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[24]] });
+			const stackState = parseInt(stateStack[stateStack.length - 1].slice(1));
+			const gotoState = table.get(stackState)?.get(production.left);
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23, 24]] });
-			const gotoState = table.get(stateStack[stateStack.length - 1])?.get(production.left);
-
-			if (!gotoState) {
+			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[25]] });
+			if (!gotoState || gotoState === '') {
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[26]] });
 				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
 				break;
@@ -119,22 +144,23 @@ export function slrparsing(inputString, augRules, table) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[27]] });
 			functionCalls.push({
 				trace: Error().stack,
-				name: 'addParentNode',
-				args: [production.left, production.right, `parent-${Date.now()}`]
+				name: 'addToStackState',
+				args: [production.left, production.left, '']
 			});
+			stateStack.push(production.left);
+			const goto = parseInt(gotoState.slice(1));
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[28]] });
 			functionCalls.push({
 				trace: Error().stack,
-				name: 'addToStack',
-				args: [gotoState, `s${gotoState}`, '', 'state-stack']
+				name: 'addToStackState',
+				args: [goto, `s${goto}`, '']
 			});
+			stateStack.push(`s${goto}`);
 		}
 
-		functionCalls.push({ trace: Error().stack, name: 'addPauseParse', args: [id] });
+		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	}
-
-	functionCalls.push({ trace: Error().stack, name: 'limitHitParse', args: [id] });
-	functionCalls.push({ trace: Error().stack, name: 'addPauseParse', args: [id] });
+	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
 	return {
 		accepted: false,

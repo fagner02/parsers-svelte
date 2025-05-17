@@ -14,6 +14,7 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { id, elemIds, saves, functionCalls, slrparsing } from '$lib/slrparse';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -22,8 +23,11 @@
 	let inputStack = $state(writable([]));
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<string>[]>}*/
 	let stateStack = $state(writable([]));
-	/** @type {{id: string, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>, stateList: any}} */
-	let { id, table, stateList } = $props();
+	/** @type {{
+	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>,
+	 * stateList: any,
+	 * tableData: Map<number, Map<string, string>>}} */
+	let { table, tableData, stateList } = $props();
 
 	let codeCard = /**@type {PseudoCode}*/ ($state());
 
@@ -36,14 +40,10 @@
 
 	let loadGrammar = /** @type {() => Promise<any>} */ ($state());
 
-	let {
-		initializeTree,
-		addFloatingNode: addFloatingNode,
-		resetTree,
-		addParent
-	} = getTreeFunctions();
+	let { addFloatingNode, resetTree, addParent } = getTreeFunctions();
 
 	function reset() {
+		slrparsing(inputString, augRules, tableData);
 		stateStack.update(() => []);
 		inputStack.update(() => []);
 		svgLines?.setHideOpacity();
@@ -54,109 +54,117 @@
 	}
 	setResetCall(reset, id);
 
+	/**@type {any}*/
+	const obj = {
+		addPause: () => addPause,
+		addFloatingNode: () => addFloatingNode,
+		resetTree: () => resetTree,
+		addParent: () => addParent,
+		addToStackState: () => stateStackElement.addToStack,
+		addToStackInput: () => inputStackElement.addToStack,
+		removeFromStackState: () => stateStackElement.removeFromStack,
+		removeFromStackInput: () => inputStackElement.removeFromStack,
+		setAccept: () => context.setAccept,
+		highlightLines: () => codeCard?.highlightLines
+	};
+
 	async function parsing() {
 		try {
-			await addPause(id);
-			resetTree();
-
-			if (initializeTree === undefined) {
-				let functions = getTreeFunctions();
-				initializeTree = functions.initializeTree;
-				addFloatingNode = functions.addFloatingNode;
-				resetTree = functions.resetTree;
+			for (let call of functionCalls) {
+				if (!obj[call.name]) {
+					console.error(`Function ${call.name} not found in map`);
+					continue;
+				}
+				try {
+					await obj[call.name]()(...call.args);
+				} catch (e) {
+					console.error(`Error calling function ${call.name}:`, call.trace, e);
+				}
 			}
-
-			await codeCard?.highlightLines([1]);
-			await stateStackElement.addToStack(0, 's0', '');
-
-			for (let i of ['$'].concat(inputString.reverse())) {
-				await codeCard?.highlightLines([2]);
-				await inputStackElement.addToStack(i, i, '');
-			}
-
-			while (true) {
-				await codeCard?.highlightLines([3]);
-				await codeCard?.highlightLines([4]);
-				const topState = /**@type {number}*/ stateStackElement.top();
-				await codeCard?.highlightLines([5]);
-				const topInput = inputStackElement.top();
-
-				await codeCard?.highlightLines([6]);
-				const action = $table.get(`s${topState}`)?.get(topInput);
-
-				await codeCard?.highlightLines([7]);
-				if (!action || action?.data === '') {
-					await codeCard?.highlightLines([8]);
-					context.setAccept(false);
-					break;
-				}
-
-				await codeCard?.highlightLines([9]);
-				if (action.data.startsWith('a')) {
-					await codeCard?.highlightLines([10]);
-					context.setAccept(true);
-					break;
-				}
-
-				await codeCard?.highlightLines([11]);
-				if (action.data.startsWith('s')) {
-					await codeCard?.highlightLines([12]);
-
-					let state = parseInt(action.data.slice(1));
-					addFloatingNode([topInput]);
-					await codeCard?.highlightLines([13]);
-					await stateStackElement.addToStack(topInput, topInput, '');
-					await codeCard?.highlightLines([14]);
-					await stateStackElement.addToStack(state, `s${state}`, '');
-					await codeCard?.highlightLines([15]);
-					await inputStackElement.removeFromStack($inputStack.length - 1);
-				}
-
-				await codeCard?.highlightLines([16]);
-				if (action.data.startsWith('r')) {
-					await codeCard?.highlightLines([17]);
-					await codeCard?.highlightLines([18]);
-					let rule = parseInt(action.data.slice(1));
-					let children = [];
-
-					await codeCard?.highlightLines([19]);
-					if (augRules[rule].right[0] !== '') {
-						for (let i = 0; i < augRules[rule].right.length; i++) {
-							await codeCard?.highlightLines([20]);
-							children.push($stateStack[$stateStack.length - 2].data);
-							await codeCard?.highlightLines([21]);
-							await stateStackElement.removeFromStack($stateStack.length - 1);
-							await codeCard?.highlightLines([22]);
-							await stateStackElement.removeFromStack($stateStack.length - 1);
-						}
-					}
-
-					children.reverse();
-					addParent(augRules[rule].left, children);
-
-					await codeCard?.highlightLines([23]);
-					await codeCard?.highlightLines([24]);
-					let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
-
-					await codeCard?.highlightLines([25]);
-					if (!goto) {
-						await codeCard?.highlightLines([26]);
-						context.setAccept(false);
-						break;
-					}
-
-					let gotoState = parseInt(goto?.slice(1));
-					await codeCard?.highlightLines([27]);
-					await stateStackElement.addToStack(augRules[rule].left, augRules[rule].left, '');
-					await codeCard?.highlightLines([28]);
-					await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
-				}
-
-				await addPause(id);
-			}
-
-			limitHit(id);
-			await addPause(id);
+			// await addPause(id);
+			// resetTree();
+			// if (initializeTree === undefined) {
+			// 	let functions = getTreeFunctions();
+			// 	initializeTree = functions.initializeTree;
+			// 	addFloatingNode = functions.addFloatingNode;
+			// 	resetTree = functions.resetTree;
+			// }
+			// await codeCard?.highlightLines([1]);
+			// await stateStackElement.addToStack(0, 's0', '');
+			// for (let i of ['$'].concat(inputString.reverse())) {
+			// 	await codeCard?.highlightLines([2]);
+			// 	await inputStackElement.addToStack(i, i, '');
+			// }
+			// while (true) {
+			// 	await codeCard?.highlightLines([3]);
+			// 	await codeCard?.highlightLines([4]);
+			// 	const topState = /**@type {number}*/ stateStackElement.top();
+			// 	await codeCard?.highlightLines([5]);
+			// 	const topInput = inputStackElement.top();
+			// 	await codeCard?.highlightLines([6]);
+			// 	const action = $table.get(`s${topState}`)?.get(topInput);
+			// 	await codeCard?.highlightLines([7]);
+			// 	if (!action || action?.data === '') {
+			// 		await codeCard?.highlightLines([8]);
+			// 		context.setAccept(false);
+			// 		break;
+			// 	}
+			// 	await codeCard?.highlightLines([9]);
+			// 	if (action.data.startsWith('a')) {
+			// 		await codeCard?.highlightLines([10]);
+			// 		context.setAccept(true);
+			// 		break;
+			// 	}
+			// 	await codeCard?.highlightLines([11]);
+			// 	if (action.data.startsWith('s')) {
+			// 		await codeCard?.highlightLines([12]);
+			// 		let state = parseInt(action.data.slice(1));
+			// 		addFloatingNode([topInput]);
+			// 		await codeCard?.highlightLines([13]);
+			// 		await stateStackElement.addToStack(topInput, topInput, '');
+			// 		await codeCard?.highlightLines([14]);
+			// 		await stateStackElement.addToStack(state, `s${state}`, '');
+			// 		await codeCard?.highlightLines([15]);
+			// 		await inputStackElement.removeFromStack($inputStack.length - 1);
+			// 	}
+			// 	await codeCard?.highlightLines([16]);
+			// 	if (action.data.startsWith('r')) {
+			// 		await codeCard?.highlightLines([17]);
+			// 		await codeCard?.highlightLines([18]);
+			// 		let rule = parseInt(action.data.slice(1));
+			// 		let children = [];
+			// 		await codeCard?.highlightLines([19]);
+			// 		if (augRules[rule].right[0] !== '') {
+			// 			for (let i = 0; i < augRules[rule].right.length; i++) {
+			// 				await codeCard?.highlightLines([20]);
+			// 				children.push($stateStack[$stateStack.length - 2].data);
+			// 				await codeCard?.highlightLines([21]);
+			// 				await stateStackElement.removeFromStack($stateStack.length - 1);
+			// 				await codeCard?.highlightLines([22]);
+			// 				await stateStackElement.removeFromStack($stateStack.length - 1);
+			// 			}
+			// 		}
+			// 		children.reverse();
+			// 		addParent(augRules[rule].left, children);
+			// 		await codeCard?.highlightLines([23]);
+			// 		await codeCard?.highlightLines([24]);
+			// 		let goto = $table.get(`s${stateStackElement.top()}`)?.get(augRules[rule].left)?.data;
+			// 		await codeCard?.highlightLines([25]);
+			// 		if (!goto) {
+			// 			await codeCard?.highlightLines([26]);
+			// 			context.setAccept(false);
+			// 			break;
+			// 		}
+			// 		let gotoState = parseInt(goto?.slice(1));
+			// 		await codeCard?.highlightLines([27]);
+			// 		await stateStackElement.addToStack(augRules[rule].left, augRules[rule].left, '');
+			// 		await codeCard?.highlightLines([28]);
+			// 		await stateStackElement.addToStack(gotoState, `s${gotoState}`, '');
+			// 	}
+			// 	await addPause(id);
+			// }
+			// limitHit(id);
+			// await addPause(id);
 		} catch (e) {}
 	}
 	onMount(async () => {

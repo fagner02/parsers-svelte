@@ -17,8 +17,10 @@
 	import { onMount } from 'svelte';
 	import { automatonToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
-	let code = '';
+	import { id as parseId } from '$lib/slrparse';
 
+	let code = '';
+	let tableData = $state(new Map());
 	let algos = $state([
 		{
 			comp: LR0AutomatonAlgorithm,
@@ -107,6 +109,7 @@
 		);
 
 		algos[1].id = _table.id;
+		tableData = _table.table;
 
 		results.push({
 			title: 'Conjunto Follow',
@@ -134,7 +137,7 @@
 	});
 </script>
 
-<AlgorithmTab {results} bind:limit bind:id {code}>
+<AlgorithmTab {parseId} {results} bind:limit bind:id {code}>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -181,10 +184,7 @@
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">
-			<SlrParse
-				id="slralgo{algos[0].name}Parser"
-				stateList={automaton.states.map((x) => `s${x.index}`)}
-				{table}
+			<SlrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}
 			></SlrParse>
 		</div>
 	{/snippet}
