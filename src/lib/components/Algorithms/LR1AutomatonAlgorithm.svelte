@@ -15,7 +15,7 @@
 	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { functionCalls, lr1Automaton } from '$lib/lr1automaton';
+	import { functionCalls } from '$lib/lr1automaton';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();

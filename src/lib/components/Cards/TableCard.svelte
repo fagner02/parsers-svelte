@@ -158,7 +158,6 @@
 	 * @param {string} value
 	 */
 	export function setConflictTooltip(value) {
-		console.log(conflictElem, value);
 		if (!conflictElem) return;
 		setUpTooltip(conflictElem, {
 			text: value,

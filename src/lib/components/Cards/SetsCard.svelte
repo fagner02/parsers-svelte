@@ -3,7 +3,14 @@
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
-	/** @type {{id: string, set: import('svelte/store').Writable<Array<import('@/types').SetRow>>, setIndexes?: Map<any, number>, setId: string, useNote?: boolean, svgLines?: import('@/Structures/SvgLines.svelte').default | null, hue: any, label: any}} */
+	/** @type {{
+	 * id: string,
+	 * set: import('svelte/store').Writable<Array<import('@/types').SetRow>>,
+	 * setIndexes?: Map<any, number>,
+	 * setId: string, useNote?: boolean,
+	 * svgLines?: import('@/Structures/SvgLines.svelte').default | null,
+	 * hue: any,
+	 * label: any}} */
 	let {
 		id,
 		set = $bindable(),

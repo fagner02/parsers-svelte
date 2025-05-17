@@ -9,8 +9,8 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import SlrParse from '@/Algorithms/SLRParse.svelte';
 	import { writable } from 'svelte/store';
-	import { follow } from '$lib/follow';
-	import { first } from '$lib/first';
+	import { followDataOnly } from '$lib/follow';
+	import { firstDataOnly } from '$lib/first';
 	import { lr0Automaton } from '$lib/lr0automaton';
 	import { slrTable } from '$lib/slrtable';
 	import { setUpTooltip } from '$lib/tooltip';
@@ -24,9 +24,16 @@
 			comp: LR0AutomatonAlgorithm,
 			name: 'Autômato',
 			desc: 'Construção do autômato LR(0)',
-			loaded: false
+			loaded: false,
+			id: ''
 		},
-		{ comp: SLRTableAlgorithm, name: 'Tabela', desc: 'Construção da tabela SLR', loaded: false }
+		{
+			comp: SLRTableAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela SLR',
+			loaded: false,
+			id: ''
+		}
 	]);
 
 	let id = $state('');
@@ -45,10 +52,10 @@
 	(() => {
 		if (!isGrammarLoaded()) return;
 		const { augRules, nt, t } = getAugGrammar();
-		const _follow = follow(augRules, nt, first(augRules, nt));
+		const _follow = followDataOnly(augRules, nt, firstDataOnly(augRules, nt));
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[..._follow.entries()].map((x) => {
+				[..._follow.followSet.entries()].map((x) => {
 					/**@type {string[]}*/
 					let values = [];
 					for (let value of x[1].values()) {
@@ -71,14 +78,16 @@
 			)
 		);
 
-		automaton = lr0Automaton(augRules, nt, t);
+		let _automaton = lr0Automaton(augRules, nt, t);
+		automaton = _automaton.automaton;
+		algos[0].id = _automaton.id;
 
-		const _table = slrTable(automaton, augRules, nt, t, _follow);
+		const _table = slrTable(_automaton.automaton, augRules, nt, t, _follow.followSet);
 
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
-					[..._table].map(([rowKey, cols]) => [
+					[..._table.table].map(([rowKey, cols]) => [
 						`s${rowKey}`,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
@@ -97,26 +106,28 @@
 			)
 		);
 
+		algos[1].id = _table.id;
+
 		results.push({
 			title: 'Conjunto Follow',
-			content: followToString(_follow)
+			content: followToString(_follow.followSet)
 		});
 
 		results.push({
 			title: 'Autômato LR(0)',
-			content: automatonToString(automaton.states, augRules)
+			content: automatonToString(_automaton.automaton.states, augRules)
 		});
 
 		results.push({
 			title: 'Tabela SLR(1)',
-			content: tableToString(_table, 'estados', { key: (a) => `s${a}` })
+			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
 		});
 	})();
 	const limitHitCallback = () => {
 		limit = getLimitHit(id);
 	};
 	onMount(() => {
-		id = `slralgo${algos[0].name}`;
+		id = algos[0].id;
 		setLimitHitCallback(limitHitCallback, id);
 		swapAlgorithm(id);
 		algos[0].loaded = true;
@@ -133,7 +144,7 @@
 							use:setUpTooltip={{ text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
-								id = `slralgo${algo.name}`;
+								id = algo.id;
 								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id);
 								algo.loaded = true;
@@ -150,15 +161,14 @@
 							<div
 								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
 							>
-								<LR0AutomatonAlgorithm id="slralgo{algos[0].name}"></LR0AutomatonAlgorithm>
+								<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
 							</div>
 						{/if}
 						{#if algos[1].loaded}
 							<div
 								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
 							>
-								<SLRTableAlgorithm id="slralgo{algos[1].name}" {automaton} {followSet}
-								></SLRTableAlgorithm>
+								<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
 							</div>
 						{/if}
 					{/snippet}

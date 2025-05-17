@@ -4,19 +4,18 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-	import { first, mergedFirst } from '$lib/first';
+	import { first, firstDataOnly, mergedFirst } from '$lib/first';
 	import { writable } from 'svelte/store';
 	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
-	import { functionCalls, lr1Automaton } from '$lib/lr1automaton';
-	import { clrTable } from '$lib/clrTable';
+	import { lr1Automaton } from '$lib/lr1automaton';
+	import { clrTable } from '$lib/clrtable';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, firstToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
-	import Lr1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
@@ -41,7 +40,8 @@
 			desc: 'Construção de autômato LR(1)',
 			loaded: false,
 			saves: [],
-			functionCalls: functionCalls,
+			/**@type {{name:string, args: any[]}[]}*/
+			functionCalls: [],
 			id: '',
 			elemIds: {}
 		},
@@ -51,14 +51,15 @@
 			desc: 'Construção da tabela LR(1)',
 			loaded: false,
 			saves: [],
-			functionCalls: clrTable,
+			/**@type {{name:string, args: any[]}[]}*/
+			functionCalls: [],
 			id: '',
 			elemIds: {}
 		}
 	]);
 	(() => {
 		if (!isGrammarLoaded()) return;
-		const _first = first(augRules, nt);
+		const _first = firstDataOnly(augRules, nt);
 		const _mergedFirst = mergedFirst(_first, augRules);
 
 		firstSet.set(
@@ -103,16 +104,24 @@
 		algos[0].elemIds = elemIds;
 		_automaton.set(automaton);
 
-		const _table = clrTable($_automaton, augRules, nt, t);
+		let _table = clrTable($_automaton, augRules, nt, t);
 
+		algos[1].saves = _table.saves;
+		algos[1].functionCalls = _table.functionCalls;
+		algos[1].id = _table.id;
+		algos[1].elemIds = _table.elemIds;
+		results.push({
+			title: 'Autômato LR(1)',
+			content: automatonToString(automaton.states, augRules)
+		});
 		results.push({
 			title: 'Tabela CLR(1)',
-			content: tableToString(_table, 'estados', { key: (a) => `s${a}` })
+			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
 		});
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
-					[..._table].map(([rowKey, cols]) => [
+					[..._table.table].map(([rowKey, cols]) => [
 						`s${rowKey}`,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
@@ -153,7 +162,7 @@
 							use:setUpTooltip={{ text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
-								id = algos[0].id === '' ? `clralgo${algo.name}` : algos[0].id;
+								id = algo.id === '' ? `clralgo${algo.name}` : algo.id;
 
 								algo.loaded = true;
 								setLimitHitCallback(limitHitCallback, id);
@@ -185,8 +194,7 @@
 							<div
 								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
 							>
-								<CLRTableAlgorithm automaton={$_automaton} id="clralgo{algos[1].name}"
-								></CLRTableAlgorithm>
+								<CLRTableAlgorithm automaton={$_automaton}></CLRTableAlgorithm>
 							</div>
 						{/if}
 					{/snippet}
