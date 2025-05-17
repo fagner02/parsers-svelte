@@ -16,10 +16,12 @@
 	import { onMount } from 'svelte';
 	import { automatonToString, firstToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
+	import { id as parseId } from '$lib/clrparse';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
 
+	let tableData = $state(new Map());
 	let id = $state('');
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
@@ -30,8 +32,8 @@
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>} */
 	let table = writable(new Map());
 
-	/**@type {import('svelte/store').Writable<import('@/types').LR1Automaton> }*/
-	let _automaton = writable({ states: [], transitions: new Map() });
+	/**@type {import('@/types').LR1Automaton}*/
+	let automaton = $state({ states: [], transitions: new Map() });
 
 	let algos = $state([
 		{
@@ -39,28 +41,41 @@
 			name: 'Autômato',
 			desc: 'Construção de autômato LR(1)',
 			loaded: false,
-			saves: [],
-			/**@type {{name:string, args: any[]}[]}*/
-			functionCalls: [],
-			id: '',
-			elemIds: {}
+			id: ''
 		},
 		{
 			comp: CLRTableAlgorithm,
 			name: 'Tabela',
 			desc: 'Construção da tabela LR(1)',
 			loaded: false,
-			saves: [],
-			/**@type {{name:string, args: any[]}[]}*/
-			functionCalls: [],
-			id: '',
-			elemIds: {}
+			id: ''
 		}
 	]);
 	(() => {
 		if (!isGrammarLoaded()) return;
 		const _first = firstDataOnly(augRules, nt);
 		const _mergedFirst = mergedFirst(_first, augRules);
+		const _automaton = lr1Automaton(augRules, nt, t, _mergedFirst);
+		const _table = clrTable(_automaton.automaton, augRules, nt, t);
+
+		tableData = _table.table;
+		automaton = _automaton.automaton;
+
+		algos[0].id = id;
+		algos[1].id = _table.id;
+
+		results.push({
+			title: 'Conjunto First',
+			content: firstToString(_first, augRules)
+		});
+		results.push({
+			title: 'Autômato LR(1)',
+			content: automatonToString(automaton.states, augRules)
+		});
+		results.push({
+			title: 'Tabela CLR(1)',
+			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
+		});
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
@@ -86,38 +101,6 @@
 				})
 			)
 		);
-
-		results.push({
-			title: 'Conjunto First',
-			content: firstToString(_first, augRules)
-		});
-
-		let { automaton, functionCalls, saves, id, elemIds } = lr1Automaton(
-			augRules,
-			nt,
-			t,
-			_mergedFirst
-		);
-		algos[0].saves = saves;
-		algos[0].functionCalls = functionCalls;
-		algos[0].id = id;
-		algos[0].elemIds = elemIds;
-		_automaton.set(automaton);
-
-		let _table = clrTable($_automaton, augRules, nt, t);
-
-		algos[1].saves = _table.saves;
-		algos[1].functionCalls = _table.functionCalls;
-		algos[1].id = _table.id;
-		algos[1].elemIds = _table.elemIds;
-		results.push({
-			title: 'Autômato LR(1)',
-			content: automatonToString(automaton.states, augRules)
-		});
-		results.push({
-			title: 'Tabela CLR(1)',
-			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
-		});
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
@@ -152,7 +135,7 @@
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {results} bind:limit {code} bind:id>
+<AlgorithmTab {parseId} {results} bind:limit {code} bind:id>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -180,21 +163,14 @@
 							<div
 								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
 							>
-								<LR1AutomatonAlgorithm
-									saves={algos[0].saves}
-									functionCalls={algos[0].functionCalls}
-									elemIds={algos[0].elemIds}
-									id={algos[0].id}
-									{firstSet}
-									bind:results
-								></LR1AutomatonAlgorithm>
+								<LR1AutomatonAlgorithm {firstSet} bind:results></LR1AutomatonAlgorithm>
 							</div>
 						{/if}
 						{#if algos[1].loaded}
 							<div
 								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
 							>
-								<CLRTableAlgorithm automaton={$_automaton}></CLRTableAlgorithm>
+								<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>
 							</div>
 						{/if}
 					{/snippet}
@@ -203,14 +179,11 @@
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="clralgo{algos[0].name}Parser" floating={true}></SyntaxTree>
+		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">
-			<ClrParse
-				id="clralgo{algos[0].name}Parser"
-				stateList={$_automaton.states.map((x) => `s${x.index}`)}
-				{table}
+			<ClrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}
 			></ClrParse>
 		</div>
 	{/snippet}

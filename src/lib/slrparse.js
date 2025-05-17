@@ -1,5 +1,10 @@
-export const id = 'lr0automaton';
-export const elemIds = {};
+export const id = 'slrparsing';
+export const elemIds = {
+	grammar: `${id}-grammar`,
+	stateStack: `${id}-stateStack`,
+	table: `${id}-table`,
+	inputStack: `${id}-inputStack`
+};
 /**@type {any} */
 export let functionCalls = [];
 /**@type {any} */
@@ -68,7 +73,8 @@ export function slrparsing(inputString, augRules, table) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'addFloatingNode',
-				args: [[lookahead]]
+				args: [[lookahead]],
+				skip: true
 			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
 			functionCalls.push({
@@ -127,7 +133,8 @@ export function slrparsing(inputString, augRules, table) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'addParent',
-				args: [production.left, children]
+				args: [production.left, children],
+				skip: true
 			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[24]] });

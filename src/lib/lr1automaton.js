@@ -4,8 +4,8 @@ import { colors } from './selectSymbol';
 export let saves = [];
 /**@type {any} */
 export let functionCalls = [];
-let id = 'lr1automaton';
-let elemIds = {
+export const id = 'lr1automaton';
+export const elemIds = {
 	alphabet: `${id}-alphabet`,
 	grammar: `${id}-grammar`,
 	originState: `${id}-originalState`,
@@ -359,7 +359,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls.push({
 		trace: Error().stack,
 		name: 'addNode',
-		args: [null, 0, structuredClone(automaton.states[0]), null]
+		args: [null, 0, structuredClone(automaton.states[0]), null],
+		skip: true
 	});
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
@@ -514,7 +515,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 						automaton.states.length - 1,
 						structuredClone(automaton.states[automaton.states.length - 1]),
 						symbol
-					]
+					],
+					skip: true
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[19]] });
 				functionCalls.push({

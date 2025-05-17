@@ -89,7 +89,8 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'addToTree',
-					args: [prod, topSymbol]
+					args: [prod, topSymbol],
+					skip: true
 				});
 				for (const i of prod) {
 					functionCalls.push({
@@ -102,7 +103,8 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'addToTree',
-					args: [['\u03B5'], topSymbol]
+					args: [['\u03B5'], topSymbol],
+					skip: true
 				});
 			}
 			if (last.input === newLast.input && last.symbol === newLast.symbol) {

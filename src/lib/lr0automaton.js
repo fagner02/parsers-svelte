@@ -131,7 +131,8 @@ export function lr0Automaton(rules, nt, t) {
 	functionCalls.push({
 		trace: Error().stack,
 		name: 'addState',
-		args: [null, 0, structuredClone(automaton.states[automaton.states.length - 1]), null]
+		args: [null, 0, structuredClone(automaton.states[automaton.states.length - 1]), null],
+		skip: true
 	});
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	/**@type {number[]} */
@@ -269,7 +270,8 @@ export function lr0Automaton(rules, nt, t) {
 						automaton.states.length - 1,
 						structuredClone(automaton.states[automaton.states.length - 1]),
 						symbol
-					]
+					],
+					skip: true
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[24]] });
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[25]] });
@@ -303,7 +305,8 @@ export function lr0Automaton(rules, nt, t) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'addState',
-				args: [stateStack[0], existent, null, symbol]
+				args: [stateStack[0], existent, null, symbol],
+				skip: true
 			});
 
 			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });

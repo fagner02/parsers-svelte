@@ -37,7 +37,7 @@
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
-		let { rules, nt, t, startingSymbol } = getGrammar();
+		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
 		const _follow = follow(rules, nt, _first.firstSet);
 		const _table = lltable(rules, nt, t, _first.firstSet, _follow.followSet);
@@ -220,7 +220,7 @@
 		</div>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="llalgo{algos[0].name}Parser"></SyntaxTree>
+		<SyntaxTree id={parseId}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">

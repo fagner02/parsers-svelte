@@ -55,6 +55,28 @@
 		if (!isGrammarLoaded()) return;
 		const { augRules, nt, t } = getAugGrammar();
 		const _follow = followDataOnly(augRules, nt, firstDataOnly(augRules, nt));
+		const _automaton = lr0Automaton(augRules, nt, t);
+		const _table = slrTable(_automaton.automaton, augRules, nt, t, _follow.followSet);
+
+		tableData = _table.table;
+		automaton = _automaton.automaton;
+
+		algos[1].id = _table.id;
+		algos[0].id = _automaton.id;
+
+		results.push({
+			title: 'Conjunto Follow',
+			content: followToString(_follow.followSet)
+		});
+		results.push({
+			title: 'Autômato LR(0)',
+			content: automatonToString(_automaton.automaton.states, augRules)
+		});
+		results.push({
+			title: 'Tabela SLR(1)',
+			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
+		});
+
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._follow.followSet.entries()].map((x) => {
@@ -79,13 +101,6 @@
 				})
 			)
 		);
-
-		let _automaton = lr0Automaton(augRules, nt, t);
-		automaton = _automaton.automaton;
-		algos[0].id = _automaton.id;
-
-		const _table = slrTable(_automaton.automaton, augRules, nt, t, _follow.followSet);
-
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
@@ -107,24 +122,6 @@
 				)
 			)
 		);
-
-		algos[1].id = _table.id;
-		tableData = _table.table;
-
-		results.push({
-			title: 'Conjunto Follow',
-			content: followToString(_follow.followSet)
-		});
-
-		results.push({
-			title: 'Autômato LR(0)',
-			content: automatonToString(_automaton.automaton.states, augRules)
-		});
-
-		results.push({
-			title: 'Tabela SLR(1)',
-			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
-		});
 	})();
 	const limitHitCallback = () => {
 		limit = getLimitHit(id);
@@ -180,7 +177,7 @@
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="slralgo{algos[0].name}Parser" floating={true}></SyntaxTree>
+		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">

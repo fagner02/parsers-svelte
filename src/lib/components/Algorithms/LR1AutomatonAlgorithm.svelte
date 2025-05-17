@@ -15,7 +15,7 @@
 	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { functionCalls } from '$lib/lr1automaton';
+	import { id, saves, elemIds, functionCalls } from '$lib/lr1automaton';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -42,13 +42,9 @@
 	let targetState = writable([]);
 
 	/** @type {{
-	 * id: string,
 	 * firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>,
-	 * saves: any,
-	 * functionCalls: any,
-	 * elemIds: any,
 	 * results: import("@/types").ResultsTabItem[]}} */
-	let { id, firstSet, elemIds, results = $bindable() } = $props();
+	let { firstSet, results = $bindable() } = $props();
 	let { nt, augRules, alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
