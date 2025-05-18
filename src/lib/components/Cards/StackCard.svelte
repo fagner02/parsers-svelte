@@ -63,7 +63,7 @@
 					document.querySelector(`#stack-${stackId}-${reversed ? 0 : $stack.length - 1}`)
 				);
 				elem.style.height = `${elem.scrollHeight}px`;
-				elem.style.width = `${elem.scrollWidth}px`;
+				elem.style.width = `${elem.clientWidth}px`;
 				elem.style.opacity = '1';
 				elem.style.top = '0px';
 
@@ -171,14 +171,13 @@
 	export async function loadStack(items) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				idCount = items.length;
 				stack.set(items);
 
 				await wait(id, 0);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 				while (elem) {
-					elem.style.height = `${elem.scrollHeight}px`;
-					elem.style.width = `${elem.scrollWidth}px`;
 					elem.style.opacity = '1';
 					elem.style.top = '0px';
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
@@ -216,7 +215,7 @@
 	{label}
 	cardId={stackId}
 >
-	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (`${stackId}-${stackItem.id}`)}
+	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (stackItem.id)}
 		<p
 			id="stack-{stackId}-{index}"
 			class={`stack-item ${highlighted ? (horizontal ? 'empty' : 'block') : ''}`}
