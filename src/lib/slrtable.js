@@ -45,7 +45,11 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 		});
 		functionCalls.push({ trace: Error().stack, name: 'resetState', args: [true] });
 		functionCalls.push({ trace: Error().stack, name: 'stateName', args: [`s${s.index}`] });
-		functionCalls.push({ trace: Error().stack, name: 'loadState', args: [s] });
+		functionCalls.push({
+			trace: Error().stack,
+			name: 'loadState',
+			args: [structuredClone(s.items)]
+		});
 
 		for (let [index, item] of s.items.entries()) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });

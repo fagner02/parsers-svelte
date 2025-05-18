@@ -158,7 +158,7 @@ export function lr0Automaton(rules, nt, t) {
 		functionCalls.push({
 			trace: Error().stack,
 			name: 'loadState',
-			args: [automaton.states[stateStack[0]]]
+			args: [structuredClone(automaton.states[stateStack[0]].items)]
 		});
 		/**@type {string?} */
 		let selectId = null;

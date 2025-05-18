@@ -133,13 +133,13 @@
 	}
 
 	/**
-	 * @param {import('@/types').LR0State} stateToLoad
+	 * @param {import('@/types').LR0StateItem[]} stateToLoad
 	 */
 	export async function loadState(stateToLoad) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				cardState.update(() =>
-					stateToLoad.items.map((x) => {
+					stateToLoad.map((x) => {
 						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,

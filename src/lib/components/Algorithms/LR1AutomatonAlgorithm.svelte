@@ -16,6 +16,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/lr1automaton';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -59,6 +60,8 @@
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
+	let currentStep = 0;
+	let stepChanged = false;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let lookaheadStack = writable([]);
@@ -81,22 +84,30 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let alphabetSelection;
 
-	function reset() {
-		try {
-			stateStack.update(() => []);
-			originStateElem?.resetState(false);
-			targetStateElem?.resetState(false);
-			svgLines?.hideLine(false, id);
-			automatonElem?.reset();
-			grammarSelection.hideSelect();
-			stateSelection.hideSelect();
-			targetStateSelection.hideSelect();
-			alphabetSelection.hideSelect();
-			originStateName = '';
-		} catch (e) {}
-		buildAutomaton();
+	/**
+	 * @param {number} step
+	 */
+	function setStep(step) {
+		const save = saves[step];
+		svgLines?.hideLine(false, id);
+		grammarSelection.hideSelect();
+		stateSelection.hideSelect();
+		targetStateSelection.hideSelect();
+		alphabetSelection.hideSelect();
+		originStateName = save.originStateName;
+		targetStateName = save.targetStateName;
+		originStateElem?.loadState(save.originState);
+		targetStateElem?.loadState(save.targetState);
+		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
+		automatonElem?.reset();
+		automatonElem?.loadAutomaton(save.automaton);
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	function getStep() {
+		return currentStep;
+	}
+	setResetCall(setStep, saves.length - 1, id, getStep);
 
 	/**@type {any}*/
 	export const obj = {
@@ -114,14 +125,14 @@
 		addLookahead: () => lookaheadElem?.addToStack,
 		hideSelectGrammar: () => grammarSelection.hideSelect,
 		hideSelectTargetState: () => targetStateSelection.hideSelect,
-		originalStateName: () => {
+		originStateName: () => {
 			return (/**@type {string}*/ value) => {
 				originStateName = value;
 			};
 		},
 		addNode: () => automatonElem?.addNode,
-		resetOriginalState: () => originStateElem?.resetState,
-		loadOriginalState: () => originStateElem?.loadState,
+		resetOriginState: () => originStateElem?.resetState,
+		loadOriginState: () => originStateElem?.loadState,
 		selectForAlphabet: () => alphabetSelection.selectFor,
 		hideSelectAlphabet: () => alphabetSelection.hideSelect,
 		selectForOriginalState: () => stateSelection.selectFor,
@@ -137,16 +148,35 @@
 		console.log('buildAutomaton');
 		try {
 			loadGrammar?.();
-			for (let call of functionCalls) {
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
+					console.log('stepChanged', currentStep, i, functionCalls.length, saves.length);
+					continue;
+				}
+				console.log('step', currentStep, i);
+				const call = functionCalls[i];
 				if (!obj[call.name]) {
 					console.error(`Function ${call.name} not found in map`);
 					continue;
 				}
-				if (call.skip) obj[call.name]()(...call.args);
-				else await obj[call.name]()(...call.args);
+				try {
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					console.log('inerr', e);
+					continue;
+				}
+				console.log(call.name);
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 		} catch (e) {
-			console.log(e);
+			console.log('outerr', e);
 		}
 	}
 

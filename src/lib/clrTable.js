@@ -40,7 +40,11 @@ export function clrTable(automaton, rules, nt, t) {
 		});
 		functionCalls.push({ trace: Error().stack, name: 'resetState', args: [true] });
 		functionCalls.push({ trace: Error().stack, name: 'stateName', args: [`s${sindex}`] });
-		functionCalls.push({ trace: Error().stack, name: 'loadState', args: [structuredClone(s)] });
+		functionCalls.push({
+			trace: Error().stack,
+			name: 'loadState',
+			args: [structuredClone(s.items)]
+		});
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
 
 		for (let [index, item] of s.items.entries()) {

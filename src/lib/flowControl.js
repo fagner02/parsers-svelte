@@ -127,7 +127,7 @@ export function resolveAllWaits(id) {
  */
 export function killAllWaits(id) {
 	for (let [i, reject] of waitRejects.get(id) ?? []) {
-		reject(waitRe.get(id)?.get(i));
+		reject(waitRejects.get(id)?.get(i));
 	}
 	waitResolves.get(id)?.clear();
 	waitRejects.get(id)?.clear();
@@ -138,8 +138,10 @@ export function killAllWaits(id) {
 let closeInstruction;
 /** @type {() => Promise<void>} */
 let openInstruction;
-/** @type {Map<string, () => void>}*/
+/** @type {Map<string, (step:number) => void>}*/
 let resetCalls = new Map();
+/** @type {Map<string, () => number>}*/
+let getSteps = new Map();
 
 /**
  * @param {() => Promise<void>} _closeInstruction
@@ -156,16 +158,18 @@ export function setOpenInstruction(_openInstruction) {
 }
 
 /**
- * @param {() => void} resetCall
+ * @param {(step:number) => void} resetCall
+ * @param {number} lastSaveIndex
  * @param {string} id
+ * @param {()=> number} getStep
  */
-export function setResetCall(resetCall, id) {
+export function setResetCall(resetCall, lastSaveIndex, id, getStep) {
 	limit.set(id, false);
 	currentStep.set(id, 0);
 	jumpWait.set(id, false);
 	jumpPause.set(id, false);
-	maxStep.set(id, -1);
-
+	maxStep.set(id, lastSaveIndex);
+	getSteps.set(id, getStep);
 	resetCalls.set(id, resetCall);
 }
 export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
@@ -271,18 +275,23 @@ export async function forward(id) {
  */
 export async function skipToEnd(id) {
 	appendData(`control flow,skip to end`);
-	action.set(id, flowActions.skipping);
+	// action.set(id, flowActions.skipping);
 
-	jumpPause.set(id, true);
-	jumpWait.set(id, true);
-	if ((pauseResolves.get(id)?.size ?? 0) > 0) {
-		resolvePause(id);
-		openInstruction?.();
-		return;
-	}
+	// jumpPause.set(id, true);
+	// jumpWait.set(id, true);
+	killAllWaits(id);
+	killPause(id);
+	jumpPause.set(id, false);
+	jumpWait.set(id, false);
+	resetCalls.get(id)?.((maxStep.get(id) ?? 1) - 1);
+	// if ((pauseResolves.get(id)?.size ?? 0) > 0) {
+	// 	resolvePause(id);
+	// 	openInstruction?.();
+	// 	return;
+	// }
 
-	jumpWait.set(id, true);
-	resolveAllWaits(id);
+	// jumpWait.set(id, true);
+	// resolveAllWaits(id);
 }
 
 /**
@@ -290,16 +299,21 @@ export async function skipToEnd(id) {
  */
 export function back(id) {
 	appendData(`control flow,back`);
-	if ((currentStep.get(id) ?? 0) <= 1 && !limit.get(id)) return;
-	action.set(id, flowActions.back);
-	let newStep = limit.get(id) ? maxStep.get(id) : (currentStep.get(id) ?? 0) - 1;
-	targetStep.set(id, /**@type {number}*/ (newStep));
-	limit.set(id, false);
-	limitHitCallback.get(id)?.();
-
-	jumpPause.set(id, true);
-	jumpWait.set(id, true);
-	reset(id);
+	// if ((currentStep.get(id) ?? 0) <= 1 && !limit.get(id)) return;
+	// action.set(id, flowActions.back);
+	// let newStep = limit.get(id) ? maxStep.get(id) : (currentStep.get(id) ?? 0) - 1;
+	// targetStep.set(id, /**@type {number}*/ (newStep));
+	// limit.set(id, false);
+	// limitHitCallback.get(id)?.();
+	if (getSteps.get(id)?.() === 0) return;
+	killAllWaits(id);
+	killPause(id);
+	jumpPause.set(id, false);
+	jumpWait.set(id, false);
+	resetCalls.get(id)?.((getSteps.get(id)?.() ?? 1) - 1);
+	// jumpPause.set(id, true);
+	// jumpWait.set(id, true);
+	// reset(id);
 }
 
 /**
@@ -320,7 +334,7 @@ export function reset(id) {
 		jumpWait.set(id, false);
 	}
 
-	resetCalls.get(id)?.();
+	// resetCalls.get(id)?.();
 }
 
 /**

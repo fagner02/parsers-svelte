@@ -521,6 +521,9 @@
 	 * @param {import('@/types').LR0Automaton} automaton
 	 */
 	export async function loadAutomaton(automaton) {
+		if (automaton.states.length === 0) {
+			return;
+		}
 		let states = [
 			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];

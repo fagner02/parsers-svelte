@@ -1,7 +1,26 @@
 import { colors } from './selectSymbol';
 
-/**@type {any} */
-export let saves = [];
+/** @type {{
+ * targetState: import('@/types').LR1StateItem[],
+ * originState: import('@/types').LR1StateItem[],
+ * originStateName: string,
+ * targetStateName: string,
+ * stateStack: number[],
+ * automaton: import('@/types').LR1Automaton,
+ * lookahead: Set<string>,
+ * functionCall: number}[]} */
+export let saves = [
+	{
+		targetState: [],
+		originState: [],
+		originStateName: '',
+		targetStateName: 's?',
+		stateStack: [],
+		automaton: { states: [], transitions: new Map() },
+		lookahead: new Set(),
+		functionCall: 0
+	}
+];
 /**@type {any} */
 export let functionCalls = [];
 export const id = 'lr1automaton';
@@ -25,10 +44,10 @@ export function closure(state, rules, nt, firstSet) {
 	saves.push({
 		targetState: [...state],
 		lookahead: new Set(),
-		originalState: saves[saves.length - 1].originalState,
+		originState: saves[saves.length - 1].originState,
 		stateStack: saves[saves.length - 1].stateStack,
 		automaton: saves[saves.length - 1].automaton,
-		originalStateName: saves[saves.length - 1].originalStateName,
+		originStateName: saves[saves.length - 1].originStateName,
 		targetStateName: saves[saves.length - 1].targetStateName,
 		functionCall: functionCalls.length - 1
 	});
@@ -86,10 +105,10 @@ export function closure(state, rules, nt, firstSet) {
 			saves.push({
 				targetState: [...state],
 				lookahead: new Set(lookahead),
-				originalState: saves[saves.length - 1].originalState,
+				originState: saves[saves.length - 1].originState,
 				stateStack: saves[saves.length - 1].stateStack,
 				automaton: saves[saves.length - 1].automaton,
-				originalStateName: saves[saves.length - 1].originalStateName,
+				originStateName: saves[saves.length - 1].originStateName,
 				targetStateName: saves[saves.length - 1].targetStateName,
 				functionCall: functionCalls.length - 1
 			});
@@ -125,10 +144,10 @@ export function closure(state, rules, nt, firstSet) {
 					saves.push({
 						targetState: [...state],
 						lookahead: new Set(lookahead),
-						originalState: saves[saves.length - 1].originalState,
+						originState: saves[saves.length - 1].originState,
 						stateStack: saves[saves.length - 1].stateStack,
 						automaton: saves[saves.length - 1].automaton,
-						originalStateName: saves[saves.length - 1].originalStateName,
+						originStateName: saves[saves.length - 1].originStateName,
 						targetStateName: saves[saves.length - 1].targetStateName,
 						functionCall: functionCalls.length - 1
 					});
@@ -155,10 +174,10 @@ export function closure(state, rules, nt, firstSet) {
 					saves.push({
 						targetState: [...state],
 						lookahead: new Set(lookahead),
-						originalState: saves[saves.length - 1].originalState,
+						originState: saves[saves.length - 1].originState,
 						stateStack: saves[saves.length - 1].stateStack,
 						automaton: saves[saves.length - 1].automaton,
-						originalStateName: saves[saves.length - 1].originalStateName,
+						originStateName: saves[saves.length - 1].originStateName,
 						targetStateName: saves[saves.length - 1].targetStateName,
 						functionCall: functionCalls.length - 1
 					});
@@ -203,10 +222,10 @@ export function closure(state, rules, nt, firstSet) {
 				saves.push({
 					targetState: [...state],
 					lookahead: new Set(lookahead),
-					originalState: saves[saves.length - 1].originalState,
+					originState: saves[saves.length - 1].originState,
 					stateStack: saves[saves.length - 1].stateStack,
 					automaton: saves[saves.length - 1].automaton,
-					originalStateName: saves[saves.length - 1].originalStateName,
+					originStateName: saves[saves.length - 1].originStateName,
 					targetStateName: saves[saves.length - 1].targetStateName,
 					functionCall: functionCalls.length - 1
 				});
@@ -249,10 +268,10 @@ export function closure(state, rules, nt, firstSet) {
 				saves.push({
 					targetState: [...state],
 					lookahead: new Set(lookahead),
-					originalState: saves[saves.length - 1].originalState,
+					originState: saves[saves.length - 1].originState,
 					stateStack: saves[saves.length - 1].stateStack,
 					automaton: saves[saves.length - 1].automaton,
-					originalStateName: saves[saves.length - 1].originalStateName,
+					originStateName: saves[saves.length - 1].originStateName,
 					targetStateName: saves[saves.length - 1].targetStateName,
 					functionCall: functionCalls.length - 1
 				});
@@ -277,10 +296,10 @@ export function closure(state, rules, nt, firstSet) {
 			saves.push({
 				targetState: [...state],
 				lookahead: new Set(state[existent].lookahead),
-				originalState: saves[saves.length - 1].originalState,
+				originState: saves[saves.length - 1].originState,
 				stateStack: saves[saves.length - 1].stateStack,
 				automaton: saves[saves.length - 1].automaton,
-				originalStateName: saves[saves.length - 1].originalStateName,
+				originStateName: saves[saves.length - 1].originStateName,
 				targetStateName: saves[saves.length - 1].targetStateName,
 				functionCall: functionCalls.length - 1
 			});
@@ -325,16 +344,7 @@ export function closure(state, rules, nt, firstSet) {
  */
 export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
-	saves.push({
-		targetState: [],
-		originalState: [],
-		originalStateName: '',
-		targetStateName: '',
-		stateStack: [],
-		automaton: { states: [], transitions: new Map() },
-		lookahead: new Set(),
-		functionCall: 0
-	});
+
 	/**@type {import('@/types').LR1Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
@@ -355,7 +365,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	closure(state0, rules, nt, firstSet);
 
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
-	functionCalls.push({ trace: Error().stack, name: 'originalStateName', args: ['s0'] });
+	functionCalls.push({ trace: Error().stack, name: 'originStateName', args: ['s0'] });
 	automaton.states.push({ index: 0, items: [...state0] });
 	functionCalls.push({
 		trace: Error().stack,
@@ -367,11 +377,12 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	saves.push({
 		targetState: structuredClone(state0),
-		originalState: [],
-		originalStateName: '',
+		originState: [],
+		originStateName: '',
 		targetStateName: 's?',
 		stateStack: structuredClone(stateStack),
 		automaton: structuredClone(automaton),
+		lookahead: new Set(),
 		functionCall: functionCalls.length - 1
 	});
 
@@ -386,16 +397,16 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
 	while (stateStack.length > 0) {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
-		functionCalls.push({ trace: Error().stack, name: 'resetOriginalState', args: [] });
+		functionCalls.push({ trace: Error().stack, name: 'resetOriginState', args: [] });
 		functionCalls.push({
 			trace: Error().stack,
-			name: 'originalStateName',
+			name: 'originStateName',
 			args: [`s${stateStack[0]}`]
 		});
 		functionCalls.push({
 			trace: Error().stack,
-			name: 'loadOriginalState',
-			args: [automaton.states[stateStack[0]]]
+			name: 'loadOriginState',
+			args: [structuredClone(automaton.states[stateStack[0]].items)]
 		});
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
 		for (let [symbolIndex, symbol] of alphabet.entries()) {
@@ -465,10 +476,11 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
-					originalState: structuredClone(automaton.states[stateStack[0]]),
-					originalStateName: `s${stateStack[0]}`,
+					originState: structuredClone(automaton.states[stateStack[0]].items),
+					originStateName: `s${stateStack[0]}`,
 					targetStateName: 's?',
 					stateStack: structuredClone(stateStack),
+					lookahead: new Set(),
 					automaton: structuredClone(automaton),
 					functionCall: functionCalls.length - 1
 				});
@@ -535,10 +547,11 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
-					originalState: structuredClone(automaton.states[stateStack[0]]),
-					originalStateName: `s${stateStack[0]}`,
+					originState: structuredClone(automaton.states[stateStack[0]].items),
+					originStateName: `s${stateStack[0]}`,
 					targetStateName: 's?',
 					stateStack: structuredClone(stateStack),
+					lookahead: new Set(),
 					automaton: structuredClone(automaton),
 					functionCall: functionCalls.length - 1
 				});
@@ -558,9 +571,10 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
 	saves.push({
-		targetState: structuredClone(automaton),
-		originalState: saves[saves.length - 1].originalState,
-		originalStateName: saves[saves.length - 1].originalStateName,
+		targetState: saves[saves.length - 1].targetState,
+		lookahead: new Set(),
+		originState: saves[saves.length - 1].originState,
+		originStateName: saves[saves.length - 1].originStateName,
 		targetStateName: 's?',
 		stateStack: structuredClone(stateStack),
 		automaton: structuredClone(automaton),
