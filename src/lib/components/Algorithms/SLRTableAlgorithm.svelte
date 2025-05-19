@@ -130,7 +130,6 @@
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.log(e);
 					continue;
 				}
 				if (call.name === 'addPause') {

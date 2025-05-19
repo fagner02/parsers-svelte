@@ -17,14 +17,7 @@ export let functionCalls = [];
  * table: Map<number, Map<string, string>>,
  * stateName: string,
  * functionCall: number }[]} */
-export let saves = [
-	{
-		state: [],
-		table: new Map(),
-		stateName: '',
-		functionCall: -1
-	}
-];
+export let saves = [];
 
 /**
  * @param {import('@/types').LR1Automaton} automaton

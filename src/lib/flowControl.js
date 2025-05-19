@@ -308,7 +308,7 @@ export function back(id) {
 	// targetStep.set(id, /**@type {number}*/ (newStep));
 	// limit.set(id, false);
 	// limitHitCallback.get(id)?.();
-	if (getSteps.get(id)?.() === 0) return;
+	if ((getSteps.get(id)?.() ?? 0) <= 0) return;
 	killAllWaits(id);
 	killPause(id);
 	jumpPause.set(id, false);

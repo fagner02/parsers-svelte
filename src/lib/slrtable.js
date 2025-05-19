@@ -16,17 +16,7 @@ export let elemIds = {
  * stackSelect: string,
  * stateSelect: string,
  * functionCall: number }[]}*/
-export let saves = [
-	{
-		state: [],
-		table: new Map(),
-		stateName: '',
-		followSelect: '',
-		stackSelect: '',
-		stateSelect: '',
-		functionCall: -1
-	}
-];
+export let saves = [];
 /** @type {any}*/
 export let functionCalls = [];
 
@@ -47,6 +37,15 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	}
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		state: [],
+		table: structuredClone(table),
+		stateName: '',
+		followSelect: '',
+		stackSelect: '',
+		stateSelect: '',
+		functionCall: 0
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
