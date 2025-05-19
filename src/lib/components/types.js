@@ -13,7 +13,7 @@
  */
 
 /**
- * @typedef {{left: string, right: Array<any>, note: string | null, showRight: boolean, rightProps: Array<SetItem>}} SetRow
+ * @typedef {{left: string, right: Array<any>}} SetRow
  */
 
 /**

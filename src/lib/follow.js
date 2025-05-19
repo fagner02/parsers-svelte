@@ -12,7 +12,12 @@ export const elemIds = {
 
 /**@type {any} */
 export let functionCalls = [];
-/**@type {any} */
+/**@type {{
+ * follow: Map<string, Set<string>>,
+ * join: Map<string, Set<string>>,
+ * joinStack: string[],
+ * grammarSelect: string,
+ * functionCall: number}[]} */
 export let saves = [];
 /**
  * @param {Array<import('@/types').GrammarItem>} rules
@@ -37,13 +42,12 @@ export function follow(rules, nt, firstSet) {
 		args: [[1]]
 	});
 
-	// Initialize follow set for start symbol
 	followSet.set(rules[0].left, new Set(['$']));
 	followIndexes.set(rules[0].left, 0);
 	functionCalls.push({
 		trace: Error().stack,
 		name: 'addSetRowFollow',
-		args: [rules[0].left, rules[0].left, `${elemIds.grammar}gl0`]
+		args: [rules[0].left, `${elemIds.grammar}gl0`]
 	});
 	functionCalls.push({
 		trace: Error().stack,
@@ -53,7 +57,7 @@ export function follow(rules, nt, firstSet) {
 	functionCalls.push({
 		trace: Error().stack,
 		name: 'joinSetsFollow',
-		args: [['$'], ['$'], null, rules[0].left]
+		args: [['$'], rules[0].left]
 	});
 
 	for (let i = 0; i < rules.length; i++) {
@@ -115,7 +119,7 @@ export function follow(rules, nt, firstSet) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'addSetRowFollow',
-					args: [symbol, symbol, `${elemIds.grammar}gr${i}-${j}`]
+					args: [symbol, `${elemIds.grammar}gr${i}-${j}`]
 				});
 				functionCalls.push({
 					trace: Error().stack,
@@ -160,7 +164,7 @@ export function follow(rules, nt, firstSet) {
 						functionCalls.push({
 							trace: Error().stack,
 							name: 'addSetRowJoin',
-							args: [symbol, symbol, `${elemIds.grammar}gr${i}-${j}`]
+							args: [symbol, `${elemIds.grammar}gr${i}-${j}`]
 						});
 						functionCalls.push({
 							trace: Error().stack,
@@ -183,7 +187,7 @@ export function follow(rules, nt, firstSet) {
 						functionCalls.push({
 							trace: Error().stack,
 							name: 'joinSetsJoin',
-							args: [[rules[i].left], [rules[i].left], null, symbol, `${elemIds.grammar}gl${i}`]
+							args: [[rules[i].left], symbol, `${elemIds.grammar}gl${i}`]
 						});
 						functionCalls.push({
 							trace: Error().stack,
@@ -267,7 +271,7 @@ export function follow(rules, nt, firstSet) {
 							functionCalls.push({
 								trace: Error().stack,
 								name: 'joinSetsFollow',
-								args: [[...right], [...right], null, rules[left].left, `${elemIds.first}l${left}`]
+								args: [[...right], rules[left].left, `${elemIds.first}l${left}`]
 							});
 							functionCalls.push({
 								trace: Error().stack,
@@ -323,13 +327,7 @@ export function follow(rules, nt, firstSet) {
 					functionCalls.push({
 						trace: Error().stack,
 						name: 'joinSetsFollow',
-						args: [
-							[followingSymbol],
-							[followingSymbol],
-							null,
-							symbol,
-							`${elemIds.grammar}gr${i}-${followingSymbolIndex}`
-						]
+						args: [[followingSymbol], symbol, `${elemIds.grammar}gr${i}-${followingSymbolIndex}`]
 					});
 					functionCalls.push({
 						trace: Error().stack,
@@ -471,13 +469,7 @@ export function follow(rules, nt, firstSet) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'joinSetsFollow',
-				args: [
-					[...setToJoin],
-					[...setToJoin],
-					null,
-					topKey,
-					`${elemIds.follow}gl${followIndexes.get(topKey)}`
-				]
+				args: [[...setToJoin], topKey, `${elemIds.follow}gl${followIndexes.get(topKey)}`]
 			});
 			functionCalls.push({
 				trace: Error().stack,

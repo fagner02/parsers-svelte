@@ -19,6 +19,7 @@
 	import FistInfo from '@/Info/FirstInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/first';
+	import { getGrammar } from '$lib/utils';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -50,7 +51,12 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarSelection;
 
-	export const reset = () => {
+	let { rules } = getGrammar();
+	let currentStep = 0;
+	let stepChanged = false;
+
+	/**@param {number} step*/
+	function setStep(step) {
 		joinStack.update(() => []);
 		joinSet.update(() => []);
 		firstSet.update(() => []);
@@ -59,9 +65,10 @@
 		firstIndexes.clear();
 		joinIndexes.clear();
 		codeCard?.reset();
-		first();
-	};
-	setResetCall(reset, id);
+		currentStep = step;
+		stepChanged = true;
+	}
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	const obj = {
@@ -74,7 +81,7 @@
 		selectGrammar: () => grammarSelection?.selectFor,
 		hideSelectGrammar: () => grammarSelection?.hideSelect,
 		addSetRow: () => firstSetElement?.addSetRow,
-		addJoinSetRow: () => joinSetElement?.addSetRow,
+		addSetRowJoin: () => joinSetElement?.addSetRow,
 		addToStack: () => joinStackElement?.addToStack,
 		removeFromStack: () => joinStackElement?.removeFromStack,
 		joinSets: () => firstSetElement?.joinSets,
@@ -273,7 +280,10 @@
 		<SetsCard
 			setId={elemIds.first}
 			set={firstSet}
-			setIndexes={firstIndexes}
+			convert={{
+				left: (value) => rules[value].left,
+				noteLeft: (value) => value.toString()
+			}}
 			hue={colors.blue}
 			label={'first set'}
 			bind:this={firstSetElement}
@@ -283,7 +293,12 @@
 		<SetsCard
 			setId={elemIds.join}
 			set={joinSet}
-			setIndexes={joinIndexes}
+			convert={{
+				left: (v) => rules[v].left,
+				noteLeft: (v) => v.toString(),
+				right: (v) => rules[v].left,
+				noteRight: (v) => v.toString()
+			}}
 			hue={colors.blue}
 			label={'join set'}
 			bind:this={joinSetElement}

@@ -84,7 +84,7 @@ export function first(rules, nt) {
 		functionCalls.push({
 			trace: Error().stack,
 			name: 'addSetRow',
-			args: [rules[i].left, i, `${elemIds.grammar}gl${i}`]
+			args: [i, `${elemIds.grammar}gl${i}`]
 		});
 		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
@@ -100,8 +100,8 @@ export function first(rules, nt) {
 					joinIndexes.set(i, joinSet.size - 1);
 					functionCalls.push({
 						trace: Error().stack,
-						name: 'addJoinSetRow',
-						args: [rules[i].left, i, `${elemIds.grammar}gl${i}`]
+						name: 'addSetRowJoin',
+						args: [i, `${elemIds.grammar}gl${i}`]
 					});
 				}
 				functionCalls.push({
@@ -120,13 +120,7 @@ export function first(rules, nt) {
 						functionCalls.push({
 							trace: Error().stack,
 							name: 'joinSetsJoin',
-							args: [
-								[rule.index],
-								[rule.left],
-								[rule.index.toString()],
-								i,
-								`${elemIds.grammar}gr${i}-${j}`
-							]
+							args: [[rule.index], i, `${elemIds.grammar}gr${i}-${j}`]
 						});
 					}
 				}
@@ -142,7 +136,7 @@ export function first(rules, nt) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'joinSets',
-					args: [[symbol], [symbol], null, i, `${elemIds.grammar}gr${i}-${j}`]
+					args: [[symbol], i, `${elemIds.grammar}gr${i}-${j}`]
 				});
 			}
 
@@ -168,7 +162,7 @@ export function first(rules, nt) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'joinSets',
-				args: [[''], [''], null, i, `${elemIds.grammar}gr${i}-${rules[i].right.length - 1}`]
+				args: [[''], i, `${elemIds.grammar}gr${i}-${rules[i].right.length - 1}`]
 			});
 		}
 	}
@@ -237,7 +231,7 @@ export function first(rules, nt) {
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'joinSets',
-				args: [[...setToJoin], [...setToJoin], null, topKey, `${elemIds.first}l${topValue}`]
+				args: [[...setToJoin], topKey, `${elemIds.first}l${topValue}`]
 			});
 			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
