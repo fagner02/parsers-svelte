@@ -114,12 +114,24 @@
 	async function slrTable() {
 		try {
 			await loadGrammar();
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
 					continue;
 				}
-				await obj[call.name]()(...call.args);
+				const call = functionCalls[i];
+				try {
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					continue;
+				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 			// await addPause(id);
 
