@@ -17,6 +17,7 @@
 	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls } from '$lib/slrtable';
+	import { tableCard } from '@/Tabs/dataToComp';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem;
@@ -29,6 +30,8 @@
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
 	let stateName = $state('');
+	let currentStep = 0;
+	let stepChanged = false;
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let slrState = writable([]);
@@ -48,7 +51,7 @@
 			id: index
 		}))
 	]);
-	let { nt, augRules, alphabet } = getAugGrammar();
+	let { alphabet } = getAugGrammar();
 
 	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
 	let columns = [...alphabet];
@@ -63,18 +66,27 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stackSelection;
 
-	function reset() {
-		try {
-			stateElem?.resetState(false);
-			svgLines?.hideLine(false, id);
-			followSelection?.hideSelect();
-			stateSelection?.hideSelect();
-			stackSelection?.hideSelect();
-			tableElem?.resetTable();
-		} catch (e) {}
-		slrTable();
+	/**
+	 * @param {number} step
+	 */
+	function setStep(step) {
+		stateName = saves[step].stateName;
+		stateElem?.loadState(saves[step].state);
+		svgLines?.hideLine(false, id);
+		saves[step].followSelect === ''
+			? followSelection?.hideSelect()
+			: followSelection?.selectFor(saves[step].followSelect);
+		saves[step].stateSelect === ''
+			? stateSelection?.hideSelect()
+			: stateSelection?.selectFor(saves[step].stateSelect);
+		saves[step].stackSelect === ''
+			? stackSelection?.hideSelect()
+			: stackSelection?.selectFor(saves[step].stackSelect);
+		table.set(tableCard(saves[step].table, {}));
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	const obj = {
@@ -206,7 +218,7 @@
 		stackSelection = getSelectionFunctions(elemIds.stateStack);
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
-		swapAlgorithm(id);
+
 		slrTable();
 	});
 </script>

@@ -52,8 +52,9 @@
 							selection.style.width = `${elemRect.width + 17}px`;
 							selection.style.height = `${elemRect.height + 3}px`;
 						}, 100);
-
-					await wait(props.id, 500);
+					try {
+						await wait(props.id, 500);
+					} catch (e) {}
 					return resolve();
 				} catch (e) {
 					reject(e);

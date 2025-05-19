@@ -41,7 +41,7 @@ export function stackCard(stack, convert) {
 
 /**
  * @param {Map<any, Map<any, any>>} table
- * @param {{key: (value:any)=>string}?} convert
+ * @param {{key?: (value:any)=>string}} convert
  */
 export function tableCard(table, convert) {
 	return /**@type {Map<string, import('@/types').tableCol<string>>}*/ (

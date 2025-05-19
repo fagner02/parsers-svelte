@@ -153,8 +153,9 @@
 
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
-
-				if (shouldWait) await wait(id, 500);
+				try {
+					if (shouldWait) await wait(id, 500);
+				} catch (e) {}
 				resolve(null);
 			} catch (e) {
 				reject(e);

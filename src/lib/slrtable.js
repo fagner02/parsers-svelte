@@ -8,8 +8,25 @@ export let elemIds = {
 	follow: `${id}-follow`,
 	state: `${id}-state`
 };
-/** @type {any}*/
-export let saves = [];
+/** @type {{
+ * state: import('@/types').LR0StateItem[],
+ * stateName: string,
+ * table: Map<number, Map<string, string>>,
+ * followSelect: string,
+ * stackSelect: string,
+ * stateSelect: string,
+ * functionCall: number }[]}*/
+export let saves = [
+	{
+		state: [],
+		table: new Map(),
+		stateName: '',
+		followSelect: '',
+		stackSelect: '',
+		stateSelect: '',
+		functionCall: -1
+	}
+];
 /** @type {any}*/
 export let functionCalls = [];
 
@@ -59,6 +76,15 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 				args: [`state-${elemIds.state}-${index}`]
 			});
 			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			saves.push({
+				state: structuredClone(s.items),
+				table: structuredClone(table),
+				stateName: `s${s.index}`,
+				followSelect: '',
+				stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
+				stateSelect: `state-${elemIds.state}-${index}`,
+				functionCall: functionCalls.length - 1
+			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
 
 			if (
@@ -92,6 +118,16 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
+					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					saves.push({
+						state: structuredClone(s.items),
+						table: structuredClone(table),
+						stateName: `s${s.index}`,
+						followSelect: '',
+						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
+						stateSelect: `state-${elemIds.state}-${index}`,
+						functionCall: functionCalls.length - 1
+					});
 					continue;
 				}
 
@@ -121,6 +157,16 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 						]
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
+					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					saves.push({
+						state: structuredClone(s.items),
+						table: structuredClone(table),
+						stateName: `s${s.index}`,
+						followSelect: `${elemIds.follow}set${followIndex}`,
+						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
+						stateSelect: `state-${elemIds.state}-${index}`,
+						functionCall: functionCalls.length - 1
+					});
 				}
 				functionCalls.push({ trace: Error().stack, name: 'hideSelectFollow', args: [] });
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
@@ -159,6 +205,16 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					args: [{ action: 'g', state: transition }, `g${transition}`, `s${s.index}`, currentSymbol]
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
+				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					state: structuredClone(s.items),
+					table: structuredClone(table),
+					stateName: `s${s.index}`,
+					followSelect: '',
+					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
+					stateSelect: `state-${elemIds.state}-${index}`,
+					functionCall: functionCalls.length - 1
+				});
 			} else {
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[21]] });
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[22]] });
@@ -185,6 +241,16 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					args: [{ action: 's', state: transition }, `s${transition}`, `s${s.index}`, currentSymbol]
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
+				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					state: structuredClone(s.items),
+					table: structuredClone(table),
+					stateName: `s${s.index}`,
+					followSelect: '',
+					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
+					stateSelect: `state-${elemIds.state}-${index}`,
+					functionCall: functionCalls.length - 1
+				});
 			}
 			functionCalls.push({
 				trace: Error().stack,
@@ -199,6 +265,15 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[]] });
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		state: [],
+		table: structuredClone(table),
+		stateName: '',
+		followSelect: '',
+		stackSelect: '',
+		stateSelect: '',
+		functionCall: functionCalls.length - 1
+	});
 
 	return { table, functionCalls, id };
 }
