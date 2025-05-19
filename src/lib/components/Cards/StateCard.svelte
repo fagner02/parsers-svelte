@@ -83,9 +83,6 @@
 	export async function updateLookahead(lookahead, existent, updateSelection = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#state-${stateId}-${existent}`)
-				);
 				cardState.update((x) => {
 					x[existent].lookahead = new Set([
 						.../**@type {Set<string>}*/ (x[existent].lookahead),
