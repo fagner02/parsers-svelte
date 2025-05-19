@@ -15,6 +15,7 @@
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls } from '$lib/lr0automaton';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -43,6 +44,9 @@
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
 
+	let currentStep = 0;
+	let stepChanged = false;
+
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
 		alphabet.map((x, index) => ({
@@ -68,22 +72,29 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let grammarSelection;
 
-	function reset() {
-		try {
-			stateStack.update(() => []);
-			originStateElem?.resetState(false);
-			targetStateElem?.resetState(false);
-			svgLines?.hideLine(false, id);
-			automatonElem?.reset();
-			symbolsSelection.hideSelect();
-			originStateSelection.hideSelect();
-			targetStateSelection.hideSelect();
-			grammarSelection.hideSelect();
-			originStateName = '';
-		} catch (e) {}
-		buildAutomaton();
+	/**
+	 * @param {number} step
+	 */
+	function setStep(step) {
+		symbolsSelection.hideSelect();
+		originStateSelection.hideSelect();
+		targetStateSelection.hideSelect();
+		grammarSelection.hideSelect();
+		svgLines?.hideLine(false, id);
+
+		stateStackElem?.loadStack(stackCard(saves[step].stateStack, { key: (a) => `s${a}` }));
+		originStateName = saves[step].originStateName;
+		originStateElem?.loadState(saves[step].originState, false);
+		targetStateElem?.loadState(saves[step].targetState, false);
+		automatonElem?.reset();
+		automatonElem?.loadAutomaton(saves[step].automaton);
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	function getStep() {
+		return currentStep;
+	}
+	setResetCall(setStep, saves.length - 1, id, getStep);
 
 	/**@type {any}*/
 	const obj = {
@@ -120,13 +131,24 @@
 	async function buildAutomaton() {
 		try {
 			await loadGrammar();
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
 					continue;
 				}
-				if (call.skip) obj[call.name]()(...call.args);
-				else await obj[call.name]()(...call.args);
+				const call = functionCalls[i];
+				try {
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					continue;
+				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 		} catch (e) {
 			console.log(e);

@@ -395,6 +395,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
 
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
+	let originStateIndex = 0;
 	while (stateStack.length > 0) {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
 		functionCalls.push({ trace: Error().stack, name: 'resetOriginState', args: [] });
@@ -403,6 +404,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 			name: 'originStateName',
 			args: [`s${stateStack[0]}`]
 		});
+		originStateIndex = stateStack[0];
 		functionCalls.push({
 			trace: Error().stack,
 			name: 'loadOriginState',
@@ -476,8 +478,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
-					originState: structuredClone(automaton.states[stateStack[0]].items),
-					originStateName: `s${stateStack[0]}`,
+					originState: structuredClone(automaton.states[originStateIndex].items),
+					originStateName: `s${originStateIndex}`,
 					targetStateName: 's?',
 					stateStack: structuredClone(stateStack),
 					lookahead: new Set(),
@@ -547,8 +549,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
-					originState: structuredClone(automaton.states[stateStack[0]].items),
-					originStateName: `s${stateStack[0]}`,
+					originState: structuredClone(automaton.states[originStateIndex].items),
+					originStateName: `s${originStateIndex}`,
 					targetStateName: 's?',
 					stateStack: structuredClone(stateStack),
 					lookahead: new Set(),
@@ -564,17 +566,17 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
 		}
 		stateStack.shift();
+		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[20]] });
+		functionCalls.push({ trace: Error().stack, name: 'removeFromStack', args: [0] });
 	}
 	functionCalls.push({ trace: Error().stack, name: 'hideSelectAlphabet', args: [] });
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[20]] });
-	functionCalls.push({ trace: Error().stack, name: 'removeFromStack', args: [0] });
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
 	saves.push({
-		targetState: saves[saves.length - 1].targetState,
+		targetState: [],
 		lookahead: new Set(),
-		originState: saves[saves.length - 1].originState,
-		originStateName: saves[saves.length - 1].originStateName,
+		originState: automaton.states[originStateIndex].items,
+		originStateName: `s${originStateIndex}`,
 		targetStateName: 's?',
 		stateStack: structuredClone(stateStack),
 		automaton: structuredClone(automaton),

@@ -41,6 +41,7 @@
 							const elem = /**@type {HTMLElement?}*/ (document.querySelector(_id));
 							if (elem === null) {
 								console.error(`Element ${_id} not found`);
+								selectionFunctions?.hideSelect();
 								return;
 							}
 							const parent = /**@type {HTMLElement}*/ (selection.parentElement);

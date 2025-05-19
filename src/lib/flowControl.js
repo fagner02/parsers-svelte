@@ -286,7 +286,7 @@ export async function skipToEnd(id) {
 	killPause(id);
 	jumpPause.set(id, false);
 	jumpWait.set(id, false);
-	resetCalls.get(id)?.((maxStep.get(id) ?? 1) - 1);
+	resetCalls.get(id)?.(maxStep.get(id) ?? 0);
 	// if ((pauseResolves.get(id)?.size ?? 0) > 0) {
 	// 	resolvePause(id);
 	// 	openInstruction?.();
@@ -324,18 +324,13 @@ export function back(id) {
  */
 export function reset(id) {
 	appendData(`control flow,reset`);
-	limit.set(id, false);
-	limitHitCallback.get(id)?.();
-	currentStep.set(id, 0);
+
 	killAllWaits(id);
 	killPause(id);
-	jumpWait.set(id, true);
 	closeInstruction?.();
-	if (!(action.get(id) === flowActions.back)) {
-		targetStep.set(id, -1);
-		jumpPause.set(id, false);
-		jumpWait.set(id, false);
-	}
+	jumpPause.set(id, false);
+	jumpWait.set(id, false);
+	resetCalls.get(id)?.(0);
 
 	// resetCalls.get(id)?.();
 }

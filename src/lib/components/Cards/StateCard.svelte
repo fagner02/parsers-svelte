@@ -2,7 +2,7 @@
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
 
@@ -142,7 +142,9 @@
 						});
 					})
 				);
-				await wait(id, 0);
+
+				await noJumpWait(0);
+
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 				while (elem !== null) {
 					elem.style.maxWidth = `${elem.scrollWidth}px`;

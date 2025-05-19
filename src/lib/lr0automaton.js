@@ -10,10 +10,26 @@ export const elemIds = {
 	alphabet: `${id}-alphabet`,
 	automaton: `${id}-automaton`
 };
+
 /** @type {any} */
 export let functionCalls = [];
-/** @type {any} */
-export let saves = [];
+/** @type {{
+ * targetState: import('@/types').LR0StateItem[],
+ * originState: import('@/types').LR0StateItem[],
+ * originStateName: string,
+ * stateStack: number[],
+ * automaton: import('@/types').LR0Automaton,
+ * functionCall: number}[]} */
+export let saves = [
+	{
+		automaton: { states: [], transitions: new Map() },
+		targetState: [],
+		originState: [],
+		originStateName: '',
+		stateStack: [],
+		functionCall: 0
+	}
+];
 
 /**
  * @param {import('@/types').LR0StateItem[]} state
@@ -83,6 +99,19 @@ export function closure(state, rules, nt) {
 			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[14]] });
 			itemsToCheck.push(state.length - 1);
+			functionCalls.push({
+				trace: Error().stack,
+				name: 'addPause',
+				args: [id]
+			});
+			saves.push({
+				targetState: structuredClone(state),
+				originState: saves[saves.length - 1].originState,
+				originStateName: saves[saves.length - 1].originStateName,
+				stateStack: saves[saves.length - 1].stateStack,
+				automaton: saves[saves.length - 1].automaton,
+				functionCall: functionCalls.length - 1
+			});
 		}
 
 		functionCalls.push({ trace: Error().stack, name: 'hideSelectGrammar', args: [] });
@@ -135,6 +164,14 @@ export function lr0Automaton(rules, nt, t) {
 		skip: true
 	});
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		targetState: structuredClone(state0),
+		originState: saves[saves.length - 1].originState,
+		originStateName: originStateName,
+		stateStack: saves[saves.length - 1].stateStack,
+		automaton: structuredClone(automaton),
+		functionCall: functionCalls.length - 1
+	});
 	/**@type {number[]} */
 	let stateStack = [0];
 	functionCalls.push({
@@ -143,7 +180,7 @@ export function lr0Automaton(rules, nt, t) {
 		args: [0, 's0', '', `state-${elemIds.targetState}-title`]
 	});
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
-
+	let originStateIndex = 0;
 	while (stateStack.length > 0) {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
 		functionCalls.push({
@@ -151,6 +188,7 @@ export function lr0Automaton(rules, nt, t) {
 			name: 'selectForStack',
 			args: [`stack-${elemIds.stateStack}-${stateStack.length - 1}`]
 		});
+		originStateIndex = stateStack[0];
 		originStateName = `s${automaton.states[stateStack[0]].index}`;
 
 		functionCalls.push({ trace: Error().stack, name: 'resetStateOrigin', args: [true] });
@@ -226,6 +264,20 @@ export function lr0Automaton(rules, nt, t) {
 					args: [prod.ruleIndex, prod.pos + 1]
 				});
 				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: null });
+
+				functionCalls.push({
+					trace: Error().stack,
+					name: 'addPause',
+					args: [id]
+				});
+				saves.push({
+					targetState: structuredClone(state1),
+					originState: structuredClone(automaton.states[originStateIndex].items),
+					originStateName: originStateName,
+					stateStack: structuredClone(stateStack),
+					automaton: structuredClone(automaton),
+					functionCall: functionCalls.length - 1
+				});
 			}
 			functionCalls.push({ trace: Error().stack, name: 'hideSelectOrigin', args: [] });
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
@@ -292,10 +344,18 @@ export function lr0Automaton(rules, nt, t) {
 					name: 'selectForStack',
 					args: [`stack-${elemIds.stateStack}-${stateStack.length - 1}`]
 				});
+				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
 
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[26]] });
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
-				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
+				saves.push({
+					targetState: structuredClone(state1),
+					originState: structuredClone(automaton.states[originStateIndex].items),
+					originStateName: originStateName,
+					stateStack: structuredClone(stateStack),
+					automaton: structuredClone(automaton),
+					functionCall: functionCalls.length - 1
+				});
 				continue;
 			}
 
@@ -308,22 +368,48 @@ export function lr0Automaton(rules, nt, t) {
 				args: [stateStack[0], existent, null, symbol],
 				skip: true
 			});
+			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
 
 			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
-			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
+			saves.push({
+				targetState: structuredClone(state1),
+				originState: structuredClone(automaton.states[originStateIndex].items),
+				originStateName: originStateName,
+				stateStack: structuredClone(stateStack),
+				automaton: structuredClone(automaton),
+				functionCall: functionCalls.length - 1
+			});
 		}
 		functionCalls.push({ trace: Error().stack, name: 'hideSelectAlphabet', args: [] });
 
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[29]] });
 		functionCalls.push({ trace: Error().stack, name: 'hideSelectStack', args: [] });
 
+		stateStack.shift();
 		functionCalls.push({ trace: Error().stack, name: 'removeFromStack', args: [0] });
 
 		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
-		stateStack.shift();
+		saves.push({
+			targetState: [],
+			originState: structuredClone(automaton.states[originStateIndex].items),
+			originStateName: originStateName,
+			stateStack: structuredClone(stateStack),
+			automaton: structuredClone(automaton),
+			functionCall: functionCalls.length - 1
+		});
 	}
 
 	functionCalls.push({ trace: Error().stack, name: 'hideSelectStack', args: [] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[]] });
+	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+
+	saves.push({
+		targetState: [],
+		originState: structuredClone(automaton.states[originStateIndex].items),
+		originStateName: originStateName,
+		stateStack: structuredClone(stateStack),
+		automaton: structuredClone(automaton),
+		functionCall: functionCalls.length - 1
+	});
 	return { automaton, id };
 }
