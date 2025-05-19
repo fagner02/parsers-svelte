@@ -208,7 +208,6 @@
 		<SetsCard
 			{id}
 			setId={elemIds.followSet}
-			useNote={false}
 			set={followSet}
 			hue={colors.blue}
 			label={'follow set'}
@@ -217,7 +216,6 @@
 		<SetsCard
 			{id}
 			setId={elemIds.firstSet}
-			useNote={false}
 			set={firstSet}
 			hue={colors.blue}
 			label={'first set'}

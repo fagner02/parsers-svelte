@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
+	import { addPause, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import {
 		colors,
@@ -20,6 +20,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/first';
 	import { getGrammar } from '$lib/utils';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -43,11 +44,6 @@
 	 * joinSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>}} */
 	let { instruction = $bindable(), firstSet = writable([]), joinSet = writable([]) } = $props();
 
-	/**@type {Map<number,number>}*/
-	let firstIndexes = new Map();
-	/**@type {Map<number,number>}*/
-	let joinIndexes = new Map();
-
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarSelection;
 
@@ -57,14 +53,13 @@
 
 	/**@param {number} step*/
 	function setStep(step) {
-		joinStack.update(() => []);
-		joinSet.update(() => []);
-		firstSet.update(() => []);
-		svgLines?.setHideOpacity();
-		grammarSelection?.hideSelect();
-		firstIndexes.clear();
-		joinIndexes.clear();
-		codeCard?.reset();
+		svgLines?.hideLine(false, id);
+		saves[step].grammarSelect === ''
+			? grammarSelection?.hideSelect()
+			: grammarSelection?.selectFor(saves[step].grammarSelect);
+		joinStackElement?.loadStack(stackCard(saves[step].joinStack, { key: (a) => rules[a].left }));
+		joinSetElement?.loadSets(saves[step].join);
+		firstSetElement?.loadSets(saves[step].first);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -92,16 +87,24 @@
 	async function first() {
 		try {
 			await loadGrammar();
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
 					continue;
 				}
+				const call = functionCalls[i];
 				try {
-					await obj[call.name]()(...call.args);
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.error(`Error calling function ${call.name}:`, call.trace, e);
+					continue;
 				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 			// await addPause(id);
 			// const nullable = calcNullable(rules);
