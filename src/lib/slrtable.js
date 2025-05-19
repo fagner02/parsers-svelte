@@ -266,9 +266,9 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[]] });
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	saves.push({
-		state: [],
+		state: saves[saves.length - 1].state,
 		table: structuredClone(table),
-		stateName: '',
+		stateName: saves[saves.length - 1].stateName,
 		followSelect: '',
 		stackSelect: '',
 		stateSelect: '',

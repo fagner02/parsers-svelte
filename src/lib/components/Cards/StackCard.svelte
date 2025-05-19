@@ -106,14 +106,6 @@
 		});
 	}
 
-	export function top() {
-		return $stack[$stack.length - 1].data;
-	}
-
-	export function first() {
-		return $stack[0].data;
-	}
-
 	/**
 	 * @param {number} index
 	 */

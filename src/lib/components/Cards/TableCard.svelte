@@ -68,7 +68,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				table.update((x) => {
-					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
+					x.get(row)?.set(column, {
 						data: data,
 						text: text,
 						opacity: 0,
@@ -80,7 +80,7 @@
 				await wait(id, 50);
 
 				table.update((x) => {
-					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
+					x.get(row)?.set(column, {
 						data: data,
 						text: text,
 						opacity: 1,
@@ -108,7 +108,10 @@
 			try {
 				let colIndex = $table.get(row)?.keys().toArray().indexOf(column);
 				let element = document.querySelector(`#td-${tableId}-${row}-${colIndex}`);
-				if (element === null) return;
+				if (element === null) {
+					console.error(`Element td-${tableId}-${row}-${colIndex} not found`);
+					return resolve(null);
+				}
 
 				highlightRow = row;
 				highlightColumn = column;

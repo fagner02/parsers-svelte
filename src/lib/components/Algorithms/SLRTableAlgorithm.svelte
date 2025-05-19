@@ -73,16 +73,20 @@
 		stateName = saves[step].stateName;
 		stateElem?.loadState(saves[step].state);
 		svgLines?.hideLine(false, id);
-		saves[step].followSelect === ''
-			? followSelection?.hideSelect()
-			: followSelection?.selectFor(saves[step].followSelect);
-		saves[step].stateSelect === ''
-			? stateSelection?.hideSelect()
-			: stateSelection?.selectFor(saves[step].stateSelect);
-		saves[step].stackSelect === ''
-			? stackSelection?.hideSelect()
-			: stackSelection?.selectFor(saves[step].stackSelect);
-		table.set(tableCard(saves[step].table, {}));
+		try {
+			saves[step].followSelect === ''
+				? followSelection?.hideSelect()
+				: followSelection?.selectFor(saves[step].followSelect);
+			saves[step].stateSelect === ''
+				? stateSelection?.hideSelect()
+				: stateSelection?.selectFor(saves[step].stateSelect);
+			saves[step].stackSelect === ''
+				? stackSelection?.hideSelect()
+				: stackSelection?.selectFor(saves[step].stackSelect);
+		} catch (e) {
+			console.log(e);
+		}
+		table.set(tableCard(saves[step].table, { key: (a) => `s${a}` }));
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -123,9 +127,10 @@
 				}
 				const call = functionCalls[i];
 				try {
-					if (call.skip) obj[call.name]()(...call.args);
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
+					console.log(e);
 					continue;
 				}
 				if (call.name === 'addPause') {
