@@ -153,23 +153,15 @@
 				if (stepChanged) {
 					stepChanged = false;
 					i = saves[currentStep].functionCall;
-					console.log('stepChanged', currentStep, i, functionCalls.length, saves.length);
 					continue;
 				}
-				console.log('step', currentStep, i);
 				const call = functionCalls[i];
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
-					continue;
-				}
 				try {
 					if (call.skip) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.log('inerr', e);
 					continue;
 				}
-				console.log(call.name);
 				if (call.name === 'addPause') {
 					currentStep++;
 				}

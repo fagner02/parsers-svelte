@@ -14,6 +14,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, functionCalls, elemIds } from '$lib/clrtable';
+	import { tableCard } from '@/Tabs/dataToComp';
 
 	let stateStackElem = /**@type {StackCard | undefined}*/ ($state());
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
@@ -21,9 +22,10 @@
 	let automatonElem = /**@type {Automaton | undefined}*/ ($state());
 	let codeCard = /**@type {PseudoCode | undefined}*/ ($state());
 
-	/** @type {{ automaton: import('@/types').LR1Automaton}} */
+	/** @type {{
+	 * automaton: import('@/types').LR1Automaton}} */
 	let { automaton } = $props();
-	let { nt, augRules, alphabet } = getAugGrammar();
+	let { alphabet } = getAugGrammar();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable(
@@ -43,30 +45,37 @@
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>}*/
 	let table = $state(writable(new Map()));
 
-	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
+	let rows = Array.from({ length: automaton.states.length }, (_, index) => `s${index}`);
 
 	let columns = [...alphabet];
 
 	let stateName = $state('');
 	let svgLines = /**@type {SvgLines | undefined}*/ ($state());
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
+	let currentStep = 0;
+	let stepChanged = false;
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stateStackSelection;
-	function reset() {
-		try {
-			stateElem?.resetState(false);
-			svgLines?.hideLine(false, id);
-			stateSelection?.hideSelect();
-			stateStackSelection?.hideSelect();
-			tableElem?.resetTable();
-			stateName = '';
-		} catch (e) {}
-		clrTable();
+	/**
+	 * @param {number} step
+	 */
+	function setStep(step) {
+		svgLines?.hideLine(false, id);
+		stateSelection?.hideSelect();
+		stateStackSelection?.hideSelect();
+		stateElem?.loadState(saves[step].state, false);
+		table.set(tableCard(saves[step].table, { key: (a) => `s${a}` }));
+		stateName = saves[step].stateName;
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	function getStep() {
+		return currentStep;
+	}
+	setResetCall(setStep, saves.length - 1, id, getStep);
 
 	/**@type {any}*/
 	const obj = {
@@ -88,26 +97,31 @@
 			return (/** @type {string} */ value) => {
 				stateName = value;
 			};
-		},
-		debug: () => {
-			return (/** @type {any} */ value) => {
-				value();
-			};
 		}
 	};
 
 	async function clrTable() {
-		if (stateElem) stateSelection = getSelectionFunctions(stateElem.getId());
-		if (stateStackElem) stateStackSelection = getSelectionFunctions(stateStackElem.getId());
-
 		try {
 			await loadGrammar();
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
 					continue;
 				}
-				await obj[call.name]()(...call.args);
+				const call = functionCalls[i];
+				try {
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					console.log(e);
+					continue;
+				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 		} catch (e) {
 			console.log(e);

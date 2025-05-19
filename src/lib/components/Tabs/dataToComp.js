@@ -41,13 +41,13 @@ export function stackCard(stack, convert) {
 
 /**
  * @param {Map<any, Map<any, any>>} table
- * @returns
+ * @param {{key: (value:any)=>string}?} convert
  */
-export function tableCard(table) {
+export function tableCard(table, convert) {
 	return /**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 		new Map(
 			[...table].map(([rowKey, cols]) => [
-				`s${rowKey}`,
+				convert?.key ? convert.key(rowKey) : rowKey,
 				new Map(
 					[...cols].map(([colKey, cell]) => [
 						colKey,

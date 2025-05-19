@@ -65,10 +65,10 @@ export function getAction(id) {
  */
 export async function wait(id, ms) {
 	if (jumpWait.get(id)) return;
+	let er = Error('wait rejected');
 	return new Promise((resolve, reject) => {
 		const index = waitCount.get(id) ?? 0;
-		waitRejects.get(id)?.set(index, reject);
-		waitRe.get(id)?.set(index, Error('wait rejected'));
+		waitRejects.get(id)?.set(index, () => reject(er));
 		waitResolves.get(id)?.set(index, resolve);
 		waitCount.set(id, index + 1);
 		setTimeout(() => {
@@ -127,7 +127,9 @@ export function resolveAllWaits(id) {
  */
 export function killAllWaits(id) {
 	for (let [i, reject] of waitRejects.get(id) ?? []) {
-		reject(waitRejects.get(id)?.get(i));
+		try {
+			reject(waitRejects.get(id)?.get(i));
+		} catch (e) {}
 	}
 	waitResolves.get(id)?.clear();
 	waitRejects.get(id)?.clear();
@@ -253,13 +255,14 @@ export async function addPause(id) {
  */
 export async function forward(id) {
 	appendData(`control flow,forward`);
-	if (limit.get(id)) return;
+	// if (limit.get(id)) return;
+	if (maxStep.get(id) === getSteps.get(id)?.()) return;
 	action.set(id, flowActions.forward);
 
-	if ((currentStep.get(id) ?? 0) > 1) {
-		closeInstruction?.();
-		await wait(id, 200);
-	}
+	// if ((currentStep.get(id) ?? 0) > 1) {
+	// 	closeInstruction?.();
+	// 	await wait(id, 200);
+	// }
 	if ((pauseResolves.get(id)?.size ?? 0) > 0) {
 		resolvePause(id);
 		openInstruction?.();

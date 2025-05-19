@@ -11,8 +11,21 @@ export let elemIds = {
 
 /** @type {any} */
 export let functionCalls = [];
-/** @type {any} */
-export let saves = [];
+
+/** @type {{
+ * state: import('@/types').LR1StateItem[],
+ * table: Map<number, Map<string, string>>,
+ * stateName: string,
+ * functionCall: number }[]} */
+export let saves = [
+	{
+		state: [],
+		table: new Map(),
+		stateName: '',
+		functionCall: -1
+	}
+];
+
 /**
  * @param {import('@/types').LR1Automaton} automaton
  * @param {Array<import('@/types').GrammarItem>} rules
@@ -27,6 +40,12 @@ export function clrTable(automaton, rules, nt, t) {
 		table.set(state.index, new Map(alphabet.map((x) => [x, ''])));
 	}
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		state: [],
+		table: structuredClone(table),
+		stateName: '',
+		functionCall: functionCalls.length - 1
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
@@ -78,6 +97,12 @@ export function clrTable(automaton, rules, nt, t) {
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					saves.push({
+						state: structuredClone(s.items),
+						table: structuredClone(table),
+						stateName: `s${s.index}`,
+						functionCall: functionCalls.length - 1
+					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
 					continue;
 				}
@@ -105,8 +130,20 @@ export function clrTable(automaton, rules, nt, t) {
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					saves.push({
+						state: structuredClone(s.items),
+						table: structuredClone(table),
+						stateName: `s${s.index}`,
+						functionCall: functionCalls.length - 1
+					});
 				}
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					state: structuredClone(s.items),
+					table: structuredClone(table),
+					stateName: `s${s.index}`,
+					functionCall: functionCalls.length - 1
+				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
 				continue;
 			}
@@ -139,6 +176,12 @@ export function clrTable(automaton, rules, nt, t) {
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					state: structuredClone(s.items),
+					table: structuredClone(table),
+					stateName: `s${s.index}`,
+					functionCall: functionCalls.length - 1
+				});
 			} else {
 				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `s${transition}`);
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
@@ -155,6 +198,12 @@ export function clrTable(automaton, rules, nt, t) {
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					state: structuredClone(s.items),
+					table: structuredClone(table),
+					stateName: `s${s.index}`,
+					functionCall: functionCalls.length - 1
+				});
 			}
 			functionCalls.push({
 				trace: Error().stack,
@@ -168,10 +217,12 @@ export function clrTable(automaton, rules, nt, t) {
 
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[]] });
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		state: saves[saves.length - 1].state,
+		table: structuredClone(table),
+		stateName: saves[saves.length - 1].stateName,
+		functionCall: functionCalls.length - 1
+	});
 
-	/**
-	 * @type {any}
-	 */
-	let saves = [];
-	return { table: table, functionCalls, saves, elemIds, id };
+	return { table, id };
 }
