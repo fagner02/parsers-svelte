@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
 
@@ -96,6 +96,33 @@
 				return resolve(null);
 			} catch (e) {
 				console.log(e);
+				reject(e);
+			}
+		});
+	}
+
+	/**@param {Map<any, Set<any>>} sets */
+	export async function loadSets(sets) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				set.set(
+					/**@type {import('@/types').SetRow[]}*/ (
+						sets
+							.entries()
+							.toArray()
+							.map((x) => ({ left: x[0], right: x[1].values().toArray() }))
+					)
+				);
+				await noJumpWait(0);
+				for (let i = 0; i < $set.length; i++) {
+					for (let j = 0; j < $set[i].right.length; j++) {
+						let elem = /**@type {HTMLElement}*/ (document.querySelector(`#${setId}r${i}-${j}`));
+						elem.style.maxWidth = `${elem.scrollWidth}px`;
+						elem.style.opacity = '1';
+					}
+				}
+				resolve(null);
+			} catch (e) {
 				reject(e);
 			}
 		});

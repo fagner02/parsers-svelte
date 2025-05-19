@@ -88,23 +88,9 @@
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._mergedFirst.entries()].map((x) => {
-					/**@type {string[]}*/
-					let values = [];
-					for (let value of x[1].values()) {
-						values.push(value);
-						if (values.length < x[1].size * 2 - 1) {
-							values.push(',');
-						}
-					}
-
 					return {
 						left: x[0],
-						right: [...x[1]],
-						showRight: true,
-						rightProps: values.map((s) => {
-							return { value: s, opacity: 1, hide: false, note: '' };
-						}),
-						note: ''
+						right: [...x[1]]
 					};
 				})
 			)
