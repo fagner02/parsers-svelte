@@ -2,7 +2,14 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
+	import {
+		addPause,
+		limitHit,
+		setMaxStep,
+		setOnInputChanged,
+		setResetCall,
+		wait
+	} from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
@@ -13,6 +20,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, clrparsing } from '$lib/clrparse';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -33,27 +41,39 @@
 
 	let { augRules, alphabet } = getAugGrammar();
 	let context = getContext('parseView');
+	let currentStep = 0;
+	let stepChanged = false;
+	let inputChanged = false;
 
 	let loadGrammar = /**@type {() => Promise<any>}*/ ($state());
-	let { addFloatingNode: addFloatingNode, resetTree, addParent } = getTreeFunctions();
+	let { addFloatingNode, resetTree, loadFloatingTree, addParent } = getTreeFunctions();
 
-	function reset() {
-		clrparsing(inputString, augRules, tableData);
-		stateStack.update(() => []);
-		inputStack.update(() => []);
+	/**@param {number} step*/
+	function setStep(step) {
+		stateStackElement.loadStack(stackCard(saves[step].stateStack, {}));
+		inputStackElement.loadStack(stackCard(saves[step].inputStack, {}));
 		svgLines?.setHideOpacity();
-		context.setAccept(null);
+		saves[step].accept === undefined
+			? context.setAccept(null)
+			: context.setAccept(saves[step].accept);
 		resetTree();
-
-		parsing();
+		loadFloatingTree(saves[step].tree);
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
+
+	function onInputChanged() {
+		clrparsing(inputString, augRules, tableData);
+		setMaxStep(saves.length - 1, id);
+		inputChanged = true;
+	}
+	setOnInputChanged(onInputChanged, id);
 
 	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		addFloatingNode: () => addFloatingNode,
-		resetTree: () => resetTree,
 		addParent: () => addParent,
 		addToStackState: () => stateStackElement.addToStack,
 		addToStackInput: () => inputStackElement.addToStack,
@@ -65,17 +85,31 @@
 
 	async function parsing() {
 		try {
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (inputChanged) {
+					currentStep = 0;
+					stepChanged = false;
+					inputChanged = false;
+					i = 0;
 					continue;
 				}
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
+					continue;
+				}
+				const call = functionCalls[i];
 				try {
-					if (call.skip) obj[call.name]()(...call.args);
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.error(`Error calling function ${call.name}:`, call.trace, e);
+					continue;
 				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 		} catch (e) {}
 	}
@@ -84,7 +118,8 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		loadGrammar();
-		await parsing();
+		onInputChanged();
+		parsing();
 	});
 </script>
 
@@ -94,14 +129,14 @@
 		<PseudoCode title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<TableCard
 			{id}
 			rows={stateList}
 			columns={alphabet}
 			{table}
 			bind:svgLines
-			tableId="clr{id}"
+			tableId={elemIds.table}
 			label="tabela lr1"
 			hue={colors.blue}
 		></TableCard>
@@ -110,7 +145,7 @@
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
-			stackId="input{id}"
+			stackId={elemIds.inputStack}
 			hue={colors.green}
 			label="entrada"
 		></StackCard>
@@ -119,7 +154,7 @@
 			bind:svgLines
 			bind:stack={stateStack}
 			bind:this={stateStackElement}
-			stackId="symbols{id}"
+			stackId={elemIds.stateStack}
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>

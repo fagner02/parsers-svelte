@@ -7,6 +7,7 @@ export const elemIds = {
 };
 /**@type {any} */
 export let functionCalls = [];
+
 /**
  * @type {{
  * stateStack: string[]
@@ -17,6 +18,7 @@ export let functionCalls = [];
  * }[]}
  * */
 export let saves = [];
+
 /**
  * @param {string[]} inputString
  * @param {import('@/types').GrammarItem[]} augRules
