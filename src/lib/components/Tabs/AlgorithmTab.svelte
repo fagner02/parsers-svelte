@@ -146,14 +146,14 @@
 	{#snippet content()}
 		<div class="controls-box">
 			<div class="controls">
-				<button
+				<!-- <button
 					use:setUpTooltip={{ text: 'Código' }}
 					class="popup-button"
 					onclick={() => updateSelected('code')}
 					disabled={selected == 'code'}
 				>
 					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
-				</button>
+				</button> -->
 				<button
 					use:setUpTooltip={{ text: 'Copiar resultados como texto' }}
 					class="popup-button"
