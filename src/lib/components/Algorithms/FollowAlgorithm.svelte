@@ -38,9 +38,13 @@
 	let joinSet = writable([]);
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let joinStack = writable([]);
+	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
+	let followSet = writable([]);
 
-	/** @type {{instruction: string, followSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>, firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
-	let { instruction = $bindable(), followSet = writable([]), firstSet } = $props();
+	/** @type {{
+	 * instruction: string,
+	 * firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
+	let { instruction = $bindable(), firstSet } = $props();
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions|undefined}*/
 	let grammarSelection;

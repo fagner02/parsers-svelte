@@ -13,7 +13,7 @@
 	import { lr1Automaton } from '$lib/lr1automaton';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
-	import { automatonToString, firstToString, tableToString } from './dataToString';
+	import { automatonToString, firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
 	import { id as parseId } from '$lib/clrparse';
 	import LR1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
@@ -76,7 +76,7 @@
 
 		results.push({
 			title: 'Conjunto First',
-			content: firstToString(_first, augRules)
+			content: followToString(_mergedFirst)
 		});
 		results.push({
 			title: 'Autômato LR(1)',

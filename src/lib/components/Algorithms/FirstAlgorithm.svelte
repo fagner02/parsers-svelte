@@ -37,17 +37,18 @@
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let joinStack = writable([]);
+	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
+	let firstSet = writable([]);
+	/** @type { import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
+	let joinSet = writable([]);
 
-	/** @type {{
-	 * instruction: string,
-	 * firstSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>,
-	 * joinSet?: import('svelte/store').Writable<Array<import('@/types').SetRow>>}} */
-	let { instruction = $bindable(), firstSet = writable([]), joinSet = writable([]) } = $props();
+	/** @type {{ instruction: string,}} */
+	let { instruction = $bindable() } = $props();
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarSelection;
 
-	let { rules, nt } = getGrammar();
+	let { rules } = getGrammar();
 	let currentStep = 0;
 	let stepChanged = false;
 

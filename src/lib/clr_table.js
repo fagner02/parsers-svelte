@@ -43,12 +43,13 @@ export function clrTable(automaton, rules, nt, t) {
 		stateName: '',
 		functionCall: functionCalls.length - 1
 	});
+	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	functionCalls.push({ name: 'highlightLines', args: [[3]] });
-	functionCalls.push({ name: 'highlightLines', args: [[4]] });
 
 	for (let [sindex, s] of automaton.states.entries()) {
+		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		functionCalls.push({
 			name: 'selectForStack',
 			args: [`stack-${elemIds.stateStack}-${sindex}`]
@@ -59,26 +60,24 @@ export function clrTable(automaton, rules, nt, t) {
 			name: 'loadState',
 			args: [structuredClone(s.items)]
 		});
-		functionCalls.push({ name: 'highlightLines', args: [[5]] });
 
 		for (let [index, item] of s.items.entries()) {
+			functionCalls.push({ name: 'highlightLines', args: [[5]] });
 			functionCalls.push({
 				name: 'selectFor',
 				args: [`state-${elemIds.state}-${index}`]
 			});
 			functionCalls.push({ name: 'highlightLines', args: [[6]] });
-			functionCalls.push({ name: 'highlightLines', args: [[7]] });
 
 			if (
 				item.pos === rules[item.ruleIndex].right.length ||
 				rules[item.ruleIndex].right[0] === ''
 			) {
-				functionCalls.push({ name: 'highlightLines', args: [[8]] });
-
+				functionCalls.push({ name: 'highlightLines', args: [[7]] });
 				if (item.ruleIndex === 0) {
+					functionCalls.push({ name: 'highlightLines', args: [[8]] });
 					functionCalls.push({ name: 'highlightDot', args: [index] });
 					table.get(s.index)?.set('$', 'a');
-					functionCalls.push({ name: 'highlightLines', args: [[9]] });
 					functionCalls.push({
 						name: 'highlightOn',
 						args: [`s${s.index}`, '$']
@@ -95,15 +94,14 @@ export function clrTable(automaton, rules, nt, t) {
 						stateName: `s${s.index}`,
 						functionCall: functionCalls.length - 1
 					});
-					functionCalls.push({ name: 'highlightLines', args: [[13]] });
 					continue;
 				}
 
-				functionCalls.push({ name: 'highlightLines', args: [[10]] });
+				functionCalls.push({ name: 'highlightLines', args: [[9]] });
 				for (let symbol of item.lookahead) {
 					table.get(s.index)?.set(symbol, `r${item.ruleIndex}`);
+					functionCalls.push({ name: 'highlightLines', args: [[10]] });
 					functionCalls.push({ name: 'highlightLines', args: [[11]] });
-					functionCalls.push({ name: 'highlightLines', args: [[12]] });
 					functionCalls.push({ name: 'highlightDot', args: [index] });
 					functionCalls.push({
 						name: 'highlightOn',
@@ -129,25 +127,25 @@ export function clrTable(automaton, rules, nt, t) {
 					stateName: `s${s.index}`,
 					functionCall: functionCalls.length - 1
 				});
-				functionCalls.push({ name: 'highlightLines', args: [[13]] });
+				functionCalls.push({ name: 'highlightLines', args: [[12]] });
 				continue;
 			}
 
-			functionCalls.push({ name: 'highlightLines', args: [[14]] });
+			functionCalls.push({ name: 'highlightLines', args: [[13]] });
 			const currentSymbol = rules[item.ruleIndex].right[item.pos];
 			functionCalls.push({ name: 'highlightDot', args: [index] });
 			functionCalls.push({
 				name: 'selectSymbol',
 				args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 			});
-			functionCalls.push({ name: 'highlightLines', args: [[15]] });
+			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 
 			let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
-			functionCalls.push({ name: 'highlightLines', args: [[16]] });
+			functionCalls.push({ name: 'highlightLines', args: [[15]] });
 
 			if (nt.includes(currentSymbol)) {
 				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `g${transition}`);
-				functionCalls.push({ name: 'highlightLines', args: [[17]] });
+				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 				functionCalls.push({
 					name: 'highlightOn',
 					args: [`s${s.index}`, currentSymbol]
@@ -166,8 +164,8 @@ export function clrTable(automaton, rules, nt, t) {
 				});
 			} else {
 				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `s${transition}`);
+				functionCalls.push({ name: 'highlightLines', args: [[17]] });
 				functionCalls.push({ name: 'highlightLines', args: [[18]] });
-				functionCalls.push({ name: 'highlightLines', args: [[19]] });
 				functionCalls.push({
 					name: 'highlightOn',
 					args: [`s${s.index}`, currentSymbol]
