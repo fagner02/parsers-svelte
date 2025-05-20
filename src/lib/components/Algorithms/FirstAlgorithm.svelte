@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, setResetCall } from '$lib/flowControl';
+	import { addPause, setCurrentStep, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import {
 		colors,
@@ -67,6 +67,7 @@
 		joinSetElement?.loadSets(save.join);
 		firstSetElement?.loadSets(save.first);
 		currentStep = step;
+		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
 	setResetCall(setStep, saves.length - 1, id, () => currentStep);
@@ -114,6 +115,7 @@
 				}
 				if (call.name === 'addPause') {
 					currentStep++;
+					setCurrentStep(currentStep);
 				}
 				i++;
 			}

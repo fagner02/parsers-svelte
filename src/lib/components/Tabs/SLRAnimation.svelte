@@ -44,6 +44,7 @@
 	]);
 
 	let id = $state('');
+	const tabId = 'slr';
 	let currentInfo = $state(algos[0].infoComp);
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
@@ -120,12 +121,13 @@
 	onMount(() => {
 		id = algos[0].id;
 		setLimitHitCallback(limitHitCallback, id);
-		swapAlgorithm(id, currentInfo);
+		swapAlgorithm(id, currentInfo, tabId);
 		algos[0].loaded = true;
 	});
 </script>
 
 <AlgorithmTab
+	{tabId}
 	{currentInfo}
 	parseInfo={SlrParsingInfo}
 	{parseId}
@@ -145,7 +147,7 @@
 							onclick={() => {
 								id = algo.id;
 								setLimitHitCallback(limitHitCallback, id);
-								swapAlgorithm(id, algo.infoComp);
+								swapAlgorithm(id, algo.infoComp, tabId);
 								algo.loaded = true;
 								resetSelectionFunctions();
 								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);

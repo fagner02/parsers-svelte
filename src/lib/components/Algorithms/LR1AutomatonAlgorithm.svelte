@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setResetCall } from '$lib/flowControl';
+	import { addPause, setCurrentStep, setResetCall } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -105,6 +105,7 @@
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
 		currentStep = step;
+		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
 	setResetCall(setStep, saves.length - 1, id, () => currentStep);
@@ -168,6 +169,7 @@
 				}
 				if (call.name === 'addPause') {
 					currentStep++;
+					setCurrentStep(currentStep);
 				}
 				i++;
 			}

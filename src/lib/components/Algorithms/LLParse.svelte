@@ -2,7 +2,13 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, setMaxStep, setOnInputChanged, setResetCall } from '$lib/flowControl';
+	import {
+		addPause,
+		setCurrentStep,
+		setMaxStep,
+		setOnInputChanged,
+		setResetCall
+	} from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTree } from '$lib/treeFunctions';
@@ -54,6 +60,7 @@
 		tree.resetTree();
 		tree.loadSyntaxTree(save.tree, startingSymbol);
 		currentStep = step;
+		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
 	setResetCall(setStep, saves.length - 1, id, () => currentStep);
@@ -108,6 +115,7 @@
 				}
 				if (call.name === 'addPause') {
 					currentStep++;
+					setCurrentStep(currentStep);
 				}
 				i++;
 			}

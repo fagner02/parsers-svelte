@@ -11,6 +11,11 @@ let waitRejects = new Map();
 let waitRe = new Map();
 /** @type {Map<string, Map<number, (reason?: any) => void>>} */
 let waitResolves = new Map();
+/** @typedef {{setMaxStep: (v: number)=>void, setCurrentStep: (v: number)=>void}} Tab*/
+/** @type {Map<string, Tab>} */
+let tabs = new Map();
+/**@type {string} */
+let currentTab = '';
 
 /**@type {Map<string, number>} */
 let waitCount = new Map();
@@ -22,6 +27,20 @@ let jumpWait = new Map();
 /**@type {Map<string, boolean>} */
 let jumpPause = new Map();
 
+/**
+ * @param {string} tabId
+ * @param {Tab} tab
+ */
+export function setTab(tabId, tab) {
+	tabs.set(tabId, tab);
+}
+
+/**
+ * @param {number} step
+ */
+export function setCurrentStep(step) {
+	tabs.get(currentTab)?.setCurrentStep(step);
+}
 /**
  * @param {boolean} value
  * @param {string} id
@@ -168,6 +187,7 @@ export function setOpenInstruction(_openInstruction) {
  * @param {()=> number} getStep
  */
 export function setResetCall(resetCall, lastSaveIndex, id, getStep) {
+	tabs.get(currentTab)?.setMaxStep(lastSaveIndex);
 	limit.set(id, false);
 	currentStep.set(id, 0);
 	jumpWait.set(id, false);
@@ -279,6 +299,18 @@ export function inputChanged(id) {
 
 /**
  * @param {string} id
+ * @param {number} step
+ */
+export function goToStep(id, step) {
+	killAllWaits(id);
+	killPause(id);
+	jumpPause.set(id, false);
+	jumpWait.set(id, false);
+	resetCalls.get(id)?.(step);
+}
+
+/**
+ * @param {string} id
  */
 export async function forward(id) {
 	appendData(`control flow,forward`);
@@ -365,8 +397,14 @@ export function reset(id) {
 /**
  * @param {string} id
  * @param {ConstructorOfATypedSvelteComponent} infoComp
+ * @param {string} tabId
  */
-export function swapAlgorithm(id, infoComp) {
+export function swapAlgorithm(id, infoComp, tabId) {
+	const tab = tabs.get(tabId);
+	currentTab = tabId;
+	if (tab) {
+		tab.setMaxStep(maxStep.get(id) ?? 0);
+	}
 	setInfoComponent(infoComp);
 	limitHitCallback.get(id)?.();
 	if (!pauseResolves.has(id)) {

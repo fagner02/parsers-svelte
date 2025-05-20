@@ -35,6 +35,7 @@
 	/**@type {Map<string, Map<string, number>>}*/
 	let tableData = $state(new Map());
 	let id = $state('');
+	const tabId = 'll';
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -147,7 +148,7 @@
 	};
 	onMount(() => {
 		id = algos[0].id;
-		swapAlgorithm(id, algos[0].infoComp);
+		swapAlgorithm(id, algos[0].infoComp, tabId);
 		setLimitHitCallback(limitHitCallback, id);
 		algos[0].loaded = true;
 	});
@@ -155,6 +156,7 @@
 </script>
 
 <AlgorithmTab
+	{tabId}
 	{currentInfo}
 	parseInfo={LlParsingInfo}
 	{parseId}
@@ -175,7 +177,7 @@
 							id = algo.id;
 							algo.loaded = true;
 							setLimitHitCallback(limitHitCallback, id);
-							swapAlgorithm(id, algo.infoComp);
+							swapAlgorithm(id, algo.infoComp, tabId);
 							resetSelectionFunctions();
 							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
 							selectedAlgorithm = algo.name;
