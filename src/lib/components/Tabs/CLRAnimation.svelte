@@ -11,7 +11,6 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
 	import { lr1Automaton } from '$lib/lr1automaton';
-	import { clrTable } from '$lib/clrtable';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, firstToString, tableToString } from './dataToString';
@@ -20,6 +19,7 @@
 	import LR1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import CLRTableInfo from '@/Info/CLRTableInfo.svelte';
 	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
+	import { clrTable } from '$lib/clr_table';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();

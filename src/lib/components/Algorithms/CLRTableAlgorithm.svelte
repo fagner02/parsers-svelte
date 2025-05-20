@@ -13,7 +13,7 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, saves, functionCalls, elemIds } from '$lib/clrtable';
+	import { id, saves, functionCalls, elemIds } from '$lib/clr_table';
 	import { tableCard } from '@/Tabs/dataToComp';
 
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
