@@ -54,10 +54,9 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	functionCalls.push({ name: 'highlightLines', args: [[3]] });
-	functionCalls.push({ name: 'highlightLines', args: [[4]] });
 
 	for (let s of automaton.states) {
-		functionCalls.push({ name: 'highlightLines', args: [[5]] });
+		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		functionCalls.push({
 			name: 'selectForStack',
 			args: [`stack-${elemIds.stateStack}-${s.index}`]
@@ -70,7 +69,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 		});
 
 		for (let [index, item] of s.items.entries()) {
-			functionCalls.push({ name: 'highlightLines', args: [[6]] });
+			functionCalls.push({ name: 'highlightLines', args: [[5]] });
 			functionCalls.push({
 				name: 'selectFor',
 				args: [`state-${elemIds.state}-${index}`]
@@ -85,21 +84,20 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 				stateSelect: `state-${elemIds.state}-${index}`,
 				functionCall: functionCalls.length - 1
 			});
-			functionCalls.push({ name: 'highlightLines', args: [[7]] });
+			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 
 			if (
 				item.pos === rules[item.ruleIndex].right.length ||
 				rules[item.ruleIndex].right[0] === ''
 			) {
-				functionCalls.push({ name: 'highlightLines', args: [[8]] });
 				let followIndex = followSet.keys().toArray().indexOf(rules[item.ruleIndex].left);
 				let follow = followSet.get(rules[item.ruleIndex].left);
-				functionCalls.push({ name: 'highlightLines', args: [[9]] });
 
 				if (!follow) continue;
 
+				functionCalls.push({ name: 'highlightLines', args: [[7]] });
 				if (item.ruleIndex === 0) {
-					functionCalls.push({ name: 'highlightLines', args: [[12]] });
+					functionCalls.push({ name: 'highlightLines', args: [[8]] });
 					functionCalls.push({
 						name: 'highlightDot',
 						args: [index]
@@ -128,13 +126,15 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					continue;
 				}
 
-				functionCalls.push({ name: 'highlightLines', args: [[14]] });
+				functionCalls.push({ name: 'highlightLines', args: [[9]] });
 				for (let symbol of follow) {
-					functionCalls.push({ name: 'highlightLines', args: [[15]] });
+					functionCalls.push({ name: 'highlightLines', args: [[10]] });
 					functionCalls.push({
 						name: 'selectForFollow',
 						args: [`${elemIds.follow}set${followIndex}`]
 					});
+
+					functionCalls.push({ name: 'highlightLines', args: [[11]] });
 					functionCalls.push({ name: 'highlightDot', args: [index] });
 					table.get(s.index)?.set(symbol, `r${item.ruleIndex}`);
 					functionCalls.push({
@@ -158,19 +158,18 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					});
 				}
 				functionCalls.push({ name: 'hideSelectFollow', args: [] });
-				functionCalls.push({ name: 'highlightLines', args: [[16]] });
+				functionCalls.push({ name: 'highlightLines', args: [[12]] });
 				continue;
 			}
 
-			functionCalls.push({ name: 'highlightLines', args: [[17]] });
+			functionCalls.push({ name: 'highlightLines', args: [[13]] });
 			const currentSymbol = rules[item.ruleIndex].right[item.pos];
-			functionCalls.push({ name: 'highlightLines', args: [[18]] });
-
+			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 			let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
-			functionCalls.push({ name: 'highlightLines', args: [[19]] });
 
+			functionCalls.push({ name: 'highlightLines', args: [[15]] });
 			if (nt.includes(currentSymbol)) {
-				functionCalls.push({ name: 'highlightLines', args: [[20]] });
+				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 				functionCalls.push({
 					name: 'highlightDot',
 					args: [index]
@@ -201,8 +200,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					functionCall: functionCalls.length - 1
 				});
 			} else {
-				functionCalls.push({ name: 'highlightLines', args: [[21]] });
-				functionCalls.push({ name: 'highlightLines', args: [[22]] });
+				functionCalls.push({ name: 'highlightLines', args: [[17]] });
+				functionCalls.push({ name: 'highlightLines', args: [[18]] });
 				functionCalls.push({
 					name: 'highlightDot',
 					args: [index]
@@ -242,7 +241,6 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 	}
 	functionCalls.push({ name: 'hideSelectStack', args: [] });
 
-	functionCalls.push({ name: 'highlightLines', args: [[23]] });
 	functionCalls.push({ name: 'highlightLines', args: [[]] });
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({

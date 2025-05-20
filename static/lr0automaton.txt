@@ -1,4 +1,3 @@
-<span>Algoritmo autômato lr0:</span>
 <span><b>autômato</b> &lt;- &#x3008;estados, transições&#x3009;</span>
 <span><b>estado0</b> &lt;- [item da forma { posição: 0, regra: primeira regra da gramática }]</span>
 <span><b>filaEstados</b> &lt- []</span>

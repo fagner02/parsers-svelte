@@ -1,11 +1,10 @@
-<span>Algoritmo tabela clr:</span>
 <span><b>tabela</b> &lt;- Mapa&#x3008;estado, Mapa&#x3008;símbolo, ação&#x3009;&#x3009;</span>
 <span>alfabeto &lt;- [terminais, não-terminais] concatenados</span>
 <span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
 <span>    inicializar <b>tabela[s]</b> com entradas vazias para todos os símbolos em <b>alfabeto</b></span>
 <span>para cada estado <b>s</b> em <b>autômato.estados</b>:</span>
 <span>    para cada item <b>i</b> em <b>s.items</b>:</span>
-<span>        se <b>i.pos</b> for o final da produção <b>OU</b> produção de <b>i</b> é vazia:</span>
+<span>        se <b>i.pos</b> for o final da produção OU produção de <b>i</b> é vazia:</span>
 <span>            se <b>i</b> for a produção inicial (índice 0):</span>
 <span>                <b>tabela[s]['$']</b> &lt;- 'a' (aceitar)</span>
 <span>            senão:</span>
