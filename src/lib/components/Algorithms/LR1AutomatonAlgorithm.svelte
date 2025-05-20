@@ -29,9 +29,6 @@
 	/**@type {StackCard | undefined}*/
 	let lookaheadElem = $state();
 	/**@type {GrammarCard | undefined}*/
-	let grammarElem = $state();
-	/**@type {StackCard | undefined}*/
-	let alphabetElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -41,10 +38,9 @@
 	let targetState = writable([]);
 
 	/** @type {{
-	 * firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>,
-	 * results: import("@/types").ResultsTabItem[]}} */
-	let { firstSet, results = $bindable() } = $props();
-	let { nt, augRules, alphabet } = getAugGrammar();
+	 * firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
+	let { firstSet } = $props();
+	let { alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let alphabetStack = writable(
@@ -89,7 +85,6 @@
 		const save = saves[step];
 		if (save === undefined) {
 			console.error(`Step ${step} not found`);
-			console.log(saves);
 			return;
 		}
 		svgLines?.hideLine(false, id);
@@ -157,11 +152,6 @@
 				}
 				const call = functionCalls[i];
 				try {
-					if (!obj[call.name]) {
-						console.error(`Function ${call.name} not found`);
-						console.log(obj[call.name], call, obj);
-						return executeSteps();
-					}
 					if (call.skip) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -197,13 +187,7 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard
-			bind:this={grammarElem}
-			{id}
-			cardId={elemIds.grammar}
-			isAugmented={true}
-			bind:loadGrammar
-		></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<SetsCard {id} set={firstSet} label="first" setId={elemIds.firstSet} hue={colors.blue}
 		></SetsCard>
 		<StateCard
@@ -246,7 +230,6 @@
 		></StackCard>
 		<StackCard
 			{id}
-			bind:this={alphabetElem}
 			stack={alphabetStack}
 			stackId={elemIds.alphabet}
 			label="alfabeto"

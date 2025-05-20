@@ -56,7 +56,6 @@
 		const save = saves[step];
 		if (save === undefined) {
 			console.error(`Step ${step} not found`);
-			console.log(saves);
 			return;
 		}
 		svgLines?.hideLine(false, id);
@@ -103,11 +102,6 @@
 				}
 				const call = functionCalls[i];
 				try {
-					if (!obj[call.name]) {
-						console.error(`Function ${call.name} not found`);
-						console.log(obj[call.name], call, obj);
-						return executeSteps();
-					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {

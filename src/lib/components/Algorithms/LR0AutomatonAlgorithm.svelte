@@ -38,6 +38,7 @@
 	let targetState = writable([]);
 	let { alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
+	let { ...props } = $props();
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
@@ -77,7 +78,6 @@
 		const save = saves[step];
 		if (save === undefined) {
 			console.error(`Step ${step} not found`);
-			console.log(saves);
 			return;
 		}
 		symbolsSelection.hideSelect();
@@ -143,7 +143,6 @@
 				try {
 					if (!obj[call.name]) {
 						console.error(`Function ${call.name} not found`);
-						console.log(obj[call.name], call, obj);
 						return executeSteps();
 					}
 					if (call.skip) obj[call.name]()(...call.args);
