@@ -68,7 +68,7 @@ export function first(rules, nt) {
 	functionCalls = [];
 	saves = [];
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		join: structuredClone(joinSet),
 		first: structuredClone(firstSet),
@@ -76,30 +76,27 @@ export function first(rules, nt) {
 		grammarSelect: '',
 		functionCall: functionCalls.length - 1
 	});
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
+	functionCalls.push({ name: 'highlightLines', args: [[0]] });
+	functionCalls.push({ name: 'highlightLines', args: [[1]] });
 
 	for (let i = 0; i < rules.length; i++) {
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
+		functionCalls.push({ name: 'highlightLines', args: [[2]] });
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'selectGrammar',
 			args: [`${elemIds.grammar}gset${i}`]
 		});
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
+		functionCalls.push({ name: 'highlightLines', args: [[3]] });
+		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'selectLSymbol',
 			args: [`${elemIds.grammar}g`, i, colors.blue, id]
 		});
 		firstSet.set(i, new Set());
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'addSetRow',
 			args: [i, `${elemIds.grammar}gl${i}`]
 		});
-		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+		functionCalls.push({ name: 'addPause', args: [id] });
 		saves.push({
 			join: structuredClone(joinSet),
 			first: structuredClone(firstSet),
@@ -109,34 +106,31 @@ export function first(rules, nt) {
 		});
 		let isNull = true;
 		for (let j = 0; j < rules[i].right.length; j++) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
+			functionCalls.push({ name: 'highlightLines', args: [[5]] });
 			let symbol = rules[i].right[j];
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
+			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 			if (nt.includes(symbol)) {
 				if (!joinSet.has(i)) {
 					joinSet.set(i, new Set());
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'addSetRowJoin',
 						args: [i, `${elemIds.grammar}gl${i}`]
 					});
 				}
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectRSymbol',
 					args: [`${elemIds.grammar}g`, i, j, colors.blue, id, false]
 				});
 
 				const matchingRules = rules.filter((x) => x.left === symbol);
 				for (let rule of matchingRules) {
-					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
-					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
+					functionCalls.push({ name: 'highlightLines', args: [[7]] });
+					functionCalls.push({ name: 'highlightLines', args: [[8]] });
 					if (rule.index !== i) {
 						joinSet.get(i)?.add(rule.index);
-						functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
+						functionCalls.push({ name: 'highlightLines', args: [[9]] });
 						functionCalls.push({
-							trace: Error().stack,
 							name: 'joinSetsJoin',
 							args: [[rule.index], i, `${elemIds.grammar}gr${i}-${j}`]
 						});
@@ -144,8 +138,8 @@ export function first(rules, nt) {
 				}
 			} else {
 				firstSet.get(i)?.add(symbol);
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[10]] });
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'highlightLines', args: [[10]] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					join: structuredClone(joinSet),
 					first: structuredClone(firstSet),
@@ -154,21 +148,19 @@ export function first(rules, nt) {
 					functionCall: functionCalls.length - 1
 				});
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectRSymbol',
 					args: [`${elemIds.grammar}g`, i, j, colors.green, id, false]
 				});
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'joinSets',
 					args: [[symbol], i, `${elemIds.grammar}gr${i}-${j}`]
 				});
 			}
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[12]] });
+			functionCalls.push({ name: 'highlightLines', args: [[12]] });
 			if (!(nullable.get(symbol) ?? false)) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[14]] });
+				functionCalls.push({ name: 'highlightLines', args: [[13]] });
+				functionCalls.push({ name: 'highlightLines', args: [[14]] });
 				isNull = false;
 				break;
 			}
@@ -176,16 +168,14 @@ export function first(rules, nt) {
 
 		if (isNull) {
 			firstSet.get(i)?.add('');
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
+			functionCalls.push({ name: 'highlightLines', args: [[16]] });
 			if (rules[i].right[0] === '') {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectRSymbol',
 					args: [`${elemIds.grammar}g`, i, 0, colors.green, id, false]
 				});
 			}
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'joinSets',
 				args: [[''], i, `${elemIds.grammar}gr${i}-${rules[i].right.length - 1}`]
 			});
@@ -199,23 +189,22 @@ export function first(rules, nt) {
 			return false;
 		});
 	for (let item of joinSet.keys()) {
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[17]] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
+		functionCalls.push({ name: 'highlightLines', args: [[17]] });
+		functionCalls.push({ name: 'highlightLines', args: [[18]] });
 		if (joinSet.get(item)?.size === 0) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[19]] });
+			functionCalls.push({ name: 'highlightLines', args: [[19]] });
 			continue;
 		}
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[20]] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[21]] });
+		functionCalls.push({ name: 'highlightLines', args: [[20]] });
+		functionCalls.push({ name: 'highlightLines', args: [[21]] });
 
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'addToStack',
 			args: [item, rules[item].left, item.toString(), `${elemIds.join}l${item}`]
 		});
 		/** @type {Array<number>} */
 		let joinStack = [item];
-		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+		functionCalls.push({ name: 'addPause', args: [id] });
 		saves.push({
 			join: structuredClone(joinSet),
 			first: structuredClone(firstSet),
@@ -226,24 +215,23 @@ export function first(rules, nt) {
 
 		addedToStack[item] = true;
 		while (joinStack.length > 0) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[22]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[24]] });
+			functionCalls.push({ name: 'highlightLines', args: [[22]] });
+			functionCalls.push({ name: 'highlightLines', args: [[23]] });
+			functionCalls.push({ name: 'highlightLines', args: [[24]] });
 
 			const topKey = joinStack[joinStack.length - 1];
 			const top = /**@type {Set<number>}*/ (joinSet.get(topKey));
 			const topValue = /**@type {number}*/ (top?.values().next().value);
 
 			let nextSet = joinSet.get(topValue);
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[25]] });
+			functionCalls.push({ name: 'highlightLines', args: [[25]] });
 
 			if (nextSet !== undefined && !(nextSet.size === 0) && !addedToStack[topValue]) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[26]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[27]] });
+				functionCalls.push({ name: 'highlightLines', args: [[26]] });
+				functionCalls.push({ name: 'highlightLines', args: [[27]] });
 
 				joinStack.push(topValue);
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addToStack',
 					args: [topValue, rules[topValue].left, topValue.toString()]
 				});
@@ -257,15 +245,14 @@ export function first(rules, nt) {
 					_firstSet?.add(item);
 				}
 			}
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[28]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[29]] });
+			functionCalls.push({ name: 'highlightLines', args: [[28]] });
+			functionCalls.push({ name: 'highlightLines', args: [[29]] });
 
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'joinSets',
 				args: [[...setToJoin], topKey, `${elemIds.first}l${topValue}`]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				join: structuredClone(joinSet),
 				first: structuredClone(firstSet),
@@ -274,14 +261,13 @@ export function first(rules, nt) {
 				functionCall: functionCalls.length - 1
 			});
 			top.delete(topValue);
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[30]] });
+			functionCalls.push({ name: 'highlightLines', args: [[30]] });
 
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'removeSet',
 				args: [topKey, topValue]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				join: structuredClone(joinSet),
 				first: structuredClone(firstSet),
@@ -289,13 +275,12 @@ export function first(rules, nt) {
 				grammarSelect: '',
 				functionCall: functionCalls.length - 1
 			});
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[31]] });
+			functionCalls.push({ name: 'highlightLines', args: [[31]] });
 			if (top.size === 0) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[32]] });
+				functionCalls.push({ name: 'highlightLines', args: [[32]] });
 
 				joinStack.pop();
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'removeFromStack',
 					args: [joinStack.length]
 				});
@@ -303,7 +288,7 @@ export function first(rules, nt) {
 		}
 	}
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		join: structuredClone(joinSet),
 		first: structuredClone(firstSet),

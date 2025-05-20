@@ -4,7 +4,6 @@ export function stackFloatingWindows(elem) {
 		let boundingBox = document.querySelector('#wrapper>.grid>.not-hidden');
 		if (!boundingBox) return;
 		let boundingBoxRect = boundingBox.getBoundingClientRect();
-		let parentRect = elem.getBoundingClientRect();
 		const pad = 10;
 		let top = pad + 10;
 		for (let item of elem.children) {

@@ -31,7 +31,7 @@ export const elemIds = {
  * @param {Map<string, Set<string>>} firstSet
  */
 export function closure(state, rules, nt, firstSet) {
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		targetState: [...state],
 		lookahead: new Set(),
@@ -43,20 +43,19 @@ export function closure(state, rules, nt, firstSet) {
 		functionCall: functionCalls.length - 1
 	});
 	let itemsToCheck = [...state.keys()];
-	functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[0]] });
+	functionCalls.push({ name: 'highlightLinesClosure', args: [[0]] });
 	let itemSymbolId = null;
 	while (itemsToCheck.length > 0) {
-		functionCalls.push({ trace: Error().stack, name: 'lookaheadRemoveAll', args: [] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[1]] });
+		functionCalls.push({ name: 'lookaheadRemoveAll', args: [] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[1]] });
 		let item = state[itemsToCheck[0]];
 		let index = itemsToCheck[0];
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[2]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[2]] });
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'selectForTargetState',
 			args: [`state-${elemIds.targetState}-${index}`]
 		});
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[3]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[3]] });
 		let symbol = rules[item.ruleIndex].right[item.pos];
 		itemSymbolId =
 			item.pos < rules[item.ruleIndex].right.length
@@ -64,34 +63,32 @@ export function closure(state, rules, nt, firstSet) {
 				: null;
 		if (itemSymbolId)
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectSymbol',
 				args: [itemSymbolId, colors.pink, id, false]
 			});
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[4]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[4]] });
 		if (!nt.includes(symbol)) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[5]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[6]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[5]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[6]] });
 			itemsToCheck.shift();
 			continue;
 		}
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[7]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
 		let lookahead = new Set();
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[8]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
 		if (rules[item.ruleIndex].right.length - 1 === item.pos) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[9]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightDotTarget', args: [index] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
+			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
 			for (let l of item.lookahead) {
 				if (lookahead.has(l)) continue;
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addLookahead',
 					args: [l, l, '', `look-${elemIds.targetState}-${index}`]
 				});
 			}
 			lookahead = new Set(item.lookahead);
 
-			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			functionCalls.push({ name: 'addPause', args: [id] });
 
 			saves.push({
 				targetState: [...state],
@@ -103,35 +100,33 @@ export function closure(state, rules, nt, firstSet) {
 				targetStateName: saves[saves.length - 1].targetStateName,
 				functionCall: functionCalls.length - 1
 			});
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[10]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
 		} else {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[10]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[11]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[11]] });
 			let nullable = true;
 			let betaId = null;
 			for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[12]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[12]] });
 				let beta = rules[item.ruleIndex].right[item.pos + i];
 				betaId = `state-${elemIds.targetState}-${index}-${item.pos + i}`;
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectSymbol',
 					args: [betaId, colors.pink, id, false]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[13]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[13]] });
 				if (!nt.includes(beta)) {
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[14]] });
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[15]] });
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[16]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[15]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[16]] });
 					if (!lookahead.has(beta)) {
 						functionCalls.push({
-							trace: Error().stack,
 							name: 'addLookahead',
 							args: [beta, beta, '', betaId]
 						});
 					}
 					lookahead.add(beta);
-					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					functionCalls.push({ name: 'addPause', args: [id] });
 					saves.push({
 						targetState: [...state],
 						lookahead: new Set(lookahead),
@@ -145,23 +140,22 @@ export function closure(state, rules, nt, firstSet) {
 					nullable = false;
 					break;
 				} else {
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[17]] });
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[18]] });
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[19]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[17]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[18]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[19]] });
 					let firstIndex = rules.findIndex((x) => x.left === beta);
 					let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
 
 					for (let [i, l] of first.filter((x) => x !== '').entries()) {
 						if (lookahead.has(l) || l === '') continue;
 						functionCalls.push({
-							trace: Error().stack,
 							name: 'addLookahead',
 							args: [l, l, '', `${elemIds.firstSet}-${firstIndex}-${i}`]
 						});
 
 						lookahead.add(l);
 					}
-					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					functionCalls.push({ name: 'addPause', args: [id] });
 					saves.push({
 						targetState: [...state],
 						lookahead: new Set(lookahead),
@@ -172,15 +166,13 @@ export function closure(state, rules, nt, firstSet) {
 						targetStateName: saves[saves.length - 1].targetStateName,
 						functionCall: functionCalls.length - 1
 					});
-					functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[20]] });
+					functionCalls.push({ name: 'highlightLinesClosure', args: [[20]] });
 					if (!first.includes('')) {
 						functionCalls.push({
-							trace: Error().stack,
 							name: 'highlightLinesClosure',
 							args: [[21]]
 						});
 						functionCalls.push({
-							trace: Error().stack,
 							name: 'highlightLinesClosure',
 							args: [[22]]
 						});
@@ -189,27 +181,26 @@ export function closure(state, rules, nt, firstSet) {
 					}
 				}
 				if (betaId) {
-					functionCalls.push({ trace: Error().stack, name: 'deselectSymbol', args: [betaId, id] });
+					functionCalls.push({ name: 'deselectSymbol', args: [betaId, id] });
 					betaId = null;
 				}
 			}
 			if (betaId) {
-				functionCalls.push({ trace: Error().stack, name: 'deselectSymbol', args: [betaId, id] });
+				functionCalls.push({ name: 'deselectSymbol', args: [betaId, id] });
 				betaId = null;
 			}
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[23]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[23]] });
 			if (nullable) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[24]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[24]] });
 				for (let l of item.lookahead) {
 					if (lookahead.has(l)) continue;
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'addLookahead',
 						args: [l, l, '', `look-${elemIds.targetState}-${index}`]
 					});
 					lookahead.add(l);
 				}
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					targetState: [...state],
 					lookahead: new Set(lookahead),
@@ -223,39 +214,36 @@ export function closure(state, rules, nt, firstSet) {
 			}
 		}
 		for (let rule of rules) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[25]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[25]] });
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectForGrammar',
 				args: [`${elemIds.grammar}gset${rule.index}`]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[26]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[26]] });
 			if (!(rule.left === symbol)) continue;
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightDotTarget', args: [index] });
+			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
 			/**@type {string?} */
 			let ruleId = `${elemIds.grammar}gl${rule.index}`;
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectSymbol',
 				args: [ruleId, colors.blue, id, false]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[27]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[27]] });
 			let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[28]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[28]] });
 			if (existent === -1) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[29]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[29]] });
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addItem',
 					args: [rule.index, 0, new Set(lookahead), ruleId]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[30]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[31]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[30]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[31]] });
 				state.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
 				itemsToCheck.push(state.length - 1);
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					targetState: [...state],
 					lookahead: new Set(lookahead),
@@ -267,23 +255,22 @@ export function closure(state, rules, nt, firstSet) {
 					functionCall: functionCalls.length - 1
 				});
 				if (ruleId) {
-					functionCalls.push({ trace: Error().stack, name: 'deselectSymbol', args: [ruleId, id] });
+					functionCalls.push({ name: 'deselectSymbol', args: [ruleId, id] });
 					ruleId = null;
 				}
 				continue;
 			}
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[32]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[33]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[32]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[33]] });
 			let size = state[existent].lookahead.size;
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'updateLookahead',
-				args: [new Set(lookahead), existent, index === existent]
+				args: [new Set(lookahead), existent]
 			});
 			for (let l of lookahead) {
 				state[existent].lookahead.add(l);
 			}
-			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				targetState: [...state],
 				lookahead: new Set(state[existent].lookahead),
@@ -295,24 +282,23 @@ export function closure(state, rules, nt, firstSet) {
 				functionCall: functionCalls.length - 1
 			});
 			if (ruleId) {
-				functionCalls.push({ trace: Error().stack, name: 'deselectSymbol', args: [ruleId, id] });
+				functionCalls.push({ name: 'deselectSymbol', args: [ruleId, id] });
 				ruleId = null;
 			}
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[34]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[34]] });
 			if (state[existent].lookahead.size === size) {
 				continue;
 			}
-			functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[35]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[35]] });
 
 			itemsToCheck.push(existent);
 		}
-		functionCalls.push({ trace: Error().stack, name: 'hideSelectGrammar', args: [] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLinesClosure', args: [[36]] });
+		functionCalls.push({ name: 'hideSelectGrammar', args: [] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[36]] });
 
 		itemsToCheck.shift();
 		if (itemSymbolId) {
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'deselectSymbol',
 				args: [itemSymbolId, id]
 			});
@@ -320,11 +306,11 @@ export function closure(state, rules, nt, firstSet) {
 		}
 	}
 	if (itemSymbolId) {
-		functionCalls.push({ trace: Error().stack, name: 'deselectSymbol', args: [itemSymbolId, id] });
+		functionCalls.push({ name: 'deselectSymbol', args: [itemSymbolId, id] });
 		itemSymbolId = null;
 	}
-	functionCalls.push({ trace: Error().stack, name: 'lookaheadRemoveAll', args: [] });
-	functionCalls.push({ trace: Error().stack, name: 'hideSelectTargetState', args: [] });
+	functionCalls.push({ name: 'lookaheadRemoveAll', args: [] });
+	functionCalls.push({ name: 'hideSelectTargetState', args: [] });
 }
 
 /**
@@ -336,7 +322,7 @@ export function closure(state, rules, nt, firstSet) {
 export function lr1Automaton(rules, nt, t, firstSet) {
 	functionCalls = [];
 	saves = [];
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		targetState: [],
 		originState: [],
@@ -350,12 +336,11 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 
 	/**@type {import('@/types').LR1Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
+	functionCalls.push({ name: 'highlightLines', args: [[1]] });
+	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	/**@type {number[]} */
 	let stateStack = [0];
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'addItem',
 		args: [0, 0, new Set(['$']), `${id}gl0`]
 	});
@@ -363,21 +348,20 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	/**@type {import('@/types').LR1StateItem[]} */
 	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: new Set(['$']) }];
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
+	functionCalls.push({ name: 'highlightLines', args: [[3]] });
 
 	closure(state0, rules, nt, firstSet);
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
-	functionCalls.push({ trace: Error().stack, name: 'originStateName', args: ['s0'] });
+	functionCalls.push({ name: 'highlightLines', args: [[4]] });
+	functionCalls.push({ name: 'originStateName', args: ['s0'] });
 	automaton.states.push({ index: 0, items: [...state0] });
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'addNode',
 		args: [null, 0, structuredClone(automaton.states[0]), null],
 		skip: true
 	});
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		targetState: structuredClone(state0),
 		originState: [],
@@ -389,72 +373,64 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 		functionCall: functionCalls.length - 1
 	});
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
+	functionCalls.push({ name: 'highlightLines', args: [[5]] });
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'addToStack',
 		args: [0, 's0', '', `label-${elemIds.targetState}`]
 	});
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
+	functionCalls.push({ name: 'highlightLines', args: [[6]] });
 
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
 	let originStateIndex = 0;
 	while (stateStack.length > 0) {
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
-		functionCalls.push({ trace: Error().stack, name: 'resetOriginState', args: [] });
+		functionCalls.push({ name: 'highlightLines', args: [[7]] });
+		functionCalls.push({ name: 'resetOriginState', args: [] });
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'originStateName',
 			args: [`s${stateStack[0]}`]
 		});
 		originStateIndex = stateStack[0];
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'loadOriginState',
 			args: [structuredClone(automaton.states[stateStack[0]].items)]
 		});
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
+		functionCalls.push({ name: 'highlightLines', args: [[8]] });
 		for (let [symbolIndex, symbol] of alphabet.entries()) {
 			/**@type {import('@/types').LR1StateItem[]} */
 			let state1 = [];
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectForAlphabet',
 				args: [`stack-${elemIds.alphabet}-${symbolIndex}`]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'targetStateReset', args: [] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[10]] });
+			functionCalls.push({ name: 'targetStateReset', args: [] });
+			functionCalls.push({ name: 'highlightLines', args: [[9]] });
+			functionCalls.push({ name: 'highlightLines', args: [[10]] });
 			for (let [prodIndex, prod] of automaton.states[stateStack[0]].items.entries()) {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectForOriginalState',
 					args: [`state-${elemIds.originState}-${prodIndex}`]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[11]] });
+				functionCalls.push({ name: 'highlightLines', args: [[11]] });
 				if (
 					prod.pos >= rules[prod.ruleIndex].right.length ||
 					rules[prod.ruleIndex].right[prod.pos] !== symbol
 				)
 					continue;
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'highlightDotOriginal',
 					args: [prodIndex]
 				});
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectSymbol',
 					args: [`state-${elemIds.originState}-${prodIndex}-${prod.pos}`, colors.pink, id, false]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[12]] });
+				functionCalls.push({ name: 'highlightLines', args: [[12]] });
 				let existent = state1.findIndex(
 					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
 				);
 				if (existent === -1) {
 					state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: prod.lookahead });
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'addItem',
 						args: [
 							prod.ruleIndex,
@@ -465,7 +441,6 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					});
 				} else {
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'updateLookahead',
 						args: [structuredClone(prod.lookahead), existent]
 					});
@@ -473,12 +448,11 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					state1[existent].lookahead = new Set([...state1[existent].lookahead, ...prod.lookahead]);
 				}
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'deselectSymbol',
 					args: [`state-${elemIds.originState}-${prodIndex}-${prod.pos}`, id]
 				});
 
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
 					originState: structuredClone(automaton.states[originStateIndex].items),
@@ -490,8 +464,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					functionCall: functionCalls.length - 1
 				});
 			}
-			functionCalls.push({ trace: Error().stack, name: 'hideSelectOriginal', args: [] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
+			functionCalls.push({ name: 'hideSelectOriginal', args: [] });
+			functionCalls.push({ name: 'highlightLines', args: [[13]] });
 			if (state1.length === 0) continue;
 			closure(state1, rules, nt, firstSet);
 			let existent = automaton.states.findIndex((x) => {
@@ -515,18 +489,17 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				return eq;
 			});
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[14]] });
+			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 			if (!automaton.transitions.has(stateStack[0]))
 				automaton.transitions.set(stateStack[0], new Map());
 
 			if (existent === -1) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[17]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
+				functionCalls.push({ name: 'highlightLines', args: [[16]] });
+				functionCalls.push({ name: 'highlightLines', args: [[17]] });
+				functionCalls.push({ name: 'highlightLines', args: [[18]] });
 
 				automaton.states.push({ index: automaton.states.length, items: structuredClone(state1) });
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addNode',
 					args: [
 						stateStack[0],
@@ -536,9 +509,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					],
 					skip: true
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[19]] });
+				functionCalls.push({ name: 'highlightLines', args: [[19]] });
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addToStack',
 					args: [
 						automaton.states.length - 1,
@@ -549,7 +521,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				});
 				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
 				stateStack.push(automaton.states.length - 1);
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					targetState: structuredClone(state1),
 					originState: structuredClone(automaton.states[originStateIndex].items),
@@ -562,18 +534,18 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				});
 				continue;
 			} else {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[15]] });
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
+				functionCalls.push({ name: 'highlightLines', args: [[15]] });
+				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 			}
 
 			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
 		}
 		stateStack.shift();
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[20]] });
-		functionCalls.push({ trace: Error().stack, name: 'removeFromStack', args: [0] });
+		functionCalls.push({ name: 'highlightLines', args: [[20]] });
+		functionCalls.push({ name: 'removeFromStack', args: [0] });
 	}
-	functionCalls.push({ trace: Error().stack, name: 'hideSelectAlphabet', args: [] });
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'hideSelectAlphabet', args: [] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 
 	saves.push({
 		targetState: [],

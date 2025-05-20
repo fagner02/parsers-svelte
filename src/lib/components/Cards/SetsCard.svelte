@@ -155,26 +155,6 @@
 		});
 	}
 
-	export function get(/**@type {any}*/ key) {
-		const index = $set.findIndex((i) => i.left === key);
-		if (index !== undefined) {
-			return $set[index].right;
-		}
-	}
-
-	export function has(/**@type {any}*/ key) {
-		return $set.findIndex((i) => i.left === key) !== -1;
-	}
-
-	export function getSetId() {
-		return setId;
-	}
-
-	export async function reloadElement() {
-		visible = !visible;
-		await noJumpWait(0);
-		initialize();
-	}
 	onMount(initialize);
 	let maxHeight = $derived(lineHeight * Math.max($set?.length ?? 0, 1));
 </script>

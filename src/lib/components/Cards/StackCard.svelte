@@ -181,10 +181,6 @@
 		});
 	}
 
-	export function getId() {
-		return stackId;
-	}
-
 	onMount(async () => {
 		let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 

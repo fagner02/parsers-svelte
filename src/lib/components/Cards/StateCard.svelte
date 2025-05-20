@@ -78,9 +78,8 @@
 	/**
 	 * @param {Set<string>} lookahead
 	 * @param {number} existent
-	 * @param {boolean} updateSelection
 	 */
-	export async function updateLookahead(lookahead, existent, updateSelection = false) {
+	export async function updateLookahead(lookahead, existent) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				cardState.update((x) => {
@@ -188,10 +187,6 @@
 				reject(e);
 			}
 		});
-	}
-
-	export function getId() {
-		return stateId;
 	}
 
 	onMount(() => {

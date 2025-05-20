@@ -27,7 +27,7 @@ export let saves = [];
 export function llParsing(startingSymbol, inputString, nt, table, rules) {
 	functionCalls = [];
 	saves = [];
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	/**
 	 * @type {typeof saves[0]['tree']}
 	 */
@@ -38,28 +38,26 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		functionCall: functionCalls.length - 1,
 		tree: []
 	});
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
-	functionCalls.push({ trace: Error().stack, name: 'resetTree', args: [] });
-	functionCalls.push({ trace: Error().stack, name: 'initializeTree', args: [startingSymbol] });
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
+	functionCalls.push({ name: 'highlightLines', args: [[0]] });
+	functionCalls.push({ name: 'resetTree', args: [] });
+	functionCalls.push({ name: 'initializeTree', args: [startingSymbol] });
+	functionCalls.push({ name: 'highlightLines', args: [[1]] });
 	const symbolStack = ['$', startingSymbol];
 	for (const i of symbolStack)
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'addToStackSymbols',
 			args: [i, i, '']
 		});
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
+	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	const inputStack = ['$', ...inputString.toReversed()];
 	for (const i of inputStack)
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'addToStackInput',
 			args: [i, i, '']
 		});
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		symbolStack: structuredClone(symbolStack),
 		inputStack: structuredClone(inputStack),
@@ -67,23 +65,23 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		tree: structuredClone(tree)
 	});
 
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
+	functionCalls.push({ name: 'highlightLines', args: [[3]] });
 	let last = { input: '', symbol: '' };
 	while (inputStack.length > 0) {
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
+		functionCalls.push({ name: 'highlightLines', args: [[4]] });
+		functionCalls.push({ name: 'highlightLines', args: [[5]] });
 		const topSymbol = symbolStack[symbolStack.length - 1];
 		const topInput = inputStack[inputStack.length - 1];
 
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
+		functionCalls.push({ name: 'highlightLines', args: [[6]] });
 		if (nt.includes(topSymbol)) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
+			functionCalls.push({ name: 'highlightLines', args: [[7]] });
 			const production = table.get(topSymbol)?.get(topInput);
 			let newLast = { input: topInput, symbol: topSymbol };
 			if (production === undefined || production === -1) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
-				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'highlightLines', args: [[9]] });
+				functionCalls.push({ name: 'setAccept', args: [false] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					symbolStack: structuredClone(symbolStack),
 					inputStack: structuredClone(inputStack),
@@ -95,31 +93,26 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			}
 
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[10]]
 			});
 			symbolStack.pop();
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'removeFromStackSymbols',
 				args: [symbolStack.length]
 			});
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[11]]
 			});
 			if (!rules[production].right.includes('')) {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'highlightLines',
 					args: [[12]]
 				});
 				const prod = rules[production].right.toReversed();
 				symbolStack.push(...prod);
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addToTree',
 					args: [prod, topSymbol],
 					skip: true
@@ -127,14 +120,12 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 				tree.push({ data: prod, parentData: topSymbol });
 				for (const i of prod) {
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'addToStackSymbols',
 						args: [i, i, '']
 					});
 				}
 			} else {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addToTree',
 					args: [['\u03B5'], topSymbol],
 					skip: true
@@ -144,11 +135,10 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			}
 			if (last.input === newLast.input && last.symbol === newLast.symbol) {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'setAccept',
 					args: [false]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					symbolStack: structuredClone(symbolStack),
 					inputStack: structuredClone(inputStack),
@@ -161,19 +151,17 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			last = newLast;
 		} else {
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[13]]
 			});
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[14]]
 			});
 			if (topSymbol !== topInput) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[15]] });
-				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'highlightLines', args: [[15]] });
+				functionCalls.push({ name: 'setAccept', args: [false] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					symbolStack: structuredClone(symbolStack),
 					inputStack: structuredClone(inputStack),
@@ -185,23 +173,19 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 				return false;
 			}
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[16]]
 			});
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'removeFromStackInput',
 				args: [inputStack.length]
 			});
 			symbolStack.pop();
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightLines',
 				args: [[17]]
 			});
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'removeFromStackSymbols',
 				args: [symbolStack.length]
 			});
@@ -209,7 +193,6 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		}
 
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'addPause',
 			args: [id]
 		});
@@ -221,17 +204,14 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		});
 	}
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'highlightLines',
 		args: [[18]]
 	});
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'setAccept',
 		args: [symbolStack.length === 0 && inputStack.length === 0]
 	});
 	functionCalls.push({
-		trace: Error().stack,
 		name: 'addPause',
 		args: [id]
 	});

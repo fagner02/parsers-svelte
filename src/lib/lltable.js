@@ -24,7 +24,7 @@ export let saves = [];
 /**@param {string[]} arr */
 function deselectSymbols(arr) {
 	for (let f of arr) {
-		functionCalls.push({ skip: true, trace: Error().stack, name: 'deselectSymbol', args: [f, id] });
+		functionCalls.push({ skip: true, name: 'deselectSymbol', args: [f, id] });
 	}
 }
 
@@ -45,7 +45,7 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 		table.set(item, new Map(t.map((x) => [x, -1])));
 	}
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		table: structuredClone(table),
 		firstSelect: '',
@@ -53,23 +53,21 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 		firstSymbols: [],
 		functionCall: functionCalls.length - 1
 	});
-	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
+	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	for (let [left, right] of firstSet) {
 		let firstSelected = [];
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
+		functionCalls.push({ name: 'highlightLines', args: [[1]] });
 
 		functionCalls.push({
-			trace: Error().stack,
 			name: 'selectFirst',
 			args: [`${elemIds.firstSet}set${left}`]
 		});
 
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
-		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
+		functionCalls.push({ name: 'highlightLines', args: [[2]] });
+		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		if (right.has('')) {
 			firstSelected.push(`${elemIds.firstSet}r${left}-0`);
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectSymbol',
 				args: [firstSelected.at(-1), colors.green, id, false]
 			});
@@ -79,30 +77,27 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 
 			let followSelected = [];
 			for (const followItem of followItems) {
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
+				functionCalls.push({ name: 'highlightLines', args: [[4]] });
 				followSelected.push(`${elemIds.firstSet}r${followIndex}-${followIndex2}`);
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'selectSymbol',
 					args: [followSelected.at(-1), colors.green, id, false]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[5]] });
+				functionCalls.push({ name: 'highlightLines', args: [[5]] });
 
 				let cell = table.get(rules[left].left)?.get(followItem);
 				if (cell !== undefined && cell !== -1) {
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'showConflict',
 						args: [rules[left].left, followItem]
 					});
 					let rule = `${rules[left].left} -> ${rules[left].right[0] === '' ? 'ε' : rules[left].right.join(' ')}`;
 					let cellRule = `${rules[cell].left} -> ${rules[cell].right[0] === '' ? 'ε' : rules[cell].right.join(' ')}`;
 					functionCalls.push({
-						trace: Error().stack,
 						name: 'setConflictTooltip',
 						args: [`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cellRule}]`]
 					});
-					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+					functionCalls.push({ name: 'addPause', args: [id] });
 					saves.push({
 						table: structuredClone(table),
 						firstSelect: `${elemIds.firstSet}set${left}`,
@@ -120,19 +115,17 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 				}
 
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'highlightOn',
 					args: [rules[left].left, followItem]
 				});
 				table.get(rules[left].left)?.set(followItem, left);
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'addToTable',
 					args: [left, rules[left].left, followItem]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
+				functionCalls.push({ name: 'highlightOff', args: [] });
 
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					table: structuredClone(table),
 					firstSelect: `${elemIds.firstSet}set${left}`,
@@ -147,17 +140,16 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 
 		let j = 0;
 		for (const symbol of right) {
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[6]] });
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
+			functionCalls.push({ name: 'highlightLines', args: [[6]] });
+			functionCalls.push({ name: 'highlightLines', args: [[7]] });
 			if (symbol === '') {
 				j++;
 				continue;
 			}
 
-			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
+			functionCalls.push({ name: 'highlightLines', args: [[8]] });
 			firstSelected.push(`${elemIds.firstSet}r${left}-${j}`);
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'selectSymbol',
 				args: [firstSelected.at(-1), colors.green, id, false]
 			});
@@ -165,18 +157,16 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 			let cell = table.get(rules[left].left)?.get(symbol);
 			if (cell !== undefined && cell !== -1) {
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'showConflict',
 					args: [rules[left].left, symbol]
 				});
 				let rule = `${rules[left].left} -> ${rules[left].right[0] === '' ? 'ε' : rules[left].right.join(' ')}`;
 				let cellRule = `${rules[cell].left} -> ${rules[cell].right[0] === '' ? 'ε' : rules[cell].right.join(' ')}`;
 				functionCalls.push({
-					trace: Error().stack,
 					name: 'setConflictTooltip',
 					args: [`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cellRule}]`]
 				});
-				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					table: structuredClone(table),
 					firstSelect: `${elemIds.firstSet}set${left}`,
@@ -193,19 +183,17 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 			}
 
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'highlightOn',
 				args: [rules[left].left, symbol]
 			});
 			table.get(rules[left].left)?.set(symbol, left);
 			functionCalls.push({
-				trace: Error().stack,
 				name: 'addToTable',
 				args: [left, rules[left].left, symbol]
 			});
-			functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
+			functionCalls.push({ name: 'highlightOff', args: [] });
 			j++;
-			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				table: structuredClone(table),
 				firstSelect: `${elemIds.firstSet}set${left}`,
@@ -217,7 +205,7 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 		deselectSymbols(firstSelected);
 	}
 
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		table: structuredClone(table),
 		firstSelect: '',

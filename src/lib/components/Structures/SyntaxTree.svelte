@@ -88,6 +88,5 @@
 		height: inherit;
 		border: 1px solid hsl(0, 0%, 80%);
 		border-radius: 10px;
-		/* box-shadow: 0 0 5px hsl(0, 0%, 0%, 20%); */
 	}
 </style>

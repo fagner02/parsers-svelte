@@ -544,7 +544,7 @@ export class SyntaxTreeClass {
 
 	/**@param {{data: string[], parent?: string}[]} levels*/
 	async loadFloatingTree(levels) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async (resolve, _) => {
 			try {
 				for (let i of levels) {
 					if (i.parent !== undefined) {

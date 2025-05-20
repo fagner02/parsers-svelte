@@ -177,10 +177,10 @@
 	}
 
 	onMount(() => {
-		grammarSelection = getSelectionFunctions(grammarElem?.getCardId() ?? '');
-		stateSelection = getSelectionFunctions(originStateElem?.getId() ?? '');
-		targetStateSelection = getSelectionFunctions(targetStateElem?.getId() ?? '');
-		alphabetSelection = getSelectionFunctions(alphabetElem?.getId() ?? '');
+		grammarSelection = getSelectionFunctions(elemIds.grammar);
+		stateSelection = getSelectionFunctions(elemIds.originState);
+		targetStateSelection = getSelectionFunctions(elemIds.targetState);
+		alphabetSelection = getSelectionFunctions(elemIds.alphabet);
 
 		fetch('./lr1automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
