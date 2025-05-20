@@ -7,9 +7,7 @@
 		setCloseInstruction,
 		setOpenInstruction,
 		swapAlgorithm,
-		setLimitHitCallback,
 		skipToEnd,
-		getLimitHit,
 		goToStep,
 		setTab
 	} from '$lib/flowControl';
@@ -133,11 +131,6 @@
 		} catch {}
 	}
 
-	function limitHitCallback() {
-		limit = getLimitHit(id);
-	}
-
-	setLimitHitCallback(limitHitCallback, id);
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
 
@@ -184,7 +177,6 @@
 						currentId = id;
 						id = parseId;
 						parseLoaded = true;
-						setLimitHitCallback(limitHitCallback, id);
 						appendData(`open parse,${id}`);
 						swapAlgorithm(id, props.parseInfo, tabId);
 						parseOn = true;
@@ -201,7 +193,6 @@
 						parseOn = false;
 						id = currentId;
 						appendData(`close parse,${id}`);
-						setLimitHitCallback(limitHitCallback, id);
 						swapAlgorithm(id, props.currentInfo, tabId);
 						closePopup();
 					}}
@@ -253,14 +244,14 @@
 				</button>
 				<button
 					use:setUpTooltip={{ text: 'Próximo passo' }}
-					disabled={limit}
+					disabled={currentStep >= maxStep}
 					onclick={() => forward(`${id}`)}
 				>
 					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
 				<button
 					use:setUpTooltip={{ text: 'Pular para o final' }}
-					disabled={limit}
+					disabled={currentStep >= maxStep}
 					onclick={() => skipToEnd(`${id}`)}
 				>
 					<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>

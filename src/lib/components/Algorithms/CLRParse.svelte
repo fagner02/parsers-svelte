@@ -7,7 +7,7 @@
 		setCurrentStep,
 		setMaxStep,
 		setOnInputChanged,
-		setResetCall
+		setStepCall
 	} from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
@@ -66,7 +66,7 @@
 		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
-	setResetCall(setStep, saves.length - 1, id, () => currentStep);
+	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
 	function onInputChanged() {
 		clrparsing(inputString, augRules, tableData);

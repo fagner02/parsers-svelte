@@ -1,5 +1,5 @@
 <script>
-	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm } from '$lib/flowControl';
 	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
@@ -115,12 +115,9 @@
 			)
 		);
 	})();
-	const limitHitCallback = () => {
-		limit = getLimitHit(id);
-	};
+
 	onMount(() => {
 		id = algos[0].id;
-		setLimitHitCallback(limitHitCallback, id);
 		swapAlgorithm(id, currentInfo, tabId);
 		algos[0].loaded = true;
 	});
@@ -146,7 +143,6 @@
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
 								id = algo.id;
-								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id, algo.infoComp, tabId);
 								algo.loaded = true;
 								resetSelectionFunctions();

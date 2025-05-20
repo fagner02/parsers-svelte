@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, setCurrentStep, setResetCall } from '$lib/flowControl';
+	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -67,7 +67,7 @@
 		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
-	setResetCall(setStep, saves.length - 1, id, () => currentStep);
+	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	const obj = {

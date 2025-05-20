@@ -6,7 +6,7 @@
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
 	import { firstDataOnly, mergedFirst } from '$lib/first';
 	import { writable } from 'svelte/store';
-	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
@@ -117,12 +117,9 @@
 			)
 		);
 	})();
-	const limitHitCallback = () => {
-		limit = getLimitHit(id);
-	};
+
 	onMount(() => {
 		id = algos[0].id;
-		setLimitHitCallback(limitHitCallback, id);
 		algos[0].loaded = true;
 		swapAlgorithm(id, currentInfo, tabId);
 	});
@@ -150,7 +147,6 @@
 							onclick={() => {
 								id = algo.id;
 								algo.loaded = true;
-								setLimitHitCallback(limitHitCallback, id);
 								swapAlgorithm(id, algo.infoComp, tabId);
 								resetSelectionFunctions();
 								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);

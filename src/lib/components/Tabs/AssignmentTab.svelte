@@ -214,6 +214,7 @@ num * (num)
 	.row {
 		display: flex;
 		margin: -10px 0px;
+		flex-wrap: wrap;
 	}
 
 	.col {

@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setCurrentStep, setResetCall } from '$lib/flowControl';
+	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -108,7 +108,7 @@
 		setCurrentStep(currentStep);
 		stepChanged = true;
 	}
-	setResetCall(setStep, saves.length - 1, id, () => currentStep);
+	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	export const obj = {

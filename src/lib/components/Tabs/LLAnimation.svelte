@@ -12,7 +12,7 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
-	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
@@ -143,13 +143,10 @@
 	]);
 
 	let currentInfo = $state(algos[0].infoComp);
-	const limitHitCallback = () => {
-		limit = getLimitHit(id);
-	};
+
 	onMount(() => {
 		id = algos[0].id;
 		swapAlgorithm(id, algos[0].infoComp, tabId);
-		setLimitHitCallback(limitHitCallback, id);
 		algos[0].loaded = true;
 	});
 	let selectedAlgorithm = $state(algos[0].name);
@@ -176,7 +173,6 @@
 						onclick={() => {
 							id = algo.id;
 							algo.loaded = true;
-							setLimitHitCallback(limitHitCallback, id);
 							swapAlgorithm(id, algo.infoComp, tabId);
 							resetSelectionFunctions();
 							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
