@@ -151,8 +151,9 @@
 
 	/**
 	 * @param {string} data
+	 * @param {boolean} shouldWait
 	 */
-	async function addFloatingToSvg(data) {
+	async function addFloatingToSvg(data, shouldWait) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const lastLevel = levels.length - 1;
@@ -180,7 +181,12 @@
 					index: index
 				});
 				levels = levels;
-				await wait(props.id, 100);
+				try {
+					await wait(props.id, 100);
+				} catch (e) {
+					console.log(e);
+					return reject(e);
+				}
 				let newNode = levels[lastLevel][index];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text${props.id}-${newNode.id}`)
@@ -191,7 +197,7 @@
 				levels = levels;
 				blockSize = bbox.height;
 				height = svg.getBBox().height + 100;
-				await wait(props.id, 500);
+				if (shouldWait) await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -203,8 +209,9 @@
 	 * @param {string} data
 	 * @param {number} newItemIndex
 	 * @param {number} level
+	 * @param {boolean} shouldWait
 	 */
-	async function addParentToSvg(data, newItemIndex, level) {
+	async function addParentToSvg(data, newItemIndex, level, shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				addSpaceForNewNode(level, newItemIndex);
@@ -226,7 +233,11 @@
 					id: count++
 				});
 				levels = levels;
-				await wait(props.id, 100);
+				try {
+					await wait(props.id, 100);
+				} catch (e) {
+					return reject(e);
+				}
 				let newNode = levels[level][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
 					document.querySelector(`#parse-text${props.id}-${newNode.id}`)
@@ -236,7 +247,7 @@
 				newNode.width = bbox.width;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(props.id, 500);
+				if (shouldWait) await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -284,95 +295,100 @@
 	/**
 	 * @param {string} parentData
 	 * @param {string[]} children
+	 * @param {boolean} shouldWait
 	 */
-	async function addParent(parentData, children) {
-		return new Promise(async (resolve) => {
-			let matchLoc = -1;
-			for (let j = 0; j < treeTop.length; j++) {
-				let match = true;
-				for (let i = 0; i < children.length; i++) {
-					if (j + i >= treeTop.length) {
-						match = false;
-						break;
-					}
-					const symbol = levels[treeTop[j + i].level][treeTop[j + i].index].data;
-					if (symbol !== children[i]) {
-						match = false;
-						break;
-					}
-				}
-				if (match) {
-					matchLoc = j;
-					break;
-				}
-			}
-
-			let highestLevel = treeTop[matchLoc].level;
-			for (let i = matchLoc + 1; i < matchLoc + children.length; i++) {
-				if (treeTop[i].level < highestLevel) highestLevel = treeTop[i].level;
-			}
-
-			if (highestLevel - 1 < 0) {
-				highestLevel = 1;
-				levels.unshift([]);
-				for (let i = 0; i < treeTop.length; i++) {
-					treeTop[i].level = treeTop[i].level + 1;
-				}
-				for (let j = 0; j < levels.length; j++) {
-					for (let i = 0; i < levels[j].length; i++) {
-						let node = levels[j][i];
-						node.level = j;
-						if (node?.parentLevel !== -1) {
-							node.parentLevel += 1;
+	async function addParent(parentData, children, shouldWait = true) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let matchLoc = -1;
+				for (let j = 0; j < treeTop.length; j++) {
+					let match = true;
+					for (let i = 0; i < children.length; i++) {
+						if (j + i >= treeTop.length) {
+							match = false;
+							break;
 						}
-						node.y = vGap + vGap * j + (blockSize / 2) * j;
-						if (node.parentIndex === -1) continue;
-
-						setDPath(node, levels[node.parentLevel][node.parentIndex]);
+						const symbol = levels[treeTop[j + i].level][treeTop[j + i].index].data;
+						if (symbol !== children[i]) {
+							match = false;
+							break;
+						}
+					}
+					if (match) {
+						matchLoc = j;
+						break;
 					}
 				}
-			}
 
-			levels = levels;
-			await wait(props.id, 500);
-
-			let parentLevel = highestLevel - 1;
-			let matchLeftmost = getLeftmost(treeTop[matchLoc].level, treeTop[matchLoc].index);
-			let neighborIndex = 0;
-			if (levels[parentLevel].length > 0) {
-				let neighborLeftmost = getLeftmost(parentLevel, neighborIndex);
-				while (neighborLeftmost.index < matchLeftmost.index) {
-					neighborIndex++;
-					if (neighborIndex >= levels[parentLevel].length) break;
-					neighborLeftmost = getLeftmost(parentLevel, neighborIndex);
+				let highestLevel = treeTop[matchLoc].level;
+				for (let i = matchLoc + 1; i < matchLoc + children.length; i++) {
+					if (treeTop[i].level < highestLevel) highestLevel = treeTop[i].level;
 				}
-			}
-			let parentIndex = neighborIndex;
 
-			await addParentToSvg(parentData, parentIndex, parentLevel);
+				if (highestLevel - 1 < 0) {
+					highestLevel = 1;
+					levels.unshift([]);
+					for (let i = 0; i < treeTop.length; i++) {
+						treeTop[i].level = treeTop[i].level + 1;
+					}
+					for (let j = 0; j < levels.length; j++) {
+						for (let i = 0; i < levels[j].length; i++) {
+							let node = levels[j][i];
+							node.level = j;
+							if (node?.parentLevel !== -1) {
+								node.parentLevel += 1;
+							}
+							node.y = vGap + vGap * j + (blockSize / 2) * j;
+							if (node.parentIndex === -1) continue;
 
-			for (let i = matchLoc; i < matchLoc + children.length; i++) {
-				let loc = treeTop[i];
-				let node = levels[loc.level][loc.index];
-				setDPath(node, levels[parentLevel][parentIndex]);
+							setDPath(node, levels[node.parentLevel][node.parentIndex]);
+						}
+					}
+				}
 
-				node.parentIndex = parentIndex;
-				node.parentLevel = parentLevel;
+				levels = levels;
+				if (shouldWait) await wait(props.id, 500);
+
+				let parentLevel = highestLevel - 1;
+				let matchLeftmost = getLeftmost(treeTop[matchLoc].level, treeTop[matchLoc].index);
+				let neighborIndex = 0;
+				if (levels[parentLevel].length > 0) {
+					let neighborLeftmost = getLeftmost(parentLevel, neighborIndex);
+					while (neighborLeftmost.index < matchLeftmost.index) {
+						neighborIndex++;
+						if (neighborIndex >= levels[parentLevel].length) break;
+						neighborLeftmost = getLeftmost(parentLevel, neighborIndex);
+					}
+				}
+				let parentIndex = neighborIndex;
+
+				await addParentToSvg(parentData, parentIndex, parentLevel, shouldWait);
+
+				for (let i = matchLoc; i < matchLoc + children.length; i++) {
+					let loc = treeTop[i];
+					let node = levels[loc.level][loc.index];
+					setDPath(node, levels[parentLevel][parentIndex]);
+
+					node.parentIndex = parentIndex;
+					node.parentLevel = parentLevel;
+				}
+				levels = levels;
+				if (shouldWait) await wait(props.id, 500);
+				for (let i = matchLoc; i < matchLoc + children.length; i++) {
+					let loc = treeTop[i];
+					let node = levels[loc.level][loc.index];
+					node.dashOffset = 0;
+				}
+				levels = levels;
+				treeTop.splice(matchLoc, children.length, {
+					level: parentLevel,
+					index: parentIndex
+				});
+				if (shouldWait) await wait(props.id, 500);
+				resolve(null);
+			} catch (e) {
+				reject(e);
 			}
-			levels = levels;
-			await wait(props.id, 500);
-			for (let i = matchLoc; i < matchLoc + children.length; i++) {
-				let loc = treeTop[i];
-				let node = levels[loc.level][loc.index];
-				node.dashOffset = 0;
-			}
-			levels = levels;
-			treeTop.splice(matchLoc, children.length, {
-				level: parentLevel,
-				index: parentIndex
-			});
-			await wait(props.id, 500);
-			resolve(null);
 		});
 	}
 
@@ -425,12 +441,13 @@
 	}
 	/**
 	 * @param {string[]} data
+	 * @param {boolean} shouldWait
 	 */
-	export async function addFloatingNode(data) {
+	export async function addFloatingNode(data, shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				for (let i = 0; i < data.length; i++) {
-					await addFloatingToSvg(data[i]);
+					await addFloatingToSvg(data[i], shouldWait);
 				}
 				resolve(null);
 			} catch (e) {
@@ -480,6 +497,24 @@
 				resolve(null);
 			} catch (e) {
 				reject(e);
+			}
+		});
+	}
+
+	/**@param {{data: string[], parent?: string}[]} levels*/
+	async function loadFloatingTree(levels) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				for (let i of levels) {
+					if (i.parent !== undefined) {
+						await addParent(i.parent, i.data, false);
+					} else {
+						await addFloatingNode(i.data, false);
+					}
+				}
+				resolve(null);
+			} catch (e) {
+				resolve(null);
 			}
 		});
 	}
@@ -541,7 +576,8 @@
 		addToTree,
 		addParent,
 		resetTree,
-		loadSyntaxTree
+		loadSyntaxTree,
+		loadFloatingTree
 	});
 </script>
 

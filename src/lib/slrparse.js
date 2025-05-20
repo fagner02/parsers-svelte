@@ -7,7 +7,15 @@ export const elemIds = {
 };
 /**@type {any} */
 export let functionCalls = [];
-/**@type {any} */
+/**
+ * @type {{
+ * stateStack: string[]
+ * inputStack: string[]
+ * accept?: boolean
+ * functionCall: number
+ * tree: {parent?: string, data: string[]}[]
+ * }[]}
+ * */
 export let saves = [];
 /**
  * @param {string[]} inputString
@@ -16,19 +24,30 @@ export let saves = [];
  */
 export function slrparsing(inputString, augRules, table) {
 	functionCalls = [];
-	const stateStack = ['s0'];
-	const inputStack = ['$', ...inputString.reverse()];
+	saves = [];
+	/**@type {typeof saves[0]['tree']}*/
+	let tree = [];
+	/** @type {string[]} */
+	const stateStack = [];
+	/** @type {string[]} */
+	const inputStack = [];
 
-	// Initial setup
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		inputStack: structuredClone(inputStack),
+		stateStack: structuredClone(stateStack),
+		tree: structuredClone(tree),
+		functionCall: functionCalls.length - 1
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({
 		trace: Error().stack,
 		name: 'addToStackState',
 		args: [0, 's0', '']
 	});
+	stateStack.push('s0');
 
-	['$'].concat(inputString.reverse()).forEach((char, i) => {
+	['$'].concat(inputString.toReversed()).forEach((char, i) => {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });
 		functionCalls.push({
 			trace: Error().stack,
@@ -36,7 +55,9 @@ export function slrparsing(inputString, augRules, table) {
 			args: [char, char, '']
 		});
 	});
+	inputStack.push('$', ...inputString.toReversed());
 
+	let accept = false;
 	while (true) {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[4]] });
@@ -49,23 +70,21 @@ export function slrparsing(inputString, augRules, table) {
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[7]] });
 		const action = table.get(parseInt(currentState.slice(1)))?.get(lookahead);
 
-		// Handle invalid/missing action
 		if (!action || action === '') {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[8]] });
-			functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
 			break;
 		}
 
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
-		// Accept action
+
 		if (action === 'a') {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[10]] });
-			functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [true] });
+			accept = true;
 			break;
 		}
 
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[11]] });
-		// Shift action
+
 		if (action.startsWith('s')) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[12]] });
 			const newState = parseInt(action.slice(1));
@@ -76,6 +95,7 @@ export function slrparsing(inputString, augRules, table) {
 				args: [[lookahead]],
 				skip: true
 			});
+			tree.push({ data: [lookahead] });
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
 			functionCalls.push({
 				trace: Error().stack,
@@ -97,10 +117,17 @@ export function slrparsing(inputString, augRules, table) {
 				args: [inputStack.length - 1]
 			});
 			inputStack.pop();
+			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			saves.push({
+				inputStack: structuredClone(inputStack),
+				stateStack: structuredClone(stateStack),
+				tree: structuredClone(tree),
+				functionCall: functionCalls.length - 1
+			});
 		}
 
 		functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[16]] });
-		// Reduce action
+
 		if (action.startsWith('r')) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[17]] });
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[18]] });
@@ -129,12 +156,21 @@ export function slrparsing(inputString, augRules, table) {
 					stateStack.pop();
 				}
 			}
+
 			children.reverse();
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'addParent',
 				args: [production.left, children],
 				skip: true
+			});
+			tree.push({ parent: production.left, data: children });
+			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			saves.push({
+				inputStack: structuredClone(inputStack),
+				stateStack: structuredClone(stateStack),
+				tree: structuredClone(tree),
+				functionCall: functionCalls.length - 1
 			});
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[23]] });
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[24]] });
@@ -144,7 +180,6 @@ export function slrparsing(inputString, augRules, table) {
 			functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[25]] });
 			if (!gotoState || gotoState === '') {
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[26]] });
-				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
 				break;
 			}
 
@@ -163,14 +198,23 @@ export function slrparsing(inputString, augRules, table) {
 				args: [goto, `s${goto}`, '']
 			});
 			stateStack.push(`s${goto}`);
+			functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+			saves.push({
+				inputStack: structuredClone(inputStack),
+				stateStack: structuredClone(stateStack),
+				tree: structuredClone(tree),
+				functionCall: functionCalls.length - 1
+			});
 		}
-
-		functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	}
-	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 
-	return {
-		accepted: false,
-		functionCalls
-	};
+	functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [accept] });
+	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		inputStack: structuredClone(inputStack),
+		stateStack: structuredClone(stateStack),
+		tree: structuredClone(tree),
+		accept: accept,
+		functionCall: functionCalls.length - 1
+	});
 }

@@ -6,6 +6,7 @@
  * addFloatingNode: (data: string[])=>Promise<any>,
  * addParent: (parent: string, children: string[]) => Promise<void>,
  * loadSyntaxTree: (levels: {data: string[], parentData: string}[], startingSymbol: string) => Promise<void>
+ * loadFloatingTree: (levels: {data: string[], parent?: string}[]) => Promise<void>
  * }} TreeFunctions
  * */
 
