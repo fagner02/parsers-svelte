@@ -191,6 +191,7 @@ export function setStepCall(resetCall, lastSaveIndex, id, getStep) {
  * @param {string} id
  */
 export function setMaxStep(step, id) {
+	tabs.get(currentTab)?.setMaxStep(step);
 	maxStep.set(id, step);
 }
 
