@@ -5,7 +5,7 @@
 	import { addPause, setMaxStep, setOnInputChanged, setResetCall } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
-	import { getTreeFunctions } from '$lib/treeFunctions';
+	import { getTree } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { setInfoComponent } from '$lib/infoText';
@@ -37,7 +37,7 @@
 	let currentStep = 0;
 	let stepChanged = false;
 	let inputChanged = false;
-	let { initializeTree, addToTree, resetTree, loadSyntaxTree } = getTreeFunctions();
+	let tree = getTree();
 
 	/**@param {number} step*/
 	function setStep(step) {
@@ -47,8 +47,8 @@
 		saves[step].accept === undefined
 			? context.setAccept(null)
 			: context.setAccept(saves[step].accept);
-		resetTree();
-		loadSyntaxTree(saves[step].tree, startingSymbol);
+		tree.resetTree();
+		tree.loadSyntaxTree(saves[step].tree, startingSymbol);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -67,9 +67,9 @@
 		removeFromStackSymbols: () => symbolStackElement.removeFromStack,
 		addToStackInput: () => inputStackElement.addToStack,
 		removeFromStackInput: () => inputStackElement.removeFromStack,
-		addToTree: () => addToTree,
-		resetTree: () => resetTree,
-		initializeTree: () => initializeTree,
+		addToTree: () => tree.addToTree,
+		resetTree: () => tree.resetTree,
+		initializeTree: () => tree.initializeTree,
 		addPause: () => addPause,
 		setAccept: () => context.setAccept
 	};

@@ -20,10 +20,6 @@
 	let svgLines = $state();
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
-	/**@type {SetsCard | undefined}*/
-	let firstCard = $state();
-	/**@type {SetsCard | undefined}*/
-	let followCard = $state();
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let firstFuncs;
 
@@ -114,96 +110,6 @@
 				}
 				i++;
 			}
-			// await addPause(id);
-			// instruction = 'Since this thing is like that we have add to the stack';
-
-			// await codeCard?.highlightLines([0]);
-			// for (let i = 0; i < $firstSet.length; i++) {
-			// 	await codeCard?.highlightLines([1]);
-			// 	const item = $firstSet[i];
-
-			// 	await firstFuncs?.selectFor(`${firstCard?.getSetId()}set${i}`);
-			// 	await codeCard?.highlightLines([2]);
-			// 	await codeCard?.highlightLines([3]);
-			// 	if (item.right.includes('')) {
-			// 		await selectRSymbol(/**@type {string}*/ (firstCard?.getSetId()), i, 0, colors.green, id);
-			// 		const followIndex = $followSet.findIndex((x) => x.left === item.left);
-			// 		const follow = /**@type {import('@/types').SetRow}*/ ($followSet[followIndex]);
-			// 		for (let f = 0; f < follow.right.length; f++) {
-			// 			await codeCard?.highlightLines([4]);
-
-			// 			selectRSymbol(
-			// 				/**@type {string}*/ (followCard?.getSetId()),
-			// 				followIndex,
-			// 				f * 2,
-			// 				colors.green,
-			// 				id
-			// 			);
-			// 			await codeCard?.highlightLines([5]);
-
-			// 			let cell = $table.get(item.left)?.get(follow.right[f]);
-			// 			if (cell?.data !== null) {
-			// 				await tableElement.showConflict(item.left, follow.right[f]);
-			// 				let rule = `${item.left} -> ${rules[i].right[0] === '' ? 'ε' : rules[i].right.join(' ')}`;
-			// 				tableElement.setConflictTooltip(
-			// 					`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cell?.text}]`
-			// 				);
-			// 				await addPause(id);
-			// 				limitHit(id);
-			// 				await addPause(id);
-			// 				return;
-			// 			}
-
-			// 			await tableElement.addToTable(
-			// 				i,
-			// 				rules[i].right[0] === ''
-			// 					? `${item.left} -> ε`
-			// 					: `${item.left} -> ${rules[i].right.join(' ')}`,
-			// 				item.left,
-			// 				follow.right[f]
-			// 			);
-			// 			await addPause(id);
-			// 		}
-			// 	}
-			// 	for (let j = 0; j < item.right.length; j++) {
-			// 		await codeCard?.highlightLines([6]);
-			// 		await codeCard?.highlightLines([7]);
-			// 		if (item.right[j] == '') {
-			// 			continue;
-			// 		}
-			// 		await codeCard?.highlightLines([8]);
-
-			// 		await selectRSymbol(
-			// 			/**@type {string}*/ (firstCard?.getSetId()),
-			// 			i,
-			// 			j * 2,
-			// 			colors.green,
-			// 			id
-			// 		);
-
-			// 		let cell = $table.get(item.left)?.get(item.right[j]);
-			// 		if (cell?.data !== null) {
-			// 			await tableElement.showConflict(item.left, item.right[j]);
-			// 			let rule = `${item.left} -> ${rules[i].right[0] === '' ? 'ε' : rules[i].right.join(' ')}`;
-			// 			tableElement.setConflictTooltip(
-			// 				`Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cell?.text}]`
-			// 			);
-			// 			limitHit(id);
-			// 			await addPause(id);
-			// 			return;
-			// 		}
-			// 		await tableElement.addToTable(
-			// 			parseFloat(/**@type {string}*/ (item.note)),
-			// 			`${item.left} -> ${rules[i].right.join(' ')}`,
-			// 			item.left,
-			// 			item.right[j]
-			// 		);
-			// 		await addPause(id);
-			// 	}
-			// }
-
-			// limitHit(id);
-			// await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
@@ -242,13 +148,7 @@
 			label="tabela ll(1)"
 			hue={colors.blue}
 		></TableCard>
-		<SetsCard
-			{id}
-			setId={elemIds.followSet}
-			set={followSet}
-			hue={colors.blue}
-			label={'follow set'}
-			bind:this={followCard}
+		<SetsCard {id} setId={elemIds.followSet} set={followSet} hue={colors.blue} label={'follow set'}
 		></SetsCard>
 		<SetsCard
 			{id}
@@ -260,7 +160,6 @@
 			}}
 			hue={colors.blue}
 			label={'first set'}
-			bind:this={firstCard}
 		></SetsCard>
 	</div>
 </div>

@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
-	import { colors, deselectSymbol, selectRSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { addPause, setResetCall } from '$lib/flowControl';
+	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
@@ -16,7 +16,6 @@
 	import { id, saves, functionCalls, elemIds } from '$lib/clrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 
-	let stateStackElem = /**@type {StackCard | undefined}*/ ($state());
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
 	let stateElem = /**@type {StateCard | undefined}*/ ($state());
 	let automatonElem = /**@type {Automaton | undefined}*/ ($state());
@@ -40,6 +39,7 @@
 			})
 			.toReversed()
 	);
+
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let clrState = writable([]);
 	/**@type {import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>}*/
@@ -172,7 +172,6 @@
 			stackId={elemIds.stateStack}
 			label="estados novos"
 			hue={colors.blue}
-			bind:this={stateStackElem}
 			bind:svgLines
 		></StackCard>
 	</div>

@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setResetCall, wait, limitHit, swapAlgorithm } from '$lib/flowControl';
+	import { addPause, setResetCall } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -19,8 +19,6 @@
 	import { id, elemIds, saves, functionCalls } from '$lib/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 
-	/**@type {StackCard | undefined}*/
-	let stateStackElem;
 	/**@type {TableCard | undefined}*/
 	let tableElem = $state();
 	/**@type {StateCard | undefined}*/
@@ -53,7 +51,7 @@
 	]);
 	let { alphabet } = getAugGrammar();
 
-	let rows = Array.from({ length: automaton.states.length }, (value, index) => `s${index}`);
+	let rows = Array.from({ length: automaton.states.length }, (_, index) => `s${index}`);
 	let columns = [...alphabet];
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -137,89 +135,6 @@
 				}
 				i++;
 			}
-			// await addPause(id);
-
-			// await codeCard?.highlightLines([0]);
-			// await codeCard?.highlightLines([1]);
-			// await codeCard?.highlightLines([2]);
-			// await codeCard?.highlightLines([3]);
-			// await codeCard?.highlightLines([4]);
-
-			// for (let s of automaton.states) {
-			// 	await codeCard?.highlightLines([5]);
-			// 	for (let i of s.items) {
-			// 		await codeCard?.highlightLines([6]);
-			// 		await addPause(id);
-
-			// 		await codeCard?.highlightLines([7]);
-			// 		if (
-			// 			i.pos === augRules[i.ruleIndex].right.length ||
-			// 			augRules[i.ruleIndex].right[0] === ''
-			// 		) {
-			// 			await codeCard?.highlightLines([8]);
-			// 			let follow = $followSet.find((x) => x.left === augRules[i.ruleIndex].left);
-
-			// 			await codeCard?.highlightLines([9]);
-			// 			if (!follow) continue;
-
-			// 			await codeCard?.highlightLines([11]);
-			// 			if (i.ruleIndex === 0) {
-			// 				await codeCard?.highlightLines([12]);
-			// 				await tableElem?.addToTable(
-			// 					{ action: 'a', state: i.ruleIndex },
-			// 					`a`,
-			// 					`s${s.index}`,
-			// 					'$'
-			// 				);
-			// 				await codeCard?.highlightLines([13]);
-			// 				continue;
-			// 			}
-
-			// 			await codeCard?.highlightLines([14]);
-			// 			for (let symbol of follow.right) {
-			// 				await codeCard?.highlightLines([15]);
-			// 				await tableElem?.addToTable(
-			// 					{ action: 'r', state: i.ruleIndex },
-			// 					`r${i.ruleIndex}`,
-			// 					`s${s.index}`,
-			// 					symbol
-			// 				);
-			// 			}
-			// 			await codeCard?.highlightLines([16]);
-			// 			continue;
-			// 		}
-
-			// 		await codeCard?.highlightLines([17]);
-			// 		const currentSymbol = augRules[i.ruleIndex].right[i.pos];
-
-			// 		await codeCard?.highlightLines([18]);
-			// 		let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
-
-			// 		await codeCard?.highlightLines([19]);
-			// 		if (nt.includes(currentSymbol)) {
-			// 			await codeCard?.highlightLines([20]);
-			// 			await tableElem?.addToTable(
-			// 				{ action: 'g', state: transition },
-			// 				`g${transition}`,
-			// 				`s${s.index}`,
-			// 				currentSymbol
-			// 			);
-			// 		} else {
-			// 			await codeCard?.highlightLines([21]);
-			// 			await codeCard?.highlightLines([22]);
-			// 			await tableElem?.addToTable(
-			// 				{ action: 's', state: transition },
-			// 				`s${transition}`,
-			// 				`s${s.index}`,
-			// 				currentSymbol
-			// 			);
-			// 		}
-			// 	}
-			// }
-
-			// await codeCard?.highlightLines([23]);
-			// limitHit(id);
-			// await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}

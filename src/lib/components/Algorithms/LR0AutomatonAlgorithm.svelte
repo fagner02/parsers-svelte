@@ -29,8 +29,6 @@
 	let codeCard = $state();
 	/**@type {PseudoCode | undefined}*/
 	let closureCodeCard = $state();
-	/**@type {StackCard | undefined}*/
-	let symbolListElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -38,7 +36,7 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let targetState = writable([]);
-	let { nt, augRules, alphabet } = getAugGrammar();
+	let { alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 
 	let originStateName = $state('');
@@ -81,7 +79,6 @@
 		targetStateSelection.hideSelect();
 		grammarSelection.hideSelect();
 		svgLines?.hideLine(false, id);
-
 		stateStackElem?.loadStack(stackCard(saves[step].stateStack, { key: (a) => `s${a}` }));
 		originStateName = saves[step].originStateName;
 		originStateElem?.loadState(saves[step].originState, false);
@@ -207,7 +204,6 @@
 		></StackCard>
 		<StackCard
 			{id}
-			bind:this={symbolListElem}
 			stack={symbolList}
 			stackId={elemIds.alphabet}
 			label="alfabeto"

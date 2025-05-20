@@ -1,5 +1,5 @@
 <script>
-	import { inputChanged, reset } from '$lib/flowControl';
+	import { inputChanged } from '$lib/flowControl';
 	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
 	/** @type {{

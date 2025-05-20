@@ -5,10 +5,6 @@
 {#if getPlatform() === platforms.web}
 	<header>
 		<h1>VANSI</h1>
-		<!-- <div>
-			<a class="selected">Home</a>
-			<a>About</a>
-		</div> -->
 	</header>
 {/if}
 

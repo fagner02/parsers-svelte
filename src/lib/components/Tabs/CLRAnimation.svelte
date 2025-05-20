@@ -4,7 +4,7 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-	import { first, firstDataOnly, mergedFirst } from '$lib/first';
+	import { firstDataOnly, mergedFirst } from '$lib/first';
 	import { writable } from 'svelte/store';
 	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';

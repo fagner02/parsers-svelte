@@ -30,8 +30,6 @@
 	let lookaheadElem = $state();
 	/**@type {GrammarCard | undefined}*/
 	let grammarElem = $state();
-	/**@type {SetsCard | undefined}*/
-	let firstElem = $state();
 	/**@type {StackCard | undefined}*/
 	let alphabetElem = $state();
 
@@ -197,13 +195,7 @@
 			isAugmented={true}
 			bind:loadGrammar
 		></GrammarCard>
-		<SetsCard
-			bind:this={firstElem}
-			{id}
-			set={firstSet}
-			label="first"
-			setId={elemIds.firstSet}
-			hue={colors.blue}
+		<SetsCard {id} set={firstSet} label="first" setId={elemIds.firstSet} hue={colors.blue}
 		></SetsCard>
 		<StateCard
 			{id}

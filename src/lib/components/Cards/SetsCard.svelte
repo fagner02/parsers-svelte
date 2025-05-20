@@ -1,7 +1,7 @@
 <script>
 	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
-	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
 
 	/** @type {{

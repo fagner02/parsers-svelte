@@ -2,17 +2,10 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import {
-		addPause,
-		limitHit,
-		setMaxStep,
-		setOnInputChanged,
-		setResetCall,
-		wait
-	} from '$lib/flowControl';
+	import { addPause, setMaxStep, setOnInputChanged, setResetCall } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
-	import { getTreeFunctions } from '$lib/treeFunctions';
+	import { getTree } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
@@ -46,7 +39,7 @@
 	let inputChanged = false;
 
 	let loadGrammar = /**@type {() => Promise<any>}*/ ($state());
-	let { addFloatingNode, resetTree, loadFloatingTree, addParent } = getTreeFunctions();
+	let tree = getTree();
 
 	/**@param {number} step*/
 	function setStep(step) {
@@ -56,8 +49,8 @@
 		saves[step].accept === undefined
 			? context.setAccept(null)
 			: context.setAccept(saves[step].accept);
-		resetTree();
-		loadFloatingTree(saves[step].tree);
+		tree.resetTree();
+		tree.loadFloatingTree(saves[step].tree);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -73,8 +66,8 @@
 	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
-		addFloatingNode: () => addFloatingNode,
-		addParent: () => addParent,
+		addFloatingNode: () => tree.addFloatingNode,
+		addParent: () => tree.addParent,
 		addToStackState: () => stateStackElement.addToStack,
 		addToStackInput: () => inputStackElement.addToStack,
 		removeFromStackState: () => stateStackElement.removeFromStack,
