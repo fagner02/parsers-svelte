@@ -102,10 +102,7 @@
 		currentStep = step;
 		stepChanged = true;
 	}
-	function getStep() {
-		return currentStep;
-	}
-	setResetCall(setStep, saves.length - 1, id, getStep);
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	export const obj = {
