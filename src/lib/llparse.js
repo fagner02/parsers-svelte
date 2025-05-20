@@ -27,11 +27,9 @@ export let saves = [];
 export function llParsing(startingSymbol, inputString, nt, table, rules) {
 	functionCalls = [];
 	saves = [];
-	functionCalls.push({ name: 'addPause', args: [id] });
-	/**
-	 * @type {typeof saves[0]['tree']}
-	 */
+	/** @type {typeof saves[0]['tree']} */
 	let tree = [];
+	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		symbolStack: [],
 		inputStack: [],

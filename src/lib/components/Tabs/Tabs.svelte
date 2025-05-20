@@ -8,17 +8,41 @@
 	import AssignmentTab from './AssignmentTab.svelte';
 	import { appendData } from '$lib/log';
 	import { setGrammarChangeCallback } from '$lib/utils';
-	import { clearControlFlow } from '$lib/flowControl';
+	import { clearControlFlow, setCurrentTab } from '$lib/flowControl';
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
 
 	let items = /**@type {Array<import('@/types').TabItem>} */ (
 		$state([
-			{ comp: TextInput, name: 'Gramática', loaded: true, desc: 'Digitar gramática de entrada' },
-			{ comp: LLAnimation, name: 'LL(1)', loaded: false, desc: 'Visualização do parser LL(1)' },
-			{ comp: SLRAnimation, name: 'SLR', loaded: false, desc: 'Visualização do parser SLR' },
-			{ comp: CLRAnimation, name: 'LR(1)', loaded: false, desc: 'Visualização do parser LR(1)' },
-			{ comp: AssignmentTab, name: 'Tarefa', loaded: false, desc: 'Tarefa' }
+			{
+				comp: TextInput,
+				name: 'Gramática',
+				loaded: true,
+				desc: 'Digitar gramática de entrada',
+				tabId: 'grammar'
+			},
+			{
+				comp: LLAnimation,
+				name: 'LL(1)',
+				loaded: false,
+				desc: 'Visualização do parser LL(1)',
+				tabId: 'll'
+			},
+			{
+				comp: SLRAnimation,
+				name: 'SLR',
+				loaded: false,
+				desc: 'Visualização do parser SLR',
+				tabId: 'slr'
+			},
+			{
+				comp: CLRAnimation,
+				name: 'LR(1)',
+				loaded: false,
+				desc: 'Visualização do parser LR(1)',
+				tabId: 'clr'
+			},
+			{ comp: AssignmentTab, name: 'Tarefa', loaded: false, desc: 'Tarefa', tabId: 'assign' }
 		])
 	);
 	const algoTabs = [1, 2, 3];
@@ -44,8 +68,10 @@
 						? 'hsl(200,50%,50%)'
 						: 'hsl(200,50%,70%)'};"
 					onclick={async () => {
-						items[items.findIndex((i) => i.name === item.name)].loaded = true;
+						item.loaded = true;
+						setCurrentTab(item.tabId);
 						selected = item;
+
 						appendData(`tab change,${item.name}`);
 					}}>{item.name}</button
 				>
@@ -59,7 +85,7 @@
 						style="height: inherit;"
 					>
 						{#if item.loaded}
-							<item.comp></item.comp>
+							<item.comp tabId={item.tabId}></item.comp>
 						{/if}
 					</div>
 				{/each}

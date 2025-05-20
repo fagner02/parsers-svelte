@@ -23,10 +23,11 @@
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();
-
+	/**@type {{tabId: string}}*/
+	let { tabId } = $props();
 	let tableData = $state(new Map());
 	let id = $state('');
-	const tabId = 'clr';
+
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -157,20 +158,13 @@
 				</div>
 				<FillSize class="grid">
 					{#snippet content()}
-						{#if algos[0].loaded}
-							<div
-								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
-							>
-								<LR1AutomatonAlgorithm {firstSet} bind:results></LR1AutomatonAlgorithm>
-							</div>
-						{/if}
-						{#if algos[1].loaded}
-							<div
-								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
-							>
-								<CLRTableAlgorithm {automaton}></CLRTableAlgorithm>
-							</div>
-						{/if}
+						{#each algos as algo}
+							{#if algo.loaded}
+								<div class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}">
+									<algo.comp {automaton} {firstSet} />
+								</div>
+							{/if}
+						{/each}
 					{/snippet}
 				</FillSize>
 			{/snippet}

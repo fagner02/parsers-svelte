@@ -9,6 +9,8 @@ let pauseRejects = new Map();
 let waitRejects = new Map();
 /** @type {Map<string, Map<number, (reason?: any) => void>>} */
 let waitResolves = new Map();
+/**@type {Map<string, number>} */
+let maxStep = new Map();
 /** @typedef {{setMaxStep: (v: number)=>void, setCurrentStep: (v: number)=>void}} Tab*/
 /** @type {Map<string, Tab>} */
 let tabs = new Map();
@@ -195,8 +197,12 @@ export function setMaxStep(step, id) {
 	maxStep.set(id, step);
 }
 
-/**@type {Map<string, number>} */
-let maxStep = new Map();
+/**
+ * @param {string} tabId
+ */
+export function setCurrentTab(tabId) {
+	currentTab = tabId;
+}
 
 /**
  * @param {string} id

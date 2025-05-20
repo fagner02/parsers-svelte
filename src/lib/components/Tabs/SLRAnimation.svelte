@@ -22,6 +22,9 @@
 	import SLRTableInfo from '@/Info/SLRTableInfo.svelte';
 	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 
+	/**@type {{tabId: string}}*/
+	let { tabId } = $props();
+
 	let code = '';
 	let tableData = $state(new Map());
 	let algos = $state([
@@ -44,7 +47,6 @@
 	]);
 
 	let id = $state('');
-	const tabId = 'slr';
 	let currentInfo = $state(algos[0].infoComp);
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
@@ -154,20 +156,14 @@
 				</div>
 				<FillSize class="grid">
 					{#snippet content()}
-						{#if algos[0].loaded}
-							<div
-								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
-							>
-								<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
-							</div>
-						{/if}
-						{#if algos[1].loaded}
-							<div
-								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
-							>
-								<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
-							</div>
-						{/if}
+						{#each algos as algo}
+							{#if algo.loaded}<div
+									class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}"
+								>
+									<algo.comp {automaton} {followSet} />
+								</div>
+							{/if}
+						{/each}
 					{/snippet}
 				</FillSize>
 			{/snippet}

@@ -32,10 +32,12 @@
 	let table = writable();
 	// ========== Components ====================
 
+	/**@type {{tabId: string}}*/
+	let { tabId } = $props();
+
 	/**@type {Map<string, Map<string, number>>}*/
 	let tableData = $state(new Map());
 	let id = $state('');
-	const tabId = 'll';
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -182,30 +184,14 @@
 				{/each}
 			</div>
 			<div class="grid">
-				{#if algos[0].loaded}
-					<div
-						class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
-						style="height: inherit;"
-					>
-						<FirstAlgorithm bind:instruction></FirstAlgorithm>
-					</div>
-				{/if}
-				{#if algos[1].loaded}
-					<div
-						class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
-						style="height: inherit;"
-					>
-						<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
-					</div>
-				{/if}
-				{#if algos[2].loaded}
-					<div
-						class="unit grid {selectedAlgorithm === algos[2].name ? 'not-hidden' : 'hidden'}"
-						style="height: inherit;"
-					>
-						<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>
-					</div>
-				{/if}
+				{#each algos as algo}
+					{#if algo.loaded}<div
+							class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}"
+						>
+							<algo.comp bind:instruction {firstSet} {followSet} />
+						</div>
+					{/if}
+				{/each}
 			</div>
 		</div>
 	{/snippet}
