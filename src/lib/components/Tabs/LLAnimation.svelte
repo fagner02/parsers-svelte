@@ -3,7 +3,7 @@
 	import AlgorithmTab from './AlgorithmTab.svelte';
 	import FirstAlgorithm from '@/Algorithms/FirstAlgorithm.svelte';
 	import FollowAlgorithm from '@/Algorithms/FollowAlgorithm.svelte';
-	import LlAlgorithm from '@/Algorithms/LLAlgorithm.svelte';
+	import LlAlgorithm from '@/Algorithms/LLTableAlgorithm.svelte';
 	import LlParse from '@/Algorithms/LLParse.svelte';
 	import { first } from '$lib/first';
 	import { follow } from '$lib/follow';
@@ -12,10 +12,15 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
-	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
+	import { id as parseId } from '$lib/llparse';
+	import FirstInfo from '@/Info/FirstInfo.svelte';
+	import FollowInfo from '@/Info/FollowInfo.svelte';
+	import Ll1TableInfo from '@/Info/LL1TableInfo.svelte';
+	import LlParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -27,7 +32,10 @@
 	let table = writable();
 	// ========== Components ====================
 
+	/**@type {Map<string, Map<string, number>>}*/
+	let tableData = $state(new Map());
 	let id = $state('');
+	const tabId = 'll';
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -36,22 +44,23 @@
 		if (!isGrammarLoaded()) return;
 		let { rules, nt, t } = getGrammar();
 		const _first = first(rules, nt);
-		const _follow = follow(rules, nt, _first);
-		const _table = lltable(rules, nt, t, _first, _follow);
+		const _follow = follow(rules, nt, _first.firstSet);
+		const _table = lltable(rules, nt, t, _first.firstSet, _follow.followSet);
+		tableData = _table.table;
 
 		results.push({
 			title: 'Conjunto First',
-			content: firstToString(_first, rules)
+			content: firstToString(_first.firstSet, rules)
 		});
 
 		results.push({
 			title: 'Conjunto Follow',
-			content: followToString(_follow)
+			content: followToString(_follow.followSet)
 		});
 
 		results.push({
 			title: 'Tabela LL(1)',
-			content: tableToString(_table, ' ', {
+			content: tableToString(_table.table, ' ', {
 				cell: (a) => {
 					if (a === -1) return ' ';
 					return `${rules[a].left} -> ${rules[a].right[0] === '' ? 'ε' : rules[a].right.join(' ')}`;
@@ -61,24 +70,10 @@
 
 		firstSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[..._first.entries()].map((x) => {
-					/**@type {string[]}*/
-					let values = [];
-					for (let value of x[1].values()) {
-						values.push(value);
-						if (values.length < x[1].size * 2 - 1) {
-							values.push(',');
-						}
-					}
-
+				[..._first.firstSet.entries()].map((x) => {
 					return {
-						left: rules[x[0]].left,
-						right: [...x[1]],
-						showRight: true,
-						rightProps: values.map((s) => {
-							return { value: s, opacity: 1, hide: false, note: '' };
-						}),
-						note: x[0].toString()
+						left: x[0],
+						right: [...x[1]]
 					};
 				})
 			)
@@ -86,24 +81,10 @@
 
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[..._follow.entries()].map((x) => {
-					/**@type {string[]}*/
-					let values = [];
-					for (let value of x[1].values()) {
-						values.push(value);
-						if (values.length < x[1].size * 2 - 1) {
-							values.push(',');
-						}
-					}
-
+				[..._follow.followSet.entries()].map((x) => {
 					return {
 						left: x[0],
-						right: [...x[1]],
-						showRight: true,
-						rightProps: values.map((s) => {
-							return { value: s, opacity: 1, hide: false, note: '' };
-						}),
-						note: ''
+						right: [...x[1]]
 					};
 				})
 			)
@@ -112,7 +93,7 @@
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<any>>}*/ (
 				new Map(
-					[..._table].map(([rowKey, cols]) => [
+					[..._table.table].map(([rowKey, cols]) => [
 						rowKey,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
@@ -121,10 +102,6 @@
 									data: cell,
 									opacity: 1,
 									pos: 0,
-									text:
-										cell > -1
-											? `${rules[cell].left} -> ${rules[cell].right[0] === '' ? 'ε' : rules[cell].right.join(' ')}`
-											: '',
 									width: 1
 								})
 							])
@@ -133,26 +110,59 @@
 				)
 			)
 		);
+		algos[0].id = _first.id;
+		algos[1].id = _follow.id;
+		algos[2].id = _table.id;
 	});
 
 	const algos = $state([
-		{ comp: FirstAlgorithm, name: 'First', desc: 'Construção do conjunto first', loaded: false },
-		{ comp: FollowAlgorithm, name: 'Follow', desc: 'Construção do conjunto follow', loaded: false },
-		{ comp: LlAlgorithm, name: 'Tabela', desc: 'Construção da tabela LL(1)', loaded: false }
+		{
+			comp: FirstAlgorithm,
+			name: 'First',
+			desc: 'Construção do conjunto first',
+			loaded: false,
+			id: '',
+			infoComp: FirstInfo
+		},
+		{
+			comp: FollowAlgorithm,
+			name: 'Follow',
+			desc: 'Construção do conjunto follow',
+			loaded: false,
+			id: '',
+			infoComp: FollowInfo
+		},
+		{
+			comp: LlAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela LL(1)',
+			loaded: false,
+			id: '',
+			infoComp: Ll1TableInfo
+		}
 	]);
-	const limitHitCallback = () => {
-		limit = getLimitHit(id);
-	};
+
+	let currentInfo = $state(algos[0].infoComp);
+
 	onMount(() => {
-		id = `llalgo${algos[0].name}`;
-		swapAlgorithm(id);
-		setLimitHitCallback(limitHitCallback, id);
+		id = algos[0].id;
+		swapAlgorithm(id, algos[0].infoComp, tabId);
 		algos[0].loaded = true;
 	});
 	let selectedAlgorithm = $state(algos[0].name);
 </script>
 
-<AlgorithmTab {results} bind:limit bind:id bind:instruction {code}>
+<AlgorithmTab
+	{tabId}
+	{currentInfo}
+	parseInfo={LlParsingInfo}
+	{parseId}
+	{results}
+	bind:limit
+	bind:id
+	bind:instruction
+	{code}
+>
 	{#snippet steps()}
 		<div style="max-width: inherit; width: 100%;">
 			<div class="algo-buttons">
@@ -161,10 +171,9 @@
 						use:setUpTooltip={{ text: algo.desc }}
 						disabled={selectedAlgorithm === algo.name}
 						onclick={() => {
-							id = `llalgo${algo.name}`;
+							id = algo.id;
 							algo.loaded = true;
-							setLimitHitCallback(limitHitCallback, id);
-							swapAlgorithm(id);
+							swapAlgorithm(id, algo.infoComp, tabId);
 							resetSelectionFunctions();
 							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
 							selectedAlgorithm = algo.name;
@@ -178,7 +187,7 @@
 						class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
 						style="height: inherit;"
 					>
-						<FirstAlgorithm id="llalgo{algos[0].name}" bind:instruction></FirstAlgorithm>
+						<FirstAlgorithm bind:instruction></FirstAlgorithm>
 					</div>
 				{/if}
 				{#if algos[1].loaded}
@@ -186,8 +195,7 @@
 						class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
 						style="height: inherit;"
 					>
-						<FollowAlgorithm id="llalgo{algos[1].name}" {firstSet} bind:instruction
-						></FollowAlgorithm>
+						<FollowAlgorithm {firstSet} bind:instruction></FollowAlgorithm>
 					</div>
 				{/if}
 				{#if algos[2].loaded}
@@ -195,19 +203,18 @@
 						class="unit grid {selectedAlgorithm === algos[2].name ? 'not-hidden' : 'hidden'}"
 						style="height: inherit;"
 					>
-						<LlAlgorithm id="llalgo{algos[2].name}" {firstSet} {followSet} bind:instruction
-						></LlAlgorithm>
+						<LlAlgorithm {firstSet} {followSet} bind:instruction></LlAlgorithm>
 					</div>
 				{/if}
 			</div>
 		</div>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="llalgo{algos[0].name}Parser"></SyntaxTree>
+		<SyntaxTree id={parseId}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">
-			<LlParse id="llalgo{algos[0].name}Parser" {table}></LlParse>
+			<LlParse {tableData} {table}></LlParse>
 		</div>
 	{/snippet}
 </AlgorithmTab>

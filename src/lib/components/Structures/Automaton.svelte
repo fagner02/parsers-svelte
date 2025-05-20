@@ -1,5 +1,5 @@
 <script>
-	import { flowActions, getAction, getJumpPause } from '$lib/flowControl';
+	import { getJumpPause } from '$lib/flowControl';
 	import { getAugGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
@@ -369,8 +369,7 @@
 		}
 		let ex =
 			to === (nodes.length - 1 && from !== null) ? undefined : [/**@type {number}*/ (from), to];
-		if (shouldUpdate && getAction(props.id) !== flowActions.skipping && !getJumpPause(props.id))
-			update(ex);
+		if (shouldUpdate && !getJumpPause(props.id)) update(ex);
 	}
 
 	/**
@@ -521,6 +520,9 @@
 	 * @param {import('@/types').LR0Automaton} automaton
 	 */
 	export async function loadAutomaton(automaton) {
+		if (automaton.states.length === 0) {
+			return;
+		}
 		let states = [
 			/**@type {import('@/types').LR0State}*/ (automaton.states.find((x) => x.index === 0))
 		];

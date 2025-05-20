@@ -5,7 +5,7 @@
 	import { getAugGrammar, getGrammar } from '$lib/utils';
 	import CardWrapper from './CardWrapper.svelte';
 
-	/** @type {{isAugmented?: boolean, cardId: string, id: string, loadGrammar: ()=>Promise<any>}} */
+	/** @type {{isAugmented?: boolean, cardId: string, id: string, loadGrammar?: ()=>Promise<any>}} */
 	let { isAugmented = false, loadGrammar = $bindable(), ...props } = $props();
 
 	loadGrammar = async function () {

@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -14,9 +14,9 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { id, elemIds, saves, functionCalls } from '$lib/lr0automaton';
+	import { stackCard } from '@/Tabs/dataToComp';
 
-	/** @type {{id: string}} */
-	let { id } = $props();
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
 	/**@type {StateCard | undefined}*/
@@ -29,8 +29,6 @@
 	let codeCard = $state();
 	/**@type {PseudoCode | undefined}*/
 	let closureCodeCard = $state();
-	/**@type {StackCard | undefined}*/
-	let symbolListElem = $state();
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable([]);
@@ -38,11 +36,14 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let targetState = writable([]);
-	let { nt, augRules, alphabet } = getAugGrammar();
+	let { alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
+
+	let currentStep = 0;
+	let stepChanged = false;
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
@@ -61,227 +62,112 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
-	let stateSelection;
+	let originStateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let targetStateSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let stateStackSelection;
+	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
+	let grammarSelection;
 
-	function reset() {
-		try {
-			stateStack.update(() => []);
-			originStateElem?.resetState(false);
-			targetStateElem?.resetState(false);
-			svgLines?.hideLine(false, id);
-			automatonElem?.reset();
-			symbolsSelection.hideSelect();
-			stateSelection.hideSelect();
-			targetStateSelection.hideSelect();
-			originStateName = '';
-		} catch (e) {}
-		buildAutomaton();
+	/**
+	 * @param {number} step
+	 */
+	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
+		symbolsSelection.hideSelect();
+		originStateSelection.hideSelect();
+		targetStateSelection.hideSelect();
+		grammarSelection.hideSelect();
+		svgLines?.hideLine(false, id);
+		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
+		originStateName = save.originStateName;
+		originStateElem?.loadState(save.originState, false);
+		targetStateElem?.loadState(save.targetState, false);
+		automatonElem?.reset();
+		automatonElem?.loadAutomaton(save.automaton);
+		currentStep = step;
+		setCurrentStep(currentStep);
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	async function closure() {
-		return new Promise(async (resolve, reject) => {
-			try {
-				await closureCodeCard?.highlightLines([0]);
-				await closureCodeCard?.highlightLines([1]);
-				await closureCodeCard?.highlightLines([2]);
-
-				let itemsToCheck = [...$targetState.keys()];
-				while (itemsToCheck.length > 0) {
-					await closureCodeCard?.highlightLines([3]);
-					await closureCodeCard?.highlightLines([4]);
-					let item = $targetState[itemsToCheck[0]];
-					let index = $targetState.findIndex(
-						(x) => x.ruleIndex === item.ruleIndex && x.pos === item.pos
-					);
-					await targetStateSelection.selectFor(`state-${targetStateElem?.getId()}-${index}`);
-					let symbol = augRules[item.ruleIndex].right[item.pos];
-					await closureCodeCard?.highlightLines([5]);
-					if (!nt.includes(symbol)) {
-						await closureCodeCard?.highlightLines([6]);
-						await closureCodeCard?.highlightLines([7]);
-						itemsToCheck.shift();
-						continue;
-					}
-
-					await closureCodeCard?.highlightLines([8]);
-					for (let rule of augRules) {
-						await closureCodeCard?.highlightLines([9]);
-						if (!(rule.left === symbol)) continue;
-						await closureCodeCard?.highlightLines([11]);
-						if ($targetState.some((x) => x.ruleIndex === rule.index && x.pos === 0)) continue;
-
-						await targetStateElem?.highlightDot(index);
-						await selectSymbol(
-							`state-${targetStateElem?.getId()}-${index}-${item.pos}`,
-							colors.pink,
-							id,
-							false
-						);
-						await closureCodeCard?.highlightLines([13, 14]);
-						await targetStateElem?.addItem(rule.index, 0, null, `${id}gl${rule.index}`);
-						itemsToCheck.push($targetState.length - 1);
-					}
-					await deselectSymbol(`state-${targetStateElem?.getId()}-${index}-${item.pos}`, id);
-					await closureCodeCard?.highlightLines([15]);
-					itemsToCheck.shift();
-				}
-				targetStateSelection.hideSelect();
-				await closureCodeCard?.highlightLines([]);
-				resolve(null);
-			} catch (e) {
-				reject(e);
-			}
-		});
-	}
-	async function buildAutomaton() {
+	/**@type {any}*/
+	const obj = {
+		addPause: () => addPause,
+		highlightLinesClosure: () => closureCodeCard?.highlightLines,
+		highlightLines: () => codeCard?.highlightLines,
+		deselectSymbol: () => deselectSymbol,
+		selectSymbol: () => selectSymbol,
+		highlightDotTarget: () => targetStateElem?.highlightDot,
+		highlightDotOrigin: () => originStateElem?.highlightDot,
+		addItemTarget: () => targetStateElem?.addItem,
+		addState: () => automatonElem?.addNode,
+		addToStack: () => stateStackElem?.addToStack,
+		selectForTarget: () => targetStateSelection.selectFor,
+		selectForStack: () => stateStackSelection.selectFor,
+		selectForAlphabet: () => symbolsSelection.selectFor,
+		selectForOrigin: () => originStateSelection.selectFor,
+		selectForGrammar: () => grammarSelection.selectFor,
+		hideSelectOrigin: () => originStateSelection.hideSelect,
+		hideSelectStack: () => stateStackSelection.hideSelect,
+		hideSelectTarget: () => targetStateSelection.hideSelect,
+		hideSelectAlphabet: () => symbolsSelection.hideSelect,
+		hideSelectGrammar: () => grammarSelection.hideSelect,
+		removeFromStack: () => stateStackElem?.removeFromStack,
+		resetStateOrigin: () => originStateElem?.resetState,
+		resetStateTarget: () => targetStateElem?.resetState,
+		loadState: () => originStateElem?.loadState,
+		stateName: () => {
+			return (/** @type {string} */ value) => {
+				originStateName = value;
+			};
+		}
+	};
+	async function executeSteps() {
 		try {
 			await loadGrammar();
-			await addPause(id);
-
-			await codeCard?.highlightLines([0]);
-			/**@type {import('@/types').LR0Automaton}*/
-			let automaton = { states: [], transitions: new Map() };
-			await codeCard?.highlightLines([1]);
-
-			await codeCard?.highlightLines([2]);
-			await targetStateElem?.addItem(0, 0, null, `${id}gl0`);
-
-			await codeCard?.highlightLines([3]);
-
-			await codeCard?.highlightLines([4]);
-			await closure();
-
-			await codeCard?.highlightLines([5, 6]);
-			originStateName = `s${automaton.states.length}`;
-			automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
-			automatonElem?.addNode(null, 0, automaton.states[automaton.states.length - 1], null);
-			await addPause(id);
-			await stateStackElem?.addToStack(0, 's0', '', `state-${targetStateElem?.getId()}-title`);
-
-			while ($stateStack.length > 0) {
-				await codeCard?.highlightLines([7]);
-				await originStateElem?.resetState();
-				originStateName = `s${automaton.states[stateStackElem?.first()].index}`;
-				await originStateElem?.loadState(automaton.states[stateStackElem?.first()]);
-
-				for (let [symbolIndex, symbol] of alphabet.entries()) {
-					await codeCard?.highlightLines([8]);
-					await symbolsSelection.selectFor(`stack-${symbolListElem?.getId()}-${symbolIndex}`);
-					await targetStateElem?.resetState();
-
-					await codeCard?.highlightLines([9]);
-
-					for (let [prodIndex, prod] of automaton.states[stateStackElem?.first()].items.entries()) {
-						await codeCard?.highlightLines([10]);
-						await stateSelection.selectFor(`state-${originStateElem?.getId()}-${prodIndex}`);
-
-						await codeCard?.highlightLines([11]);
-						if (
-							prod.pos >= augRules[prod.ruleIndex].right.length ||
-							augRules[prod.ruleIndex].right[prod.pos] !== symbol
-						) {
-							await codeCard?.highlightLines([12]);
-							continue;
-						}
-
-						await originStateElem?.highlightDot(prodIndex);
-						await selectSymbol(
-							`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`,
-							colors.pink,
-							id,
-							false
-						);
-						await codeCard?.highlightLines([13]);
-
-						await codeCard?.highlightLines([15]);
-						if (
-							$targetState.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)
-						) {
-							await codeCard?.highlightLines([16]);
-							deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
-							continue;
-						}
-						deselectSymbol(`state-${originStateElem?.getId()}-${prodIndex}-${prod.pos}`, id);
-						await codeCard?.highlightLines([17]);
-						await targetStateElem?.addItem(prod.ruleIndex, prod.pos + 1);
-					}
-
-					await codeCard?.highlightLines([18]);
-					await stateSelection.hideSelect();
-					if ($targetState.length === 0) {
-						await codeCard?.highlightLines([19]);
-						continue;
-					}
-
-					await codeCard?.highlightLines([20]);
-					await closure();
-
-					await codeCard?.highlightLines([21]);
-					let existent = automaton.states.findIndex((x) => {
-						if (x.items.length != $targetState.length) return false;
-						let eq = true;
-						for (let k = 0; k < x.items.length; k++) {
-							let match = false;
-							for (let m = 0; m < $targetState.length; m++) {
-								match =
-									match ||
-									(x.items[k].pos === $targetState[m].pos &&
-										x.items[k].ruleIndex === $targetState[m].ruleIndex);
-								if (match) break;
-							}
-							eq = match;
-							if (!eq) break;
-						}
-						return eq;
-					});
-
-					await codeCard?.highlightLines([22]);
-					if (existent === -1) {
-						await codeCard?.highlightLines([23]);
-						automaton.states.push({ index: automaton.states.length, items: [...$targetState] });
-						automatonElem?.addNode(
-							stateStackElem?.first(),
-							automaton.states.length - 1,
-							automaton.states[automaton.states.length - 1],
-							symbol
-						);
-						await codeCard?.highlightLines([24]);
-						await codeCard?.highlightLines([25]);
-						await stateStackElem?.addToStack(
-							automaton.states.length - 1,
-							`s${automaton.states.length - 1}`,
-							'',
-							`state-${targetStateElem?.getId()}-title`
-						);
-						await codeCard?.highlightLines([26]);
-						await addPause(id);
-						continue;
-					}
-
-					await codeCard?.highlightLines([27, 28]);
-					automatonElem?.addNode(stateStackElem?.first(), existent, null, symbol);
-					await addPause(id);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
+					continue;
 				}
-
-				await codeCard?.highlightLines([29]);
-				await stateStackElem?.removeFromStack(0);
+				const call = functionCalls[i];
+				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
+					if (call.skip) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					continue;
+				}
+				if (call.name === 'addPause') {
+					currentStep++;
+					setCurrentStep(currentStep);
+				}
+				i++;
 			}
-
-			limitHit(id);
-			automatonElem?.update(undefined, 10);
-			await addPause(id);
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	onMount(async () => {
-		symbolsSelection = getSelectionFunctions(`symbolList${id}`);
-		stateSelection = getSelectionFunctions('origem' + id);
-		targetStateSelection = getSelectionFunctions('destino' + id);
+		symbolsSelection = getSelectionFunctions(elemIds.alphabet);
+		originStateSelection = getSelectionFunctions(elemIds.originState);
+		targetStateSelection = getSelectionFunctions(elemIds.targetState);
+		stateStackSelection = getSelectionFunctions(elemIds.stateStack);
+		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./lr0automaton.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
@@ -289,18 +175,18 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Lr0AutomatonInfo);
-		buildAutomaton();
+		executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="unit grid">
 	<div class="cards-box unit" id="card-box{id}" style="max-width: inherit;">
-		<GrammarCard {id} cardId={id} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
 		<StateCard
 			{id}
 			state={targetState}
-			stateId="destino{id}"
+			stateId={elemIds.targetState}
 			label={'estado destino'}
 			hue={colors.pink}
 			bind:this={targetStateElem}
@@ -310,7 +196,7 @@
 		<StateCard
 			{id}
 			state={originState}
-			stateId="origem{id}"
+			stateId={elemIds.originState}
 			label={'estado origem'}
 			hue={colors.pink}
 			bind:this={originStateElem}
@@ -320,7 +206,7 @@
 		<StackCard
 			{id}
 			stack={stateStack}
-			stackId="temp{id}"
+			stackId={elemIds.stateStack}
 			label="estados novos"
 			hue={colors.blue}
 			bind:this={stateStackElem}
@@ -328,9 +214,8 @@
 		></StackCard>
 		<StackCard
 			{id}
-			bind:this={symbolListElem}
 			stack={symbolList}
-			stackId="symbolList{id}"
+			stackId={elemIds.alphabet}
 			label="alfabeto"
 			hue={colors.green}
 			reversed={false}
@@ -338,9 +223,10 @@
 		></StackCard>
 	</div>
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="lr0closure"></PseudoCode>
-		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard} id="lr0"></PseudoCode>
-		<Automaton id="lr0" bind:this={automatonElem}></Automaton>
+		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="{id}-code-closure"
+		></PseudoCode>
+		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard} id="{id}-code-lr0"></PseudoCode>
+		<Automaton id={elemIds.automaton} bind:this={automatonElem}></Automaton>
 	</div>
 </div>
 

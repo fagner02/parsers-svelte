@@ -1,5 +1,5 @@
 <script>
-	import { getLimitHit, setLimitHitCallback, swapAlgorithm } from '$lib/flowControl';
+	import { swapAlgorithm } from '$lib/flowControl';
 	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
@@ -9,27 +9,43 @@
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import SlrParse from '@/Algorithms/SLRParse.svelte';
 	import { writable } from 'svelte/store';
-	import { follow } from '$lib/follow';
-	import { first } from '$lib/first';
+	import { followDataOnly } from '$lib/follow';
+	import { firstDataOnly } from '$lib/first';
 	import { lr0Automaton } from '$lib/lr0automaton';
 	import { slrTable } from '$lib/slrtable';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
-	let code = '';
+	import { id as parseId } from '$lib/slrparse';
+	import LR0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
+	import SLRTableInfo from '@/Info/SLRTableInfo.svelte';
+	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 
+	let code = '';
+	let tableData = $state(new Map());
 	let algos = $state([
 		{
 			comp: LR0AutomatonAlgorithm,
 			name: 'Autômato',
 			desc: 'Construção do autômato LR(0)',
-			loaded: false
+			loaded: false,
+			id: '',
+			infoComp: LR0AutomatonInfo
 		},
-		{ comp: SLRTableAlgorithm, name: 'Tabela', desc: 'Construção da tabela SLR', loaded: false }
+		{
+			comp: SLRTableAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela SLR',
+			loaded: false,
+			id: '',
+			infoComp: SLRTableInfo
+		}
 	]);
 
 	let id = $state('');
+	const tabId = 'slr';
+	let currentInfo = $state(algos[0].infoComp);
 	let limit = $state();
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
@@ -45,40 +61,43 @@
 	(() => {
 		if (!isGrammarLoaded()) return;
 		const { augRules, nt, t } = getAugGrammar();
-		const _follow = follow(augRules, nt, first(augRules, nt));
+		const _follow = followDataOnly(augRules, nt, firstDataOnly(augRules, nt));
+		const _automaton = lr0Automaton(augRules, nt, t);
+		const _table = slrTable(_automaton.automaton, augRules, nt, t, _follow.followSet);
+
+		tableData = _table.table;
+		automaton = _automaton.automaton;
+
+		algos[0].id = _automaton.id;
+		algos[1].id = _table.id;
+
+		results.push({
+			title: 'Conjunto Follow',
+			content: followToString(_follow.followSet)
+		});
+		results.push({
+			title: 'Autômato LR(0)',
+			content: automatonToString(_automaton.automaton.states, augRules)
+		});
+		results.push({
+			title: 'Tabela SLR(1)',
+			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
+		});
+
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
-				[..._follow.entries()].map((x) => {
-					/**@type {string[]}*/
-					let values = [];
-					for (let value of x[1].values()) {
-						values.push(value);
-						if (values.length < x[1].size * 2 - 1) {
-							values.push(',');
-						}
-					}
-
+				[..._follow.followSet.entries()].map((x) => {
 					return {
 						left: x[0],
-						right: [...x[1]],
-						showRight: true,
-						rightProps: values.map((s) => {
-							return { value: s, opacity: 1, hide: false, note: '' };
-						}),
-						note: ''
+						right: [...x[1]]
 					};
 				})
 			)
 		);
-
-		automaton = lr0Automaton(augRules, nt, t);
-
-		const _table = slrTable(automaton, augRules, nt, t, _follow);
-
 		table.set(
 			/**@type {Map<string, import('@/types').tableCol<string>>}*/ (
 				new Map(
-					[..._table].map(([rowKey, cols]) => [
+					[..._table.table].map(([rowKey, cols]) => [
 						`s${rowKey}`,
 						new Map(
 							[...cols].map(([colKey, cell]) => [
@@ -87,7 +106,6 @@
 									data: cell,
 									opacity: 1,
 									pos: 0,
-									text: cell,
 									width: 1
 								})
 							])
@@ -96,34 +114,25 @@
 				)
 			)
 		);
-
-		results.push({
-			title: 'Conjunto Follow',
-			content: followToString(_follow)
-		});
-
-		results.push({
-			title: 'Autômato LR(0)',
-			content: automatonToString(automaton.states, augRules)
-		});
-
-		results.push({
-			title: 'Tabela SLR(1)',
-			content: tableToString(_table, 'estados', { key: (a) => `s${a}` })
-		});
 	})();
-	const limitHitCallback = () => {
-		limit = getLimitHit(id);
-	};
+
 	onMount(() => {
-		id = `slralgo${algos[0].name}`;
-		setLimitHitCallback(limitHitCallback, id);
-		swapAlgorithm(id);
+		id = algos[0].id;
+		swapAlgorithm(id, currentInfo, tabId);
 		algos[0].loaded = true;
 	});
 </script>
 
-<AlgorithmTab {results} bind:limit bind:id {code}>
+<AlgorithmTab
+	{tabId}
+	{currentInfo}
+	parseInfo={SlrParsingInfo}
+	{parseId}
+	{results}
+	bind:limit
+	bind:id
+	{code}
+>
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
 			{#snippet content()}
@@ -133,9 +142,8 @@
 							use:setUpTooltip={{ text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
-								id = `slralgo${algo.name}`;
-								setLimitHitCallback(limitHitCallback, id);
-								swapAlgorithm(id);
+								id = algo.id;
+								swapAlgorithm(id, algo.infoComp, tabId);
 								algo.loaded = true;
 								resetSelectionFunctions();
 								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
@@ -150,15 +158,14 @@
 							<div
 								class="unit grid {selectedAlgorithm === algos[0].name ? 'not-hidden' : 'hidden'}"
 							>
-								<LR0AutomatonAlgorithm id="slralgo{algos[0].name}"></LR0AutomatonAlgorithm>
+								<LR0AutomatonAlgorithm></LR0AutomatonAlgorithm>
 							</div>
 						{/if}
 						{#if algos[1].loaded}
 							<div
 								class="unit grid {selectedAlgorithm === algos[1].name ? 'not-hidden' : 'hidden'}"
 							>
-								<SLRTableAlgorithm id="slralgo{algos[1].name}" {automaton} {followSet}
-								></SLRTableAlgorithm>
+								<SLRTableAlgorithm {automaton} {followSet}></SLRTableAlgorithm>
 							</div>
 						{/if}
 					{/snippet}
@@ -167,14 +174,11 @@
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
-		<SyntaxTree id="slralgo{algos[0].name}Parser" floating={true}></SyntaxTree>
+		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
 		<div class="grid" style="place-items: center;">
-			<SlrParse
-				id="slralgo{algos[0].name}Parser"
-				stateList={automaton.states.map((x) => `s${x.index}`)}
-				{table}
+			<SlrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}
 			></SlrParse>
 		</div>
 	{/snippet}

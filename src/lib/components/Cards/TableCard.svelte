@@ -2,7 +2,6 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
-	import AlertIcon from '@icons/AlertIcon.svelte';
 	import { setUpTooltip } from '$lib/tooltip';
 
 	/** @type {{
@@ -11,6 +10,7 @@
 	 * hue: any,
 	 * columns: Array<string>,
 	 * rows: Array<string>,
+	 * convert?: (value: any)=>string
 	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>,
 	 * tableId: string,
 	 * svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
@@ -22,7 +22,8 @@
 		rows,
 		table = $bindable(),
 		tableId,
-		svgLines = $bindable()
+		svgLines = $bindable(),
+		convert = (value) => value.toString()
 	} = $props();
 
 	let highlighted = $state(false);
@@ -36,6 +37,7 @@
 		highlightColumn = '';
 		highlightRow = '';
 		highlighted = false;
+		conflict = false;
 		table.update((x) => {
 			for (let i = 0; i < rows.length; i++) {
 				x.set(
@@ -44,8 +46,7 @@
 						columns.map((x) => [
 							x,
 							{
-								data: null,
-								text: '',
+								data: -1,
 								opacity: 0,
 								pos: -40,
 								width: 0
@@ -60,18 +61,16 @@
 
 	/**
 	 * @param {any} data
-	 * @param {string} text
 	 * @param {string} row
 	 * @param {string} column
 	 * @param {string | null} srcId
 	 */
-	export async function addToTable(data, text, row, column, srcId = null) {
+	export async function addToTable(data, row, column, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				table.update((x) => {
-					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
+					x.get(row)?.set(column, {
 						data: data,
-						text: text,
 						opacity: 0,
 						pos: -40,
 						width: 0
@@ -81,9 +80,8 @@
 				await wait(id, 50);
 
 				table.update((x) => {
-					/**@type {import('@/types').tableCol<any>}*/ (x.get(row)).set(column, {
+					x.get(row)?.set(column, {
 						data: data,
-						text: text,
 						opacity: 1,
 						pos: 0,
 						width: 1
@@ -109,7 +107,10 @@
 			try {
 				let colIndex = $table.get(row)?.keys().toArray().indexOf(column);
 				let element = document.querySelector(`#td-${tableId}-${row}-${colIndex}`);
-				if (element === null) return;
+				if (element === null) {
+					console.error(`Element td-${tableId}-${row}-${colIndex} not found`);
+					return resolve(null);
+				}
 
 				highlightRow = row;
 				highlightColumn = column;
@@ -158,7 +159,6 @@
 	 * @param {string} value
 	 */
 	export function setConflictTooltip(value) {
-		console.log(conflictElem, value);
 		if (!conflictElem) return;
 		setUpTooltip(conflictElem, {
 			text: value,
@@ -185,7 +185,13 @@
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
 				{#each columns as column}
-					<th style="background: hsl({column == highlightColumn ? highlightHue : hue}, 60%, 40%);">
+					<th
+						style="background: hsl({column == highlightColumn
+							? conflict
+								? conflictHue
+								: highlightHue
+							: hue}, 60%, 40%);"
+					>
 						{column}
 					</th>
 				{/each}
@@ -214,10 +220,10 @@
 								<span
 									class="unit"
 									id="t-{tableId}-{rowKey}-{colIndex}"
-									style="width: {col.text.length * charWidth * col.width}rem;
+									style="width: {convert(col.data).length * charWidth * col.width}rem;
 										opacity: {col.opacity};top: {col.pos}px;"
 								>
-									{col.text}
+									{convert(col.data)}
 								</span>
 								{#if conflict && highlightRow === rowKey && highlightColumn === colKey}
 									<div

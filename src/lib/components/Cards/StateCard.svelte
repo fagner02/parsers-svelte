@@ -2,7 +2,7 @@
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
 
@@ -46,7 +46,7 @@
 				await wait(id, 0);
 				let index = $cardState.length - 1;
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-${index}`));
-				elem.style.width = '0px';
+				elem.style.maxWidth = '0px';
 				elem.style.height = '0px';
 				let elemWidth = elem.scrollWidth;
 				for (let i = 0; i < (lookahead?.size ?? 0); i++) {
@@ -61,11 +61,11 @@
 				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-${index}`, id);
 
 				elem.style.opacity = '1';
-				elem.style.width = `${elemWidth}px`;
+				elem.style.maxWidth = `${elemWidth}px`;
 				elem.style.height = `${elem.scrollHeight}px`;
 
 				await wait(id, 1500);
-				elem.style.width = `fit-content`;
+				elem.style.maxWidth = `fit-content`;
 				elem.style.height = `fit-content`;
 				await svgLines?.hideLine(false, id);
 				resolve(null);
@@ -83,9 +83,6 @@
 	export async function updateLookahead(lookahead, existent, updateSelection = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#state-${stateId}-${existent}`)
-				);
 				cardState.update((x) => {
 					x[existent].lookahead = new Set([
 						.../**@type {Set<string>}*/ (x[existent].lookahead),
@@ -95,19 +92,13 @@
 				});
 				await wait(id, 0);
 
-				let oldWidth = 0;
-				let newWidth = 0;
 				for (let i = 0; i < ($cardState[existent].lookahead?.size ?? 0); i++) {
 					let look = /**@type {HTMLElement}*/ (
 						document.querySelector(`#look-${stateId}-${existent}-${i}`)
 					);
-					oldWidth += look.clientWidth;
-					newWidth += look.scrollWidth;
 					look.style.maxWidth = `${look.scrollWidth}px`;
 					look.style.opacity = '1';
 				}
-				if (updateSelection && selectionFunctions)
-					await selectionFunctions.updateWidth(elem.scrollWidth - oldWidth + newWidth);
 				await wait(id, 500);
 				resolve(null);
 			} catch (e) {
@@ -133,13 +124,14 @@
 	}
 
 	/**
-	 * @param {import('@/types').LR0State} stateToLoad
+	 * @param {import('@/types').LR0StateItem[]} stateToLoad
+	 * @param {boolean} shouldWait
 	 */
-	export async function loadState(stateToLoad) {
+	export async function loadState(stateToLoad, shouldWait = true) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				cardState.update(() =>
-					stateToLoad.items.map((x) => {
+					stateToLoad.map((x) => {
 						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,
@@ -147,17 +139,20 @@
 						});
 					})
 				);
-				await wait(id, 0);
+
+				await noJumpWait(0);
+
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 				while (elem !== null) {
-					elem.style.width = `${elem.scrollWidth}px`;
+					elem.style.maxWidth = `${elem.scrollWidth}px`;
 					elem.style.height = `${elem.scrollHeight}px`;
 					elem.style.opacity = '1';
 
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
-
-				await wait(id, 500);
+				try {
+					if (shouldWait) await wait(id, 500);
+				} catch (e) {}
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -225,7 +220,7 @@
 		{#each $cardState as item, rindex}
 			<p
 				id="state-{stateId}-{rindex}"
-				style="opacity: 0;font-size: {fontSize}rem;width: {charWidth}rem; height: 0px"
+				style="opacity: 0;font-size: {fontSize}rem;min-width: {charWidth}rem;max-width: 0px; height: 0px"
 			>
 				<span style="font-size: {subFontSize}rem;">{item.ruleIndex}</span>
 				<span>{rules[item.ruleIndex].left} -&gt;&nbsp;</span>

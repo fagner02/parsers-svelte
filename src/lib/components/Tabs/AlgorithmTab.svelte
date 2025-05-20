@@ -7,9 +7,9 @@
 		setCloseInstruction,
 		setOpenInstruction,
 		swapAlgorithm,
-		setLimitHitCallback,
 		skipToEnd,
-		getLimitHit
+		goToStep,
+		setTab
 	} from '$lib/flowControl';
 	import Code from '@/Layout/Code.svelte';
 	import FillSize from '@/Layout/FillSize.svelte';
@@ -29,30 +29,55 @@
 	import { isGrammarLoaded } from '$lib/utils';
 	import { setUpTooltip } from '$lib/tooltip.js';
 	import { appendData } from '$lib/log';
-
-	let animIn = 'rotA 0.5s';
-	let animOut = 'rotD 0.5s forwards';
-	let animation = $state(animIn);
-	let parseOn = $state(false);
+	import { colors } from '$lib/selectSymbol';
 
 	/**@type {{
 	 * code: string,
-	 * id: string, instruction?:
-	 * string,
+	 * id: string,
+	 * tabId: string,
+	 * parseId: string,
+	 * instruction?: string,
 	 * class?: string,
 	 * limit?: boolean,
 	 * results: import('@/types').ResultsTabItem[],
 	 * steps: any,
 	 * tree: any,
-	 * parse: any}}*/
+	 * parse: any,
+	 * currentInfo: ConstructorOfATypedSvelteComponent,
+	 * parseInfo: ConstructorOfATypedSvelteComponent}}*/
 	let {
 		code,
+		tabId,
 		id = $bindable(),
+		parseId,
 		instruction = $bindable(),
 		limit = $bindable(),
 		...props
 	} = $props();
 
+	let animIn = 'rotA 0.5s';
+	let animOut = 'rotD 0.5s forwards';
+	let animation = $state(animIn);
+	let parseOn = $state(false);
+	let maxStep = $state(0);
+	let currentStep = $state(0);
+
+	setTab(tabId, {
+		setMaxStep: (step) => {
+			const elem = /**@type {HTMLElement}*/ (document.querySelector(`input#${tabId}-step`));
+			if (elem) {
+				setUpTooltip(elem, {
+					text: `Digite o número do passo entre ${0} e ${step}`,
+					willRemove: true,
+					hue: colors.blue
+				});
+			}
+			maxStep = step;
+		},
+		setCurrentStep: (step) => (currentStep = step)
+	});
+
+	let currentId = $state(id);
 	limit ??= false;
 
 	instruction ??= '';
@@ -106,11 +131,6 @@
 		} catch {}
 	}
 
-	function limitHitCallback() {
-		limit = getLimitHit(id);
-	}
-
-	setLimitHitCallback(limitHitCallback, id);
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
 
@@ -154,11 +174,11 @@
 					use:setUpTooltip={{ text: 'Analisar string de entrada' }}
 					class="view-button"
 					onclick={() => {
-						id = `${id}Parser`;
+						currentId = id;
+						id = parseId;
 						parseLoaded = true;
-						setLimitHitCallback(limitHitCallback, id);
 						appendData(`open parse,${id}`);
-						swapAlgorithm(id);
+						swapAlgorithm(id, props.parseInfo, tabId);
 						parseOn = true;
 						closePopup();
 					}}
@@ -171,10 +191,9 @@
 					class="view-button"
 					onclick={() => {
 						parseOn = false;
-						id = id.replace('Parser', '');
+						id = currentId;
 						appendData(`close parse,${id}`);
-						setLimitHitCallback(limitHitCallback, id);
-						swapAlgorithm(id);
+						swapAlgorithm(id, props.currentInfo, tabId);
 						closePopup();
 					}}
 					disabled={!parseOn}
@@ -184,6 +203,39 @@
 			</div>
 
 			<div class="flow-controls controls">
+				<div style="display: flex;gap: 10px;">
+					<button
+						use:setUpTooltip={{ text: 'Ir para passo especificado' }}
+						onclick={() => {
+							const elem = /**@type {HTMLInputElement}*/ (
+								document.querySelector(`input#${tabId}-step`)
+							);
+							let step = parseInt(elem.value);
+							if (isNaN(step)) {
+								step = 0;
+							}
+							if (step > maxStep) {
+								step = maxStep;
+							}
+							if (step < 0) {
+								step = 0;
+							}
+							elem.value = step.toString();
+							goToStep(id, step);
+						}}
+						style="padding: 0 5px;color: white">Ir</button
+					>
+					<input
+						placeholder="Passo"
+						style="border-radius: 5px; min-width: 50px; padding: 0 5px; outline: none; border: 2px solid hsl(0, 0%, 50%);"
+						type="number"
+						id="{tabId}-step"
+						name="step"
+						min="0"
+						max={maxStep}
+						value={currentStep}
+					/>
+				</div>
 				<button use:setUpTooltip={{ text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
 					<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
@@ -192,14 +244,14 @@
 				</button>
 				<button
 					use:setUpTooltip={{ text: 'Próximo passo' }}
-					disabled={limit}
+					disabled={currentStep >= maxStep}
 					onclick={() => forward(`${id}`)}
 				>
 					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
 				<button
 					use:setUpTooltip={{ text: 'Pular para o final' }}
-					disabled={limit}
+					disabled={currentStep >= maxStep}
 					onclick={() => skipToEnd(`${id}`)}
 				>
 					<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>

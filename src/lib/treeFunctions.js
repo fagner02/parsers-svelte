@@ -1,18 +1,13 @@
-/**
- * @typedef {{
- * initializeTree: (symbol: string)=>Promise<void>,
- * addToTree: (data: string[], parent:string)=>Promise<void>,
- * resetTree: ()=>void,
- * addFloatingNode: (data: string[])=>Promise<any>,
- * addParent: (parent: string, children: string[]) => Promise<void>
- * }} TreeFunctions
- * */
+/**@type {import("@/Structures/SyntaxTreeClass.svelte").SyntaxTreeClass} */
+let tree;
 
-let treeFunctions = /**@type {TreeFunctions}*/ ({});
-export function setTreeFunctions(/**@type {TreeFunctions}*/ funcs) {
-	treeFunctions = funcs;
+/**
+ * @param {import("@/Structures/SyntaxTreeClass.svelte").SyntaxTreeClass} _tree
+ */
+export function setTree(_tree) {
+	tree = _tree;
 }
 
-export function getTreeFunctions() {
-	return treeFunctions;
+export function getTree() {
+	return tree;
 }

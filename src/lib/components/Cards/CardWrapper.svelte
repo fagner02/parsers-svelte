@@ -23,25 +23,38 @@
 	let selection;
 
 	selectionFunctions = {
+		interval: null,
 		selectFor: async function (/**@type {string}*/ _id) {
 			if (getJumpPause(props.id)) return;
 			return new Promise(async (resolve, reject) => {
 				try {
+					if (selectionFunctions?.interval) {
+						window.clearInterval(selectionFunctions?.interval);
+						selectionFunctions.interval = null;
+					}
 					if (!_id.startsWith('#')) {
 						_id = '#' + _id;
 					}
-					const elem = document.querySelector(_id);
-					if (elem === null) return resolve();
-					const parent = /**@type {HTMLElement}*/ (selection.parentElement);
 
-					const elemRect = elem.getBoundingClientRect();
-					const parentRect = parent.getBoundingClientRect();
-
-					selection.style.opacity = '1';
-					selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
-					selection.style.width = `${elemRect.width + 17}px`;
-					selection.style.height = `${elemRect.height + 3}px`;
-					await wait(props.id, 500);
+					if (selectionFunctions)
+						selectionFunctions.interval = setInterval(() => {
+							const elem = /**@type {HTMLElement?}*/ (document.querySelector(_id));
+							if (elem === null) {
+								console.error(`Element ${_id} not found`);
+								selectionFunctions?.hideSelect();
+								return;
+							}
+							const parent = /**@type {HTMLElement}*/ (selection.parentElement);
+							const elemRect = elem.getBoundingClientRect();
+							const parentRect = parent.getBoundingClientRect();
+							selection.style.opacity = '1';
+							selection.style.transform = `translate(${elemRect.x - parentRect.x - 16}px, ${elemRect.y - parentRect.y - 9}px)`;
+							selection.style.width = `${elemRect.width + 17}px`;
+							selection.style.height = `${elemRect.height + 3}px`;
+						}, 100);
+					try {
+						await wait(props.id, 500);
+					} catch (e) {}
 					return resolve();
 				} catch (e) {
 					reject(e);
@@ -50,11 +63,10 @@
 		},
 		hideSelect: function () {
 			selection.style.opacity = '0';
-		},
-
-		updateWidth: async function (width) {
-			selection.style.width = `${width + 17}px`;
-			await wait(props.id, 500);
+			if (selectionFunctions?.interval) {
+				window.clearInterval(selectionFunctions?.interval);
+				selectionFunctions.interval = null;
+			}
 		}
 	};
 	setSelectionFunctions(props.cardId, selectionFunctions);

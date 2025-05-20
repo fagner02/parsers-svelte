@@ -65,7 +65,10 @@ export async function selectSymbol(_id, hue, id, padded = true) {
 		try {
 			if (!_id.startsWith('#')) _id = '#' + _id;
 			let symbol = /** @type {HTMLElement} */ (document.querySelector(_id));
-			if (symbol === null) return resolve(null);
+			if (symbol === null) {
+				console.error('Symbol not found', _id);
+				return resolve(null);
+			}
 			symbol.classList.add(padded ? 'block' : 'empty');
 			symbol.style.setProperty('--block-hue', hue.toString());
 			await wait(id, 500);
@@ -84,7 +87,10 @@ export function deselectSymbol(_id, id) {
 		try {
 			if (!_id.startsWith('#')) _id = '#' + _id;
 			let symbol = /** @type {HTMLElement} */ (document.querySelector(_id));
-			if (symbol === null) return resolve(null);
+			if (symbol === null) {
+				console.error('Symbol not found', _id);
+				resolve(null);
+			}
 			symbol.classList.add('block-deselect');
 			await wait(id, 500);
 			symbol.classList.remove('empty', 'block', 'block-deselect');

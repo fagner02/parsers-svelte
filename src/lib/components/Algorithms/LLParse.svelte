@@ -2,10 +2,16 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
+	import {
+		addPause,
+		setCurrentStep,
+		setMaxStep,
+		setOnInputChanged,
+		setStepCall
+	} from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
-	import { getTreeFunctions } from '$lib/treeFunctions';
+	import { getTree } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import { setInfoComponent } from '$lib/infoText';
@@ -13,12 +19,16 @@
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { id, elemIds, saves, functionCalls, llParsing } from '$lib/llparse';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	/** @type {{id: string, table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>}} */
-	let { id, table } = $props();
+	/** @type {{
+	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>
+	 * tableData: Map<string, Map<string, number>>}} */
+	let { table, tableData } = $props();
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
 	let inputStack = $state(writable([]));
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
@@ -30,100 +40,85 @@
 	let inputStackElement = /** @type {StackCard}*/ ($state());
 	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
+	let currentStep = 0;
+	let stepChanged = false;
+	let inputChanged = false;
+	let tree = getTree();
 
-	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
-
-	function reset() {
-		symbolStack.update(() => []);
-		inputStack.update(() => []);
+	/**@param {number} step*/
+	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
+		symbolStackElement.loadStack(stackCard(save.symbolStack, {}));
+		inputStackElement.loadStack(stackCard(save.inputStack, {}));
 		svgLines?.setHideOpacity();
-		context.setAccept(null);
-		resetTree();
-
-		parsing();
+		save.accept === undefined ? context.setAccept(null) : context.setAccept(save.accept);
+		tree.resetTree();
+		tree.loadSyntaxTree(save.tree, startingSymbol);
+		currentStep = step;
+		setCurrentStep(currentStep);
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setStepCall(setStep, saves.length - 1, id, () => currentStep);
+	function onInputChanged() {
+		llParsing(startingSymbol, inputString, nt, tableData, rules);
+		setMaxStep(saves.length - 1, id);
+		inputChanged = true;
+	}
+	setOnInputChanged(onInputChanged, id);
 
-	async function parsing() {
+	/**@type {any}*/
+	const obj = {
+		highlightLines: () => codeCard?.highlightLines,
+		addToStackSymbols: () => symbolStackElement.addToStack,
+		removeFromStackSymbols: () => symbolStackElement.removeFromStack,
+		addToStackInput: () => inputStackElement.addToStack,
+		removeFromStackInput: () => inputStackElement.removeFromStack,
+		addToTree: () => tree.addToTree,
+		resetTree: () => tree.resetTree,
+		initializeTree: () => tree.initializeTree,
+		addPause: () => addPause,
+		setAccept: () => context.setAccept
+	};
+
+	async function executeSteps() {
 		try {
-			if (initializeTree === undefined) {
-				let functions = getTreeFunctions();
-				initializeTree = functions.initializeTree;
-				addToTree = functions.addToTree;
-				resetTree = functions.resetTree;
-			}
-			await addPause(id);
-			await codeCard?.highlightLines([0]);
-			resetTree();
-			initializeTree(startingSymbol);
-			await codeCard?.highlightLines([1]);
-			for (let i of ['$', startingSymbol]) {
-				await symbolStackElement.addToStack(i, i, '');
-			}
-
-			await codeCard?.highlightLines([2]);
-			for (let i of ['$'].concat(inputString.reverse())) {
-				await inputStackElement.addToStack(i, i, '');
-			}
-
-			await addPause(id);
-			await codeCard?.highlightLines([3]);
-			while ($inputStack.length > 0) {
-				await codeCard?.highlightLines([4]);
-				const topSymbol = $symbolStack[$symbolStack.length - 1].data;
-				await codeCard?.highlightLines([5]);
-				const topInput = $inputStack[$inputStack.length - 1].data;
-
-				await codeCard?.highlightLines([6]);
-				if (nt.includes(topSymbol)) {
-					await codeCard?.highlightLines([7]);
-					const prodIndex = $table.get(topSymbol)?.get(topInput)?.data;
-
-					await codeCard?.highlightLines([8]);
-					if (prodIndex == null || prodIndex === -1) {
-						await codeCard?.highlightLines([9]);
-						context.setAccept(false);
-						return;
-					}
-
-					await codeCard?.highlightLines([10]);
-					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-
-					await codeCard?.highlightLines([11]);
-					if (!rules[prodIndex].right.includes('')) {
-						await codeCard?.highlightLines([12]);
-						const prod = [...rules[prodIndex].right].reverse();
-						addToTree([...rules[prodIndex].right], topSymbol);
-						for (let p of prod) {
-							await symbolStackElement.addToStack(p, p, '');
-						}
-					} else {
-						addToTree(['\u03B5'], topSymbol);
-					}
-				} else {
-					await codeCard?.highlightLines([13]);
-					await codeCard?.highlightLines([14]);
-					if (topSymbol !== topInput) {
-						await codeCard?.highlightLines([15]);
-						context.setAccept(false);
-						limitHit(id);
-						return;
-					}
-
-					await codeCard?.highlightLines([16]);
-					await symbolStackElement.removeFromStack($symbolStack.length - 1);
-					await codeCard?.highlightLines([17]);
-					await inputStackElement.removeFromStack($inputStack.length - 1);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (inputChanged) {
+					setStep(0);
+					stepChanged = false;
+					inputChanged = false;
+					i = 0;
+					continue;
 				}
-
-				await addPause(id);
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
+					continue;
+				}
+				const call = functionCalls[i];
+				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
+				} catch (e) {
+					continue;
+				}
+				if (call.name === 'addPause') {
+					currentStep++;
+					setCurrentStep(currentStep);
+				}
+				i++;
 			}
-
-			await codeCard?.highlightLines([18]);
-			const result = $inputStack.length === 0 && $symbolStack.length === 0;
-			context.setAccept(result);
-			limitHit(id);
-			await addPause(id);
 		} catch (e) {}
 	}
 
@@ -132,7 +127,8 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Ll1ParsingInfo);
-		await parsing();
+		onInputChanged();
+		executeSteps();
 	});
 </script>
 
@@ -148,16 +144,20 @@
 			columns={t}
 			{table}
 			bind:svgLines
-			tableId="ll"
+			tableId={elemIds.table}
 			label="tabela ll(1)"
 			hue={colors.blue}
+			convert={(v) =>
+				v > -1
+					? `${rules[v].left} -> ${rules[v].right[0] === '' ? 'ε' : rules[v].right.join(' ')}`
+					: ''}
 		></TableCard>
 		<StackCard
 			{id}
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
-			stackId="input{id}"
+			stackId={elemIds.input}
 			hue={colors.green}
 			label="entrada"
 		></StackCard>
@@ -166,7 +166,7 @@
 			bind:svgLines
 			bind:stack={symbolStack}
 			bind:this={symbolStackElement}
-			stackId="symbols{id}"
+			stackId={elemIds.states}
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>
