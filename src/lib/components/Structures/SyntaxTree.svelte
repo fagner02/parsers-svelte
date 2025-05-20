@@ -1,7 +1,7 @@
 <script>
 	import { setTree } from '$lib/treeFunctions';
 	import { onMount } from 'svelte';
-	import { SyntaxTreeClass } from '@/Structures/syntaxTreeClass.svelte';
+	import { SyntaxTreeClass } from '@/Structures/SyntaxTreeClass.svelte';
 
 	/**@type {{id: string, style?: string, floating?: boolean}}*/
 	let { floating = false, style = '', ...props } = $props();
