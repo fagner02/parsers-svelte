@@ -1,5 +1,5 @@
 <script>
-	import { reset } from '$lib/flowControl';
+	import { inputChanged, reset } from '$lib/flowControl';
 	import { setInputString } from '$lib/parseString';
 	import { setContext } from 'svelte';
 	/** @type {{
@@ -26,7 +26,7 @@
 			name="string a ser analisada"
 			oninput={(v) => {
 				setInputString(v.currentTarget.value);
-				reset(props.id);
+				inputChanged(props.id);
 				accept = null;
 			}}
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}

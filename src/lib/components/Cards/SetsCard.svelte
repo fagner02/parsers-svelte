@@ -2,6 +2,7 @@
 	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight, subCharWidth, subFontSize } from '$lib/globalStyle';
+	import { onMount } from 'svelte';
 
 	/** @type {{
 	 * id: string,
@@ -101,31 +102,30 @@
 		});
 	}
 
+	function initialize() {
+		for (let i = 0; i < $set.length; i++) {
+			for (let j = 0; j < $set[i].right.length; j++) {
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#${setId}r${i}-${j}`));
+				elem.style.maxWidth = `${elem.scrollWidth}px`;
+				elem.style.opacity = '1';
+			}
+		}
+	}
+
 	/**@param {Map<any, Set<any>>} sets */
 	export async function loadSets(sets) {
-		return new Promise(async (resolve, reject) => {
-			try {
-				set.set(
-					/**@type {import('@/types').SetRow[]}*/ (
-						sets
-							.entries()
-							.toArray()
-							.map((x) => ({ left: x[0], right: x[1].values().toArray() }))
-					)
-				);
-				await noJumpWait(0);
-				for (let i = 0; i < $set.length; i++) {
-					for (let j = 0; j < $set[i].right.length; j++) {
-						let elem = /**@type {HTMLElement}*/ (document.querySelector(`#${setId}r${i}-${j}`));
-						elem.style.maxWidth = `${elem.scrollWidth}px`;
-						elem.style.opacity = '1';
-					}
-				}
-				resolve(null);
-			} catch (e) {
-				reject(e);
-			}
-		});
+		try {
+			set.set(
+				/**@type {import('@/types').SetRow[]}*/ (
+					sets
+						.entries()
+						.toArray()
+						.map((x) => ({ left: x[0], right: x[1].values().toArray() }))
+				)
+			);
+			await noJumpWait(0);
+			initialize();
+		} catch (e) {}
 	}
 
 	/**
@@ -170,10 +170,12 @@
 		return setId;
 	}
 
-	export function reloadElement() {
+	export async function reloadElement() {
 		visible = !visible;
+		await noJumpWait(0);
+		initialize();
 	}
-
+	onMount(initialize);
 	let maxHeight = $derived(lineHeight * Math.max($set?.length ?? 0, 1));
 </script>
 

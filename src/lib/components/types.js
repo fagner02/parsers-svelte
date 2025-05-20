@@ -13,7 +13,7 @@
  */
 
 /**
- * @typedef {{left: string, right: Array<any>}} SetRow
+ * @typedef {{left: any, right: Array<any>}} SetRow
  */
 
 /**
@@ -29,8 +29,7 @@
  * data: string,
  * id: number,
  * done: boolean,
- * level:
- * number,
+ * level: number,
  * index: number,
  * parentIndex: number,
  * opacity: number,
@@ -45,8 +44,16 @@
 /** @typedef {{level: number,index: number}} nodeId*/
 
 /**
+ * @typedef {{
+ * data: string,
+ * self: nodeId
+ * parent: nodeId
+ * }} DataNode
+ */
+
+/**
  * @template T
- * @typedef {{data: T, text: string, opacity: number,width:number, pos: number }} tableItem*/
+ * @typedef {{data: T, opacity: number,width:number, pos: number }} tableItem*/
 
 /**
  * @template T

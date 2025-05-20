@@ -10,6 +10,7 @@
 	 * hue: any,
 	 * columns: Array<string>,
 	 * rows: Array<string>,
+	 * convert?: (value: any)=>string
 	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>,
 	 * tableId: string,
 	 * svgLines: import('@/Structures/SvgLines.svelte').default | undefined}} */
@@ -21,7 +22,8 @@
 		rows,
 		table = $bindable(),
 		tableId,
-		svgLines = $bindable()
+		svgLines = $bindable(),
+		convert = (value) => value.toString()
 	} = $props();
 
 	let highlighted = $state(false);
@@ -35,6 +37,7 @@
 		highlightColumn = '';
 		highlightRow = '';
 		highlighted = false;
+		conflict = false;
 		table.update((x) => {
 			for (let i = 0; i < rows.length; i++) {
 				x.set(
@@ -43,8 +46,7 @@
 						columns.map((x) => [
 							x,
 							{
-								data: null,
-								text: '',
+								data: -1,
 								opacity: 0,
 								pos: -40,
 								width: 0
@@ -59,18 +61,16 @@
 
 	/**
 	 * @param {any} data
-	 * @param {string} text
 	 * @param {string} row
 	 * @param {string} column
 	 * @param {string | null} srcId
 	 */
-	export async function addToTable(data, text, row, column, srcId = null) {
+	export async function addToTable(data, row, column, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				table.update((x) => {
 					x.get(row)?.set(column, {
 						data: data,
-						text: text,
 						opacity: 0,
 						pos: -40,
 						width: 0
@@ -82,7 +82,6 @@
 				table.update((x) => {
 					x.get(row)?.set(column, {
 						data: data,
-						text: text,
 						opacity: 1,
 						pos: 0,
 						width: 1
@@ -221,10 +220,10 @@
 								<span
 									class="unit"
 									id="t-{tableId}-{rowKey}-{colIndex}"
-									style="width: {col.text.length * charWidth * col.width}rem;
+									style="width: {convert(col.data).length * charWidth * col.width}rem;
 										opacity: {col.opacity};top: {col.pos}px;"
 								>
-									{col.text}
+									{convert(col.data)}
 								</span>
 								{#if conflict && highlightRow === rowKey && highlightColumn === colKey}
 									<div

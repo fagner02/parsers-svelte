@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import { setTreeFunctions } from '$lib/treeFunctions';
 	import { onMount } from 'svelte';
 
@@ -92,8 +92,9 @@
 	 * @param {string} data
 	 * @param {number} newItemIndex
 	 * @param {number} nodeId
+	 * @param {boolean} shouldWait
 	 */
-	async function addToSvg(parent, data, newItemIndex, nodeId) {
+	async function addToSvg(parent, data, newItemIndex, nodeId, shouldWait) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				if (
@@ -124,7 +125,7 @@
 				});
 
 				levels = levels;
-				await wait(props.id, 0);
+				await noJumpWait(0);
 
 				let newNode = levels[parent.level + 1][newItemIndex];
 				let bbox = /**@type {SVGTextElement}*/ (
@@ -140,7 +141,7 @@
 				newNode.dashOffset = 0;
 				levels = levels;
 				height = svg.getBBox().height + 100;
-				await wait(props.id, 500);
+				if (shouldWait) await wait(props.id, 500);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -440,8 +441,9 @@
 	/**
 	 * @param {string[]} data
 	 * @param {string} parentData
+	 * @param {boolean} shouldWait
 	 */
-	export async function addToTree(data, parentData) {
+	export async function addToTree(data, parentData, shouldWait) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const parent = /**@type {import('@/types').node}*/ (findNode(parentData));
@@ -456,7 +458,24 @@
 				levelIndex = levelIndex === -1 ? levels[parent.level + 1].length : levelIndex;
 
 				for (let i = 0; i < data.length; i++) {
-					await addToSvg(parent, data[i], levelIndex + i, i);
+					await addToSvg(parent, data[i], levelIndex + i, i, shouldWait);
+				}
+				resolve(null);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
+	/**@param {{data: string[], parentData: string}[]} levels
+	 * @param {string} startingSymbol
+	 */
+	async function loadSyntaxTree(levels, startingSymbol) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				initializeTree(startingSymbol, false);
+				for (let i of levels) {
+					await addToTree(i.data, i.parentData, false);
 				}
 				resolve(null);
 			} catch (e) {
@@ -492,7 +511,10 @@
 		});
 	}
 
-	export async function initializeTree(/**@type {string}*/ symbol) {
+	export async function initializeTree(
+		/**@type {string}*/ symbol,
+		/**@type {boolean}*/ shouldWait = true
+	) {
 		await addToSvg(
 			{
 				level: -1,
@@ -502,7 +524,8 @@
 			},
 			symbol,
 			0,
-			0
+			0,
+			shouldWait
 		);
 	}
 
@@ -512,7 +535,14 @@
 		treeTop = [];
 	}
 
-	setTreeFunctions({ initializeTree, addFloatingNode, addToTree, addParent, resetTree });
+	setTreeFunctions({
+		initializeTree,
+		addFloatingNode,
+		addToTree,
+		addParent,
+		resetTree,
+		loadSyntaxTree
+	});
 </script>
 
 <div class="svg-box" id="svg-box{props.id}" {style}>

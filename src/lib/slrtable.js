@@ -113,7 +113,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					functionCalls.push({
 						trace: Error().stack,
 						name: 'addToTable',
-						args: [{ action: 'a', state: item.ruleIndex }, 'a', `s${s.index}`, '$']
+						args: ['a', `s${s.index}`, '$']
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 					functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[13]] });
@@ -148,12 +148,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					functionCalls.push({
 						trace: Error().stack,
 						name: 'addToTable',
-						args: [
-							{ action: 'r', state: item.ruleIndex },
-							`r${item.ruleIndex}`,
-							`s${s.index}`,
-							symbol
-						]
+						args: [`r${item.ruleIndex}`, `s${s.index}`, symbol]
 					});
 					functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 					functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
@@ -201,7 +196,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'addToTable',
-					args: [{ action: 'g', state: transition }, `g${transition}`, `s${s.index}`, currentSymbol]
+					args: [`g${transition}`, `s${s.index}`, currentSymbol]
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
@@ -237,7 +232,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'addToTable',
-					args: [{ action: 's', state: transition }, `s${transition}`, `s${s.index}`, currentSymbol]
+					args: [`s${transition}`, `s${s.index}`, currentSymbol]
 				});
 				functionCalls.push({ trace: Error().stack, name: 'highlightOff', args: [] });
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });

@@ -142,6 +142,8 @@ let closeInstruction;
 let openInstruction;
 /** @type {Map<string, (step:number) => void>}*/
 let resetCalls = new Map();
+/** @type {Map<string, () => void>}*/
+let onInputChanged = new Map();
 /** @type {Map<string, () => number>}*/
 let getSteps = new Map();
 
@@ -173,6 +175,14 @@ export function setResetCall(resetCall, lastSaveIndex, id, getStep) {
 	maxStep.set(id, lastSaveIndex);
 	getSteps.set(id, getStep);
 	resetCalls.set(id, resetCall);
+}
+
+/**
+ * @param {number} step
+ * @param {string} id
+ */
+export function setMaxStep(step, id) {
+	maxStep.set(id, step);
 }
 export const flowActions = { none: -1, forward: 0, skipping: 1, back: 2 };
 /**@type {Map<string, number>} */
@@ -248,6 +258,23 @@ export async function addPause(id) {
 		});
 		pauseCount.set(id, (pauseCount.get(id) ?? 0) + 1);
 	});
+}
+
+/**
+ * @param {() => void} callback
+ * @param {string} id
+ */
+export function setOnInputChanged(callback, id) {
+	onInputChanged.set(id, callback);
+}
+
+/**
+ * @param {string} id
+ */
+export function inputChanged(id) {
+	killAllWaits(id);
+	killPause(id);
+	onInputChanged.get(id)?.();
 }
 
 /**

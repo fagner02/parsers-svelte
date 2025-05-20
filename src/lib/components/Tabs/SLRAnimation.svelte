@@ -105,7 +105,6 @@
 									data: cell,
 									opacity: 1,
 									pos: 0,
-									text: cell,
 									width: 1
 								})
 							])

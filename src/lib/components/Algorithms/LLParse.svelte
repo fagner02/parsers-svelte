@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, limitHit, setResetCall, wait } from '$lib/flowControl';
+	import { addPause, setMaxStep, setOnInputChanged, setResetCall } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTreeFunctions } from '$lib/treeFunctions';
@@ -14,6 +14,7 @@
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, llParsing } from '$lib/llparse';
+	import { stackCard } from '@/Tabs/dataToComp';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -33,20 +34,31 @@
 	let inputStackElement = /** @type {StackCard}*/ ($state());
 	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
+	let currentStep = 0;
+	let stepChanged = false;
+	let inputChanged = false;
+	let { initializeTree, addToTree, resetTree, loadSyntaxTree } = getTreeFunctions();
 
-	let { initializeTree, addToTree, resetTree } = getTreeFunctions();
-
-	function reset() {
-		llParsing(startingSymbol, inputString, nt, tableData, rules);
-		symbolStack.update(() => []);
-		inputStack.update(() => []);
+	/**@param {number} step*/
+	function setStep(step) {
+		symbolStackElement.loadStack(stackCard(saves[step].symbolStack, {}));
+		inputStackElement.loadStack(stackCard(saves[step].inputStack, {}));
 		svgLines?.setHideOpacity();
-		context.setAccept(null);
+		saves[step].accept === undefined
+			? context.setAccept(null)
+			: context.setAccept(saves[step].accept);
 		resetTree();
-
-		parsing();
+		loadSyntaxTree(saves[step].tree, startingSymbol);
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
+	function onInputChanged() {
+		llParsing(startingSymbol, inputString, nt, tableData, rules);
+		setMaxStep(saves.length - 1, id);
+		inputChanged = true;
+	}
+	setOnInputChanged(onInputChanged, id);
 
 	/**@type {any}*/
 	const obj = {
@@ -64,17 +76,31 @@
 
 	async function parsing() {
 		try {
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (inputChanged) {
+					currentStep = 0;
+					stepChanged = false;
+					inputChanged = false;
+					i = 0;
 					continue;
 				}
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
+					continue;
+				}
+				const call = functionCalls[i];
 				try {
-					if (call.skip) obj[call.name]()(...call.args);
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.error(`Error calling function ${call.name}:`, call.trace, e);
+					continue;
 				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 		} catch (e) {}
 	}
@@ -84,7 +110,8 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Ll1ParsingInfo);
-		await parsing();
+		onInputChanged();
+		parsing();
 	});
 </script>
 
@@ -100,16 +127,20 @@
 			columns={t}
 			{table}
 			bind:svgLines
-			tableId="ll"
+			tableId={elemIds.table}
 			label="tabela ll(1)"
 			hue={colors.blue}
+			convert={(v) =>
+				v > -1
+					? `${rules[v].left} -> ${rules[v].right[0] === '' ? 'ε' : rules[v].right.join(' ')}`
+					: ''}
 		></TableCard>
 		<StackCard
 			{id}
 			bind:svgLines
 			bind:stack={inputStack}
 			bind:this={inputStackElement}
-			stackId="input{id}"
+			stackId={elemIds.input}
 			hue={colors.green}
 			label="entrada"
 		></StackCard>
@@ -118,7 +149,7 @@
 			bind:svgLines
 			bind:stack={symbolStack}
 			bind:this={symbolStackElement}
-			stackId="symbols{id}"
+			stackId={elemIds.states}
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>

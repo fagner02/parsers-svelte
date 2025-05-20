@@ -145,7 +145,6 @@
 	};
 
 	async function buildAutomaton() {
-		console.log('buildAutomaton');
 		try {
 			loadGrammar?.();
 			let i = 0;
@@ -167,9 +166,7 @@
 				}
 				i++;
 			}
-		} catch (e) {
-			console.log('outerr', e);
-		}
+		} catch (e) {}
 	}
 
 	onMount(() => {

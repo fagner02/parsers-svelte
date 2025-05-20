@@ -35,6 +35,13 @@ export function follow(rules, nt, firstSet) {
 	let followIndexes = new Map();
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		follow: structuredClone(followSet),
+		join: structuredClone(joinSet),
+		joinStack: [],
+		grammarSelect: '',
+		functionCall: functionCalls.length - 1
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
 	functionCalls.push({
 		trace: Error().stack,
@@ -96,6 +103,13 @@ export function follow(rules, nt, firstSet) {
 					name: 'addPause',
 					args: [id]
 				});
+				saves.push({
+					follow: structuredClone(followSet),
+					join: structuredClone(joinSet),
+					joinStack: [],
+					grammarSelect: `${elemIds.grammar}gset${i}`,
+					functionCall: functionCalls.length - 1
+				});
 				continue;
 			}
 			functionCalls.push({
@@ -125,6 +139,13 @@ export function follow(rules, nt, firstSet) {
 					trace: Error().stack,
 					name: 'addPause',
 					args: [id]
+				});
+				saves.push({
+					follow: structuredClone(followSet),
+					join: structuredClone(joinSet),
+					joinStack: [],
+					grammarSelect: `${elemIds.grammar}gset${i}`,
+					functionCall: functionCalls.length - 1
 				});
 			}
 
@@ -171,6 +192,13 @@ export function follow(rules, nt, firstSet) {
 							name: 'addPause',
 							args: [id]
 						});
+						saves.push({
+							follow: structuredClone(followSet),
+							join: structuredClone(joinSet),
+							joinStack: [],
+							grammarSelect: `${elemIds.grammar}gset${i}`,
+							functionCall: functionCalls.length - 1
+						});
 					}
 					functionCalls.push({
 						trace: Error().stack,
@@ -193,6 +221,13 @@ export function follow(rules, nt, firstSet) {
 							trace: Error().stack,
 							name: 'addPause',
 							args: [id]
+						});
+						saves.push({
+							follow: structuredClone(followSet),
+							join: structuredClone(joinSet),
+							joinStack: [],
+							grammarSelect: `${elemIds.grammar}gset${i}`,
+							functionCall: functionCalls.length - 1
 						});
 					}
 					functionCalls.push({
@@ -278,6 +313,13 @@ export function follow(rules, nt, firstSet) {
 								name: 'addPause',
 								args: [id]
 							});
+							saves.push({
+								follow: structuredClone(followSet),
+								join: structuredClone(joinSet),
+								joinStack: [],
+								grammarSelect: `${elemIds.grammar}gset${i}`,
+								functionCall: functionCalls.length - 1
+							});
 						}
 					}
 					functionCalls.push({
@@ -333,6 +375,13 @@ export function follow(rules, nt, firstSet) {
 						trace: Error().stack,
 						name: 'addPause',
 						args: [id]
+					});
+					saves.push({
+						follow: structuredClone(followSet),
+						join: structuredClone(joinSet),
+						joinStack: [],
+						grammarSelect: `${elemIds.grammar}gset${i}`,
+						functionCall: functionCalls.length - 1
 					});
 					functionCalls.push({
 						trace: Error().stack,
@@ -394,6 +443,13 @@ export function follow(rules, nt, firstSet) {
 			name: 'addPause',
 			args: [id]
 		});
+		saves.push({
+			follow: structuredClone(followSet),
+			join: structuredClone(joinSet),
+			joinStack: structuredClone(joinStack),
+			grammarSelect: '',
+			functionCall: functionCalls.length - 1
+		});
 
 		while (joinStack.length > 0) {
 			functionCalls.push({
@@ -439,6 +495,14 @@ export function follow(rules, nt, firstSet) {
 					name: 'addPause',
 					args: [id]
 				});
+				saves.push({
+					follow: structuredClone(followSet),
+					join: structuredClone(joinSet),
+					joinStack: structuredClone(joinStack),
+					grammarSelect: '',
+					functionCall: functionCalls.length - 1
+				});
+
 				functionCalls.push({
 					trace: Error().stack,
 					name: 'highlightLines',
@@ -476,6 +540,14 @@ export function follow(rules, nt, firstSet) {
 				name: 'addPause',
 				args: [id]
 			});
+			saves.push({
+				follow: structuredClone(followSet),
+				join: structuredClone(joinSet),
+				joinStack: structuredClone(joinStack),
+				grammarSelect: '',
+				functionCall: functionCalls.length - 1
+			});
+
 			functionCalls.push({
 				trace: Error().stack,
 				name: 'highlightLines',
@@ -510,11 +582,25 @@ export function follow(rules, nt, firstSet) {
 					name: 'addPause',
 					args: [id]
 				});
+				saves.push({
+					follow: structuredClone(followSet),
+					join: structuredClone(joinSet),
+					joinStack: structuredClone(joinStack),
+					grammarSelect: '',
+					functionCall: functionCalls.length - 1
+				});
 			}
 		}
 	}
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		follow: structuredClone(followSet),
+		join: structuredClone(joinSet),
+		joinStack: [],
+		grammarSelect: '',
+		functionCall: functionCalls.length - 1
+	});
 
 	return { followSet, id };
 }

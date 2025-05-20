@@ -1,10 +1,11 @@
 /**
  * @typedef {{
- * initializeTree: (symbol: string)=>Promise<void>,
- * addToTree: (data: string[], parent:string)=>Promise<void>,
+ * initializeTree: (symbol: string, shouldWait?: boolean)=>Promise<void>,
+ * addToTree: (data: string[], parent:string, shouldWait: boolean)=>Promise<void>,
  * resetTree: ()=>void,
  * addFloatingNode: (data: string[])=>Promise<any>,
- * addParent: (parent: string, children: string[]) => Promise<void>
+ * addParent: (parent: string, children: string[]) => Promise<void>,
+ * loadSyntaxTree: (levels: {data: string[], parentData: string}[], startingSymbol: string) => Promise<void>
  * }} TreeFunctions
  * */
 

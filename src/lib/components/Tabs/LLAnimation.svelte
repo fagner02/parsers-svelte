@@ -71,7 +71,7 @@
 			/**@type {import('@/types').SetRow[]}*/ (
 				[..._first.firstSet.entries()].map((x) => {
 					return {
-						left: rules[x[0]].left,
+						left: x[0],
 						right: [...x[1]]
 					};
 				})
@@ -101,10 +101,6 @@
 									data: cell,
 									opacity: 1,
 									pos: 0,
-									text:
-										cell > -1
-											? `${rules[cell].left} -> ${rules[cell].right[0] === '' ? 'ε' : rules[cell].right.join(' ')}`
-											: '',
 									width: 1
 								})
 							])

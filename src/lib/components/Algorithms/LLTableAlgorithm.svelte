@@ -4,16 +4,17 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
-	import { wait, addPause, limitHit, setResetCall } from '$lib/flowControl';
+	import { addPause, setResetCall } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
-	import { colors, selectRSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { setInfoComponent } from '$lib/infoText';
 	import LL1TableInfo from '@/Info/LL1TableInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/lltable';
+	import { tableCard } from '@/Tabs/dataToComp';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -28,7 +29,8 @@
 
 	let tableElement = /**@type {TableCard}*/ ($state());
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
-
+	let currentStep = 0;
+	let stepChanged = false;
 	let { nt, t, rules } = getGrammar();
 
 	/** @type {{
@@ -43,21 +45,43 @@
 		followSet
 	} = $props();
 
-	function reset() {
-		tableElement.resetTable();
+	let lastSelected = 0;
+	/**@param {number} step*/
+	function setStep(step) {
+		if (lastSelected === step) return;
 		svgLines?.setHideOpacity();
-		firstCard?.reloadElement();
-		followCard?.reloadElement();
-		firstFuncs?.hideSelect();
-
-		lltable();
+		for (let f of saves[lastSelected].firstSymbols) {
+			deselectSymbol(f, id);
+		}
+		for (let f of saves[lastSelected].followSymbols) {
+			deselectSymbol(f, id);
+		}
+		tableElement.resetTable();
+		table.set(tableCard(saves[step].table, {}));
+		const conflict = saves[step].conflict;
+		if (conflict) {
+			tableElement.showConflict(conflict.row, conflict.col);
+			tableElement.setConflictTooltip(conflict.tooltip);
+		}
+		saves[step].firstSelect === ''
+			? firstFuncs?.hideSelect()
+			: firstFuncs?.selectFor(saves[step].firstSelect);
+		for (let f of saves[step].firstSymbols) {
+			selectSymbol(f, colors.green, id, false);
+		}
+		for (let f of saves[step].followSymbols) {
+			selectSymbol(f, colors.green, id, false);
+		}
+		currentStep = step;
+		stepChanged = true;
 	}
-	setResetCall(reset, id);
+	setResetCall(setStep, saves.length - 1, id, () => currentStep);
 
 	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
-		selectRSymbol: () => selectRSymbol,
+		selectSymbol: () => selectSymbol,
+		deselectSymbol: () => deselectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
 		selectFirst: () => firstFuncs?.selectFor,
 		showConflict: () => tableElement?.showConflict,
@@ -70,16 +94,25 @@
 	async function lltable() {
 		try {
 			await loadGrammar();
-			for (let call of functionCalls) {
-				if (!obj[call.name]) {
-					console.error(`Function ${call.name} not found in map`);
+			let i = 0;
+			while (i < functionCalls.length || stepChanged) {
+				if (stepChanged) {
+					stepChanged = false;
+					i = saves[currentStep].functionCall;
 					continue;
 				}
+				const call = functionCalls[i];
+				lastSelected = currentStep;
 				try {
-					await obj[call.name]()(...call.args);
+					if (call.skip !== undefined) obj[call.name]()(...call.args);
+					else await obj[call.name]()(...call.args);
 				} catch (e) {
-					console.error(`Error calling function ${call.name}:`, call.trace, e);
+					continue;
 				}
+				if (call.name === 'addPause') {
+					currentStep++;
+				}
+				i++;
 			}
 			// await addPause(id);
 			// instruction = 'Since this thing is like that we have add to the stack';
@@ -201,6 +234,10 @@
 			bind:table
 			bind:svgLines
 			bind:this={tableElement}
+			convert={(v) =>
+				v > -1
+					? `${rules[v].left} -> ${rules[v].right[0] === '' ? 'ε' : rules[v].right.join(' ')}`
+					: ''}
 			tableId={elemIds.table}
 			label="tabela ll(1)"
 			hue={colors.blue}
@@ -217,6 +254,10 @@
 			{id}
 			setId={elemIds.firstSet}
 			set={firstSet}
+			convert={{
+				left: (value) => rules[value].left,
+				noteLeft: (value) => value.toString()
+			}}
 			hue={colors.blue}
 			label={'first set'}
 			bind:this={firstCard}

@@ -7,7 +7,14 @@ export const elemIds = {
 };
 /**@type {any} */
 export let functionCalls = [];
-/**@type {any} */
+/**
+ * @type {{
+ * symbolStack: string[],
+ * inputStack: string[],
+ * functionCall: number,
+ * accept?: boolean,
+ * tree: {data: string[], parentData: string}[]}[]}
+ * */
 export let saves = [];
 
 /**
@@ -19,7 +26,18 @@ export let saves = [];
  */
 export function llParsing(startingSymbol, inputString, nt, table, rules) {
 	functionCalls = [];
+	saves = [];
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	/**
+	 * @type {typeof saves[0]['tree']}
+	 */
+	let tree = [];
+	saves.push({
+		symbolStack: [],
+		inputStack: [],
+		functionCall: functionCalls.length - 1,
+		tree: []
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ trace: Error().stack, name: 'resetTree', args: [] });
 	functionCalls.push({ trace: Error().stack, name: 'initializeTree', args: [startingSymbol] });
@@ -42,6 +60,12 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		});
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		symbolStack: structuredClone(symbolStack),
+		inputStack: structuredClone(inputStack),
+		functionCall: functionCalls.length - 1,
+		tree: structuredClone(tree)
+	});
 
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[3]] });
 	let last = { input: '', symbol: '' };
@@ -59,6 +83,14 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			if (production === undefined || production === -1) {
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[9]] });
 				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
+				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					symbolStack: structuredClone(symbolStack),
+					inputStack: structuredClone(inputStack),
+					functionCall: functionCalls.length - 1,
+					accept: false,
+					tree: structuredClone(tree)
+				});
 				return false;
 			}
 
@@ -92,6 +124,7 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 					args: [prod, topSymbol],
 					skip: true
 				});
+				tree.push({ data: prod, parentData: topSymbol });
 				for (const i of prod) {
 					functionCalls.push({
 						trace: Error().stack,
@@ -106,6 +139,8 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 					args: [['\u03B5'], topSymbol],
 					skip: true
 				});
+
+				tree.push({ data: ['\u03B5'], parentData: topSymbol });
 			}
 			if (last.input === newLast.input && last.symbol === newLast.symbol) {
 				functionCalls.push({
@@ -114,6 +149,13 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 					args: [false]
 				});
 				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					symbolStack: structuredClone(symbolStack),
+					inputStack: structuredClone(inputStack),
+					functionCall: functionCalls.length - 1,
+					accept: false,
+					tree: structuredClone(tree)
+				});
 				return false;
 			}
 			last = newLast;
@@ -131,6 +173,15 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			if (topSymbol !== topInput) {
 				functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[15]] });
 				functionCalls.push({ trace: Error().stack, name: 'setAccept', args: [false] });
+				functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+				saves.push({
+					symbolStack: structuredClone(symbolStack),
+					inputStack: structuredClone(inputStack),
+					functionCall: functionCalls.length - 1,
+					accept: false,
+					tree: structuredClone(tree)
+				});
+
 				return false;
 			}
 			functionCalls.push({
@@ -162,6 +213,12 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 			name: 'addPause',
 			args: [id]
 		});
+		saves.push({
+			symbolStack: structuredClone(symbolStack),
+			inputStack: structuredClone(inputStack),
+			functionCall: functionCalls.length - 1,
+			tree: structuredClone(tree)
+		});
 	}
 	functionCalls.push({
 		trace: Error().stack,
@@ -177,6 +234,13 @@ export function llParsing(startingSymbol, inputString, nt, table, rules) {
 		trace: Error().stack,
 		name: 'addPause',
 		args: [id]
+	});
+	saves.push({
+		symbolStack: structuredClone(symbolStack),
+		inputStack: structuredClone(inputStack),
+		functionCall: functionCalls.length - 1,
+		accept: symbolStack.length === 0 && inputStack.length === 0,
+		tree: structuredClone(tree)
 	});
 	return symbolStack.length === 0 && inputStack.length === 0;
 }
