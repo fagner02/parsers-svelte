@@ -194,6 +194,7 @@ export function setStepCall(resetCall, lastSaveIndex, id, getStep) {
  */
 export function setMaxStep(step, id) {
 	tabs.get(currentTab)?.setMaxStep(step);
+	setCurrentStep(getSteps.get(id)?.() ?? 0);
 	maxStep.set(id, step);
 }
 
@@ -312,11 +313,11 @@ export function reset(id) {
  * @param {string} tabId
  */
 export function swapAlgorithm(id, infoComp, tabId) {
-	const tab = tabs.get(tabId);
 	currentTab = tabId;
-	if (tab) {
-		tab.setMaxStep(maxStep.get(id) ?? 0);
-	}
+
+	tabs.get(tabId)?.setMaxStep(maxStep.get(id) ?? 0);
+	setCurrentStep(getSteps.get(id)?.() ?? 0);
+
 	setInfoComponent(infoComp);
 	if (!pauseResolves.has(id)) {
 		waitCount.set(id, 0);
