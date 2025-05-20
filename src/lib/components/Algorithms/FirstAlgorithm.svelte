@@ -18,7 +18,7 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import FistInfo from '@/Info/FirstInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, saves, elemIds, functionCalls } from '$lib/first';
+	import { id, saves, elemIds, functionCalls, first } from '$lib/first';
 	import { getGrammar } from '$lib/utils';
 	import { stackCard } from '@/Tabs/dataToComp';
 
@@ -47,19 +47,25 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarSelection;
 
-	let { rules } = getGrammar();
+	let { rules, nt } = getGrammar();
 	let currentStep = 0;
 	let stepChanged = false;
 
 	/**@param {number} step*/
 	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
 		svgLines?.hideLine(false, id);
-		saves[step].grammarSelect === ''
+		save.grammarSelect === ''
 			? grammarSelection?.hideSelect()
-			: grammarSelection?.selectFor(saves[step].grammarSelect);
-		joinStackElement?.loadStack(stackCard(saves[step].joinStack, { key: (a) => rules[a].left }));
-		joinSetElement?.loadSets(saves[step].join);
-		firstSetElement?.loadSets(saves[step].first);
+			: grammarSelection?.selectFor(save.grammarSelect);
+		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
+		joinSetElement?.loadSets(save.join);
+		firstSetElement?.loadSets(save.first);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -84,7 +90,7 @@
 		removeSet: () => joinSetElement?.remove
 	};
 
-	async function first() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -96,6 +102,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -116,7 +127,7 @@
 		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
 		setInfoComponent(FistInfo);
-		return first();
+		return executeSteps();
 	});
 </script>
 

@@ -16,7 +16,7 @@
 	import { setInfoComponent } from '$lib/infoText';
 	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls } from '$lib/slrtable';
+	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 
 	/**@type {TableCard | undefined}*/
@@ -68,23 +68,29 @@
 	 * @param {number} step
 	 */
 	function setStep(step) {
-		stateName = saves[step].stateName;
-		stateElem?.loadState(saves[step].state);
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
+		stateName = save.stateName;
+		stateElem?.loadState(save.state);
 		svgLines?.hideLine(false, id);
 		try {
-			saves[step].followSelect === ''
+			save.followSelect === ''
 				? followSelection?.hideSelect()
-				: followSelection?.selectFor(saves[step].followSelect);
-			saves[step].stateSelect === ''
+				: followSelection?.selectFor(save.followSelect);
+			save.stateSelect === ''
 				? stateSelection?.hideSelect()
-				: stateSelection?.selectFor(saves[step].stateSelect);
-			saves[step].stackSelect === ''
+				: stateSelection?.selectFor(save.stateSelect);
+			save.stackSelect === ''
 				? stackSelection?.hideSelect()
-				: stackSelection?.selectFor(saves[step].stackSelect);
+				: stackSelection?.selectFor(save.stackSelect);
 		} catch (e) {
 			console.log(e);
 		}
-		table.set(tableCard(saves[step].table, { key: (a) => `s${a}` }));
+		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -113,7 +119,7 @@
 		highlightDot: () => stateElem?.highlightDot
 	};
 
-	async function slrTable() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -125,6 +131,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -150,7 +161,7 @@
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
-		slrTable();
+		executeSteps();
 	});
 </script>
 

@@ -47,14 +47,18 @@
 
 	/**@param {number} step*/
 	function setStep(step) {
-		stateStackElement.loadStack(stackCard(saves[step].stateStack, {}));
-		inputStackElement.loadStack(stackCard(saves[step].inputStack, {}));
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
+		stateStackElement.loadStack(stackCard(save.stateStack, {}));
+		inputStackElement.loadStack(stackCard(save.inputStack, {}));
 		svgLines?.setHideOpacity();
-		saves[step].accept === undefined
-			? context.setAccept(null)
-			: context.setAccept(saves[step].accept);
+		save.accept === undefined ? context.setAccept(null) : context.setAccept(save.accept);
 		tree.resetTree();
-		tree.loadFloatingTree(saves[step].tree);
+		tree.loadFloatingTree(save.tree);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -80,7 +84,7 @@
 		highlightLines: () => codeCard?.highlightLines
 	};
 
-	async function parsing() {
+	async function executeSteps() {
 		try {
 			let i = 0;
 			while (i < functionCalls.length || stepChanged) {
@@ -98,6 +102,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -117,7 +126,7 @@
 		setInfoComponent(SlrParsingInfo);
 		loadGrammar();
 		onInputChanged();
-		parsing();
+		executeSteps();
 	});
 </script>
 

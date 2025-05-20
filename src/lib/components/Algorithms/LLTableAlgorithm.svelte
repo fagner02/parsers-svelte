@@ -44,6 +44,12 @@
 	let lastSelected = 0;
 	/**@param {number} step*/
 	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
 		if (lastSelected === step) return;
 		svgLines?.setHideOpacity();
 		for (let f of saves[lastSelected].firstSymbols) {
@@ -53,19 +59,17 @@
 			deselectSymbol(f, id);
 		}
 		tableElement.resetTable();
-		table.set(tableCard(saves[step].table, {}));
-		const conflict = saves[step].conflict;
+		table.set(tableCard(save.table, {}));
+		const conflict = save.conflict;
 		if (conflict) {
 			tableElement.showConflict(conflict.row, conflict.col);
 			tableElement.setConflictTooltip(conflict.tooltip);
 		}
-		saves[step].firstSelect === ''
-			? firstFuncs?.hideSelect()
-			: firstFuncs?.selectFor(saves[step].firstSelect);
-		for (let f of saves[step].firstSymbols) {
+		save.firstSelect === '' ? firstFuncs?.hideSelect() : firstFuncs?.selectFor(save.firstSelect);
+		for (let f of save.firstSymbols) {
 			selectSymbol(f, colors.green, id, false);
 		}
-		for (let f of saves[step].followSymbols) {
+		for (let f of save.followSymbols) {
 			selectSymbol(f, colors.green, id, false);
 		}
 		currentStep = step;
@@ -87,7 +91,7 @@
 		highlightOff: () => tableElement?.highlightOff
 	};
 
-	async function lltable() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -100,6 +104,11 @@
 				const call = functionCalls[i];
 				lastSelected = currentStep;
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -122,7 +131,7 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(LL1TableInfo);
-		lltable();
+		executeSteps();
 	});
 </script>
 

@@ -63,12 +63,18 @@
 	 * @param {number} step
 	 */
 	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
 		svgLines?.hideLine(false, id);
 		stateSelection?.hideSelect();
 		stateStackSelection?.hideSelect();
-		stateElem?.loadState(saves[step].state, false);
-		table.set(tableCard(saves[step].table, { key: (a) => `s${a}` }));
-		stateName = saves[step].stateName;
+		stateElem?.loadState(save.state, false);
+		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
+		stateName = save.stateName;
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -97,7 +103,7 @@
 		}
 	};
 
-	async function clrTable() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -109,6 +115,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -134,7 +145,7 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		clrTable();
+		executeSteps();
 	});
 </script>
 

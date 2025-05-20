@@ -21,8 +21,6 @@ export let functionCalls = [];
 export let saves = [];
 
 export function calcNullable(/**@type {import('@/types').GrammarItem[]} */ rules) {
-	functionCalls = [];
-	saves = [];
 	/** @type {Map<string, boolean>}*/
 	let nullable = new Map();
 
@@ -67,6 +65,8 @@ export function first(rules, nt) {
 	let joinSet = new Map();
 	/** @type {Map<string, boolean>}*/
 	let nullable = calcNullable(rules);
+	functionCalls = [];
+	saves = [];
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
 	saves.push({

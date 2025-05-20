@@ -74,17 +74,23 @@
 	 * @param {number} step
 	 */
 	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
 		symbolsSelection.hideSelect();
 		originStateSelection.hideSelect();
 		targetStateSelection.hideSelect();
 		grammarSelection.hideSelect();
 		svgLines?.hideLine(false, id);
-		stateStackElem?.loadStack(stackCard(saves[step].stateStack, { key: (a) => `s${a}` }));
-		originStateName = saves[step].originStateName;
-		originStateElem?.loadState(saves[step].originState, false);
-		targetStateElem?.loadState(saves[step].targetState, false);
+		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
+		originStateName = save.originStateName;
+		originStateElem?.loadState(save.originState, false);
+		targetStateElem?.loadState(save.targetState, false);
 		automatonElem?.reset();
-		automatonElem?.loadAutomaton(saves[step].automaton);
+		automatonElem?.loadAutomaton(save.automaton);
 		currentStep = step;
 		stepChanged = true;
 	}
@@ -122,7 +128,7 @@
 			};
 		}
 	};
-	async function buildAutomaton() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -134,6 +140,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -162,7 +173,7 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Lr0AutomatonInfo);
-		buildAutomaton();
+		executeSteps();
 	});
 </script>
 

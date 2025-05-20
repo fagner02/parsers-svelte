@@ -49,13 +49,19 @@
 	 * @param {number} step
 	 */
 	function setStep(step) {
+		const save = saves[step];
+		if (save === undefined) {
+			console.error(`Step ${step} not found`);
+			console.log(saves);
+			return;
+		}
 		svgLines?.hideLine(false, id);
-		saves[step].grammarSelect === ''
+		save.grammarSelect === ''
 			? grammarSelection?.hideSelect()
-			: grammarSelection?.selectFor(saves[step].grammarSelect);
-		followSetElement?.loadSets(saves[step].follow);
-		joinSetElement?.loadSets(saves[step].join);
-		joinStackElement?.loadStack(stackCard(saves[step].joinStack, {}));
+			: grammarSelection?.selectFor(save.grammarSelect);
+		followSetElement?.loadSets(save.follow);
+		joinSetElement?.loadSets(save.join);
+		joinStackElement?.loadStack(stackCard(save.joinStack, {}));
 
 		currentStep = step;
 		stepChanged = true;
@@ -78,7 +84,7 @@
 		removeSet: () => joinSetElement?.remove
 	};
 
-	async function follow() {
+	async function executeSteps() {
 		try {
 			await loadGrammar();
 			let i = 0;
@@ -90,6 +96,11 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (!obj[call.name]) {
+						console.error(`Function ${call.name} not found`);
+						console.log(obj[call.name], call, obj);
+						return executeSteps();
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -109,7 +120,7 @@
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 		setInfoComponent(FollowInfo);
-		follow();
+		executeSteps();
 	});
 </script>
 
