@@ -10,15 +10,19 @@ export const elemIds = {
 
 /**@type {any} */
 export let functionCalls = [];
-/**@type {{
+/**
+ * @type {{
  * join: Map<number, Set<number>>,
  * joinStack: number[],
  * first: Map<number, Set<string>>,
  * grammarSelect: string,
- * functionCall: number}[]} */
+ * functionCall: number}[]}
+ * */
 export let saves = [];
 
 export function calcNullable(/**@type {import('@/types').GrammarItem[]} */ rules) {
+	functionCalls = [];
+	saves = [];
 	/** @type {Map<string, boolean>}*/
 	let nullable = new Map();
 

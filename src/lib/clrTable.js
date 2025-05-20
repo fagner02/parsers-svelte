@@ -12,11 +12,13 @@ export let elemIds = {
 /** @type {any} */
 export let functionCalls = [];
 
-/** @type {{
+/**
+ * @type {{
  * state: import('@/types').LR1StateItem[],
  * table: Map<number, Map<string, string>>,
  * stateName: string,
- * functionCall: number }[]} */
+ * functionCall: number }[]}
+ * */
 export let saves = [];
 
 /**
@@ -26,6 +28,8 @@ export let saves = [];
  * @param {string[]} t
  */
 export function clrTable(automaton, rules, nt, t) {
+	functionCalls = [];
+	saves = [];
 	const alphabet = [...t, ...nt];
 	/**@type {Map<number,Map<string, string>>} */
 	let table = new Map();

@@ -13,23 +13,16 @@ export const elemIds = {
 
 /** @type {any} */
 export let functionCalls = [];
-/** @type {{
+/**
+ * @type {{
  * targetState: import('@/types').LR0StateItem[],
  * originState: import('@/types').LR0StateItem[],
  * originStateName: string,
  * stateStack: number[],
  * automaton: import('@/types').LR0Automaton,
- * functionCall: number}[]} */
-export let saves = [
-	{
-		automaton: { states: [], transitions: new Map() },
-		targetState: [],
-		originState: [],
-		originStateName: '',
-		stateStack: [],
-		functionCall: 0
-	}
-];
+ * functionCall: number}[]}
+ * */
+export let saves = [];
 
 /**
  * @param {import('@/types').LR0StateItem[]} state
@@ -136,10 +129,20 @@ export function closure(state, rules, nt) {
  * @param {string[]} t
  */
 export function lr0Automaton(rules, nt, t) {
+	functionCalls = [];
+	saves = [];
 	/**@type {import('@/types').LR0Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
 
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		automaton: { states: [], transitions: new Map() },
+		targetState: [],
+		originState: [],
+		originStateName: '',
+		stateStack: [],
+		functionCall: 0
+	});
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[1]] });
 	functionCalls.push({ trace: Error().stack, name: 'highlightLines', args: [[2]] });

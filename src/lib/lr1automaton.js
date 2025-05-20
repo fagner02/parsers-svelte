@@ -1,6 +1,7 @@
 import { colors } from './selectSymbol';
 
-/** @type {{
+/**
+ * @type {{
  * targetState: import('@/types').LR1StateItem[],
  * originState: import('@/types').LR1StateItem[],
  * originStateName: string,
@@ -8,19 +9,9 @@ import { colors } from './selectSymbol';
  * stateStack: number[],
  * automaton: import('@/types').LR1Automaton,
  * lookahead: Set<string>,
- * functionCall: number}[]} */
-export let saves = [
-	{
-		targetState: [],
-		originState: [],
-		originStateName: '',
-		targetStateName: 's?',
-		stateStack: [],
-		automaton: { states: [], transitions: new Map() },
-		lookahead: new Set(),
-		functionCall: 0
-	}
-];
+ * functionCall: number}[]}
+ * */
+export let saves = [];
 /**@type {any} */
 export let functionCalls = [];
 export const id = 'lr1automaton';
@@ -343,7 +334,19 @@ export function closure(state, rules, nt, firstSet) {
  * @param {Map<string,Set<string>>} firstSet
  */
 export function lr1Automaton(rules, nt, t, firstSet) {
+	functionCalls = [];
+	saves = [];
 	functionCalls.push({ trace: Error().stack, name: 'addPause', args: [id] });
+	saves.push({
+		targetState: [],
+		originState: [],
+		originStateName: '',
+		targetStateName: 's?',
+		stateStack: [],
+		automaton: { states: [], transitions: new Map() },
+		lookahead: new Set(),
+		functionCall: 0
+	});
 
 	/**@type {import('@/types').LR1Automaton}*/
 	let automaton = { states: [], transitions: new Map() };

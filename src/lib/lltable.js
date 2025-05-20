@@ -10,13 +10,15 @@ export const elemIds = {
 };
 /**@type {any} */
 export let functionCalls = [];
-/**@type {{
+/**
+ * @type {{
  * table: Map<string, Map<string, number>>,
  * firstSelect: string,
  * followSymbols: string[],
  * firstSymbols: string[],
  * functionCall: number,
- * conflict?: {col:string, row: string, tooltip: string}}[]} */
+ * conflict?: {col:string, row: string, tooltip: string}}[]}
+ * */
 export let saves = [];
 
 /**@param {string[]} arr */
@@ -34,6 +36,8 @@ function deselectSymbols(arr) {
  * @param {Map<string, Set<string>>} followSet
  */
 export function lltable(rules, nt, t, firstSet, followSet) {
+	functionCalls = [];
+	saves = [];
 	/**@type {Map<string, Map<string, number>>} */
 	let table = new Map();
 

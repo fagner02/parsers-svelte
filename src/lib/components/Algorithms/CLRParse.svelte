@@ -81,7 +81,7 @@
 			let i = 0;
 			while (i < functionCalls.length || stepChanged) {
 				if (inputChanged) {
-					currentStep = 0;
+					setStep(0);
 					stepChanged = false;
 					inputChanged = false;
 					i = 0;

@@ -12,19 +12,24 @@ export const elemIds = {
 
 /**@type {any} */
 export let functionCalls = [];
-/**@type {{
+/**
+ * @type {{
  * follow: Map<string, Set<string>>,
  * join: Map<string, Set<string>>,
  * joinStack: string[],
  * grammarSelect: string,
- * functionCall: number}[]} */
+ * functionCall: number}[]}
+ * */
 export let saves = [];
+
 /**
  * @param {Array<import('@/types').GrammarItem>} rules
  * @param {string[]} nt
  * @param {Map<number, Set<string>>} firstSet
  */
 export function follow(rules, nt, firstSet) {
+	functionCalls = [];
+	saves = [];
 	/** @type {Map<string, Set<string>>}*/
 	let followSet = new Map();
 	/** @type {Map<string, Set<string>>}*/

@@ -8,14 +8,16 @@ export let elemIds = {
 	follow: `${id}-follow`,
 	state: `${id}-state`
 };
-/** @type {{
+/**
+ * @type {{
  * state: import('@/types').LR0StateItem[],
  * stateName: string,
  * table: Map<number, Map<string, string>>,
  * followSelect: string,
  * stackSelect: string,
  * stateSelect: string,
- * functionCall: number }[]}*/
+ * functionCall: number }[]}
+ * */
 export let saves = [];
 /** @type {any}*/
 export let functionCalls = [];
@@ -28,6 +30,8 @@ export let functionCalls = [];
  * @param {Map<string, Set<string>>} followSet
  */
 export function slrTable(automaton, rules, nt, t, followSet) {
+	functionCalls = [];
+	saves = [];
 	const alphabet = [...t, ...nt];
 
 	/**@type {Map<number,Map<string, string>>} */
