@@ -2,13 +2,7 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import {
-		addPause,
-		setCurrentStep,
-		setMaxStep,
-		setOnInputChanged,
-		setStepCall
-	} from '$lib/flowControl';
+	import { addPause } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTree } from '$lib/treeFunctions';

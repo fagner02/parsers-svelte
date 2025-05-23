@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
+	import { addPause } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';

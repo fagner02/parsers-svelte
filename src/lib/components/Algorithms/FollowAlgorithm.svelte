@@ -4,7 +4,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
+	import { addPause } from '$lib/flowControl';
 	import { colors, selectRSymbol } from '$lib/selectSymbol';
 	import { onMount } from 'svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
