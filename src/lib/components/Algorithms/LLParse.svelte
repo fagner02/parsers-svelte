@@ -21,6 +21,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, llParsing } from '$lib/llparse';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -40,39 +41,21 @@
 	let inputStackElement = /** @type {StackCard}*/ ($state());
 	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
-	let currentStep = 0;
-	let stepChanged = false;
-	let inputChanged = false;
+
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 	let tree = getTree();
 
-	/**@param {number} step*/
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	/**@param {typeof saves[0]} save*/
+	function setStepCallback(save) {
 		symbolStackElement.loadStack(stackCard(save.symbolStack, {}));
 		inputStackElement.loadStack(stackCard(save.inputStack, {}));
 		svgLines?.setHideOpacity();
 		save.accept === undefined ? context.setAccept(null) : context.setAccept(save.accept);
 		tree.resetTree();
 		tree.loadSyntaxTree(save.tree, startingSymbol);
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
-	function onInputChanged() {
-		llParsing(startingSymbol, inputString, nt, tableData, rules);
-		setMaxStep(saves.length - 1, id);
-		inputChanged = true;
-	}
-	setOnInputChanged(onInputChanged, id);
 
-	/**@type {any}*/
 	const obj = {
 		highlightLines: () => codeCard?.highlightLines,
 		addToStackSymbols: () => symbolStackElement.addToStack,
@@ -86,45 +69,30 @@
 		setAccept: () => context.setAccept
 	};
 
-	async function executeSteps() {
-		try {
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (inputChanged) {
-					setStep(0);
-					stepChanged = false;
-					inputChanged = false;
-					i = 0;
-					continue;
-				}
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[
+			{
+				func: obj.highlightLines,
+				breakpoints: () => breakpoints
 			}
-		} catch (e) {}
-	}
-
+		],
+		obj,
+		id,
+		setStepCallback,
+		() => {
+			llParsing(startingSymbol, inputString, nt, tableData, rules);
+			stepExecution.saves = saves;
+			stepExecution.functionCalls = functionCalls;
+		}
+	);
 	onMount(async () => {
 		fetch('./llparse.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Ll1ParsingInfo);
-		onInputChanged();
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

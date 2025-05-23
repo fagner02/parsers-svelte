@@ -2,13 +2,7 @@
 	import { writable } from 'svelte/store';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
-	import {
-		addPause,
-		setCurrentStep,
-		setMaxStep,
-		setOnInputChanged,
-		setStepCall
-	} from '$lib/flowControl';
+	import { addPause } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
 	import { getTree } from '$lib/treeFunctions';
@@ -20,6 +14,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, clrparsing } from '$lib/clrparse';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -40,43 +35,22 @@
 
 	let { augRules, alphabet } = getAugGrammar();
 	let context = getContext('parseView');
-	let currentStep = 0;
-	let stepChanged = false;
-	let inputChanged = false;
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
 	let loadGrammar = /**@type {() => Promise<any>}*/ ($state());
 	let tree = getTree();
 
-	/**@param {number} step*/
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	/**@param {typeof saves[0]} save*/
+	function setStepCallback(save) {
 		stateStackElement.loadStack(stackCard(save.stateStack, {}));
 		inputStackElement.loadStack(stackCard(save.inputStack, {}));
 		svgLines?.setHideOpacity();
 		save.accept === undefined ? context.setAccept(null) : context.setAccept(save.accept);
 		tree.resetTree();
 		tree.loadFloatingTree(save.tree);
-		currentStep = step;
-
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	function onInputChanged() {
-		clrparsing(inputString, augRules, tableData);
-		setMaxStep(saves.length - 1, id);
-		inputChanged = true;
-	}
-	setOnInputChanged(onInputChanged, id);
-
-	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		addFloatingNode: () => tree.addFloatingNode,
@@ -89,44 +63,27 @@
 		highlightLines: () => codeCard?.highlightLines
 	};
 
-	async function executeSteps() {
-		try {
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (inputChanged) {
-					setStep(0);
-					stepChanged = false;
-					inputChanged = false;
-					i = 0;
-					continue;
-				}
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {}
-	}
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[{ func: obj.highlightLines, breakpoints: () => breakpoints }],
+		obj,
+		id,
+		setStepCallback,
+		() => {
+			clrparsing(inputString, augRules, tableData);
+			stepExecution.saves = saves;
+			stepExecution.functionCalls = functionCalls;
+		}
+	);
+
 	onMount(async () => {
 		fetch('./clrparse.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		loadGrammar();
-		onInputChanged();
-		executeSteps();
+
+		stepExecution.executeSteps();
 	});
 </script>
 

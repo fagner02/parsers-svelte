@@ -15,6 +15,7 @@
 	import { id, saves, functionCalls, elemIds } from '$lib/follow';
 	import { getGrammar } from '$lib/utils';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement = $state();
@@ -29,8 +30,6 @@
 
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
-	let currentStep = 0;
-	let stepChanged = false;
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
@@ -52,14 +51,9 @@
 	let grammarSelection;
 
 	/**
-	 * @param {number} step
+	 * @param {typeof saves[0]} save
 	 */
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
 		save.grammarSelect === ''
 			? grammarSelection?.hideSelect()
@@ -67,14 +61,8 @@
 		followSetElement?.loadSets(save.follow);
 		joinSetElement?.loadSets(save.join);
 		joinStackElement?.loadStack(stackCard(save.joinStack, {}));
-
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		selectRSymbol: () => selectRSymbol,
@@ -89,40 +77,25 @@
 		joinSetsJoin: () => joinSetElement?.joinSets,
 		removeSet: () => joinSetElement?.remove
 	};
-
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[
+			{
+				func: obj.highlightLines,
+				breakpoints: () => breakpoints
 			}
-		} catch (e) {
-			console.log(e);
-		}
-	}
+		],
+		obj,
+		id,
+		setStepCallback
+	);
 
 	onMount(async () => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 		setInfoComponent(FollowInfo);
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

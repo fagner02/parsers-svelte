@@ -18,6 +18,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {TableCard | undefined}*/
 	let tableElem = $state();
@@ -28,8 +29,6 @@
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
 	let stateName = $state('');
-	let currentStep = 0;
-	let stepChanged = false;
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR1StateItem>>} */
 	let slrState = writable([]);
@@ -67,14 +66,9 @@
 	let breakpoints = $state([]);
 
 	/**
-	 * @param {number} step
+	 * @param {typeof saves[0]} save
 	 */
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	function setStepCallback(save) {
 		stateName = save.stateName;
 		stateElem?.loadState(save.state);
 		svgLines?.hideLine(false, id);
@@ -92,13 +86,8 @@
 			console.log(e);
 		}
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	/**@type {any}*/
 	const obj = {
 		highlightLines: () => codeCard?.highlightLines,
 		addToTable: () => tableElem?.addToTable,
@@ -121,33 +110,15 @@
 		highlightDot: () => stateElem?.highlightDot
 	};
 
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	}
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[{ func: obj.highlightLines, breakpoints: () => breakpoints }],
+		obj,
+		id,
+		setStepCallback
+	);
+
 	onMount(async () => {
 		fetch('./slrtable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
@@ -159,7 +130,7 @@
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

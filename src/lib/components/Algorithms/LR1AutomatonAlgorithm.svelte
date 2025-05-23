@@ -17,6 +17,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/lr1automaton';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -54,8 +55,6 @@
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
-	let currentStep = 0;
-	let stepChanged = false;
 	/**@type {number[]}*/
 	let autBreakpoints = $state([]);
 	/**@type {number[]}*/
@@ -83,14 +82,9 @@
 	let alphabetSelection;
 
 	/**
-	 * @param {number} step
+	 * @param {typeof saves[0]} save
 	 */
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
 		grammarSelection.hideSelect();
 		stateSelection.hideSelect();
@@ -103,13 +97,8 @@
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	/**@type {any}*/
 	export const obj = {
 		highlightLines: () => codeCard?.highlightLines,
 		addItem: () => targetStateElem?.addItem,
@@ -144,31 +133,17 @@
 		highlightLinesClosure: () => closureCodeCard?.highlightLines
 	};
 
-	async function executeSteps() {
-		try {
-			loadGrammar?.();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {}
-	}
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[
+			{ func: obj.highlightLines, breakpoints: () => autBreakpoints },
+			{ func: obj.highlightLinesClosure, breakpoints: () => closureBreakpoints }
+		],
+		obj,
+		id,
+		setStepCallback
+	);
 
 	onMount(() => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
@@ -184,7 +159,7 @@
 		);
 
 		setInfoComponent(Lr1AutomatonInfo);
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

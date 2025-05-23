@@ -15,6 +15,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/lltable';
 	import { tableCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -25,8 +26,7 @@
 
 	let tableElement = /**@type {TableCard}*/ ($state());
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
-	let currentStep = 0;
-	let stepChanged = false;
+
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 	let { nt, t, rules } = getGrammar();
@@ -43,20 +43,41 @@
 		followSet
 	} = $props();
 
-	let lastSelected = 0;
-	/**@param {number} step*/
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
-		if (lastSelected === step) return;
+	const obj = {
+		addPause: () => addPause,
+		selectSymbol: () => selectSymbol,
+		deselectSymbol: () => deselectSymbol,
+		highlightLines: () => codeCard?.highlightLines,
+		selectFirst: () => firstFuncs?.selectFor,
+		showConflict: () => tableElement?.showConflict,
+		addToTable: () => tableElement?.addToTable,
+		setConflictTooltip: () => tableElement?.setConflictTooltip,
+		highlightOn: () => tableElement?.highlightOn,
+		highlightOff: () => tableElement?.highlightOff
+	};
+
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[
+			{
+				func: obj.highlightLines,
+				breakpoints: () => breakpoints
+			}
+		],
+		obj,
+		id,
+		setStepCallback
+	);
+
+	/**@param {typeof saves[0]} save
+	 */
+	function setStepCallback(save) {
 		svgLines?.setHideOpacity();
-		for (let f of saves[lastSelected].firstSymbols) {
+		for (let f of saves[stepExecution.lastSelected].firstSymbols) {
 			deselectSymbol(f, id);
 		}
-		for (let f of saves[lastSelected].followSymbols) {
+		for (let f of saves[stepExecution.lastSelected].followSymbols) {
 			deselectSymbol(f, id);
 		}
 		tableElement.resetTable();
@@ -73,53 +94,6 @@
 		for (let f of save.followSymbols) {
 			selectSymbol(f, colors.green, id, false);
 		}
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
-	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
-
-	/**@type {any}*/
-	const obj = {
-		addPause: () => addPause,
-		selectSymbol: () => selectSymbol,
-		deselectSymbol: () => deselectSymbol,
-		highlightLines: () => codeCard?.highlightLines,
-		selectFirst: () => firstFuncs?.selectFor,
-		showConflict: () => tableElement?.showConflict,
-		addToTable: () => tableElement?.addToTable,
-		setConflictTooltip: () => tableElement?.setConflictTooltip,
-		highlightOn: () => tableElement?.highlightOn,
-		highlightOff: () => tableElement?.highlightOff
-	};
-
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				lastSelected = currentStep;
-				try {
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {
-			console.log(e);
-		}
 	}
 
 	onMount(async () => {
@@ -129,7 +103,7 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(LL1TableInfo);
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

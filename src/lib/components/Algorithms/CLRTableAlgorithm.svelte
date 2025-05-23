@@ -15,6 +15,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, functionCalls, elemIds } from '$lib/clr_table';
 	import { tableCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
 	let stateElem = /**@type {StateCard | undefined}*/ ($state());
@@ -48,41 +49,27 @@
 	let table = $state(writable(new Map()));
 
 	let rows = Array.from({ length: automaton.states.length }, (_, index) => `s${index}`);
-
 	let columns = [...alphabet];
-
 	let stateName = $state('');
 	let svgLines = /**@type {SvgLines | undefined}*/ ($state());
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
-	let currentStep = 0;
-	let stepChanged = false;
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stateStackSelection;
 	/**
-	 * @param {number} step
+	 * @param {typeof saves[0]} save
 	 */
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
 		stateSelection?.hideSelect();
 		stateStackSelection?.hideSelect();
 		stateElem?.loadState(save.state, false);
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		stateName = save.stateName;
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		highlightLines: () => codeCard?.highlightLines,
@@ -104,34 +91,14 @@
 			};
 		}
 	};
-
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.skip) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	}
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[{ func: obj.highlightLines, breakpoints: () => breakpoints }],
+		obj,
+		id,
+		setStepCallback
+	);
 
 	onMount(() => {
 		stateSelection = getSelectionFunctions(elemIds.state);
@@ -143,7 +110,7 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 

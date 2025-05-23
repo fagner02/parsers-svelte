@@ -21,6 +21,7 @@
 	import { id, saves, elemIds, functionCalls, first } from '$lib/first';
 	import { getGrammar } from '$lib/utils';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -49,32 +50,10 @@
 	let grammarSelection;
 
 	let { rules } = getGrammar();
-	let currentStep = 0;
-	let stepChanged = false;
+
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
-	/**@param {number} step*/
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
-		svgLines?.hideLine(false, id);
-		save.grammarSelect === ''
-			? grammarSelection?.hideSelect()
-			: grammarSelection?.selectFor(save.grammarSelect);
-		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
-		joinSetElement?.loadSets(save.join);
-		firstSetElement?.loadSets(save.first);
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
-	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
-
-	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
@@ -92,45 +71,31 @@
 		joinSetsJoin: () => joinSetElement?.joinSets,
 		removeSet: () => joinSetElement?.remove
 	};
-
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (call.name === 'highlightLines' && breakpoints.some((x) => call.args[0].includes(x))) {
-						codeCard?.highlightLines(call.args[0], colors.orange);
-						await addPause(id);
-					}
-					if (call.skip !== undefined) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {
-			console.log(e);
-		}
+	function setStepCallback(/**@type {typeof saves[0]}*/ save) {
+		svgLines?.hideLine(false, id);
+		save.grammarSelect === ''
+			? grammarSelection?.hideSelect()
+			: grammarSelection?.selectFor(save.grammarSelect);
+		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
+		joinSetElement?.loadSets(save.join);
+		firstSetElement?.loadSets(save.first);
 	}
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[{ func: obj.highlightLines, breakpoints: () => breakpoints }],
+		obj,
+		id,
+		setStepCallback
+	);
 
 	onMount(async () => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
 		setInfoComponent(FistInfo);
-		return executeSteps();
+		loadGrammar();
+		stepExecution.executeSteps();
 	});
 </script>
 

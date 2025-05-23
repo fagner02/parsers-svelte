@@ -1,6 +1,6 @@
 <script>
 	import { writable } from 'svelte/store';
-	import { addPause, setCurrentStep, setStepCall } from '$lib/flowControl';
+	import { addPause } from '$lib/flowControl';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -16,6 +16,7 @@
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls } from '$lib/lr0automaton';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -38,13 +39,11 @@
 	let targetState = writable([]);
 	let { alphabet } = getAugGrammar();
 	alphabet = alphabet.filter((x) => x !== '$');
-	let { ...props } = $props();
+	let {} = $props();
 
 	let originStateName = $state('');
 	let targetStateName = $state('s?');
 
-	let currentStep = 0;
-	let stepChanged = false;
 	/**@type {number[]}*/
 	let autBreakpoints = $state([]);
 	/**@type {number[]}*/
@@ -76,14 +75,9 @@
 	let grammarSelection;
 
 	/**
-	 * @param {number} step
+	 * @param {typeof saves[0]} save
 	 */
-	function setStep(step) {
-		const save = saves[step];
-		if (save === undefined) {
-			console.error(`Step ${step} not found`);
-			return;
-		}
+	function setStepCallback(save) {
 		symbolsSelection.hideSelect();
 		originStateSelection.hideSelect();
 		targetStateSelection.hideSelect();
@@ -95,13 +89,8 @@
 		targetStateElem?.loadState(save.targetState, false);
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
-		currentStep = step;
-		setCurrentStep(currentStep);
-		stepChanged = true;
 	}
-	setStepCall(setStep, saves.length - 1, id, () => currentStep);
 
-	/**@type {any}*/
 	const obj = {
 		addPause: () => addPause,
 		highlightLinesClosure: () => closureCodeCard?.highlightLines,
@@ -133,37 +122,18 @@
 			};
 		}
 	};
-	async function executeSteps() {
-		try {
-			await loadGrammar();
-			let i = 0;
-			while (i < functionCalls.length || stepChanged) {
-				if (stepChanged) {
-					stepChanged = false;
-					i = saves[currentStep].functionCall;
-					continue;
-				}
-				const call = functionCalls[i];
-				try {
-					if (!obj[call.name]) {
-						console.error(`Function ${call.name} not found`);
-						return executeSteps();
-					}
-					if (call.skip) obj[call.name]()(...call.args);
-					else await obj[call.name]()(...call.args);
-				} catch (e) {
-					continue;
-				}
-				if (call.name === 'addPause') {
-					currentStep++;
-					setCurrentStep(currentStep);
-				}
-				i++;
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	}
+
+	let stepExecution = new StepExecution(
+		saves,
+		functionCalls,
+		[
+			{ func: obj.highlightLines, breakpoints: () => autBreakpoints },
+			{ func: obj.highlightLinesClosure, breakpoints: () => closureBreakpoints }
+		],
+		obj,
+		id,
+		setStepCallback
+	);
 
 	onMount(async () => {
 		symbolsSelection = getSelectionFunctions(elemIds.alphabet);
@@ -178,7 +148,7 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 		setInfoComponent(Lr0AutomatonInfo);
-		executeSteps();
+		stepExecution.executeSteps();
 	});
 </script>
 
