@@ -102,7 +102,8 @@
 		fetch('./lltable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		setInfoComponent(LL1TableInfo);
+
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

@@ -7,7 +7,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { getTree } from '$lib/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { getGrammar, loadGrammar } from '$lib/utils';
 	import { setInfoComponent } from '$lib/infoText';
 	import Ll1ParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 	import { inputString } from '$lib/parseString';
@@ -85,7 +85,8 @@
 		fetch('./llparse.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		setInfoComponent(Ll1ParsingInfo);
+
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

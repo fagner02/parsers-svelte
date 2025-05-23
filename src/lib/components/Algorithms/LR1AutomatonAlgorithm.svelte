@@ -158,7 +158,7 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 
-		setInfoComponent(Lr1AutomatonInfo);
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

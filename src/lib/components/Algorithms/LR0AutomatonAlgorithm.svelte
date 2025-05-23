@@ -147,7 +147,8 @@
 		fetch('./lr0closure.txt').then((data) =>
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
-		setInfoComponent(Lr0AutomatonInfo);
+
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

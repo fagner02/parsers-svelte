@@ -93,7 +93,6 @@
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
-		setInfoComponent(FistInfo);
 		loadGrammar();
 		stepExecution.executeSteps();
 	});

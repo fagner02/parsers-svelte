@@ -110,6 +110,7 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

@@ -15,6 +15,8 @@
 	import { id, elemIds, saves, functionCalls, clrparsing } from '$lib/clrparse';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { setInfoComponent } from '$lib/infoText';
+	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -82,7 +84,6 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		loadGrammar();
-
 		stepExecution.executeSteps();
 	});
 </script>

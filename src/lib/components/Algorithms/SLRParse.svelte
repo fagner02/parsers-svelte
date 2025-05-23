@@ -84,9 +84,8 @@
 		fetch('./slrparse.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		setInfoComponent(SlrParsingInfo);
-		loadGrammar();
 
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

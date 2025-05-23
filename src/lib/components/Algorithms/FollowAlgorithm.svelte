@@ -94,7 +94,8 @@
 	onMount(async () => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
-		setInfoComponent(FollowInfo);
+
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>

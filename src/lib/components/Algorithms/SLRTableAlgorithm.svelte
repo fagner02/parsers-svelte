@@ -123,13 +123,13 @@
 		fetch('./slrtable.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		setInfoComponent(SlrTableInfo);
 		followSelection = getSelectionFunctions(elemIds.follow);
 		stateSelection = getSelectionFunctions(elemIds.state);
 		stackSelection = getSelectionFunctions(elemIds.stateStack);
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
+		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
