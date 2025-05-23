@@ -27,6 +27,8 @@
 	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	let currentStep = 0;
 	let stepChanged = false;
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 	let { nt, t, rules } = getGrammar();
 
 	/** @type {{
@@ -134,7 +136,8 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Tabela LL(1)" bind:this={codeCard} id="lltable"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Tabela LL(1)" bind:this={codeCard} id="lltable"
+		></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>

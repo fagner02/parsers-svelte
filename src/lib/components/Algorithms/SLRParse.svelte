@@ -41,6 +41,8 @@
 	let stateStackElement = /** @type {StackCard}*/ ($state());
 
 	let inputStackElement = /** @type {StackCard}*/ ($state());
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 
 	let { augRules, alphabet } = getAugGrammar();
 	let context = getContext('parseView');
@@ -135,7 +137,8 @@
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="cards-box unit" id="card-box{id}">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Análise sintática SLR" bind:this={codeCard} id="slrparse"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Análise sintática SLR" bind:this={codeCard} id="slrparse"
+		></PseudoCode>
 	</div>
 	<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
 	<TableCard

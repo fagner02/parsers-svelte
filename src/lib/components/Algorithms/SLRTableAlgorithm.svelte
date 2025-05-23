@@ -63,6 +63,8 @@
 	let stateSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stackSelection;
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 
 	/**
 	 * @param {number} step
@@ -164,7 +166,7 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
 		<Automaton {id} bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">

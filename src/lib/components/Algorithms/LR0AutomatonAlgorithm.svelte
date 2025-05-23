@@ -45,6 +45,10 @@
 
 	let currentStep = 0;
 	let stepChanged = false;
+	/**@type {number[]}*/
+	let autBreakpoints = $state([]);
+	/**@type {number[]}*/
+	let closureBreakpoints = $state([]);
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let symbolList = writable(
@@ -222,9 +226,18 @@
 		></StackCard>
 	</div>
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title={'Closure LR(0)'} bind:this={closureCodeCard} id="{id}-code-closure"
+		<PseudoCode
+			bind:breakpoints={closureBreakpoints}
+			title={'Closure LR(0)'}
+			bind:this={closureCodeCard}
+			id="{id}-code-closure"
 		></PseudoCode>
-		<PseudoCode title={'Autômato LR(0)'} bind:this={codeCard} id="{id}-code-lr0"></PseudoCode>
+		<PseudoCode
+			bind:breakpoints={autBreakpoints}
+			title={'Autômato LR(0)'}
+			bind:this={codeCard}
+			id="{id}-code-lr0"
+		></PseudoCode>
 		<Automaton id={elemIds.automaton} bind:this={automatonElem}></Automaton>
 	</div>
 </div>

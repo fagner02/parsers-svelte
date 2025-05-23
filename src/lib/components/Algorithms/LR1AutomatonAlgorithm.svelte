@@ -56,6 +56,10 @@
 	let targetStateName = $state('s?');
 	let currentStep = 0;
 	let stepChanged = false;
+	/**@type {number[]}*/
+	let autBreakpoints = $state([]);
+	/**@type {number[]}*/
+	let closureBreakpoints = $state([]);
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let lookaheadStack = writable([]);
@@ -239,8 +243,18 @@
 		></StackCard>
 	</div>
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Closure LR(1)" bind:this={closureCodeCard} id="lr1closure"></PseudoCode>
-		<PseudoCode title="Autômato LR(1)" bind:this={codeCard} id="lr1"></PseudoCode>
+		<PseudoCode
+			bind:breakpoints={closureBreakpoints}
+			title="Closure LR(1)"
+			bind:this={closureCodeCard}
+			id="lr1closure"
+		></PseudoCode>
+		<PseudoCode
+			bind:breakpoints={autBreakpoints}
+			title="Autômato LR(1)"
+			bind:this={codeCard}
+			id="lr1"
+		></PseudoCode>
 
 		<Automaton id="lr1" bind:this={automatonElem}></Automaton>
 	</div>

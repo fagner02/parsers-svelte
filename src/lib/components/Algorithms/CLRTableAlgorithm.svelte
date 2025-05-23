@@ -20,6 +20,8 @@
 	let stateElem = /**@type {StateCard | undefined}*/ ($state());
 	let automatonElem = /**@type {Automaton | undefined}*/ ($state());
 	let codeCard = /**@type {PseudoCode | undefined}*/ ($state());
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 
 	/** @type {{
 	 * automaton: import('@/types').LR1Automaton}} */
@@ -180,7 +182,8 @@
 		></StackCard>
 	</div>
 	<div use:stackFloatingWindows class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; ">
-		<PseudoCode title="Tabela LR(1)" bind:this={codeCard} id="clrtable"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Tabela LR(1)" bind:this={codeCard} id="clrtable"
+		></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>
 	</div>
 </div>

@@ -43,6 +43,8 @@
 	let currentStep = 0;
 	let stepChanged = false;
 	let inputChanged = false;
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 	let tree = getTree();
 
 	/**@param {number} step*/
@@ -129,7 +131,8 @@
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="grid unit">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"
+		></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
 		<TableCard

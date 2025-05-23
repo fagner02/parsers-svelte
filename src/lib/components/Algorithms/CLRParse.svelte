@@ -43,6 +43,8 @@
 	let currentStep = 0;
 	let stepChanged = false;
 	let inputChanged = false;
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 
 	let loadGrammar = /**@type {() => Promise<any>}*/ ($state());
 	let tree = getTree();
@@ -131,7 +133,8 @@
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="grid unit">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"></PseudoCode>
+		<PseudoCode bind:breakpoints title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"
+		></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
 		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>

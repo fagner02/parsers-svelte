@@ -51,6 +51,8 @@
 	let { rules } = getGrammar();
 	let currentStep = 0;
 	let stepChanged = false;
+	/**@type {number[]}*/
+	let breakpoints = $state([]);
 
 	/**@param {number} step*/
 	function setStep(step) {
@@ -103,6 +105,10 @@
 				}
 				const call = functionCalls[i];
 				try {
+					if (call.name === 'highlightLines' && breakpoints.some((x) => call.args[0].includes(x))) {
+						codeCard?.highlightLines(call.args[0], colors.orange);
+						await addPause(id);
+					}
 					if (call.skip !== undefined) obj[call.name]()(...call.args);
 					else await obj[call.name]()(...call.args);
 				} catch (e) {
@@ -131,7 +137,7 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
 	<div class="unit" use:stackFloatingWindows>
-		<PseudoCode title="First" bind:this={codeCard} id="first"></PseudoCode>
+		<PseudoCode bind:breakpoints title="First" bind:this={codeCard} id="first"></PseudoCode>
 	</div>
 	<div class="unit cards-box" id="card-box{id}">
 		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>
