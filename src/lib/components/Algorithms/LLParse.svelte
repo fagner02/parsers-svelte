@@ -1,20 +1,18 @@
 <script>
-	import { writable } from 'svelte/store';
-	import TableCard from '@/Cards/TableCard.svelte';
-	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { addPause } from '$lib/flowControl';
-	import StackCard from '@/Cards/StackCard.svelte';
-	import { getContext, onMount } from 'svelte';
-	import { getTree } from '$lib/treeFunctions';
-	import { colors } from '$lib/selectSymbol';
-	import { getGrammar, loadGrammar } from '$lib/utils';
-	import { setInfoComponent } from '$lib/infoText';
-	import Ll1ParsingInfo from '@/Info/LL1ParsingInfo.svelte';
-	import { inputString } from '$lib/parseString';
-	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls, llParsing } from '$lib/llparse';
+	import { elemIds, functionCalls, id, llParsing, saves } from '$lib/llparse';
+	import { inputString } from '$lib/parseString';
+	import { colors } from '$lib/selectSymbol';
+	import { getTree } from '$lib/treeFunctions';
+	import { getGrammar, loadGrammar } from '$lib/utils';
+	import StackCard from '@/Cards/StackCard.svelte';
+	import TableCard from '@/Cards/TableCard.svelte';
+	import PseudoCode from '@/Layout/PseudoCode.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { getContext, onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SvgLines | undefined}*/

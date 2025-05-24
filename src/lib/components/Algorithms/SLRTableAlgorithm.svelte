@@ -13,8 +13,6 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import SlrTableInfo from '@/Info/SLRTableInfo.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';

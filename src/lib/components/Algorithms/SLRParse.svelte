@@ -9,8 +9,6 @@
 	import { colors } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import SlrParsingInfo from '@/Info/SLRParsingInfo.svelte';
 	import { inputString } from '$lib/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';

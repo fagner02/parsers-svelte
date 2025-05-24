@@ -11,8 +11,6 @@
 	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import Lr1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '$lib/interactiveElem';
 	import { id, saves, elemIds, functionCalls } from '$lib/lr1automaton';

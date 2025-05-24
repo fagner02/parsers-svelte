@@ -1,22 +1,20 @@
 <script>
-	import { writable } from 'svelte/store';
-	import TableCard from '@/Cards/TableCard.svelte';
-	import SvgLines from '@/Structures/SvgLines.svelte';
+	import { clrparsing, elemIds, functionCalls, id, saves } from '$lib/clrparse';
 	import { addPause } from '$lib/flowControl';
-	import StackCard from '@/Cards/StackCard.svelte';
-	import { getContext, onMount } from 'svelte';
-	import { getTree } from '$lib/treeFunctions';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { inputString } from '$lib/parseString';
 	import { colors } from '$lib/selectSymbol';
+	import { getTree } from '$lib/treeFunctions';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import { inputString } from '$lib/parseString';
+	import StackCard from '@/Cards/StackCard.svelte';
+	import TableCard from '@/Cards/TableCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls, clrparsing } from '$lib/clrparse';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { getContext, onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();

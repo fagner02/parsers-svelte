@@ -1,20 +1,18 @@
 <script>
-	import { writable } from 'svelte/store';
+	import { addPause } from '$lib/flowControl';
+	import { elemIds, functionCalls, id, saves } from '$lib/follow';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { colors, selectRSymbol } from '$lib/selectSymbol';
+	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
+	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
-	import SvgLines from '@/Structures/SvgLines.svelte';
-	import { addPause } from '$lib/flowControl';
-	import { colors, selectRSymbol } from '$lib/selectSymbol';
-	import { onMount } from 'svelte';
-	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import FollowInfo from '@/Info/FollowInfo.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, saves, functionCalls, elemIds } from '$lib/follow';
-	import { getGrammar } from '$lib/utils';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {SetsCard | undefined}*/

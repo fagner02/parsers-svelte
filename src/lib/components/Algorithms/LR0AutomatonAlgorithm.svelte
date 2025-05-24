@@ -1,21 +1,19 @@
 <script>
-	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
+	import { stackFloatingWindows } from '$lib/interactiveElem';
+	import { elemIds, functionCalls, id, saves } from '$lib/lr0automaton';
 	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
-	import { onMount } from 'svelte';
-	import StackCard from '@/Cards/StackCard.svelte';
-	import SvgLines from '@/Structures/SvgLines.svelte';
-	import StateCard from '@/Cards/StateCard.svelte';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import Automaton from '@/Structures/Automaton.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import StackCard from '@/Cards/StackCard.svelte';
+	import StateCard from '@/Cards/StateCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { setInfoComponent } from '$lib/infoText';
-	import Lr0AutomatonInfo from '@/Info/LR0AutomatonInfo.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls } from '$lib/lr0automaton';
+	import Automaton from '@/Structures/Automaton.svelte';
+	import SvgLines from '@/Structures/SvgLines.svelte';
 	import { stackCard } from '@/Tabs/dataToComp';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 
 	/**@type {StackCard | undefined}*/

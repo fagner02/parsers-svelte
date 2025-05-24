@@ -14,7 +14,6 @@
 	import Code from '@/Layout/Code.svelte';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import ClipboardTextIcon from '@icons/ClipboardTextIcon.svelte';
-	import CodeIcon from '@icons/CodeIcon.svelte';
 	import DocIcon from '@icons/DocIcon.svelte';
 	import PlayIcon from '@icons/PlayIcon.svelte';
 	import PlaySkipBackIcon from '@icons/PlaySkipBackIcon.svelte';
