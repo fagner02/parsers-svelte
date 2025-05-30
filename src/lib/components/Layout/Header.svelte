@@ -1,7 +1,11 @@
 <script>
+	import { supabase } from '$lib/log';
 	import { setUpTooltip } from '$lib/tooltip';
 	import { getPlatform, platforms } from '$lib/utils';
-	import UserIcon from '@icons/UserIcon.svelte';
+	import DropDown from './DropDown.svelte';
+
+	let email = $state('');
+	supabase.auth.getUser().then((v) => (email = v.data.user?.email ?? ''));
 </script>
 
 {#if getPlatform() === platforms.web}
@@ -9,9 +13,7 @@
 		<a href="/" use:setUpTooltip={{ text: 'Início' }}>
 			<h1>VANSI</h1>
 		</a>
-		<a use:setUpTooltip={{ text: 'Entrar' }} href="/login">
-			<UserIcon size={24} color="hsl(200,50%,50%)"></UserIcon>
-		</a>
+		<DropDown></DropDown>
 	</header>
 {/if}
 
@@ -26,6 +28,9 @@
 		background: hsl(200, 0%, 100%);
 		flex-direction: column;
 		margin: 8px 0px;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
 	}
 	h1 {
 		color: hsl(200, 50%, 50%);
@@ -38,13 +43,5 @@
 	}
 	a {
 		text-decoration: none;
-	}
-
-	@media (max-width: 860px) {
-		header {
-			flex-direction: row;
-			align-items: center;
-			justify-content: space-between;
-		}
 	}
 </style>

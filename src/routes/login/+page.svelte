@@ -37,7 +37,6 @@
 				credentialsError = true;
 				return;
 			}
-			supabase.auth.resetPasswordForEmail(email);
 			if (browser) {
 				if (rememberMe) {
 					localStorage.setItem('rememberedEmail', email);

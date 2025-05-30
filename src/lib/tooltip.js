@@ -45,6 +45,13 @@ export async function showTooltip(e, text, hue) {
 	arrow.style.transform = `translate(${rect.left - x - left + rect.width / 2 - arrowRect.width / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
 }
 
+/**@param {HTMLElement} elem */
+export async function removeTooltip(elem) {
+	let id = elem.getAttribute('tooltip-id');
+	if (id) {
+		map.get(id)?.();
+	}
+}
 export async function hideTooltip() {
 	activeTooltip = null;
 	let tooltip = /**@type {HTMLElement}*/ (document.querySelector('.tooltip'));
@@ -59,12 +66,14 @@ let map = new Map();
  * @param {{text: string, willRemove?: boolean, hue?: number}} data
  */
 export function setUpTooltip(elem, { text, willRemove = false, hue = 200 }) {
+	if (!elem) return;
 	let show = (/**@type {MouseEvent}*/ e) => {
 		showTooltip(e, text, hue);
 	};
 	let hide = () => {
 		hideTooltip();
 	};
+
 	elem.addEventListener('mouseenter', show);
 	elem.addEventListener('mouseleave', hide);
 	elem.addEventListener('click', hide);

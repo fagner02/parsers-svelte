@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SITE_URL, supabase } from '$lib/log';
+	import { supabase, VITE_SITE_URL } from '$lib/log';
 
 	let email = $state('');
 	let sent = $state(false);
@@ -14,7 +14,7 @@
 		try {
 			loading = true;
 			const res = await supabase.auth.resetPasswordForEmail(email, {
-				redirectTo: `${SITE_URL}/reset-password`
+				redirectTo: `${VITE_SITE_URL}/reset-password`
 			});
 			if (res.error !== null) {
 				console.error(res.error);
@@ -67,10 +67,6 @@
 	}
 	.form-group:first-child {
 		margin-bottom: 1.25rem;
-	}
-
-	label {
-		color: grey;
 	}
 
 	input {

@@ -122,10 +122,6 @@
 		margin-bottom: 1.25rem;
 	}
 
-	label {
-		color: grey;
-	}
-
 	input {
 		outline: none;
 	}

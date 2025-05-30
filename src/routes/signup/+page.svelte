@@ -1,7 +1,7 @@
 <script lang="ts">
 	import EyeIcon from '@icons/EyeIcon.svelte';
 	import EyeOffIcon from '@icons/EyeOffIcon.svelte';
-	import { SITE_URL as SITE_URL, supabase } from '$lib/log';
+	import { supabase, VITE_SITE_URL } from '$lib/log';
 
 	let email = $state('');
 	let password = $state('');
@@ -39,7 +39,7 @@
 				email: email,
 				password: password,
 				options: {
-					emailRedirectTo: SITE_URL
+					emailRedirectTo: VITE_SITE_URL
 				}
 			});
 
