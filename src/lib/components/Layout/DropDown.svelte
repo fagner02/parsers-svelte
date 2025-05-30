@@ -199,8 +199,16 @@
 		color: white;
 		padding: 10px;
 		width: max-content;
-		right: 0;
+		left: 0;
 		gap: 5px;
+		margin: 5px;
+	}
+
+	@media (max-width: 860px) {
+		.dropdown-container {
+			right: 0;
+			left: unset;
+		}
 	}
 	button {
 		color: inherit;
@@ -216,6 +224,9 @@
 		gap: 5px;
 	}
 
+	.dropdown-button {
+		padding: 0;
+	}
 	.dropdown-button:hover {
 		background: transparent;
 	}

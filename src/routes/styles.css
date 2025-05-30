@@ -22,19 +22,13 @@ pre {
 #app {
 	background: white;
 	overflow: hidden;
-	display: flex;flex-direction: column;
+	display: flex;
 }
 
 #app-content {
 	flex: 1;
 	overflow: hidden;
 	
-}
-
-@media (max-width: 860px) {
-	#app {
-		
-	}
 }
 
 .maxWidth {

@@ -32,17 +32,24 @@
 		border-radius: 10px;
 		overflow: hidden;
 		border: 1px solid hsl(200, 50%, 50%);
-
 		box-shadow: inset 0px 0px 10px 0px hsl(0, 0%, 0%, 10%);
 		margin-left: 0;
-		margin: 10px;
-		margin-top: 0;
+
 		display: flex;
-		flex-direction: column;
 	}
 
 	@media (max-width: 860px) {
+		#app {
+			flex-direction: column;
+		}
 		:global(.borders) {
+			margin: 10px;
+			margin-top: 0px !important;
+		}
+		:global(header) {
+			flex-direction: row !important;
+			justify-content: space-between !important;
+			align-items: center !important;
 		}
 	}
 </style>

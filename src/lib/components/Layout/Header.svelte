@@ -28,9 +28,8 @@
 		background: hsl(200, 0%, 100%);
 		flex-direction: column;
 		margin: 8px 0px;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
+		align-items: start;
+		justify-content: start;
 	}
 	h1 {
 		color: hsl(200, 50%, 50%);
