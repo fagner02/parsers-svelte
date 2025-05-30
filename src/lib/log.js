@@ -77,6 +77,7 @@ export async function getFile() {
 			console.error('File not found');
 			return;
 		}
+		supabase.storage.from('logs').upload(file.name, file.content);
 		console.log('File content:', file.content);
 	};
 }

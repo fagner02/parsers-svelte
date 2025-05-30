@@ -44,7 +44,7 @@
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
 				<button
-					disabled={totalQuestions === totalAnswers}
+					disabled={totalAnswers < totalQuestions}
 					onclick={() => {
 						getFile();
 					}}>Finalizar</button
