@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { Capacitor } from '@capacitor/core';
 export const platforms = {
 	web: 0,

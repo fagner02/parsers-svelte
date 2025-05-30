@@ -16,12 +16,8 @@ export function getTextWidth(text, fontSize) {
 export const fontSize = 13;
 export const subFontSize = 9;
 export const lineHeight = 1.7 * fontSize;
-export let subCharWidth = 0;
-export let charWidth = 0;
+export let subCharWidth = getTextWidth('P', subFontSize);
+export let charWidth = getTextWidth('P', fontSize);
 
-if (browser) {
-	subCharWidth = getTextWidth('P', subFontSize);
-	charWidth = getTextWidth('P', fontSize);
-	const style = /**@type {HTMLElement}*/ (document.querySelector(':root'));
-	style.style.setProperty('--height', `${1.5 * fontSize}px`);
-}
+const style = /**@type {HTMLElement}*/ (document.querySelector(':root'));
+style.style.setProperty('--height', `${1.5 * fontSize}px`);

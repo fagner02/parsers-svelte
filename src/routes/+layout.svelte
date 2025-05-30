@@ -2,6 +2,7 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import Header from '@/Layout/Header.svelte';
 	import Tooltip from '@/Layout/Tooltip.svelte';
+
 	let { children } = $props();
 </script>
 

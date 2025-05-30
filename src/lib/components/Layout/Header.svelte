@@ -34,10 +34,6 @@
 		text-transform: uppercase;
 		margin: 5px 0;
 	}
-	header > button {
-		padding: 0;
-		margin: 5px 0;
-	}
 
 	@media (max-width: 860px) {
 		header {
