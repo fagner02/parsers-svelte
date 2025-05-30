@@ -120,7 +120,7 @@
 				elem.style.width = '0px';
 				elem.style.height = '0px';
 				elem.style.opacity = '0';
-				elem.style.top = `-${lineHeight}rem`;
+				elem.style.top = `-${lineHeight}px`;
 
 				await wait(id, 1000);
 				stack.update((x) => {
@@ -145,7 +145,7 @@
 					elem.style.width = '0px';
 					elem.style.height = '0px';
 					elem.style.opacity = '0';
-					elem.style.top = `-${lineHeight}rem`;
+					elem.style.top = `-${lineHeight}px`;
 					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
 				}
 				await wait(id, 1000);
@@ -209,9 +209,9 @@
 			class={`stack-item ${highlighted ? (horizontal ? 'empty' : 'block') : ''}`}
 			style="{horizontal
 				? 'padding: 0 2px'
-				: ''};--block-hue: {hue};top: -{lineHeight}rem;line-height: {lineHeight}rem;font-size:{fontSize}rem;"
+				: ''};--block-hue: {hue};top: -{lineHeight}px;line-height: {lineHeight}px;font-size:{fontSize}px;"
 		>
-			<span style="font-size: {subFontSize}rem;">{stackItem.note}</span>{stackItem.text}
+			<span style="font-size: {subFontSize}px;">{stackItem.note}</span>{stackItem.text}
 		</p>
 	{/each}
 </CardWrapper>

@@ -47,12 +47,12 @@
 	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="{props.cardId}rules">
 		{#each rules as rule, rulesIndex}
 			<p
-				style="line-height: {lineHeight}rem; font-size: {fontSize}rem; padding: 0px; width: fit-content"
+				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
 				id="{props.cardId}gset{rulesIndex}"
 			>
 				<span id="{props.cardId}gl{rulesIndex}"
 					><span
-						style="font-size: {subFontSize}rem; position: relative;transform: translate(0px, {0.3 *
+						style="font-size: {subFontSize}px; position: relative;transform: translate(0px, {0.3 *
 							fontSize}rem)">{rule.index}</span
 					>{rule.left}</span
 				>

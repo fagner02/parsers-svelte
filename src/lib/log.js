@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { createClient } from '@supabase/supabase-js';
 
 export let started = false;
@@ -79,18 +80,19 @@ export async function getFile() {
 		console.log('File content:', file.content);
 	};
 }
-window.addEventListener('click', (event) => {
-	appendData(
-		`w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
-	);
-});
-window.addEventListener('mousemove', (event) => {
-	mousePos.x = event.clientX;
-	mousePos.y = event.clientY;
-});
-window.setInterval(() => {
-	appendData(`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`);
-}, 500);
-
+if (browser) {
+	window.addEventListener('click', (event) => {
+		appendData(
+			`w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
+		);
+	});
+	window.addEventListener('mousemove', (event) => {
+		mousePos.x = event.clientX;
+		mousePos.y = event.clientY;
+	});
+	window.setInterval(() => {
+		appendData(`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`);
+	}, 500);
+}
 const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } = import.meta.env;
 const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

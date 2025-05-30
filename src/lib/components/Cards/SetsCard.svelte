@@ -34,7 +34,7 @@
 			duration,
 			/** @param {number} t */
 			css: (t) => `opacity: ${t < 0.5 ? 0 : (t - 0.5) / 0.5};
-			width: ${charWidth * t}rem;`
+			width: ${charWidth * t}px;`
 		};
 	}
 
@@ -172,10 +172,10 @@
 		{#each $set as item, index}
 			<p
 				id="{setId}set{index}"
-				style="line-height: {lineHeight}rem;font-size:{fontSize}rem; padding: 0px; width: fit-content;height: {lineHeight}rem"
+				style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content;height: {lineHeight}px"
 			>
 				<span id="{setId}l{index}" class="block" style="--block-hue: {hue};">
-					<span style="font-size: {subFontSize}rem;">
+					<span style="font-size: {subFontSize}px;">
 						{convert.noteLeft?.(item.left)}
 					</span>{convert.left?.(item.left)}
 				</span>
@@ -187,7 +187,7 @@
 						style="max-width: 0px; opacity: 0;transition: opacity 0.5s 0.2s, max-width 0.5s;"
 						id="{setId}r{index}-{ri}"
 					>
-						<span style="font-size: {subFontSize}rem;">{convert.noteRight?.(text)}</span
+						<span style="font-size: {subFontSize}px;">{convert.noteRight?.(text)}</span
 						>{#if text === ''}
 							&#x03B5;
 						{:else}

@@ -215,9 +215,9 @@
 		{#each $cardState as item, rindex}
 			<p
 				id="state-{stateId}-{rindex}"
-				style="opacity: 0;font-size: {fontSize}rem;min-width: {charWidth}rem;max-width: 0px; height: 0px"
+				style="opacity: 0;font-size: {fontSize}px;min-width: {charWidth}px;max-width: 0px; height: 0px"
 			>
-				<span style="font-size: {subFontSize}rem;">{item.ruleIndex}</span>
+				<span style="font-size: {subFontSize}px;">{item.ruleIndex}</span>
 				<span>{rules[item.ruleIndex].left} -&gt;&nbsp;</span>
 				{#each rules[item.ruleIndex].right as symbol, index}
 					{#if item.pos === index}

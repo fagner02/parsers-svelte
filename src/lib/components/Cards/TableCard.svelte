@@ -180,7 +180,7 @@
 	style="padding: 5px;"
 	{id}
 >
-	<table style="font-size: {fontSize}rem;">
+	<table style="font-size: {fontSize}px;">
 		<thead>
 			<tr>
 				<th style="background: hsl({hue}, 40%, 70%)"></th>
@@ -220,7 +220,7 @@
 								<span
 									class="unit"
 									id="t-{tableId}-{rowKey}-{colIndex}"
-									style="width: {convert(col.data).length * charWidth * col.width}rem;
+									style="width: {convert(col.data).length * charWidth * col.width}px;
 										opacity: {col.opacity};top: {col.pos}px;"
 								>
 									{convert(col.data)}

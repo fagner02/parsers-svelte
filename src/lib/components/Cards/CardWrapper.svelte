@@ -89,7 +89,7 @@
 		<div
 			class="card"
 			id={props.id}
-			style="min-height: {props.minHeight}rem; min-width:{props.minWidth}rem;max-width: {props.maxWidth}rem; max-height: {props.maxHeight}rem;{props.transition
+			style="min-height: {props.minHeight}px; min-width:{props.minWidth}px;max-width: {props.maxWidth}px; max-height: {props.maxHeight}px;{props.transition
 				? `transition: ${props.transition}`
 				: ''};{props.style}"
 		>
@@ -98,7 +98,7 @@
 		<div
 			class="card-label"
 			id="label-{props.cardId}"
-			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}rem;"
+			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}px;"
 		>
 			{props.label}
 		</div>

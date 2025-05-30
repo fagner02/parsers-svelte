@@ -14,8 +14,8 @@
 	let {
 		id = $bindable(),
 		numGap = 0,
-		fontSize = 0.8,
-		lineHeight = fontSize + 0.5,
+		fontSize = 13,
+		lineHeight = fontSize + 9,
 		lines = 1,
 		...props
 	} = $props();
@@ -26,7 +26,7 @@
 			Math.ceil((input.clientHeight * 0.0625) / lineHeight)
 		);
 		height = lines * lineHeight;
-		numGap = lines.toString().length * charWidth + 0.8;
+		numGap = lines.toString().length * charWidth + 13;
 	}
 
 	let charWidth = 0;
@@ -65,10 +65,10 @@
 
 <div class="grid input-box unit">
 	<div class="input unit {props.class ?? ''}" use:setInput>
-		<div class="unit textnumbers" style="width: {numGap}rem;height: {height}rem;">
+		<div class="unit textnumbers" style="width: {numGap}px;height: {height}px;">
 			{#each { length: lines } as _, textInputIndex}
 				<div class="grid">
-					<p style="font-size:{fontSize}rem;height: {lineHeight}rem">{textInputIndex + 1}.</p>
+					<p style="font-size:{fontSize}px;height: {lineHeight}px">{textInputIndex + 1}.</p>
 				</div>
 			{/each}
 		</div>
@@ -77,7 +77,7 @@
 			contenteditable="true"
 			oninput={clearInput}
 			class="text"
-			style="font-size: {fontSize}rem;line-height: {lineHeight}rem;"
+			style="font-size: {fontSize}px;line-height: {lineHeight}px;"
 		></div>
 	</div>
 </div>
