@@ -6,7 +6,6 @@
 
 <svg
 	xmlns="http://www.w3.org/2000/svg"
-	style={$$props.style}
 	width={size}
 	height={size}
 	viewBox="0 0 24 24"
@@ -15,8 +14,10 @@
 	stroke-width={strokeWidth}
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
+	class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
 	><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
-		d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"
-	/><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg
+		d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"
+	/><path
+		d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+	/></svg
 >

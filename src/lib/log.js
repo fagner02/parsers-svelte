@@ -95,4 +95,4 @@ if (browser) {
 	}, 500);
 }
 const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } = import.meta.env;
-const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);
+export const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

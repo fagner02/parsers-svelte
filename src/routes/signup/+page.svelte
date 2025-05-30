@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import EyeIcon from '@icons/EyeIcon.svelte';
 	import EyeOffIcon from '@icons/EyeOffIcon.svelte';
+	import { supabase } from '$lib/log';
 
 	let email = $state('');
 	let password = $state('');
@@ -38,12 +39,26 @@
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 
-		if (!validateEmail() || !validatePassword()) return;
+		if (validateEmail() || validatePassword()) return;
 
 		isLoading = true;
 		error = '';
 
 		try {
+			console.log('sign up');
+			const res = await supabase.auth.signUp({
+				email: email,
+				password: password,
+				options: {
+					emailRedirectTo: 'https://localhost:5173'
+				}
+			});
+
+			if (!res.data.session === null) {
+				console.error(res.error);
+				return;
+			}
+
 			if (browser) {
 				if (rememberMe) {
 					localStorage.setItem('rememberedEmail', email);
@@ -52,8 +67,9 @@
 				}
 			}
 
-			await goto('/dashboard');
+			await goto('/');
 		} catch (err) {
+			console.error(err);
 		} finally {
 			isLoading = false;
 		}
@@ -61,7 +77,7 @@
 </script>
 
 <div class="login-container">
-	<h2>Login</h2>
+	<h2>Registro</h2>
 
 	<form onsubmit={handleSubmit}>
 		<div class="form-group">
@@ -75,7 +91,7 @@
 				required
 			/>
 
-			<div class="validation-error {emailError ? '' : 'hide'}">Email não registrado</div>
+			<div class="validation-error {emailError ? '' : 'hide'}">Email inválido</div>
 		</div>
 
 		<div class="form-group">
@@ -93,8 +109,7 @@
 				<button
 					class="unit show-pass"
 					onclick={(e) => {
-						e.stopImmediatePropagation();
-						e.stopPropagation();
+						e.preventDefault();
 						passVisible = !passVisible;
 					}}
 				>
@@ -106,24 +121,18 @@
 				</button>
 			</div>
 
-			<div class="validation-error {passwordError ? '' : 'hide'}">Senha incorreta</div>
-		</div>
-
-		<div class="form-options">
-			<label class="checkbox-container">
-				<input type="checkbox" bind:checked={rememberMe} />
-				Remember me
-			</label>
-			<!-- <a href="/forgot-password" class="forgot-password">Forgot password?</a> -->
+			<div class="validation-error {passwordError ? '' : 'hide'}">
+				Senha deve conter pelo menos 6 caracteres
+			</div>
 		</div>
 
 		<button class="login" type="submit" disabled={isLoading}>
-			{isLoading ? 'Fazendo login...' : 'Login'}
+			{isLoading ? 'Registrando...' : 'Registrar'}
 		</button>
 	</form>
 
 	<div class="signup-link">
-		Não tem uma conta? <a href="/signup">Registre-se</a>
+		Já tem uma conta? <a href="/login">Faça log-in</a>
 	</div>
 </div>
 
@@ -144,11 +153,9 @@
 	}
 
 	.form-group {
+		margin-bottom: 1.5rem;
 		display: flex;
 		flex-direction: column;
-	}
-	.form-group:first-child {
-		margin-bottom: 1.25rem;
 	}
 
 	label {
@@ -184,22 +191,6 @@
 	.validation-error.hide {
 		opacity: 0;
 		max-height: 0px;
-	}
-
-	.form-options {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin: 1rem 0;
-	}
-	.form-options > label {
-		display: flex;
-	}
-
-	.forgot-password {
-		font-size: 0.9rem;
-		color: #646cff;
-		text-decoration: none;
 	}
 
 	button.login {
