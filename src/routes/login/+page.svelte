@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import EyeIcon from '@icons/EyeIcon.svelte';
 	import EyeOffIcon from '@icons/EyeOffIcon.svelte';
+	import { supabase } from '$lib/log';
 
 	let email = $state('');
 	let password = $state('');
@@ -11,8 +12,7 @@
 	let error = '';
 	let passVisible = $state(false);
 	let rememberMe = $state(false);
-	let emailError = $state(false);
-	let passwordError = $state(false);
+	let credentialsError = $state(false);
 
 	onMount(() => {
 		if (browser) {
@@ -24,26 +24,20 @@
 		}
 	});
 
-	function validateEmail() {
-		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		emailError = !re.test(email);
-		return emailError;
-	}
-
-	function validatePassword() {
-		passwordError = !(password.length >= 6);
-		return passwordError;
-	}
-
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
-
-		if (!validateEmail() || !validatePassword()) return;
 
 		isLoading = true;
 		error = '';
 
 		try {
+			const res = await supabase.auth.signInWithPassword({ email: email, password: password });
+			if (res.error !== null) {
+				console.error(res.error);
+				credentialsError = true;
+				return;
+			}
+			supabase.auth.resetPasswordForEmail(email);
 			if (browser) {
 				if (rememberMe) {
 					localStorage.setItem('rememberedEmail', email);
@@ -52,7 +46,7 @@
 				}
 			}
 
-			await goto('/dashboard');
+			await goto('/');
 		} catch (err) {
 		} finally {
 			isLoading = false;
@@ -66,16 +60,7 @@
 	<form onsubmit={handleSubmit}>
 		<div class="form-group">
 			<label for="email">Email</label>
-			<input
-				id="email"
-				type="email"
-				bind:value={email}
-				oninput={validateEmail}
-				placeholder="your@email.com"
-				required
-			/>
-
-			<div class="validation-error {emailError ? '' : 'hide'}">Email não registrado</div>
+			<input id="email" type="email" bind:value={email} placeholder="your@email.com" required />
 		</div>
 
 		<div class="form-group">
@@ -86,7 +71,6 @@
 					id="password"
 					type={passVisible ? 'text' : 'password'}
 					bind:value={password}
-					oninput={validatePassword}
 					placeholder="••••••••"
 					required
 				/>
@@ -95,6 +79,7 @@
 					onclick={(e) => {
 						e.stopImmediatePropagation();
 						e.stopPropagation();
+						e.preventDefault();
 						passVisible = !passVisible;
 					}}
 				>
@@ -105,16 +90,16 @@
 					{/if}
 				</button>
 			</div>
-
-			<div class="validation-error {passwordError ? '' : 'hide'}">Senha incorreta</div>
 		</div>
+
+		<div class="validation-error {credentialsError ? '' : 'hide'}">Senha ou email inválidos</div>
 
 		<div class="form-options">
 			<label class="checkbox-container">
 				<input type="checkbox" bind:checked={rememberMe} />
 				Remember me
 			</label>
-			<!-- <a href="/forgot-password" class="forgot-password">Forgot password?</a> -->
+			<a href="/forgot-password" class="forgot-password">Forgot password?</a>
 		</div>
 
 		<button class="login" type="submit" disabled={isLoading}>
@@ -175,15 +160,17 @@
 	.validation-error {
 		color: #d32f2f;
 		font-size: 0.8rem;
-		margin-top: 0.25rem;
+		margin-top: 15px;
 		transition: all 0.5s;
 		overflow: hidden;
 		opacity: 1;
 		max-height: 20px;
+		place-self: center;
 	}
 	.validation-error.hide {
 		opacity: 0;
-		max-height: 0px;
+		max-height: 0;
+		margin-top: 0;
 	}
 
 	.form-options {

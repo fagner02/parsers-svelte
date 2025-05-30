@@ -94,5 +94,5 @@ if (browser) {
 		appendData(`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`);
 	}, 500);
 }
-const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } = import.meta.env;
+export const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, SITE_URL } = import.meta.env;
 export const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

@@ -1,37 +1,27 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
 	import EyeIcon from '@icons/EyeIcon.svelte';
 	import EyeOffIcon from '@icons/EyeOffIcon.svelte';
-	import { supabase } from '$lib/log';
+	import { SITE_URL as SITE_URL, supabase } from '$lib/log';
 
 	let email = $state('');
 	let password = $state('');
 	let isLoading = $state(false);
-	let error = '';
+	let error = $state('');
+	let showError = $state(false);
 	let passVisible = $state(false);
-	let rememberMe = $state(false);
 	let emailError = $state(false);
 	let passwordError = $state(false);
-
-	onMount(() => {
-		if (browser) {
-			const savedEmail = localStorage.getItem('rememberedEmail');
-			if (savedEmail) {
-				email = savedEmail;
-				rememberMe = true;
-			}
-		}
-	});
+	let sent = $state(false);
 
 	function validateEmail() {
+		showError = false;
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		emailError = !re.test(email);
 		return emailError;
 	}
 
 	function validatePassword() {
+		showError = false;
 		passwordError = !(password.length >= 6);
 		return passwordError;
 	}
@@ -42,32 +32,23 @@
 		if (validateEmail() || validatePassword()) return;
 
 		isLoading = true;
-		error = '';
+		showError = false;
 
 		try {
-			console.log('sign up');
 			const res = await supabase.auth.signUp({
 				email: email,
 				password: password,
 				options: {
-					emailRedirectTo: 'https://localhost:5173'
+					emailRedirectTo: SITE_URL
 				}
 			});
 
-			if (!res.data.session === null) {
-				console.error(res.error);
-				return;
+			if (res.error !== null) {
+				error = res.error.message;
+				showError = true;
+				throw res.error;
 			}
-
-			if (browser) {
-				if (rememberMe) {
-					localStorage.setItem('rememberedEmail', email);
-				} else {
-					localStorage.removeItem('rememberedEmail');
-				}
-			}
-
-			await goto('/');
+			sent = true;
 		} catch (err) {
 			console.error(err);
 		} finally {
@@ -126,6 +107,12 @@
 			</div>
 		</div>
 
+		<div class="validation-error {showError ? '' : 'hide'}">
+			{error}
+		</div>
+
+		<p class={sent ? '' : 'hide'}>Email de confirmação enviado para {email}</p>
+
 		<button class="login" type="submit" disabled={isLoading}>
 			{isLoading ? 'Registrando...' : 'Registrar'}
 		</button>
@@ -142,7 +129,7 @@
 		border: 1px solid grey;
 		place-self: center;
 		width: fit-content;
-		min-width: 300px;
+		width: 300px;
 		padding: 20px;
 	}
 
@@ -150,6 +137,18 @@
 		text-align: center;
 		margin-bottom: 1.5rem;
 		color: #333;
+	}
+
+	p {
+		transition: all 0.5s;
+		max-height: 60px;
+		opacity: 1;
+		margin-bottom: 10px;
+		text-align: center;
+	}
+	p.hide {
+		max-height: 0px;
+		opacity: 0;
 	}
 
 	.form-group {
@@ -191,6 +190,11 @@
 	.validation-error.hide {
 		opacity: 0;
 		max-height: 0px;
+		margin: 0;
+	}
+	form > .validation-error {
+		text-align: center;
+		margin-bottom: 10px;
 	}
 
 	button.login {

@@ -6,7 +6,9 @@
 
 {#if getPlatform() === platforms.web}
 	<header>
-		<h1>VANSI</h1>
+		<a href="/" use:setUpTooltip={{ text: 'Início' }}>
+			<h1>VANSI</h1>
+		</a>
 		<a use:setUpTooltip={{ text: 'Entrar' }} href="/login">
 			<UserIcon size={24} color="hsl(200,50%,50%)"></UserIcon>
 		</a>
@@ -25,7 +27,7 @@
 		flex-direction: column;
 		margin: 8px 0px;
 	}
-	header > h1 {
+	h1 {
 		color: hsl(200, 50%, 50%);
 		font-size: 16pt;
 		line-height: 18pt;
@@ -33,6 +35,9 @@
 		font-weight: normal;
 		text-transform: uppercase;
 		margin: 5px 0;
+	}
+	a {
+		text-decoration: none;
 	}
 
 	@media (max-width: 860px) {
