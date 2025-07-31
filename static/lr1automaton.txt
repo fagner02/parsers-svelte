@@ -1,4 +1,3 @@
-<span><b>Algoritmo</b> autômato lr1:</span>
 <span><b>autômato</b> &lt;- novo autômato vazio</span>
 <span><b>estado_inicial</b> &lt;- [{produção: <b>produção_inicial</b>, posição: 0, lookahead: {'$'}}]</span>
 <span><b>closurelr1</b>(<b>estado_inicial</b>)</span>

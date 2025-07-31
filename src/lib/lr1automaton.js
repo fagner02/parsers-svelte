@@ -336,8 +336,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 
 	/**@type {import('@/types').LR1Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
+	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
-	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	/**@type {number[]} */
 	let stateStack = [0];
 	functionCalls.push({
@@ -348,11 +348,11 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	/**@type {import('@/types').LR1StateItem[]} */
 	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: new Set(['$']) }];
 
-	functionCalls.push({ name: 'highlightLines', args: [[3]] });
+	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 
 	closure(state0, rules, nt, firstSet);
 
-	functionCalls.push({ name: 'highlightLines', args: [[4]] });
+	functionCalls.push({ name: 'highlightLines', args: [[3]] });
 	functionCalls.push({ name: 'originStateName', args: ['s0'] });
 	automaton.states.push({ index: 0, items: [...state0] });
 	functionCalls.push({
@@ -373,17 +373,17 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 		functionCall: functionCalls.length - 1
 	});
 
-	functionCalls.push({ name: 'highlightLines', args: [[5]] });
+	functionCalls.push({ name: 'highlightLines', args: [[4]] });
 	functionCalls.push({
 		name: 'addToStack',
 		args: [0, 's0', '', `label-${elemIds.targetState}`]
 	});
-	functionCalls.push({ name: 'highlightLines', args: [[6]] });
+	functionCalls.push({ name: 'highlightLines', args: [[5]] });
 
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
 	let originStateIndex = 0;
 	while (stateStack.length > 0) {
-		functionCalls.push({ name: 'highlightLines', args: [[7]] });
+		functionCalls.push({ name: 'highlightLines', args: [[6]] });
 		functionCalls.push({ name: 'resetOriginState', args: [] });
 		functionCalls.push({
 			name: 'originStateName',
@@ -394,7 +394,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 			name: 'loadOriginState',
 			args: [structuredClone(automaton.states[stateStack[0]].items)]
 		});
-		functionCalls.push({ name: 'highlightLines', args: [[8]] });
+		functionCalls.push({ name: 'highlightLines', args: [[7]] });
 		for (let [symbolIndex, symbol] of alphabet.entries()) {
 			/**@type {import('@/types').LR1StateItem[]} */
 			let state1 = [];
@@ -403,14 +403,14 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				args: [`stack-${elemIds.alphabet}-${symbolIndex}`]
 			});
 			functionCalls.push({ name: 'targetStateReset', args: [] });
+			functionCalls.push({ name: 'highlightLines', args: [[8]] });
 			functionCalls.push({ name: 'highlightLines', args: [[9]] });
-			functionCalls.push({ name: 'highlightLines', args: [[10]] });
 			for (let [prodIndex, prod] of automaton.states[stateStack[0]].items.entries()) {
 				functionCalls.push({
 					name: 'selectForOriginalState',
 					args: [`state-${elemIds.originState}-${prodIndex}`]
 				});
-				functionCalls.push({ name: 'highlightLines', args: [[11]] });
+				functionCalls.push({ name: 'highlightLines', args: [[10]] });
 				if (
 					prod.pos >= rules[prod.ruleIndex].right.length ||
 					rules[prod.ruleIndex].right[prod.pos] !== symbol
@@ -424,7 +424,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.originState}-${prodIndex}-${prod.pos}`, colors.pink, id, false]
 				});
-				functionCalls.push({ name: 'highlightLines', args: [[12]] });
+				functionCalls.push({ name: 'highlightLines', args: [[11]] });
 				let existent = state1.findIndex(
 					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1
 				);
@@ -465,7 +465,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				});
 			}
 			functionCalls.push({ name: 'hideSelectOriginal', args: [] });
-			functionCalls.push({ name: 'highlightLines', args: [[13]] });
+			functionCalls.push({ name: 'highlightLines', args: [[12]] });
 			if (state1.length === 0) continue;
 			closure(state1, rules, nt, firstSet);
 			let existent = automaton.states.findIndex((x) => {
@@ -489,14 +489,15 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				return eq;
 			});
 
-			functionCalls.push({ name: 'highlightLines', args: [[14]] });
-			if (!automaton.transitions.has(stateStack[0]))
+			functionCalls.push({ name: 'highlightLines', args: [[13]] });
+			if (!automaton.transitions.has(stateStack[0])) {
 				automaton.transitions.set(stateStack[0], new Map());
+			}
 
 			if (existent === -1) {
+				functionCalls.push({ name: 'highlightLines', args: [[15]] });
 				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 				functionCalls.push({ name: 'highlightLines', args: [[17]] });
-				functionCalls.push({ name: 'highlightLines', args: [[18]] });
 
 				automaton.states.push({ index: automaton.states.length, items: structuredClone(state1) });
 				functionCalls.push({
@@ -509,7 +510,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					],
 					skip: true
 				});
-				functionCalls.push({ name: 'highlightLines', args: [[19]] });
+				functionCalls.push({ name: 'highlightLines', args: [[18]] });
 				functionCalls.push({
 					name: 'addToStack',
 					args: [
@@ -534,14 +535,14 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				});
 				continue;
 			} else {
+				functionCalls.push({ name: 'highlightLines', args: [[14]] });
 				functionCalls.push({ name: 'highlightLines', args: [[15]] });
-				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 			}
 
 			automaton.transitions.get(stateStack[0])?.set(symbol, existent);
 		}
 		stateStack.shift();
-		functionCalls.push({ name: 'highlightLines', args: [[20]] });
+		functionCalls.push({ name: 'highlightLines', args: [[19]] });
 		functionCalls.push({ name: 'removeFromStack', args: [0] });
 	}
 	functionCalls.push({ name: 'hideSelectAlphabet', args: [] });
