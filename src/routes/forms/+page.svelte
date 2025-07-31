@@ -35,7 +35,7 @@
 		});
 
 		console.log(content);
-		// supabase.storage.from('forms').upload(crypto.randomUUID(), content);
+		supabase.storage.from('forms').upload(crypto.randomUUID(), content);
 	}
 
 	onMount(() => {
