@@ -93,8 +93,12 @@ export class Interaction {
 
 	/**
 	 * @param {MouseEvent | TouchEvent} e
+	 * @param {Function?} moveEndCallback
 	 */
-	moveStart(e) {
+	moveStart(e, moveEndCallback = null) {
+		if (this.moveTarget) {
+			this.moveTarget.style.cursor = 'move';
+		}
 		if (e instanceof MouseEvent) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
@@ -102,6 +106,7 @@ export class Interaction {
 		this.interactingCallback?.(true);
 		document.onmouseup = (e) => {
 			this.moveEnd(e);
+			moveEndCallback?.();
 		};
 		document.onmouseleave = (e) => {
 			this.moveEnd(e);
@@ -168,6 +173,9 @@ export class Interaction {
 		this.removeDocumentListeners();
 		this.interactingCallback?.(false);
 		if (!this.dragPos || !this.moveTarget) return;
+
+		this.moveTarget.style.cursor = 'unset';
+
 		let x, y;
 		if (e instanceof MouseEvent) {
 			x = e.clientX;

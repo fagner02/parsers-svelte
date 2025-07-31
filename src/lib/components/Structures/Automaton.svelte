@@ -6,7 +6,6 @@
 	import { Interaction } from '$lib/interactiveElem';
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
-	import HandMoveIcon from '@icons/HandMoveIcon.svelte';
 
 	let rules = getAugGrammar().augRules;
 	/** @type {{id: string}} */
@@ -32,7 +31,6 @@
 	let nodes = [];
 	/**@type {Interaction}*/
 	let svgInteraction = $state(new Interaction());
-	let moveElements = false;
 	let selectedElement = { index: -1, rect: { x: 0, y: 0 }, diff: { x: 0, y: 0 } };
 	function move(/**@type {MouseEvent|TouchEvent}*/ e) {
 		let x = 0;
@@ -185,7 +183,8 @@
 			});
 
 			let startMove = (/**@type {MouseEvent|TouchEvent}*/ e) => {
-				if (!moveElements) return;
+				e.preventDefault();
+				e.stopPropagation();
 				let x = 0;
 				let y = 0;
 				if (e instanceof MouseEvent) {
@@ -569,21 +568,6 @@
 			resetSelected(true);
 		});
 	});
-
-	const actions = [
-		{
-			icon: HandMoveIcon,
-			callback: () => {
-				resetSelected(true);
-				moveElements = true;
-			},
-			removeCallback: () => {
-				moveElements = false;
-			},
-			name: 'move-elements',
-			desc: 'Mover estados'
-		}
-	];
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -591,7 +575,6 @@
 	title={'Autômato'}
 	titleLabel={null}
 	bind:setSize
-	{actions}
 	component={AutomatonIcon}
 	id={props.id}
 	bind:interaction={svgInteraction}

@@ -2,7 +2,6 @@
 	import { wait } from '$lib/flowControl';
 	import { appendData } from '$lib/log';
 	import { setUpTooltip } from '$lib/tooltip';
-	import HandIcon from '@icons/HandIcon.svelte';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
@@ -155,30 +154,23 @@
 		>
 		<button
 			use:setUpTooltip={{ text: 'Mover janela flutuante' }}
-			disabled={selected === 'move'}
-			onclick={() => {
+			style="cursor: move;{selected == 'move' ? 'filter: brightness(0.6);' : ''}"
+			onmousedown={(/**@type {MouseEvent}*/ e) => {
 				appendData(`move float, ${props.id}`);
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
-				interaction.attachMoveListeners();
+				interaction.moveStart(e, () => {
+					selected = 'grab';
+					console.log('enddd');
+					interaction.attachTransformListeners();
+				});
+				console.log('starttt');
 			}}
 		>
 			<MoveIcon></MoveIcon></button
 		>
-		<button
-			use:setUpTooltip={{ text: 'Habilitar interação' }}
-			disabled={selected === 'grab'}
-			onclick={(/**@type {PointerEvent}*/ e) => {
-				appendData(`grab float, ${props.id}`);
-				e.stopImmediatePropagation();
-				selected = 'grab';
-				removeCallback?.();
-				interaction.removeMoveListeners();
-				interaction.attachTransformListeners();
-			}}
-			><HandIcon></HandIcon>
-		</button>
+
 		{#each actions as action}
 			<button
 				use:setUpTooltip={{ text: action.desc }}
