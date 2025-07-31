@@ -197,19 +197,6 @@ num * (num)
 		margin: 10px;
 		align-items: center;
 	}
-	.field > textarea,
-	.field > input {
-		resize: none;
-		border-radius: 5px;
-		padding: 5px;
-		flex: 1;
-	}
-
-	.row {
-		display: flex;
-		margin: -10px 0px;
-		flex-wrap: wrap;
-	}
 
 	.col {
 		flex-direction: column;
