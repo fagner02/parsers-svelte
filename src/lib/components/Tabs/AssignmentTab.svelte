@@ -6,6 +6,7 @@
 	let totalQuestions = $state(0);
 	let totalAnswers = $state(0);
 	let started = $state(false);
+	let fileSent = $state(false);
 
 	let answers = new Set();
 	/**
@@ -44,26 +45,19 @@
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
 				<button
-					disabled={totalAnswers < totalQuestions}
+					disabled={totalAnswers < totalQuestions || fileSent}
 					onclick={() => {
+						fileSent = true;
 						getFile();
-					}}>Finalizar</button
+					}}>{fileSent ? 'Finalizado' : 'Finalizar'}</button
 				>
 			</div>
 			<FillSize class="form-content">
 				{#snippet content()}
-					<div class="fields" style={started ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
-						<hr style="margin-top: 0;" />
-						<div class="row">
-							<div class="field" style="flex: 1">
-								<p>Nome Completo</p>
-								<input oninput={receiveInput} name="name" id="name" />
-							</div>
-							<div class="field">
-								<p>Matrícula</p>
-								<input oninput={receiveInput} name="matricula" id="matricula" />
-							</div>
-						</div>
+					<div
+						class="fields"
+						style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
+					>
 						<hr />
 						<div class="field col">
 							<p>
@@ -172,7 +166,7 @@ num * (num)
 		border: 1px solid hsl(0, 0%, 0%, 20%);
 		height: inherit;
 		border-radius: 8px;
-		overflow: hidden;
+		overflow: auto;
 	}
 
 	.fields {

@@ -28,7 +28,6 @@ pre {
 #app-content {
 	flex: 1;
 	overflow: hidden;
-	
 }
 
 .maxWidth {
@@ -105,13 +104,12 @@ pre {
 textarea,
 .input,
 input {
-	outline: hsl(0, 0%, 50%) solid 2px;
-	border: none;
+	border: hsl(0, 0%, 50%) solid 2px;
 }
 
 .input:focus-within,
 input:focus-within {
-	outline: hsl(200, 80%, 60%) solid 2px;
+	border: hsl(200, 80%, 60%) solid 2px;
 }
 
 ::-webkit-scrollbar {

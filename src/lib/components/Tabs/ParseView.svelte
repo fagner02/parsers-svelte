@@ -81,12 +81,12 @@
 
 	.accept {
 		background: hsl(100, 50%, 60%);
-		outline: 2px solid hsl(100, 50%, 50%);
+		border: 2px solid hsl(100, 50%, 50%);
 		color: white;
 	}
 	.reject {
 		background: hsl(0, 50%, 60%);
-		outline: 2px solid hsl(0, 50%, 50%);
+		border: 2px solid hsl(0, 50%, 50%);
 		color: white;
 	}
 </style>
