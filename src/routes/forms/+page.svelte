@@ -73,275 +73,259 @@
 			</div>
 			<FillSize class="form-content">
 				{#snippet content()}
+					<datalist id="values">
+						<option value="1"></option>
+						<option value="2"></option>
+						<option value="3"></option>
+						<option value="4"></option>
+						<option value="5"></option>
+					</datalist>
 					<div class="fields" style={!fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
 						<div class="field col">
 							1. Você já havia estudado os algoritmos LL(1), SLR ou CLR antes de usar a ferramenta?
-							<div>
-								<input type="radio" name="q1" value="Sim" /><label for="q1">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q1" value="Não" /><label for="q1">Não</label>
-							</div>
-						</div>
-						<hr />
-						<div class="field col">
-							2. Em qual nível você se considera em Compiladores?
-							<div>
-								<input type="radio" name="q2" value="Iniciante" /><label for="q2">Iniciante</label>
-							</div>
-							<div>
-								<input type="radio" name="q2" value="Intermediário" /><label for="q2"
-									>Intermediário</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q2" value="Avançado" /><label for="q2">Avançado</label>
+							<div class="row">
+								<div>
+									<input type="radio" name="q1" value="Sim" /><label for="q1">Sim</label>
+								</div>
+								<div>
+									<input type="radio" name="q1" value="Não" /><label for="q1">Não</label>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							3. A interface da ferramenta foi fácil de navegar?
-							<div>
-								<input type="radio" name="q3" value="Muito fácil" /><label for="q3"
-									>Muito fácil</label
-								>
+							2. Qual o seu nível de conhecimento sobre Analisadores Sintáticos?
+							<div class="row">
+								<div>
+									<input type="radio" name="q2" value="Iniciante" /><label for="q2">Iniciante</label
+									>
+								</div>
+								<div>
+									<input type="radio" name="q2" value="Intermediário" /><label for="q2"
+										>Intermediário</label
+									>
+								</div>
+								<div>
+									<input type="radio" name="q2" value="Avançado" /><label for="q2">Avançado</label>
+								</div>
 							</div>
-							<div>
-								<input type="radio" name="q3" value="Fácil" /><label for="q3">Fácil</label>
-							</div>
-							<div>
-								<input type="radio" name="q3" value="Neutra" /><label for="q3">Neutra</label>
-							</div>
-							<div>
-								<input type="radio" name="q3" value="Difícil" /><label for="q3">Difícil</label>
-							</div>
-							<div>
-								<input type="radio" name="q3" value="Muito difícil" /><label for="q3"
-									>Muito difícil</label
-								>
+						</div>
+						<hr />
+						<div class="field col">
+							3. De 1 a 5, quanto a interface da ferramenta foi fácil de navegar?
+							<div class="range-box">
+								<input type="range" value="0" id="q3" min="1" max="5" name="q3" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
 							4. Os elementos da interface (botões, janelas, tooltips) foram claros em sua função?
-							<div>
-								<input type="radio" name="q4" value="Sim, todos" /><label for="q4">Sim, todos</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q4" value="A maioria" /><label for="q4">A maioria</label>
-							</div>
-							<div>
-								<input type="radio" name="q4" value="Alguns" /><label for="q4">Alguns</label>
-							</div>
-							<div>
-								<input type="radio" name="q4" value="Poucos" /><label for="q4">Poucos</label>
-							</div>
-							<div>
-								<input type="radio" name="q4" value="Nenhum" /><label for="q4">Nenhum</label>
-							</div>
-						</div>
-						<hr />
-						<div class="field col">
-							5. Os tooltips (dicas ao passar o mouse) foram úteis?
-							<div>
-								<input type="radio" name="q5" value="Muito úteis" /><label for="q5"
-									>Muito úteis</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q5" value="Úteis" /><label for="q5">Úteis</label>
-							</div>
-							<div>
-								<input type="radio" name="q5" value="Neutros" /><label for="q5">Neutros</label>
-							</div>
-							<div>
-								<input type="radio" name="q5" value="Pouco úteis" /><label for="q5"
-									>Pouco úteis</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q5" value="Inúteis" /><label for="q5">Inúteis</label>
+							<div class="row">
+								<div>
+									<input type="radio" name="q4" value="Sim, todos" /><label for="q4"
+										>Sim, todos</label
+									>
+								</div>
+								<div>
+									<input type="radio" name="q4" value="A maioria" /><label for="q4">A maioria</label
+									>
+								</div>
+								<div>
+									<input type="radio" name="q4" value="Alguns" /><label for="q4">Alguns</label>
+								</div>
+								<div>
+									<input type="radio" name="q4" value="Poucos" /><label for="q4">Poucos</label>
+								</div>
+								<div>
+									<input type="radio" name="q4" value="Nenhum" /><label for="q4">Nenhum</label>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							6. Como você avalia a organização das abas (gramática, algoritmos, análise de string)?
-							<div>
-								<input type="radio" name="q6" value="Muito boa" /><label for="q6">Muito boa</label>
-							</div>
-							<div>
-								<input type="radio" name="q6" value="Boa" /><label for="q6">Boa</label>
-							</div>
-							<div>
-								<input type="radio" name="q6" value="Regular" /><label for="q6">Regular</label>
-							</div>
-							<div>
-								<input type="radio" name="q6" value="Ruim" /><label for="q6">Ruim</label>
-							</div>
-							<div>
-								<input type="radio" name="q6" value="Muito ruim" /><label for="q6">Muito ruim</label
-								>
+							5. De 1 a 5, quanto os tooltips (descrições que aparecem ao passar o mouse por cima de
+							botões) foram úteis?
+							<div class="range-box">
+								<input type="range" value="0" id="q5" min="1" max="5" name="q5" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							7. A visualização passo a passo dos algoritmos ajudou a entender seu funcionamento?
-							<div>
-								<input type="radio" name="q7" value="Muito" /><label for="q7">Muito</label>
-							</div>
-							<div>
-								<input type="radio" name="q7" value="Sim" /><label for="q7">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q7" value="Parcialmente" /><label for="q7"
-									>Parcialmente</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q7" value="Pouco" /><label for="q7">Pouco</label>
-							</div>
-							<div>
-								<input type="radio" name="q7" value="Não ajudou" /><label for="q7">Não ajudou</label
-								>
+							6. De 1 a 5, como você avalia a organização das abas (gramática, algoritmos, análise
+							de string)?
+							<div class="range-box">
+								<input type="range" value="0" id="q6" min="1" max="5" name="q6" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							8. As animações (destaques, transições, movimentação de dados) foram úteis para
-							acompanhar as mudanças nas estruturas?
-							<div>
-								<input type="radio" name="q8" value="Muito úteis" /><label for="q8"
-									>Muito úteis</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q8" value="Úteis" /><label for="q8">Úteis</label>
-							</div>
-							<div>
-								<input type="radio" name="q8" value="Neutras" /><label for="q8">Neutras</label>
-							</div>
-							<div>
-								<input type="radio" name="q8" value="Pouco úteis" /><label for="q8"
-									>Pouco úteis</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q8" value="Não foram úteis" /><label for="q8"
-									>Não foram úteis</label
-								>
+							7. De 1 a 5, quanto a visualização passo a passo dos algoritmos ajudou a entender seu
+							funcionamento?
+							<div class="range-box">
+								<input type="range" value="0" id="q7" min="1" max="5" name="q7" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							9. A visualização do autômato (itens canônicos) foi clara e ajudou no entendimento do
-							algoritmo?
-							<div>
-								<input type="radio" name="q9" value="Sim" /><label for="q9">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q9" value="Parcialmente" /><label for="q9"
-									>Parcialmente</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q9" value="Não" /><label for="q9">Não</label>
-							</div>
-						</div>
-						<hr />
-						<div class="field col">
-							10. A possibilidade de avançar, voltar e reiniciar os passos foi importante para o
-							aprendizado?
-							<div>
-								<input type="radio" name="q10" value="Muito importante" /><label for="q10"
-									>Muito importante</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q10" value="Importante" /><label for="q10"
-									>Importante</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q10" value="Neutra" /><label for="q10">Neutra</label>
-							</div>
-							<div>
-								<input type="radio" name="q10" value="Pouco importante" /><label for="q10"
-									>Pouco importante</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q10" value="Irrelevante" /><label for="q10"
-									>Irrelevante</label
-								>
+							8. De 1 a 5, quanto as animações (destaques, transições, movimentação de dados) foram
+							úteis para acompanhar as mudanças nas estruturas de dados?
+							<div class="range-box">
+								<input type="range" value="0" id="q8" min="1" max="5" name="q8" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							11. O pseudocódigo com breakpoints ajudou a relacionar a teoria com a execução?
-							<div>
-								<input type="radio" name="q11" value="Sim" /><label for="q11">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q11" value="Parcialmente" /><label for="q11"
-									>Parcialmente</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q11" value="Não" /><label for="q11">Não</label>
+							9. De 1 a 5, quanto a visualização do autômato (itens canônicos) foi clara e ajudou no
+							entendimento dos algoritmos SLR e LR(1)?
+							<div class="range-box">
+								<input type="range" value="0" id="q9" min="1" max="5" name="q9" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							12. Em geral, como você avalia a ferramenta VANSI como apoio ao aprendizado de análise
+							10. De 1 a 5, quanto a visualização da árvore sintática ajudou no entendimento da
+							análise sintática de strings?
+							<div class="range-box">
+								<input type="range" value="0" id="q10" min="1" max="5" name="q10" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							11. De 1 a 5, quanto a possibilidade de avançar, voltar e reiniciar os passos foi
+							importante para o aprendizado?
+							<div class="range-box">
+								<input type="range" value="0" id="q11" min="1" max="5" name="q11" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							12. De 1 a 5, quanto o pseudocódigo com breakpoints ajudou a relacionar a teoria com a
+							execução?
+							<div class="range-box">
+								<input type="range" value="0" id="q12" min="1" max="5" name="q12" list="values" />
+								<div class="values-box">
+									<p>1</p>
+									<p>2</p>
+									<p>3</p>
+									<p>4</p>
+									<p>5</p>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							13. Em geral, como você avalia a ferramenta VANSI como apoio ao aprendizado de análise
 							sintática?
-							<div>
-								<input type="radio" name="q12" value="Excelente" /><label for="q12">Excelente</label
-								>
-							</div>
-							<div>
-								<input type="radio" name="q12" value="Boa" /><label for="q12">Boa</label>
-							</div>
-							<div>
-								<input type="radio" name="q12" value="Regular" /><label for="q12">Regular</label>
-							</div>
-							<div>
-								<input type="radio" name="q12" value="Ruim" /><label for="q12">Ruim</label>
-							</div>
-							<div>
-								<input type="radio" name="q12" value="Péssima" /><label for="q12">Péssima</label>
-							</div>
-						</div>
-						<hr />
-						<div class="field col">
-							13. Você usaria essa ferramenta novamente para estudar algoritmos de compiladores?
-							<div>
-								<input type="radio" name="q13" value="Sim" /><label for="q13">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q13" value="Talvez" /><label for="q13">Talvez</label>
-							</div>
-							<div>
-								<input type="radio" name="q13" value="Não" /><label for="q13">Não</label>
+							<div class="row">
+								<div>
+									<input type="radio" name="q13" value="Excelente" /><label for="q13"
+										>Excelente</label
+									>
+								</div>
+								<div>
+									<input type="radio" name="q13" value="Boa" /><label for="q13">Boa</label>
+								</div>
+								<div>
+									<input type="radio" name="q13" value="Regular" /><label for="q13">Regular</label>
+								</div>
+								<div>
+									<input type="radio" name="q13" value="Ruim" /><label for="q13">Ruim</label>
+								</div>
+								<div>
+									<input type="radio" name="q13" value="Péssima" /><label for="q13">Péssima</label>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							14. Recomendaria a ferramenta para outros alunos?
-							<div>
-								<input type="radio" name="q14" value="Sim" /><label for="q14">Sim</label>
-							</div>
-							<div>
-								<input type="radio" name="q14" value="Talvez" /><label for="q14">Talvez</label>
-							</div>
-							<div>
-								<input type="radio" name="q14" value="Não" /><label for="q14">Não</label>
+							14. Você usaria essa ferramenta novamente para estudar algoritmos de compiladores?
+							<div class="row">
+								<div>
+									<input type="radio" name="q14" value="Sim" /><label for="q14">Sim</label>
+								</div>
+								<div>
+									<input type="radio" name="q14" value="Talvez" /><label for="q14">Talvez</label>
+								</div>
+								<div>
+									<input type="radio" name="q14" value="Não" /><label for="q14">Não</label>
+								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
-							15. Sugestões ou comentários adicionais sobre a ferramenta
-							<textarea data-optional="true" name="feedback" id="feedback"></textarea>
+							15. Recomendaria a ferramenta para outros alunos?
+							<div class="row">
+								<div>
+									<input type="radio" name="q15" value="Sim" /><label for="q15">Sim</label>
+								</div>
+								<div>
+									<input type="radio" name="q15" value="Talvez" /><label for="q15">Talvez</label>
+								</div>
+								<div>
+									<input type="radio" name="q15" value="Não" /><label for="q15">Não</label>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							16. Sugestões ou comentários adicionais sobre a ferramenta
+							<textarea data-optional="true" name="q16" id="q16"></textarea>
 						</div>
 					</div>
 				{/snippet}
@@ -380,11 +364,41 @@
 		color: hsl(200, 50%, 60%);
 		pointer-events: none;
 	}
+	textarea {
+		border-radius: 5px;
+	}
+	datalist {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		writing-mode: vertical-lr;
+
+		width: 200px;
+	}
 	.field {
 		display: flex;
 		gap: 20px;
 		margin: 10px;
 		align-items: center;
+		font-weight: bold;
+	}
+	label {
+		font-weight: normal;
+	}
+
+	.row {
+		display: flex;
+		gap: 10px;
+	}
+	.range-box {
+		display: flex;
+		width: fit-content;
+		flex-direction: column;
+	}
+	.values-box {
+		display: flex;
+		justify-content: space-around;
+		font-weight: normal;
 	}
 
 	.col {
