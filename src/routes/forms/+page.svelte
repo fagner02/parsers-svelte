@@ -324,7 +324,19 @@
 						</div>
 						<hr />
 						<div class="field col">
-							16. Sugestões ou comentários adicionais sobre a ferramenta
+							16. Você já usou a ferramenta antes?
+							<div class="row">
+								<div>
+									<input type="radio" name="q16" value="Sim" /><label for="q16">Sim</label>
+								</div>
+								<div>
+									<input type="radio" name="q16" value="Não" /><label for="q16">Não</label>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="field col">
+							17. Sugestões ou comentários adicionais sobre a ferramenta
 							<textarea data-optional="true" name="q16" id="q16"></textarea>
 						</div>
 					</div>

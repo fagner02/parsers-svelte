@@ -35,6 +35,7 @@ export async function createFile() {
 	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = (event) => {
 		console.log('File created successfully');
 	};
+	appendData('tab change,Tarefa');
 	started = true;
 }
 
