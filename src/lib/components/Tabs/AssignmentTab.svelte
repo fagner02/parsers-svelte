@@ -191,6 +191,11 @@ num * (num)
 		color: hsl(200, 50%, 60%);
 		pointer-events: none;
 	}
+	textarea,
+	input {
+		border-radius: 5px;
+	}
+
 	.field {
 		display: flex;
 		gap: 20px;
