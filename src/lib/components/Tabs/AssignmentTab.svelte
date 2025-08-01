@@ -14,7 +14,9 @@
 	 */
 	function receiveInput(e) {
 		const { name, value } = /**@type {HTMLInputElement}*/ (e.target);
-		appendData(`form ${name},${value}`);
+		appendData(
+			`form ${name},${value.replaceAll('\\', '\\\\').replaceAll('\n', '\\n').replaceAll(',', '\\c')}`
+		);
 
 		if (value.trim().length > 0) {
 			answers.add(name);
