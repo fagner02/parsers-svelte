@@ -162,10 +162,8 @@
 				interaction.removeTransformListeners();
 				interaction.moveStart(e, () => {
 					selected = 'grab';
-					console.log('enddd');
 					interaction.attachTransformListeners();
 				});
-				console.log('starttt');
 			}}
 		>
 			<MoveIcon></MoveIcon></button

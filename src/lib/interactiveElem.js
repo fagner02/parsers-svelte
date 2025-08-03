@@ -40,8 +40,10 @@ export class Interaction {
 	resizedElem;
 	/**@type {DOMRect | null} */
 	resizeInitial = null;
+	resizePoint = { x: 0, y: 0 };
 	resizeDirLeft = false;
 	resizeDirTop = false;
+
 	/**@type {((value: boolean)=>void)?} */
 	interactingCallback = null;
 
@@ -218,6 +220,10 @@ export class Interaction {
 		if (!this.resizedElem) return;
 		this.interactingCallback?.(true);
 		this.resizeInitial = this.resizedElem.getBoundingClientRect();
+		if (this.moveTarget?.parentElement) {
+			this.resizePoint.x = parseFloat(this.moveTarget.parentElement.style.left);
+			this.resizePoint.y = parseFloat(this.moveTarget.parentElement.style.top);
+		}
 		document.onmousemove = (e) => {
 			this.resizeMove(e);
 		};
@@ -260,13 +266,27 @@ export class Interaction {
 			x = e.touches[0].clientX;
 			y = e.touches[0].clientY;
 		}
+
 		if (this.resizeDirLeft) {
-			this.resizedElem.style.width = `${this.resizeInitial.right - x}px`;
+			const width = this.resizeInitial.right - x;
+			const left = this.resizePoint.x - (width - this.resizeInitial.width);
+
+			this.resizedElem.style.width = `${width}px`;
+			if (this.moveTarget?.parentElement) {
+				this.moveTarget.parentElement.style.left = `${left}px`;
+			}
 		} else {
 			this.resizedElem.style.width = `${x - this.resizeInitial.left}px`;
 		}
 		if (this.resizeDirTop) {
-			this.resizedElem.style.height = `${this.resizeInitial.bottom - y}px`;
+			const height = this.resizeInitial.bottom - y;
+			const top = this.resizePoint.y - (height - this.resizeInitial.height);
+
+			this.resizedElem.style.height = `${height}px`;
+
+			if (this.moveTarget?.parentElement) {
+				this.moveTarget.parentElement.style.top = `${top}px`;
+			}
 		} else {
 			this.resizedElem.style.height = `${y - this.resizeInitial.top}px`;
 		}
