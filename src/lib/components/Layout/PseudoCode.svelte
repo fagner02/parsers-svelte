@@ -5,6 +5,7 @@
 	import { Interaction } from '$lib/interactiveElem';
 	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 	import { colors } from '$lib/selectSymbol';
+	import { appendData } from '$lib/log';
 
 	/**@type {number[]}*/
 	let highlightedLines = [];
@@ -94,8 +95,10 @@
 	function toggleBreakpoint(index) {
 		const existent = breakpoints.indexOf(index);
 		if (existent === -1) {
+			appendData('breakpoint, add');
 			breakpoints.push(index);
 		} else {
+			appendData('breakpoint, remove');
 			breakpoints.splice(existent, 1);
 		}
 	}
