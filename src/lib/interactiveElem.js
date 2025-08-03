@@ -1,3 +1,5 @@
+import { appendData } from './log';
+
 /**@param {HTMLElement} elem*/
 export function stackFloatingWindows(elem) {
 	setTimeout(() => {
@@ -166,6 +168,8 @@ export class Interaction {
 
 		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.top = `${this.movePos.y}px`;
 		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.left = `${this.movePos.x}px`;
+
+		appendData(`move float, coord;${this.movePos.x} ${this.movePos.y}`);
 	}
 
 	/**
@@ -174,6 +178,7 @@ export class Interaction {
 	moveEnd(e) {
 		this.removeDocumentListeners();
 		this.interactingCallback?.(false);
+		appendData(`move float, end`);
 		if (!this.dragPos || !this.moveTarget) return;
 
 		this.moveTarget.style.cursor = 'unset';
@@ -195,8 +200,9 @@ export class Interaction {
 	/**
 	 * @param {Map<string, Elem?>} handles
 	 * @param {Elem} target
+	 * @param {string} id
 	 */
-	setResizeInteraction(handles, target) {
+	setResizeInteraction(handles, target, id) {
 		this.resizedElem = target;
 		for (let h of 'lr') {
 			for (let v of 'bt') {
@@ -205,6 +211,7 @@ export class Interaction {
 					let start = (/** @type {MouseEvent|TouchEvent} */ e) => {
 						this.resizeDirLeft = h === 'l';
 						this.resizeDirTop = v === 't';
+						appendData(`resize float, ${id};start`);
 						e.stopImmediatePropagation();
 						e.preventDefault();
 						this.resizeStart();
@@ -245,6 +252,7 @@ export class Interaction {
 	}
 
 	resizeEnd() {
+		appendData(`resize float, end`);
 		this.interactingCallback?.(false);
 		this.resizeInitial = null;
 		this.removeDocumentListeners();
@@ -267,29 +275,41 @@ export class Interaction {
 			y = e.touches[0].clientY;
 		}
 
+		let rect = { w: 0, h: 0, x: 0, y: 0 };
+
 		if (this.resizeDirLeft) {
 			const width = this.resizeInitial.right - x;
 			const left = this.resizePoint.x - (width - this.resizeInitial.width);
-
+			rect.w = width;
+			rect.x = left;
 			this.resizedElem.style.width = `${width}px`;
 			if (this.moveTarget?.parentElement) {
 				this.moveTarget.parentElement.style.left = `${left}px`;
 			}
 		} else {
-			this.resizedElem.style.width = `${x - this.resizeInitial.left}px`;
+			const width = x - this.resizeInitial.left;
+			rect.w = width;
+			rect.x = parseFloat(this.moveTarget?.parentElement?.style?.left ?? '0');
+
+			this.resizedElem.style.width = `${width}px`;
 		}
 		if (this.resizeDirTop) {
 			const height = this.resizeInitial.bottom - y;
 			const top = this.resizePoint.y - (height - this.resizeInitial.height);
-
+			rect.h = height;
+			rect.y = top;
 			this.resizedElem.style.height = `${height}px`;
 
 			if (this.moveTarget?.parentElement) {
 				this.moveTarget.parentElement.style.top = `${top}px`;
 			}
 		} else {
-			this.resizedElem.style.height = `${y - this.resizeInitial.top}px`;
+			const height = y - this.resizeInitial.top;
+			rect.h = height;
+			rect.y = parseFloat(this.moveTarget?.parentElement?.style?.top ?? '0');
+			this.resizedElem.style.height = `${height}px`;
 		}
+		appendData(`resize float, coord;${rect.x} ${rect.y};${rect.w} ${rect.h}`);
 	}
 
 	/**

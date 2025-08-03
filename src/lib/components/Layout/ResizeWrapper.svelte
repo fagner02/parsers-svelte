@@ -47,7 +47,7 @@
 	};
 
 	async function open() {
-		appendData(`open float, ${props.id}`);
+		appendData(`open float, ${props.id};${width} ${height}`);
 		minimized = false;
 
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
@@ -115,7 +115,8 @@
 				['rb', document.querySelector(`#${props.id}-rb-handle`)],
 				['rt', document.querySelector(`#${props.id}-rt-handle`)]
 			]),
-			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild)
+			/**@type {HTMLElement}*/ (wrapper.firstChild?.firstChild),
+			props.id
 		);
 		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
 		interaction.setMoveInteraction(content);
@@ -156,7 +157,7 @@
 			use:setUpTooltip={{ text: 'Mover janela flutuante' }}
 			style="cursor: move;{selected == 'move' ? 'filter: brightness(0.6);' : ''}"
 			onmousedown={(/**@type {MouseEvent}*/ e) => {
-				appendData(`move float, ${props.id}`);
+				appendData(`move float, ${props.id};start`);
 				selected = 'move';
 				removeCallback?.();
 				interaction.removeTransformListeners();
