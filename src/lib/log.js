@@ -34,8 +34,8 @@ export async function createFile() {
 	const store = transaction.objectStore('files');
 	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = (event) => {
 		console.log('File created successfully');
+		appendData('tab change,Tarefa');
 	};
-	appendData('tab change,Tarefa');
 	started = true;
 }
 

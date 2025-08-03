@@ -60,6 +60,17 @@
 						class="fields"
 						style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
 					>
+						<hr style="margin-top: 0;" />
+						<div style="display: flex;">
+							<div class="field" style="flex: 1">
+								<p>Nome Completo</p>
+								<input oninput={receiveInput} name="name" id="name" />
+							</div>
+							<div class="field">
+								<p>Matrícula</p>
+								<input oninput={receiveInput} name="matricula" id="matricula" />
+							</div>
+						</div>
 						<hr />
 						<div class="field col">
 							<p>
@@ -203,6 +214,9 @@ num * (num)
 		gap: 20px;
 		margin: 10px;
 		align-items: center;
+	}
+	.field > input {
+		flex: 1;
 	}
 
 	.col {
