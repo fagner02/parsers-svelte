@@ -31,11 +31,11 @@
 	function sendForm() {
 		let content = '';
 		answers.entries().forEach(([k, v]) => {
-			content += `${k}:${v.value}\n`;
+			content += `${k}:${v.value?.replaceAll('\\', '\\\\').replaceAll('\n', '\\n')}\n`;
 		});
 
 		console.log(content);
-		supabase.storage.from('forms').upload(crypto.randomUUID(), content);
+		supabase.storage.from('logs').upload('form' + crypto.randomUUID(), content);
 	}
 
 	onMount(() => {
