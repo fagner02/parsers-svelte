@@ -1,0 +1,69 @@
+### Objetivo do Formulário para Professores
+
+O formulário deve avaliar se a VANSI:
+
+- É útil como recurso didático em sala de aula.
+- Facilita o ensino de conceitos complexos (como análise LL(1), SLR, CLR).
+- Pode ser integrada ao plano de ensino.
+- Ajuda a reduzir o tempo de explicação ou a aumentar a compreensão dos alunos.
+- Tem potencial para ser usada em atividades avaliativas ou monitorias.
+
+---
+
+### - Avaliação da Adequação Pedagógica
+
+4. Em geral, como você avalia a VANSI como ferramenta de ensino de análise sintática?
+   []Excelente []Boa []Regular []Ruim []Péssima
+
+5. A ferramenta cobre adequadamente os tópicos que você ensina?
+   []Sim, todos []A maioria []Alguns []Poucos []Nenhum
+
+6. Quais algoritmos você considera mais bem representados na ferramenta? (marque todos)
+   []LL(1) []SLR []CLR []Construção de autômato LR(1) []Tabela de parsing []Conjuntos first e follow
+
+7. A VANSI ajuda a visualizar o funcionamento interno dos algoritmos (passo a passo)?
+   []Muito []Sim []Parcialmente []Pouco []Não
+
+8. Você usaria a VANSI em suas aulas?
+   []Sim, com certeza []Sim, talvez []Não, mas recomendaria []Não
+
+---
+
+### - Integração ao Ensino
+
+9. Em quais contextos você consideraria usar a VANSI? (marque todos)
+   []Explicação em aula []Atividade prática em laboratório []Estudo individual dos alunos []Atividade avaliativa []Monitoria ou reforço
+
+10. A ferramenta reduziria o tempo necessário para explicar os algoritmos?
+    []Sim, significativamente []Sim, um pouco []Não []Não sei
+
+11. Os elementos visuais (tabelas, autômato, árvore sintática) são claros e úteis?
+    []Sim, todos []A maioria []Alguns []Poucos []Nenhum
+
+12. Os tooltips e descrições ajudam a tornar a interface autoexplicativa?
+    []Sim, muito []Sim []Parcialmente []Pouco []Não
+
+---
+
+### - Sugestões e Melhorias
+
+13. Quais funcionalidades você gostaria de ver adicionadas?
+    text
+
+14. Você recomendaria a VANSI para outros professores da disciplina?
+    []Sim []Talvez []Não
+
+15. Justifique sua resposta da pergunta anterior:
+    text
+
+16. Comentários gerais sobre a ferramenta:
+    text
+
+### Diferenças em relação ao Formulário de Alunos
+
+| Formulário de Alunos                                  | Formulário de Professores                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------- |
+| Foco em usabilidade e dificuldade de uso              | Foco em adequação pedagógica e integrabilidade ao ensino      |
+| Perguntas como: "A interface foi fácil?"              | Perguntas como: "Você usaria isso em aula?"                   |
+| Avalia o aprendizado individual                       | Avalia o impacto no processo de ensino                        |
+| Respostas mais emocionais ("gostei", "achei difícil") | Respostas mais estratégicas ("pode substituir parte da aula") |
