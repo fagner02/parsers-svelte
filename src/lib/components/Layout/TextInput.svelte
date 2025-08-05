@@ -65,12 +65,11 @@
 <div class="input-box unit">
 	<div style="display: flex; flex-direction:column;margin-bottom: 10px;gap: 10px">
 		<div class="instruction">
-			<!-- <div style="display: flex;"> -->
 			<div class="instruction-icon">
 				<InfoIcon size={16} color="white"></InfoIcon>
 			</div>
 			<p>
-				O lado esquerdo e direito das regras devem ser separados por <kbd> -&gt;</kbd>.
+				O lado esquerdo e direito das regras devem ser separados por <kbd>-&gt;</kbd>.
 				<br />Exemplo:
 				<kbd>A -&gt; a B</kbd>.
 			</p>
@@ -100,7 +99,8 @@
 				<InfoIcon size={16} color="white"></InfoIcon>
 			</div>
 			<p>
-				As regras da gramática podem ser separadas por linha ou usando o símbolo<kbd>|</kbd>. <br />
+				As regras da gramática podem ser separadas por linha ou usando o símbolo <kbd>|</kbd>.
+				<br />
 				Exemplo: <br />
 				<kbd>A -&gt; a B</kbd> <br />
 				<kbd>A -&gt; c D</kbd><br />
