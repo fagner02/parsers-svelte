@@ -147,17 +147,17 @@ s5      |    |    | r2 |    |
 						<hr />
 						<div class="field col">
 							<p>5. Dê o conjunto First da seguinte gramática</p>
-							<pre>{`Mass → Shape Texture
-Shape → Circumscribed | Spiculated
-Circumscribed → Ccompactness Cspicindex
-Spiculated → Ecompactness Espicindex
-Texture → Contrast Acutance
-Ccompactness → cca | ccb
-Cspic index → sia | sib
-Ecompactness → ccb | ccc
-Espic index → sia | sib | sic
-Contrast → ca | cb | cc
-Acutance → aa`}</pre>
+							<pre>{`Mass -> Shape Texture
+Shape -> Circumscribed | Spiculated
+Circumscribed -> Ccompactness Cspicindex
+Spiculated -> Ecompactness Espicindex
+Texture -> Contrast Acutance
+Ccompactness -> cca | ccb
+Cspic index -> sia | sib
+Ecompactness -> ccb | ccc
+Espic index -> sia | sib | sic
+Contrast -> ca | cb | cc
+Acutance -> aa`}</pre>
 							<textarea name="q6" id="q6" oninput={receiveInput} rows="4"></textarea>
 						</div>
 						<hr />
