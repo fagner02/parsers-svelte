@@ -3,17 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 
 export let started = false;
 let mousePos = { x: 0, y: 0 };
+/**@type {string}*/
 let docId = crypto.randomUUID();
 /**@return {Promise<IDBDatabase?>}*/
 function getIDB() {
 	return new Promise((resolve, reject) => {
 		const request = indexedDB.open('ParsersFileStore', 1);
-		request.onupgradeneeded = (event) => {
-			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
-			db.createObjectStore('files', {
-				keyPath: 'name'
-			});
-		};
+		// request.onupgradeneeded = (event) => {
+		// 	const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
+		// 	db.createObjectStore('files', {
+		// 		keyPath: 'name'
+		// 	});
+		// };
 		request.onsuccess = (event) => {
 			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
 			resolve(db);
@@ -25,14 +26,22 @@ function getIDB() {
 }
 
 export async function createFile() {
+	const item = localStorage.getItem('vansi-docid');
+	if (item) {
+		docId = item;
+		console.log(docId);
+		started = true;
+		return;
+	}
 	const db = await getIDB();
 	if (!db) {
 		console.error('Error opening IndexedDB');
 		return;
 	}
-	const transaction = db.transaction('files', 'readwrite');
+	const transaction = db.transaction(['files'], 'readwrite');
 	const store = transaction.objectStore('files');
 	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = (event) => {
+		localStorage.setItem('vansi-docid', docId);
 		console.log('File created successfully');
 		appendData('tab change,Tarefa');
 	};
@@ -49,7 +58,7 @@ export async function appendData(data) {
 		console.error('Error opening IndexedDB');
 		return;
 	}
-	const transaction = db.transaction('files', 'readwrite');
+	const transaction = db.transaction(['files'], 'readwrite');
 	const store = transaction.objectStore('files');
 	store.get(docId).onsuccess = (event) => {
 		const file = /**@type {IDBRequest}*/ (event?.target)?.result;
@@ -78,7 +87,7 @@ export async function getFile() {
 			console.error('File not found');
 			return;
 		}
-		supabase.storage.from('logs').upload(file.name, file.content);
+		//supabase.storage.from('logs').upload(file.name, file.content);
 		console.log('File content:', file.content);
 	};
 }

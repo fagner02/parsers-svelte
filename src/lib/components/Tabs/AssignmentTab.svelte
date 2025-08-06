@@ -17,7 +17,8 @@
 		appendData(
 			`form ${name},${value.replaceAll('\\', '\\\\').replaceAll('\n', '\\n').replaceAll(',', '\\c')}`
 		);
-
+		localStorage.setItem('vansi-' + name, value);
+		console.log('vansi-' + name);
 		if (value.trim().length > 0) {
 			answers.add(name);
 		} else {
@@ -27,8 +28,19 @@
 	}
 
 	onMount(() => {
-		totalQuestions =
-			document.querySelector('.form')?.querySelectorAll('input,textarea').length ?? 0;
+		const inputs = document.querySelector('.form')?.querySelectorAll('input,textarea');
+		inputs?.forEach((x) => {
+			const name = /**@type {HTMLInputElement}*/ (x).name;
+			const item = localStorage.getItem('vansi-' + name);
+			console.log('vansi-' + name, item);
+			if (item) {
+				/**@type {HTMLInputElement}*/ (x).value = item;
+				answers.add(name);
+			}
+		});
+		totalQuestions = inputs?.length ?? 0;
+
+		totalAnswers = answers.size;
 	});
 </script>
 
@@ -47,7 +59,7 @@
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
 				<button
-					disabled={totalAnswers < totalQuestions || fileSent}
+					disabled={totalAnswers < totalQuestions || fileSent || !started}
 					onclick={() => {
 						fileSent = true;
 						getFile();

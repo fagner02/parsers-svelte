@@ -22,6 +22,8 @@
 			answers.set(elem.name, { value: null, req: !elem.getAttribute('data-optional') });
 		}
 
+		localStorage.setItem('vansi-form-' + elem.name, elem.value);
+
 		totalAnswers = answers
 			.values()
 			.filter((x) => x.value != null && x.req)
@@ -44,14 +46,27 @@
 		);
 		qs?.values().forEach((x) => {
 			x.oninput = receiveInput;
-			answers.set(x.name, {
-				value: null,
-				req: !x.getAttribute('data-optional')
-			});
+			const item = localStorage.getItem('vansi-form' + x.name);
+			if (item) {
+				/**@type {HTMLInputElement}*/ (x).value = item;
+				answers.set(x.name, {
+					value: item,
+					req: !x.getAttribute('data-optional')
+				});
+			} else {
+				answers.set(x.name, {
+					value: null,
+					req: !x.getAttribute('data-optional')
+				});
+			}
 		});
 		totalQuestions = answers
 			.values()
 			.filter((x) => x?.req)
+			.toArray().length;
+		totalAnswers = answers
+			.values()
+			.filter((x) => x.value != null && x.req)
 			.toArray().length;
 	});
 </script>
