@@ -146,7 +146,7 @@ s5      |    |    | r2 |    |
 						</div>
 						<hr />
 						<div class="field col">
-							<p>Dê o conjunto First da seguinte gramática</p>
+							<p>5. Dê o conjunto First da seguinte gramática</p>
 							<pre>{`Mass → Shape Texture
 Shape → Circumscribed | Spiculated
 Circumscribed → Ccompactness Cspicindex
@@ -163,7 +163,7 @@ Acutance → aa`}</pre>
 						<hr />
 						<div class="field col">
 							<p>
-								Mostre os passos da análise sintática ll(1) da string "a b a c" para a seguinte
+								6. Mostre os passos da análise sintática ll(1) da string "a b a c" para a seguinte
 								gramática
 							</p>
 							<pre>{`S -> a A
@@ -172,7 +172,7 @@ A -> b S | c`}</pre>
 						</div>
 						<hr />
 						<div class="field col">
-							<p>Dê uma gramática que aceita essas entradas</p>
+							<p>7. Dê uma gramática que aceita essas entradas</p>
 							<pre>{`num
 num + num
 num + num * num
