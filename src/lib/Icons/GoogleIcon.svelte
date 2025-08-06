@@ -1,6 +1,6 @@
 <script>
-	/** @type {{color?: string, size?: number, strokeWidth?: number}} */
-	let { color = 'black', size = 15, strokeWidth = 4 } = $props();
+	/** @type {{size?: number}} */
+	let { size = 15 } = $props();
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48">

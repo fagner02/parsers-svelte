@@ -6,8 +6,6 @@
 
 <IconWrapper {size} {color} {strokeWidth} {style}>
 	{#snippet path()}<path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
-			d="M18 9l3 3l-3 3"
-		/><path d="M15 12h6" /><path d="M6 9l-3 3l3 3" /><path d="M3 12h6" /><path
-			d="M9 18l3 3l3 -3"
-		/><path d="M12 15v6" /><path d="M15 6l-3 -3l-3 3" /><path d="M12 3v6" />{/snippet}</IconWrapper
+			d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"
+		/><path d="M12 8v3" /><path d="M12 14v.01" />{/snippet}</IconWrapper
 >
