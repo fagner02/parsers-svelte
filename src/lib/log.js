@@ -9,12 +9,6 @@ let docId = crypto.randomUUID();
 function getIDB() {
 	return new Promise((resolve, reject) => {
 		const request = indexedDB.open('ParsersFileStore', 1);
-		// request.onupgradeneeded = (event) => {
-		// 	const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
-		// 	db.createObjectStore('files', {
-		// 		keyPath: 'name'
-		// 	});
-		// };
 		request.onsuccess = (event) => {
 			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
 			resolve(db);
@@ -87,7 +81,7 @@ export async function getFile() {
 			console.error('File not found');
 			return;
 		}
-		//supabase.storage.from('logs').upload(file.name, file.content);
+		supabase.storage.from('logs').upload(file.name, file.content);
 		console.log('File content:', file.content);
 	};
 }
