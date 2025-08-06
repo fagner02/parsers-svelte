@@ -35,6 +35,8 @@ Com aplicação desse questionário esse trabalho busca avaliar os seguintes pon
    range
 8. De 1 a 5, como você avalia a organização das abas (abas de gramática, algoritmos e análise de string)?
    range
+9. De 1 a 5, o quão útil foi a janela de diálogo com resultados para copiar como texto?
+   range
 
 ---
 
@@ -56,6 +58,8 @@ Com aplicação desse questionário esse trabalho busca avaliar os seguintes pon
     range
 
 12. De 1 a 5, quanto o pseudocódigo com breakpoints ajudou a relacionar a teoria com a execução?
+    range
+13. De 1 a 5, quanto a janela de diálogo com informações sobre os algoritmos ajudaram a entender o algoritmo?
     range
 
 ---
