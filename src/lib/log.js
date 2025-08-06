@@ -9,6 +9,12 @@ let docId = crypto.randomUUID();
 function getIDB() {
 	return new Promise((resolve, reject) => {
 		const request = indexedDB.open('ParsersFileStore', 1);
+		request.onupgradeneeded = (event) => {
+			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
+			db.createObjectStore('files', {
+				keyPath: 'name'
+			});
+		};
 		request.onsuccess = (event) => {
 			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
 			resolve(db);
@@ -32,7 +38,7 @@ export async function createFile() {
 		console.error('Error opening IndexedDB');
 		return;
 	}
-	const transaction = db.transaction(['files'], 'readwrite');
+	const transaction = db.transaction('files', 'readwrite');
 	const store = transaction.objectStore('files');
 	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = (event) => {
 		localStorage.setItem('vansi-docid', docId);
@@ -52,7 +58,7 @@ export async function appendData(data) {
 		console.error('Error opening IndexedDB');
 		return;
 	}
-	const transaction = db.transaction(['files'], 'readwrite');
+	const transaction = db.transaction('files', 'readwrite');
 	const store = transaction.objectStore('files');
 	store.get(docId).onsuccess = (event) => {
 		const file = /**@type {IDBRequest}*/ (event?.target)?.result;
@@ -81,6 +87,7 @@ export async function getFile() {
 			console.error('File not found');
 			return;
 		}
+		localStorage.setItem('vansi-file-sent', 'true');
 		supabase.storage.from('logs').upload(file.name, file.content);
 		console.log('File content:', file.content);
 	};

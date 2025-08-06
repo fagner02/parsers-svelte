@@ -39,8 +39,11 @@
 			}
 		});
 		totalQuestions = inputs?.length ?? 0;
-
 		totalAnswers = answers.size;
+		if (localStorage.getItem('vansi-file-sent')) {
+			started = true;
+			fileSent = true;
+		}
 	});
 </script>
 

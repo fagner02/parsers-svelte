@@ -82,7 +82,7 @@
 				<p>
 					O símbolo <i>&epsilon;</i> é representado como uma regra da gramática sem lado esquerdo.
 					<br />
-					Exemplo: <kbd>A -&gt; </kbd> = <i>A -&gt; &epsilon;</i>.
+					Exemplo: <kbd>A -&gt; </kbd> = <i>A &rightarrow; &epsilon;</i>.
 				</p>
 			</div>
 			<div class="instruction">
