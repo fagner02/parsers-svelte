@@ -1,6 +1,6 @@
 <script>
-	import hljs from 'highlight.js';
-	import 'highlight.js/styles/atom-one-light.min.css';
+	// import hljs from 'highlight.js';
+	// import 'highlight.js/styles/atom-one-light.min.css';
 	import Popup from './Popup.svelte';
 	/** @type {{code: any, onClose: any}} */
 	let { code, onClose } = $props();
@@ -8,13 +8,13 @@
 
 <Popup id="code" {onClose}>
 	{#snippet children(/**@type {{style:string, contentClass: string}}*/ params)}
-		<pre id="pre-code" class={params.contentClass} style={params.style}><code
+		<!-- <pre id="pre-code" class={params.contentClass} style={params.style}><code
 				>{@html hljs
 					.highlight(code, {
 						language: 'javascript'
 					})
 					.value.replaceAll('\t', '    ')}</code
-			></pre>
+			></pre> -->
 	{/snippet}
 </Popup>
 
