@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="google-site-verification" content="nY3ufW69MwxAg1k84UHGg2hPiAsgnME34D1nAzhYSQE" />
 		%sveltekit.head%
-		<script src="app.js" defer></script>
+		<script src="app.js" async></script>
 	</head>
 	<body data-sveltekit-preload-data="hover" class="grid">
 		<div
@@ -19,34 +19,17 @@
 		>
 			<header>
 				<nav>
-					<svg
-						viewBox="0 0 1000 1000"
-						xmlns="http://www.w3.org/2000/svg"
-						preserveAspectRatio="none"
-						overflow="auto"
-						shape-rendering="auto"
-						fill="#ffffff"
-					>
+					<div id="rect">
+						<div></div>
+					</div>
+					<svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
 						<defs>
-							<linearGradient id="lgrad" x1="0%" y1="50%" x2="100%" y2="50%">
-								<stop offset="0%" style="stop-color: #00ff84; stop-opacity: 1" />
-								<stop offset="100%" style="stop-color: #008ee6; stop-opacity: 1" />
-							</linearGradient>
-
-							<path
-								id="wavepath"
-								d="M 0 2000 0 500 Q 130 413 260 500 t 260 0 260 0 260 0 260 0 260 0  v1000 z"
-								fill="url(#lgrad)"
-							/>
-							<path id="motionpath" d="M -520 0 0 0" />
+							<clipPath id="wavepath" clipPathUnits="objectBoundingBox">
+								<path
+									d="M0,1 L0,0.445 Q0.041,0.368,0.083,0.445 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 t0.083,0 v0.962"
+								/>
+							</clipPath>
 						</defs>
-						<g>
-							<use xlink:href="#wavepath" y="125" fill="#29B6F6">
-								<animateMotion dur="5s" repeatCount="indefinite">
-									<mpath xlink:href="#motionpath" />
-								</animateMotion>
-							</use>
-						</g>
 					</svg>
 					<h1>VANSI</h1>
 				</nav>
@@ -62,6 +45,46 @@
 		div[name='discard'] > header > nav {
 			height: 100%;
 			margin: 0;
+		}
+		svg {
+			position: absolute;
+		}
+		@keyframes wave {
+			0% {
+				transform: translate(-199%, -10px) scale(4, 1.5);
+			}
+			100% {
+				transform: translate(0%, -10px) scale(4, 1.5);
+			}
+		}
+		#rect > div {
+			height: 100%;
+			width: 100%;
+			transform: translate(-199%, -20px) scale(4, 2);
+			transform-origin: left top;
+			clip-path: url(#wavepath);
+			background: linear-gradient(
+				90deg,
+				#00ff84 0%,
+				#008ee6 22%,
+				#00ff84 45%,
+				#00ff84 49%,
+				#008ee6 71%,
+				#00ff84 95%,
+				#008ee6 100%
+			);
+			animation: wave 5s linear infinite;
+		}
+
+		nav {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch !important;
+		}
+		#rect {
+			display: flex;
+			height: 70px;
+			overflow: hidden;
 		}
 
 		div[name='discard'] > header {
