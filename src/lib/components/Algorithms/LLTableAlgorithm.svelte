@@ -70,7 +70,7 @@
 
 	/**@param {typeof saves[0]} save
 	 */
-	function setStepCallback(save) {
+	async function setStepCallback(save) {
 		svgLines?.setHideOpacity();
 		for (let f of saves[stepExecution.lastSelected].firstSymbols) {
 			deselectSymbol(f, id);
@@ -82,7 +82,7 @@
 		table.set(tableCard(save.table, {}));
 		const conflict = save.conflict;
 		if (conflict) {
-			tableElement.showConflict(conflict.row, conflict.col);
+			await tableElement.showConflict(conflict.row, conflict.col);
 			tableElement.setConflictTooltip(conflict.tooltip);
 		}
 		save.firstSelect === '' ? firstFuncs?.hideSelect() : firstFuncs?.selectFor(save.firstSelect);
