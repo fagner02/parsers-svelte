@@ -11,6 +11,9 @@ const config = {
 		alias: {
 			'@icons': path.resolve('./src/lib/Icons'),
 			'@': path.resolve('./src/lib/components')
+		},
+		output: {
+			preloadStrategy: 'preload-js'
 		}
 	}
 };
