@@ -33,6 +33,12 @@
 			.toArray().length;
 	}
 
+	/**@param {MouseEvent} e*/
+	function rangeInput(e) {
+		receiveInput(e);
+		if (e.target) /**@type {HTMLElement}*/ (e.target).onclick = null;
+	}
+
 	function sendForm() {
 		let content = '';
 		answers.entries().forEach(([k, v]) => {
@@ -54,6 +60,9 @@
 		);
 		qs?.values().forEach((x) => {
 			x.oninput = receiveInput;
+			if (x.type === 'range') {
+				x.onclick = rangeInput;
+			}
 			const item = localStorage.getItem('vansi-form' + x.name);
 			if (item) {
 				/**@type {HTMLInputElement}*/ (x).value = item;
@@ -79,7 +88,7 @@
 	});
 </script>
 
-<FillSize class="unit">
+<FillSize class="unit" style="margin: 10px">
 	{#snippet content()}
 		<div class="form">
 			<div class="form-header">
@@ -106,30 +115,37 @@
 					<div class="fields" style={!fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
 						<div class="field col">
 							1. Você já havia estudado os algoritmos LL(1), SLR ou CLR antes de usar a ferramenta?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q1" value="Sim" /><label for="q1">Sim</label>
+									<input type="radio" id="q1-0" name="q1" value="true" /><label for="q1-0"
+										>Sim</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q1" value="Não" /><label for="q1">Não</label>
+									<input type="radio" id="q1-1" name="q1" value="true" /><label for="q1-1"
+										>Não</label
+									>
 								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
 							2. Qual o seu nível de conhecimento sobre Analisadores Sintáticos?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q2" value="Iniciante" /><label for="q2">Iniciante</label
+									<input type="radio" id="q2-0" name="q2" value="true" /><label for="q2-0"
+										>Iniciante</label
 									>
 								</div>
 								<div>
-									<input type="radio" name="q2" value="Intermediário" /><label for="q2"
+									<input type="radio" id="q2-1" name="q2" value="true" /><label for="q2-1"
 										>Intermediário</label
 									>
 								</div>
 								<div>
-									<input type="radio" name="q2" value="Avançado" /><label for="q2">Avançado</label>
+									<input type="radio" id="q2-2" name="q2" value="true" /><label for="q2-2"
+										>Avançado</label
+									>
 								</div>
 							</div>
 						</div>
@@ -150,24 +166,31 @@
 						<hr />
 						<div class="field col">
 							4. Os elementos da interface (botões, janelas) foram claros em sua função?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q4" value="Sim, todos" /><label for="q4"
+									<input type="radio" id="q4-0" name="q4" value="true" /><label for="q4-0"
 										>Sim, todos</label
 									>
 								</div>
 								<div>
-									<input type="radio" name="q4" value="A maioria" /><label for="q4">A maioria</label
+									<input type="radio" id="q4-1" name="q4" value="true" /><label for="q4-1"
+										>A maioria</label
 									>
 								</div>
 								<div>
-									<input type="radio" name="q4" value="Alguns" /><label for="q4">Alguns</label>
+									<input type="radio" id="q4-2" name="q4" value="true" /><label for="q4-2"
+										>Alguns</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q4" value="Poucos" /><label for="q4">Poucos</label>
+									<input type="radio" id="q4-3" name="q4" value="true" /><label for="q4-3"
+										>Poucos</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q4" value="Nenhum" /><label for="q4">Nenhum</label>
+									<input type="radio" id="q4-4" name="q4" value="true" /><label for="q4-4"
+										>Nenhum</label
+									>
 								</div>
 							</div>
 						</div>
@@ -355,38 +378,52 @@
 						<div class="field col">
 							17. Em geral, como você avalia a ferramenta VANSI como apoio ao aprendizado de análise
 							sintática?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q17" value="Excelente" /><label for="q17"
+									<input type="radio" id="q17-0" name="q17" value="true" /><label for="q17-0"
 										>Excelente</label
 									>
 								</div>
 								<div>
-									<input type="radio" name="q17" value="Boa" /><label for="q17">Boa</label>
+									<input type="radio" id="q17-1" name="q17" value="true" /><label for="q17-1"
+										>Boa</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q17" value="Regular" /><label for="q17">Regular</label>
+									<input type="radio" id="q17-2" name="q17" value="true" /><label for="q17-2"
+										>Regular</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q17" value="Ruim" /><label for="q17">Ruim</label>
+									<input type="radio" id="q17-3" name="q17" value="true" /><label for="q17-3"
+										>Ruim</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q17" value="Péssima" /><label for="q17">Péssima</label>
+									<input type="radio" id="q17-4" name="q17" value="true" /><label for="q17-4"
+										>Péssima</label
+									>
 								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
 							18. Você usaria essa ferramenta novamente para estudar algoritmos de compiladores?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q18" value="Sim" /><label for="q18">Sim</label>
+									<input type="radio" id="q18-0" name="q18" value="true" /><label for="q18-0"
+										>Sim</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q18" value="Talvez" /><label for="q18">Talvez</label>
+									<input type="radio" id="q18-1" name="q18" value="true" /><label for="q18-1"
+										>Talvez</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q18" value="Não" /><label for="q18">Não</label>
+									<input type="radio" id="q18-2" name="q18" value="true" /><label for="q18-2"
+										>Não</label
+									>
 								</div>
 							</div>
 						</div>
@@ -394,27 +431,37 @@
 						<div class="field col">
 							19. Recomendaria a ferramenta para outros alunos aprendendo sobre analisadores
 							sintáticos?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q19" value="Sim" /><label for="q19">Sim</label>
+									<input type="radio" id="q19-0" name="q19" value="true" /><label for="q19-0"
+										>Sim</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q19" value="Talvez" /><label for="q19">Talvez</label>
+									<input type="radio" id="q19-1" name="q19" value="true" /><label for="q19-1"
+										>Talvez</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q19" value="Não" /><label for="q19">Não</label>
+									<input type="radio" id="q19-2" name="q19" value="true" /><label for="q19-2"
+										>Não</label
+									>
 								</div>
 							</div>
 						</div>
 						<hr />
 						<div class="field col">
 							20. Você já usou a ferramenta antes?
-							<div class="row">
+							<div class="col">
 								<div>
-									<input type="radio" name="q20" value="Sim" /><label for="q20">Sim</label>
+									<input type="radio" id="q20-0" name="q20" value="true" /><label for="q20-0"
+										>Sim</label
+									>
 								</div>
 								<div>
-									<input type="radio" name="q20" value="Não" /><label for="q20">Não</label>
+									<input type="radio" id="q20-1" name="q20" value="true" /><label for="q20-1"
+										>Não</label
+									>
 								</div>
 							</div>
 						</div>

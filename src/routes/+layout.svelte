@@ -2,8 +2,31 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import Header from '@/Layout/Header.svelte';
 	import Tooltip from '@/Layout/Tooltip.svelte';
+	import { noJumpWait } from '$lib/flowControl';
+	import { beforeNavigate, afterNavigate } from '$app/navigation';
+
+	let isNavigating = false;
+	beforeNavigate(() => (isNavigating = true));
+	afterNavigate(() => (isNavigating = false));
 
 	let { children } = $props();
+
+	(async () => {
+		while (isNavigating) {
+			console.log('wating');
+			await noJumpWait(100);
+		}
+
+		let div = /**@type {HTMLElement}*/ (document.querySelector("div[name='discard']"));
+		if (div === null) return;
+
+		await noJumpWait(100);
+		div.style.opacity = '0';
+		div.style.transform = 'translate(0px, -20px)';
+		await noJumpWait(1000);
+		div.remove();
+		return;
+	})();
 </script>
 
 <svelte:head>

@@ -85,7 +85,7 @@
 					onclick={() => {
 						fileSent = true;
 						getFile();
-						goto('/forms');
+						goto('/forms/aluno');
 					}}>{fileSent ? 'Finalizado' : 'Finalizar'}</button
 				>
 			</div>
