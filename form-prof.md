@@ -3,7 +3,7 @@
 O formulário deve avaliar se a VANSI:
 
 - É útil como recurso didático em sala de aula.
-- Facilita o ensino de conceitos complexos (como análise LL(1), SLR, CLR).
+- Facilita o ensino de conceitos complexos (como análise LL(1), SLR, LR(1)).
 - Pode ser integrada ao plano de ensino.
 - Ajuda a reduzir o tempo de explicação ou a aumentar a compreensão dos alunos.
 - Tem potencial para ser usada em atividades avaliativas ou monitorias.
@@ -18,10 +18,10 @@ O formulário deve avaliar se a VANSI:
 5. A ferramenta cobre adequadamente os tópicos que você ensina?
    []Sim, todos []A maioria []Alguns []Poucos []Nenhum
 
-6. Quais algoritmos você considera mais bem representados na ferramenta? (marque todos)
-   []LL(1) []SLR []CLR []Construção de autômato LR(1) []Tabela de parsing []Conjuntos first e follow
+6. Quais algoritmos você considera mais bem representados na ferramenta?
+   {}Tabela LL(1) {}Tabela SLR {}Tabela LR(1) {} Autômato LR(1) {}Autômato SLR {}Conjunto first {}Conjunto follow {}Parsing LL(1) {}Parsing SLR {}Parsing LR(1)
 
-7. A VANSI ajuda a visualizar o funcionamento interno dos algoritmos (passo a passo)?
+7. A VANSI ajuda a visualizar o funcionamento interno dos algoritmos?
    []Muito []Sim []Parcialmente []Pouco []Não
 
 8. Você usaria a VANSI em suas aulas?
@@ -31,8 +31,8 @@ O formulário deve avaliar se a VANSI:
 
 ### - Integração ao Ensino
 
-9. Em quais contextos você consideraria usar a VANSI? (marque todos)
-   []Explicação em aula []Atividade prática em laboratório []Estudo individual dos alunos []Atividade avaliativa []Monitoria ou reforço
+9. Em quais contextos você consideraria usar a VANSI?
+   {}Explicação em aula {}Atividade prática em laboratório {}Estudo individual dos alunos {}Atividade avaliativa {}Monitoria ou reforço
 
 10. A ferramenta reduziria o tempo necessário para explicar os algoritmos?
     []Sim, significativamente []Sim, um pouco []Não []Não sei

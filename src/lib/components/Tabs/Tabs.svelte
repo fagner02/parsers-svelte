@@ -46,14 +46,16 @@
 			}
 		])
 	);
+	let selected = $state(items[0]);
 	if (q === 'true') {
 		items.push({
 			comp: AssignmentTab,
 			name: 'Tarefa',
-			loaded: false,
+			loaded: true,
 			desc: 'Tarefa',
 			tabId: 'assign'
 		});
+		selected = items[items.length - 1];
 	}
 	const algoTabs = [1, 2, 3];
 	function resetLoadedItems() {
@@ -63,7 +65,6 @@
 		clearControlFlow();
 	}
 	setGrammarChangeCallback(resetLoadedItems);
-	let selected = $state(items[0]);
 </script>
 
 <FillSize class="tab {props.class ?? ''}">

@@ -2,6 +2,9 @@
 	import { appendData, createFile, getFile } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import { onMount } from 'svelte';
+	import { noJumpWait } from '$lib/flowControl';
+	import { goto } from '$app/navigation';
+	import '@/Assignments/assignment.css';
 
 	const urlParams = new URLSearchParams(window.location.search);
 	let campus = $state(urlParams.get('campus') ?? '');
@@ -11,6 +14,9 @@
 	let totalAnswers = $state(0);
 	let started = $state(false);
 	let fileSent = $state(false);
+
+	/**@type {import("svelte").Component?}*/
+	let Assignment = $state(null);
 
 	let answers = new Set();
 	/**
@@ -31,7 +37,16 @@
 		totalAnswers = answers.size;
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		switch (campus) {
+			case 'ru':
+				Assignment = (await import('../Assignments/RussasAssingment.svelte')).default;
+				break;
+			default:
+				Assignment = (await import('../Assignments/DefaultAssingment.svelte')).default;
+				break;
+		}
+		await noJumpWait(0);
 		const inputs = document.querySelector('.form')?.querySelectorAll('input,textarea');
 		inputs?.forEach((x) => {
 			const name = /**@type {HTMLInputElement}*/ (x).name;
@@ -70,6 +85,7 @@
 					onclick={() => {
 						fileSent = true;
 						getFile();
+						goto('/forms');
 					}}>{fileSent ? 'Finalizado' : 'Finalizar'}</button
 				>
 			</div>
@@ -81,7 +97,7 @@
 					>
 						<hr style="margin-top: 0;" />
 						{#if n === 'true'}
-							<div style="display: flex;">
+							<div style="display: flex;flex-wrap:wrap;">
 								<div class="field" style="flex: 1">
 									<p>Nome Completo</p>
 									<input oninput={receiveInput} name="name" id="name" />
@@ -93,101 +109,7 @@
 							</div>
 							<hr />
 						{/if}
-						<div class="field col">
-							<p>
-								1. Dado o conjunto first a seguir, forneça uma gramática que gera esse conjunto
-								first
-							</p>
-							<pre>{`E: {(, id}
-X: {+}
-X: {ε}
-T: {(, id}
-T': {*}
-T': {ε}
-F: {(}
-F: {id}`}</pre>
-							<textarea name="q1" id="q1" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>
-								2. Dado o conjunto follow a seguir, forneça uma gramática que gera esse conjunto
-								follow
-							</p>
-							<pre>
-{`S: {$}
-A: {C}
-B: {a, C, $}`}</pre>
-							<textarea name="q2" id="q2" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>3. Dada a tabela slr a seguir, forneça uma gramática que gera essa tabela</p>
-							<pre>{`estados | +  | (  | )  | id | $  | E  | T 
---------+----+----+----+----+----+----+---
-s0      |    |    |    |    |    | g1 |   
-s1      | s2 |    |    |    | a  |    |   
-s2      |    | s3 |    | s4 |    |    | g5
-s3      |    | s3 |    | s4 |    |    | g6
-s4      | r3 |    | r3 |    | r3 |    |   
-s5      | r1 |    |    |    | r1 |    |   
-s6      |    |    | s7 |    |    |    |   
-s7      | r2 |    | r2 |    | r2 |    |   
-`}</pre>
-							<textarea name="q3" id="q3" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>4. Dada a tabela lr1 a seguir, forneça uma gramática que gera essa tabela</p>
-							<pre>{`estados | c  | d  | $  | S  | C 
---------+----+----+----+----+---
-s0      | s1 | s2 |    | g3 | g4
-s1      | s1 | s2 |    |    | g5
-s2      |    |    | r3 |    |   
-s3      |    |    | a  |    |   
-s4      |    |    | r1 |    |   
-s5      |    |    | r2 |    |   
-`}</pre>
-							<textarea name="q4" id="q4" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>5. Dê o conjunto First da seguinte gramática</p>
-							<pre>{`Mass -> Shape Texture
-Shape -> Circumscribed | Spiculated
-Circumscribed -> Ccompactness Cspicindex
-Spiculated -> Ecompactness Espicindex
-Texture -> Contrast Acutance
-Ccompactness -> cca | ccb
-Cspic index -> sia | sib
-Ecompactness -> ccb | ccc
-Espic index -> sia | sib | sic
-Contrast -> ca | cb | cc
-Acutance -> aa`}</pre>
-							<textarea name="q6" id="q6" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>
-								6. Mostre os passos da análise sintática ll(1) da string "a b a c" para a seguinte
-								gramática
-							</p>
-							<pre>{`S -> a A
-A -> b S | c`}</pre>
-							<textarea name="q7" id="q7" oninput={receiveInput} rows="4"></textarea>
-						</div>
-						<hr />
-						<div class="field col">
-							<p>7. Dê uma gramática que aceita essas entradas</p>
-							<pre>{`num
-num + num
-num + num * num
-(num - num) * num
-num * (num)
-((num + num) * num)
-`}</pre>
-							<textarea name="q8" id="q8" oninput={receiveInput} rows="4"></textarea>
-						</div>
+						<Assignment {receiveInput}></Assignment>
 					</div>
 				{/snippet}
 			</FillSize>
@@ -196,53 +118,4 @@ num * (num)
 </FillSize>
 
 <style>
-	.form {
-		border: 1px solid hsl(0, 0%, 0%, 20%);
-		height: inherit;
-		border-radius: 8px;
-		overflow: auto;
-	}
-
-	.fields {
-		height: inherit;
-		overflow: auto;
-		flex-direction: column;
-	}
-	.form-header {
-		padding: 10px;
-		background: hsl(200, 50%, 50%);
-		border-radius: 8px 8px 0px 0px;
-		color: white;
-		display: flex;
-		justify-content: space-between;
-	}
-	.form-header > button {
-		background: none;
-		color: white;
-		border: 1px solid;
-	}
-	.form-header > button:disabled {
-		color: hsl(200, 50%, 60%);
-		pointer-events: none;
-	}
-	textarea,
-	input {
-		border-radius: 5px;
-	}
-
-	.field {
-		display: flex;
-		gap: 20px;
-		margin: 10px;
-		align-items: center;
-	}
-	.field > input {
-		flex: 1;
-	}
-
-	.col {
-		flex-direction: column;
-		align-items: normal;
-		gap: 10px;
-	}
 </style>

@@ -1,7 +1,9 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import { onMount } from 'svelte';
+	import '@/Assignments/assignment.css';
 
 	let totalQuestions = $state(0);
 	let totalAnswers = $state(0);
@@ -9,6 +11,7 @@
 
 	/**@type {Map<string,{value: string?, req: boolean}>}*/
 	let answers = new Map();
+
 	/**
 	 * @param {Event} e
 	 */
@@ -37,7 +40,12 @@
 		});
 
 		console.log(content);
-		supabase.storage.from('logs').upload('form' + crypto.randomUUID(), content);
+		if (import.meta.env.PROD) {
+			supabase.storage.from('logs').upload('form' + crypto.randomUUID(), content);
+		} else {
+			console.log(content);
+		}
+		goto('/');
 	}
 
 	onMount(() => {
@@ -424,74 +432,4 @@
 </FillSize>
 
 <style>
-	.form {
-		border: 1px solid hsl(0, 0%, 0%, 20%);
-		height: inherit;
-		border-radius: 8px;
-	}
-
-	.fields {
-		height: inherit;
-		overflow: auto;
-		flex-direction: column;
-	}
-	.form-header {
-		padding: 10px;
-		background: hsl(200, 50%, 50%);
-		border-radius: 8px 8px 0px 0px;
-		color: white;
-		display: flex;
-		justify-content: space-between;
-	}
-	.form-header > button {
-		background: none;
-		color: white;
-		border: 1px solid;
-	}
-	.form-header > button:disabled {
-		color: hsl(200, 50%, 60%);
-		pointer-events: none;
-	}
-	textarea {
-		border-radius: 5px;
-	}
-	datalist {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		writing-mode: vertical-lr;
-
-		width: 200px;
-	}
-	.field {
-		display: flex;
-		gap: 20px;
-		margin: 10px;
-		align-items: center;
-		font-weight: bold;
-	}
-	label {
-		font-weight: normal;
-	}
-
-	.row {
-		display: flex;
-		gap: 10px;
-	}
-	.range-box {
-		display: flex;
-		width: fit-content;
-		flex-direction: column;
-	}
-	.values-box {
-		display: flex;
-		justify-content: space-around;
-		font-weight: normal;
-	}
-
-	.col {
-		flex-direction: column;
-		align-items: normal;
-		gap: 10px;
-	}
 </style>
