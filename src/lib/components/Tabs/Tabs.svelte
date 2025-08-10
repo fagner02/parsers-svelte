@@ -12,6 +12,8 @@
 	/** @type {{[key: string]: any}} */
 	let { ...props } = $props();
 
+	const urlParams = new URLSearchParams(window.location.search);
+	let q = urlParams.get('q') ?? '';
 	let items = /**@type {Array<import('@/types').TabItem>} */ (
 		$state([
 			{
@@ -41,10 +43,18 @@
 				loaded: false,
 				desc: 'Visualização do parser LR(1)',
 				tabId: 'clr'
-			},
-			{ comp: AssignmentTab, name: 'Tarefa', loaded: false, desc: 'Tarefa', tabId: 'assign' }
+			}
 		])
 	);
+	if (q === 'true') {
+		items.push({
+			comp: AssignmentTab,
+			name: 'Tarefa',
+			loaded: false,
+			desc: 'Tarefa',
+			tabId: 'assign'
+		});
+	}
 	const algoTabs = [1, 2, 3];
 	function resetLoadedItems() {
 		for (let i = 0; i < algoTabs.length; i++) {

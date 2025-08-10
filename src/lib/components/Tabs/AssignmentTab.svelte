@@ -26,8 +26,10 @@
 		}
 		totalAnswers = answers.size;
 	}
-
+	let campus = $state('');
 	onMount(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		campus = urlParams.get('campus') ?? '';
 		const inputs = document.querySelector('.form')?.querySelectorAll('input,textarea');
 		inputs?.forEach((x) => {
 			const name = /**@type {HTMLInputElement}*/ (x).name;
