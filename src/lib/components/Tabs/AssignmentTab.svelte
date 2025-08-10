@@ -3,6 +3,10 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import { onMount } from 'svelte';
 
+	const urlParams = new URLSearchParams(window.location.search);
+	let campus = $state(urlParams.get('campus') ?? '');
+	let n = $state(urlParams.get('n') ?? '');
+
 	let totalQuestions = $state(0);
 	let totalAnswers = $state(0);
 	let started = $state(false);
@@ -26,10 +30,8 @@
 		}
 		totalAnswers = answers.size;
 	}
-	let campus = $state('');
+
 	onMount(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		campus = urlParams.get('campus') ?? '';
 		const inputs = document.querySelector('.form')?.querySelectorAll('input,textarea');
 		inputs?.forEach((x) => {
 			const name = /**@type {HTMLInputElement}*/ (x).name;
@@ -78,17 +80,19 @@
 						style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
 					>
 						<hr style="margin-top: 0;" />
-						<div style="display: flex;">
-							<div class="field" style="flex: 1">
-								<p>Nome Completo</p>
-								<input oninput={receiveInput} name="name" id="name" />
+						{#if n === 'true'}
+							<div style="display: flex;">
+								<div class="field" style="flex: 1">
+									<p>Nome Completo</p>
+									<input oninput={receiveInput} name="name" id="name" />
+								</div>
+								<div class="field">
+									<p>Matrícula</p>
+									<input oninput={receiveInput} name="matricula" id="matricula" />
+								</div>
 							</div>
-							<div class="field">
-								<p>Matrícula</p>
-								<input oninput={receiveInput} name="matricula" id="matricula" />
-							</div>
-						</div>
-						<hr />
+							<hr />
+						{/if}
 						<div class="field col">
 							<p>
 								1. Dado o conjunto first a seguir, forneça uma gramática que gera esse conjunto
