@@ -50,7 +50,7 @@ export async function createFile() {
 
 /**@param {string} data*/
 export async function appendData(data) {
-	if (!started) {
+	if (!started || docId === '') {
 		return;
 	}
 	const db = await getIDB();
@@ -63,7 +63,7 @@ export async function appendData(data) {
 	store.get(docId).onsuccess = (event) => {
 		const file = /**@type {IDBRequest}*/ (event?.target)?.result;
 		if (!file) {
-			console.error('File not found');
+			console.log('File not found');
 			return;
 		}
 		file.content += `\n${new Date().toISOString()},${data}`;
@@ -79,8 +79,9 @@ export async function getFile() {
 		console.error('Error opening IndexedDB');
 		return;
 	}
-	const transaction = db.transaction('files', 'readonly');
+	const transaction = db.transaction('files', 'readwrite');
 	const store = transaction.objectStore('files');
+
 	store.get(docId).onsuccess = (event) => {
 		const file = /**@type {IDBRequest}*/ (event?.target)?.result;
 		if (!file) {
@@ -88,8 +89,12 @@ export async function getFile() {
 			return;
 		}
 		localStorage.setItem('vansi-file-sent', 'true');
-		supabase.storage.from('logs').upload(file.name, file.content);
+		if (import.meta.env.PROD) {
+			supabase.storage.from('logs').upload(file.name, file.content);
+		}
 		console.log('File content:', file.content);
+		store.delete(docId);
+		docId = '';
 	};
 }
 if (browser) {
