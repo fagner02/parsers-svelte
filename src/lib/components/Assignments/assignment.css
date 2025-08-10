@@ -35,6 +35,9 @@
 	flex-wrap: nowrap;
 	text-wrap: nowrap;
 }
+.form-header > * {
+	font-size: 1rem !important;
+}
 .fields {
 	height: inherit;
 	overflow: auto;

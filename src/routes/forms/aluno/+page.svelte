@@ -92,7 +92,7 @@
 	{#snippet content()}
 		<div class="form">
 			<div class="form-header">
-				<p style="font-size: 0.9rem;align-content: center">
+				<p style="align-content: center">
 					Progresso: {totalAnswers}/{totalQuestions}
 				</p>
 				<button
