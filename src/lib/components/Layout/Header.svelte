@@ -1,6 +1,6 @@
 <script>
 	import { supabase } from '$lib/log';
-	import { setUpTooltip } from '$lib/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip';
 	import { getPlatform, platforms } from '$lib/utils';
 	import DropDown from './DropDown.svelte';
 

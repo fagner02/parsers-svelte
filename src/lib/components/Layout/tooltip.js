@@ -1,4 +1,4 @@
-import { noJumpWait } from './flowControl';
+import { noJumpWait } from '$lib/flowControl';
 
 let activeTooltip = null;
 

@@ -1,5 +1,5 @@
 <script>
-	import { setTree } from '$lib/treeFunctions';
+	import { setTree } from '@/Structures/treeFunctions';
 	import { onMount } from 'svelte';
 	import { SyntaxTreeClass } from '@/Structures/syntaxTreeClass.svelte';
 

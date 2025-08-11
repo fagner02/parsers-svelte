@@ -1,14 +1,8 @@
 <script>
-	import { elemIds, functionCalls, id, saves } from '$lib/first';
+	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/first';
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import {
-		colors,
-		deselectSymbol,
-		selectLSymbol,
-		selectRSymbol,
-		selectSymbol
-	} from '$lib/selectSymbol';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -55,8 +49,6 @@
 	const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
-		selectRSymbol: () => selectRSymbol,
-		selectLSymbol: () => selectLSymbol,
 		deselectSymbol: () => deselectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
 		selectGrammar: () => grammarSelection?.selectFor,
@@ -69,7 +61,7 @@
 		joinSetsJoin: () => joinSetElement?.joinSets,
 		removeSet: () => joinSetElement?.remove
 	};
-	function setStepCallback(/**@type {typeof saves[0]}*/ save) {
+	async function setStepCallback(/**@type {typeof saves[0]}*/ save) {
 		svgLines?.hideLine(false, id);
 		save.grammarSelect === ''
 			? grammarSelection?.hideSelect()
@@ -77,6 +69,7 @@
 		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
 		joinSetElement?.loadSets(save.join);
 		firstSetElement?.loadSets(save.first);
+		removeAllSymbols(id, save.symbolIds);
 	}
 	let stepExecution = new StepExecution(
 		saves,

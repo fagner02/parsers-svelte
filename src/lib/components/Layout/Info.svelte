@@ -1,6 +1,6 @@
 <script>
 	import Popup from './Popup.svelte';
-	import { component } from '$lib/infoText';
+	import { component } from '@/Info/infoText';
 	/** @type {{onClose: any}} */
 	let { onClose } = $props();
 </script>

@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export let id = 'clrTable';
 
@@ -17,6 +17,7 @@ export let functionCalls = [];
  * state: import('@/types').LR1StateItem[],
  * table: Map<number, Map<string, string>>,
  * stateName: string,
+ * symbolIds: any[],
  * functionCall: number }[]}
  * */
 export let saves = [];
@@ -36,12 +37,15 @@ export function clrTable(automaton, rules, nt, t) {
 	for (let state of automaton.states) {
 		table.set(state.index, new Map(alphabet.map((x) => [x, ''])));
 	}
+	/**@type {any[]}*/
+	let symbolIds = [];
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		state: [],
 		table: structuredClone(table),
 		stateName: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
@@ -92,7 +96,8 @@ export function clrTable(automaton, rules, nt, t) {
 						state: structuredClone(s.items),
 						table: structuredClone(table),
 						stateName: `s${s.index}`,
-						functionCall: functionCalls.length - 1
+						functionCall: functionCalls.length - 1,
+						symbolIds: structuredClone(symbolIds)
 					});
 					continue;
 				}
@@ -117,7 +122,8 @@ export function clrTable(automaton, rules, nt, t) {
 						state: structuredClone(s.items),
 						table: structuredClone(table),
 						stateName: `s${s.index}`,
-						functionCall: functionCalls.length - 1
+						functionCall: functionCalls.length - 1,
+						symbolIds: structuredClone(symbolIds)
 					});
 				}
 				functionCalls.push({ name: 'addPause', args: [id] });
@@ -125,7 +131,8 @@ export function clrTable(automaton, rules, nt, t) {
 					state: structuredClone(s.items),
 					table: structuredClone(table),
 					stateName: `s${s.index}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 				functionCalls.push({ name: 'highlightLines', args: [[12]] });
 				continue;
@@ -138,6 +145,7 @@ export function clrTable(automaton, rules, nt, t) {
 				name: 'selectSymbol',
 				args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 			});
+			symbolIds.push(functionCalls.at(-1).args);
 			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 
 			let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
@@ -160,7 +168,8 @@ export function clrTable(automaton, rules, nt, t) {
 					state: structuredClone(s.items),
 					table: structuredClone(table),
 					stateName: `s${s.index}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			} else {
 				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `s${transition}`);
@@ -180,13 +189,16 @@ export function clrTable(automaton, rules, nt, t) {
 					state: structuredClone(s.items),
 					table: structuredClone(table),
 					stateName: `s${s.index}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
+			let symbolId = `state-${elemIds.state}-${index}-${item.pos}`;
 			functionCalls.push({
 				name: 'deselectSymbol',
-				args: [`state-${elemIds.state}-${index}-${item.pos}`, id]
+				args: [symbolId, id]
 			});
+			symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 		}
 		functionCalls.push({ name: 'hideSelect', args: [] });
 	}
@@ -198,7 +210,8 @@ export function clrTable(automaton, rules, nt, t) {
 		state: saves[saves.length - 1].state,
 		table: structuredClone(table),
 		stateName: saves[saves.length - 1].stateName,
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 
 	return { table, id };

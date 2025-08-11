@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export const id = 'first';
 export const elemIds = {
@@ -16,6 +16,7 @@ export let functionCalls = [];
  * joinStack: number[],
  * first: Map<number, Set<string>>,
  * grammarSelect: string,
+ * symbolIds: any[],
  * functionCall: number}[]}
  * */
 export let saves = [];
@@ -67,29 +68,29 @@ export function first(rules, nt) {
 	let nullable = calcNullable(rules);
 	functionCalls = [];
 	saves = [];
-
+	/**@type {any[]} */
+	let symbolIds = [];
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		join: structuredClone(joinSet),
 		first: structuredClone(firstSet),
 		joinStack: [],
 		grammarSelect: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
 
 	for (let i = 0; i < rules.length; i++) {
 		functionCalls.push({ name: 'highlightLines', args: [[2]] });
-		functionCalls.push({
-			name: 'selectGrammar',
-			args: [`${elemIds.grammar}gset${i}`]
-		});
+		functionCalls.push({ name: 'selectGrammar', args: [`${elemIds.grammar}gset${i}`] });
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		functionCalls.push({
-			name: 'selectLSymbol',
-			args: [`${elemIds.grammar}g`, i, colors.blue, id]
+			name: 'selectSymbol',
+			args: [`#${elemIds.grammar}gl${i}`, colors.blue, id]
 		});
+		symbolIds.push(functionCalls.at(-1).args);
 		firstSet.set(i, new Set());
 		functionCalls.push({
 			name: 'addSetRow',
@@ -101,7 +102,8 @@ export function first(rules, nt) {
 			first: structuredClone(firstSet),
 			joinStack: [],
 			grammarSelect: `${elemIds.grammar}gset${i}`,
-			functionCall: functionCalls.length - 1
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
 		});
 		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		let isNull = true;
@@ -120,10 +122,11 @@ export function first(rules, nt) {
 					});
 				}
 				functionCalls.push({
-					name: 'selectRSymbol',
-					args: [`${elemIds.grammar}g`, i, j, colors.blue, id, false]
+					name: 'selectSymbol',
+					args: [`${elemIds.grammar}gr${i}-${j}`, colors.blue, id, false]
 				});
 
+				symbolIds.push(functionCalls.at(-1).args);
 				const matchingRules = rules.filter((x) => x.left === symbol);
 				for (let rule of matchingRules) {
 					functionCalls.push({ name: 'highlightLines', args: [[8]] });
@@ -141,9 +144,10 @@ export function first(rules, nt) {
 				functionCalls.push({ name: 'highlightLines', args: [[11]] });
 				firstSet.get(i)?.add(symbol);
 				functionCalls.push({
-					name: 'selectRSymbol',
-					args: [`${elemIds.grammar}g`, i, j, colors.green, id, false]
+					name: 'selectSymbol',
+					args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 				});
+				symbolIds.push(functionCalls.at(-1).args);
 				functionCalls.push({
 					name: 'joinSets',
 					args: [[symbol], i, `${elemIds.grammar}gr${i}-${j}`]
@@ -154,7 +158,8 @@ export function first(rules, nt) {
 					first: structuredClone(firstSet),
 					joinStack: [],
 					grammarSelect: `${elemIds.grammar}gset${i}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
 
@@ -172,9 +177,11 @@ export function first(rules, nt) {
 			functionCalls.push({ name: 'highlightLines', args: [[16]] });
 			if (rules[i].right[0] === '') {
 				functionCalls.push({
-					name: 'selectRSymbol',
-					args: [`${elemIds.grammar}g`, i, 0, colors.green, id, false]
+					name: 'selectSymbol',
+					args: [`${elemIds.grammar}gr${i}-0`, colors.green, id, false]
 				});
+
+				symbolIds.push(functionCalls.at(-1).args);
 			}
 			functionCalls.push({
 				name: 'joinSets',
@@ -211,7 +218,8 @@ export function first(rules, nt) {
 			first: structuredClone(firstSet),
 			joinStack: structuredClone(joinStack),
 			grammarSelect: '',
-			functionCall: functionCalls.length - 1
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
 		});
 
 		addedToStack[item] = true;
@@ -259,7 +267,8 @@ export function first(rules, nt) {
 				first: structuredClone(firstSet),
 				joinStack: structuredClone(joinStack),
 				grammarSelect: '',
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 			top.delete(topValue);
 			functionCalls.push({ name: 'highlightLines', args: [[30]] });
@@ -274,7 +283,8 @@ export function first(rules, nt) {
 				first: structuredClone(firstSet),
 				joinStack: structuredClone(joinStack),
 				grammarSelect: '',
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 			functionCalls.push({ name: 'highlightLines', args: [[31]] });
 			if (top.size === 0) {
@@ -295,7 +305,8 @@ export function first(rules, nt) {
 		first: structuredClone(firstSet),
 		joinStack: [],
 		grammarSelect: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	return { firstSet, id };
 }

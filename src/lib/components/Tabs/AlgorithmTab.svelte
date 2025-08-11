@@ -26,7 +26,7 @@
 	import ParseView from '@/Tabs/ParseView.svelte';
 	import ForwardIcon from '@icons/ForwardIcon.svelte';
 	import { isGrammarLoaded } from '$lib/utils';
-	import { setUpTooltip } from '$lib/tooltip.js';
+	import { setUpTooltip } from '@/Layout/tooltip.js';
 	import { appendData } from '$lib/log';
 	import { colors } from '$lib/selectSymbol';
 

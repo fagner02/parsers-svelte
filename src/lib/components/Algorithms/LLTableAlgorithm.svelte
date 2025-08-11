@@ -1,8 +1,8 @@
 <script>
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { elemIds, functionCalls, id, saves } from '$lib/lltable';
-	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lltable';
+	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -72,12 +72,6 @@
 	 */
 	async function setStepCallback(save) {
 		svgLines?.setHideOpacity();
-		for (let f of saves[stepExecution.lastSelected].firstSymbols) {
-			deselectSymbol(f, id);
-		}
-		for (let f of saves[stepExecution.lastSelected].followSymbols) {
-			deselectSymbol(f, id);
-		}
 		tableElement.resetTable();
 		table.set(tableCard(save.table, {}));
 		const conflict = save.conflict;
@@ -86,12 +80,8 @@
 			tableElement.setConflictTooltip(conflict.tooltip);
 		}
 		save.firstSelect === '' ? firstFuncs?.hideSelect() : firstFuncs?.selectFor(save.firstSelect);
-		for (let f of save.firstSymbols) {
-			selectSymbol(f, colors.green, id, false);
-		}
-		for (let f of save.followSymbols) {
-			selectSymbol(f, colors.green, id, false);
-		}
+
+		removeAllSymbols(id, save.symbolIds);
 	}
 
 	onMount(async () => {

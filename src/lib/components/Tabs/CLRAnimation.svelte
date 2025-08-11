@@ -4,22 +4,22 @@
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
 	import AlgorithmTab from '@/Tabs/AlgorithmTab.svelte';
-	import { firstDataOnly, mergedFirst } from '$lib/first';
+	import { firstDataOnly, mergedFirst } from '$lib/stepCalc/first';
 	import { writable } from 'svelte/store';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import CLRTableAlgorithm from '@/Algorithms/CLRTableAlgorithm.svelte';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
 	import ClrParse from '@/Algorithms/CLRParse.svelte';
-	import { lr1Automaton } from '$lib/lr1automaton';
-	import { setUpTooltip } from '$lib/tooltip';
+	import { lr1Automaton } from '$lib/stepCalc/lr1automaton';
+	import { setUpTooltip } from '@/Layout/tooltip';
 	import { onMount } from 'svelte';
 	import { automatonToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
-	import { id as parseId } from '$lib/clrparse';
+	import { id as parseId } from '$lib/stepCalc/clrparse';
 	import LR1AutomatonInfo from '@/Info/LR1AutomatonInfo.svelte';
 	import CLRTableInfo from '@/Info/CLRTableInfo.svelte';
 	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
-	import { clrTable } from '$lib/clr_table';
+	import { clrTable } from '$lib/stepCalc/clr_table';
 
 	let code = '';
 	let { augRules, nt, t } = getAugGrammar();

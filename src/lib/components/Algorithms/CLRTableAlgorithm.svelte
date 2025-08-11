@@ -1,8 +1,8 @@
 <script>
-	import { elemIds, functionCalls, id, saves } from '$lib/clr_table';
-	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/clr_table';
+	import { addPause, noJumpWait, wait } from '$lib/flowControl';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -61,13 +61,15 @@
 	/**
 	 * @param {typeof saves[0]} save
 	 */
-	function setStepCallback(save) {
+	async function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
 		stateSelection?.hideSelect();
 		stateStackSelection?.hideSelect();
 		stateElem?.loadState(save.state, false);
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		stateName = save.stateName;
+		await noJumpWait(5000);
+		removeAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {

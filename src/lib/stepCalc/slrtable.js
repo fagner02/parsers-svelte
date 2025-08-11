@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export let id = 'slrTable';
 export let elemIds = {
@@ -8,6 +8,7 @@ export let elemIds = {
 	follow: `${id}-follow`,
 	state: `${id}-state`
 };
+
 /**
  * @type {{
  * state: import('@/types').LR0StateItem[],
@@ -16,6 +17,7 @@ export let elemIds = {
  * followSelect: string,
  * stackSelect: string,
  * stateSelect: string,
+ * symbolIds: any[],
  * functionCall: number }[]}
  * */
 export let saves = [];
@@ -30,6 +32,8 @@ export let functionCalls = [];
  * @param {Map<string, Set<string>>} followSet
  */
 export function slrTable(automaton, rules, nt, t, followSet) {
+	/**@type {any[]} */
+	let symbolIds = [];
 	functionCalls = [];
 	saves = [];
 	const alphabet = [...t, ...nt];
@@ -48,7 +52,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 		followSelect: '',
 		stackSelect: '',
 		stateSelect: '',
-		functionCall: 0
+		functionCall: 0,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
@@ -82,7 +87,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 				followSelect: '',
 				stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
 				stateSelect: `state-${elemIds.state}-${index}`,
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 
@@ -121,7 +127,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 						followSelect: '',
 						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
 						stateSelect: `state-${elemIds.state}-${index}`,
-						functionCall: functionCalls.length - 1
+						functionCall: functionCalls.length - 1,
+						symbolIds: structuredClone(symbolIds)
 					});
 					continue;
 				}
@@ -154,7 +161,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 						followSelect: `${elemIds.follow}set${followIndex}`,
 						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
 						stateSelect: `state-${elemIds.state}-${index}`,
-						functionCall: functionCalls.length - 1
+						functionCall: functionCalls.length - 1,
+						symbolIds: structuredClone(symbolIds)
 					});
 				}
 				functionCalls.push({ name: 'hideSelectFollow', args: [] });
@@ -179,6 +187,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 				});
+				symbolIds.push(functionCalls.at(-1).args);
 				table.get(s.index)?.set(currentSymbol, `g${transition}`);
 				functionCalls.push({
 					name: 'highlightOn',
@@ -197,7 +206,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					followSelect: '',
 					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
 					stateSelect: `state-${elemIds.state}-${index}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			} else {
 				functionCalls.push({ name: 'highlightLines', args: [[17]] });
@@ -211,6 +221,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 				});
+				symbolIds.push(functionCalls.at(-1).args);
 				table.get(s.index)?.set(currentSymbol, `s${transition}`);
 				functionCalls.push({
 					name: 'highlightOn',
@@ -229,13 +240,16 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					followSelect: '',
 					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
 					stateSelect: `state-${elemIds.state}-${index}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
+			let symbolId = `state-${elemIds.state}-${index}-${item.pos}`;
 			functionCalls.push({
 				name: 'deselectSymbol',
-				args: [`state-${elemIds.state}-${index}-${item.pos}`, id]
+				args: [symbolId, id]
 			});
+			symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 		}
 		functionCalls.push({ name: 'hideSelect', args: [] });
 	}
@@ -250,7 +264,8 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 		followSelect: '',
 		stackSelect: '',
 		stateSelect: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 
 	return { table, functionCalls, id };

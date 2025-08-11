@@ -5,14 +5,14 @@
 	import { addPause } from '$lib/flowControl';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import { getContext, onMount } from 'svelte';
-	import { getTree } from '$lib/treeFunctions';
+	import { getTree } from '@/Structures/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import { inputString } from '$lib/parseString';
+	import { inputString } from '@/Layout/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls, slrparsing } from '$lib/slrparse';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { id, elemIds, saves, functionCalls, slrparsing } from '$lib/stepCalc/slrparse';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 

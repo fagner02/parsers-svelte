@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { appendData } from '$lib/log';
-	import { setUpTooltip } from '$lib/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
@@ -11,7 +11,7 @@
 	 * titleLabel?:string?,
 	 * title: string?,
 	 * id: string,
-	 * interaction: import("$lib/interactiveElem").Interaction,
+	 * interaction: import("@/Layout/interactiveElem").Interaction,
 	 * minimized?: boolean,
 	 * actions?: ResizeWrapperAction[],
 	 * component: any,

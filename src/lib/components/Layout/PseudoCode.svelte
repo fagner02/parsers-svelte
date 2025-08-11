@@ -2,7 +2,7 @@
 	import { getJumpPause, wait } from '$lib/flowControl';
 	import { onMount } from 'svelte';
 	import ResizeWrapper from './ResizeWrapper.svelte';
-	import { Interaction } from '$lib/interactiveElem';
+	import { Interaction } from '@/Layout/interactiveElem';
 	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 	import { colors } from '$lib/selectSymbol';
 	import { appendData } from '$lib/log';

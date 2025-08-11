@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
-	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
@@ -13,8 +13,8 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/slrtable';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/stepCalc/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 
@@ -84,6 +84,7 @@
 			console.log(e);
 		}
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
+		removeAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {

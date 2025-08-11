@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export const id = 'lltable';
 export const elemIds = {
@@ -17,6 +17,7 @@ export let functionCalls = [];
  * followSymbols: string[],
  * firstSymbols: string[],
  * functionCall: number,
+ * symbolIds: any[],
  * conflict?: {col:string, row: string, tooltip: string}}[]}
  * */
 export let saves = [];
@@ -44,14 +45,16 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 	for (let item of nt) {
 		table.set(item, new Map(t.map((x) => [x, -1])));
 	}
-
+	/**@type {any[]} */
+	let symbolIds = [];
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		table: structuredClone(table),
 		firstSelect: '',
 		followSymbols: [],
 		firstSymbols: [],
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	for (let [left, right] of firstSet) {
@@ -71,6 +74,7 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 				name: 'selectSymbol',
 				args: [firstSelected.at(-1), colors.green, id, false]
 			});
+			symbolIds.push(functionCalls.at(-1).args);
 			let followIndex = followSet.keys().toArray().indexOf(rules[left].left);
 			let followIndex2 = 0;
 			const followItems = followSet.get(rules[left].left) ?? new Set();
@@ -83,6 +87,8 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 					name: 'selectSymbol',
 					args: [followSelected.at(-1), colors.green, id, false]
 				});
+
+				symbolIds.push(functionCalls.at(-1).args);
 				functionCalls.push({ name: 'highlightLines', args: [[5]] });
 
 				let cell = table.get(rules[left].left)?.get(followItem);
@@ -108,7 +114,8 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 							row: rules[left].left,
 							col: followItem,
 							tooltip: `Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cellRule}]`
-						}
+						},
+						symbolIds: structuredClone(symbolIds)
 					});
 
 					return { table, id };
@@ -131,10 +138,12 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 					firstSelect: `${elemIds.firstSet}set${left}`,
 					followSymbols: structuredClone(followSelected),
 					firstSymbols: structuredClone(firstSelected),
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 				followIndex2++;
 			}
+			symbolIds = symbolIds.filter((x) => !followSelected.includes(x[0]));
 			deselectSymbols(followSelected);
 		}
 
@@ -153,6 +162,7 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 				name: 'selectSymbol',
 				args: [firstSelected.at(-1), colors.green, id, false]
 			});
+			symbolIds.push(functionCalls.at(-1).args);
 
 			let cell = table.get(rules[left].left)?.get(symbol);
 			if (cell !== undefined && cell !== -1) {
@@ -177,7 +187,8 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 						row: rules[left].left,
 						col: symbol,
 						tooltip: `Conflito: Regra [${rule}] vai ocupar o lugar da regra existente [${cellRule}]`
-					}
+					},
+					symbolIds: structuredClone(symbolIds)
 				});
 				return { table, id };
 			}
@@ -199,9 +210,12 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 				firstSelect: `${elemIds.firstSet}set${left}`,
 				followSymbols: [],
 				firstSymbols: structuredClone(firstSelected),
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 		}
+
+		symbolIds = symbolIds.filter((x) => !firstSelected.includes(x[0]));
 		deselectSymbols(firstSelected);
 	}
 
@@ -211,7 +225,8 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 		firstSelect: '',
 		followSymbols: [],
 		firstSymbols: [],
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	return { table, id };
 }

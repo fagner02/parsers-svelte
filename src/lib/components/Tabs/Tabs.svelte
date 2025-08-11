@@ -4,7 +4,7 @@
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
 	import CLRAnimation from './CLRAnimation.svelte';
-	import { setUpTooltip } from '$lib/tooltip.js';
+	import { setUpTooltip } from '@/Layout/tooltip.js';
 	import AssignmentTab from './AssignmentTab.svelte';
 	import { appendData } from '$lib/log';
 	import { setGrammarChangeCallback } from '$lib/utils';

@@ -1,10 +1,10 @@
 <script>
-	import { clrparsing, elemIds, functionCalls, id, saves } from '$lib/clrparse';
+	import { clrparsing, elemIds, functionCalls, id, saves } from '$lib/stepCalc/clrparse';
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { inputString } from '$lib/parseString';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
-	import { getTree } from '$lib/treeFunctions';
+	import { getTree } from '@/Structures/treeFunctions';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';

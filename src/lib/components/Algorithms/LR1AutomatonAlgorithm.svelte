@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
-	import { colors, deselectSymbol, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -12,8 +12,8 @@
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { id, saves, elemIds, functionCalls } from '$lib/lr1automaton';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { id, saves, elemIds, functionCalls } from '$lib/stepCalc/lr1automaton';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 
@@ -95,6 +95,7 @@
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
+		removeAllSymbols(id, save.symbolIds);
 	}
 
 	export const obj = {

@@ -1,4 +1,4 @@
-import { appendData } from './log';
+import { appendData } from '../../log';
 
 /**@param {HTMLElement} elem*/
 export function stackFloatingWindows(elem) {

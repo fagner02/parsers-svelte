@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/log';
-	import { removeTooltip, setUpTooltip } from '$lib/tooltip';
+	import { removeTooltip, setUpTooltip } from '@/Layout/tooltip';
 	import GoogleIcon from '@icons/GoogleIcon.svelte';
 	import UserIcon from '@icons/UserIcon.svelte';
 	import { onMount } from 'svelte';

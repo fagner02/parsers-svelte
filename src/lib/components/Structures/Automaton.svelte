@@ -3,7 +3,7 @@
 	import { getAugGrammar } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
-	import { Interaction } from '$lib/interactiveElem';
+	import { Interaction } from '@/Layout/interactiveElem';
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
 

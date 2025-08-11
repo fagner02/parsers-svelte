@@ -1,4 +1,4 @@
-import { setInfoComponent } from './infoText';
+import { setInfoComponent } from './components/Info/infoText';
 import { appendData } from './log';
 
 /**

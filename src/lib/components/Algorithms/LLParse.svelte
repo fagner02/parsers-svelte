@@ -1,10 +1,10 @@
 <script>
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { elemIds, functionCalls, id, llParsing, saves } from '$lib/llparse';
-	import { inputString } from '$lib/parseString';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { elemIds, functionCalls, id, llParsing, saves } from '$lib/stepCalc/llparse';
+	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
-	import { getTree } from '$lib/treeFunctions';
+	import { getTree } from '@/Structures/treeFunctions';
 	import { getGrammar, loadGrammar } from '$lib/utils';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import TableCard from '@/Cards/TableCard.svelte';

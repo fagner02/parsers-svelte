@@ -2,7 +2,7 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
-	import { setUpTooltip } from '$lib/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip';
 
 	/** @type {{
 	 * id: string,

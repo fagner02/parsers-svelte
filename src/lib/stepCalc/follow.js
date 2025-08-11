@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export const id = 'follow';
 
@@ -18,7 +18,8 @@ export let functionCalls = [];
  * join: Map<string, Set<string>>,
  * joinStack: string[],
  * grammarSelect: string,
- * functionCall: number}[]}
+ * functionCall: number,
+ * symbolIds: any[]}[]}
  * */
 export let saves = [];
 
@@ -38,14 +39,16 @@ export function follow(rules, nt, firstSet) {
 	let joinIndexes = new Map();
 	/**@type {Map<string, number>} */
 	let followIndexes = new Map();
-
+	/**@type {any[]} */
+	let symbolIds = [];
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		follow: structuredClone(followSet),
 		join: structuredClone(joinSet),
 		joinStack: [],
 		grammarSelect: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({
@@ -92,9 +95,10 @@ export function follow(rules, nt, firstSet) {
 			if (!nt.includes(symbol)) {
 				functionCalls.push({ name: 'highlightLines', args: [[7]] });
 				functionCalls.push({
-					name: 'selectRSymbol',
-					args: [`${elemIds.grammar}g`, i, j, colors.green, id, false]
+					name: 'selectSymbol',
+					args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 				});
+				symbolIds.push(functionCalls.at(-1).args);
 				functionCalls.push({
 					name: 'addPause',
 					args: [id]
@@ -104,7 +108,9 @@ export function follow(rules, nt, firstSet) {
 					join: structuredClone(joinSet),
 					joinStack: [],
 					grammarSelect: `${elemIds.grammar}gset${i}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+
+					symbolIds: structuredClone(symbolIds)
 				});
 				continue;
 			}
@@ -113,9 +119,11 @@ export function follow(rules, nt, firstSet) {
 				args: [[8]]
 			});
 			functionCalls.push({
-				name: 'selectRSymbol',
-				args: [`${elemIds.grammar}g`, i, j, colors.blue, id, false]
+				name: 'selectSymbol',
+				args: [`${elemIds.grammar}gr${i}-${j}`, colors.blue, id, false]
 			});
+
+			symbolIds.push(functionCalls.at(-1).args);
 			if (!followSet.has(symbol)) {
 				followSet.set(symbol, new Set());
 				followIndexes.set(symbol, followSet.size - 1);
@@ -136,7 +144,9 @@ export function follow(rules, nt, firstSet) {
 					join: structuredClone(joinSet),
 					joinStack: [],
 					grammarSelect: `${elemIds.grammar}gset${i}`,
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
 
@@ -181,7 +191,8 @@ export function follow(rules, nt, firstSet) {
 							join: structuredClone(joinSet),
 							joinStack: [],
 							grammarSelect: `${elemIds.grammar}gset${i}`,
-							functionCall: functionCalls.length - 1
+							functionCall: functionCalls.length - 1,
+							symbolIds: structuredClone(symbolIds)
 						});
 					}
 					functionCalls.push({
@@ -207,7 +218,8 @@ export function follow(rules, nt, firstSet) {
 							join: structuredClone(joinSet),
 							joinStack: [],
 							grammarSelect: `${elemIds.grammar}gset${i}`,
-							functionCall: functionCalls.length - 1
+							functionCall: functionCalls.length - 1,
+							symbolIds: structuredClone(symbolIds)
 						});
 					}
 					functionCalls.push({
@@ -221,9 +233,11 @@ export function follow(rules, nt, firstSet) {
 					args: [[18]]
 				});
 				functionCalls.push({
-					name: 'selectRSymbol',
-					args: [`${elemIds.grammar}g`, i, j + 1, colors.orange, id, false]
+					name: 'selectSymbol',
+					args: [`${elemIds.grammar}gr${i}-${j + 1}`, colors.orange, id, false]
 				});
+
+				symbolIds.push(functionCalls.at(-1).args);
 
 				if (nt.includes(followingSymbol)) {
 					functionCalls.push({
@@ -285,7 +299,8 @@ export function follow(rules, nt, firstSet) {
 								join: structuredClone(joinSet),
 								joinStack: [],
 								grammarSelect: `${elemIds.grammar}gset${i}`,
-								functionCall: functionCalls.length - 1
+								functionCall: functionCalls.length - 1,
+								symbolIds: structuredClone(symbolIds)
 							});
 						}
 					}
@@ -339,7 +354,9 @@ export function follow(rules, nt, firstSet) {
 						join: structuredClone(joinSet),
 						joinStack: [],
 						grammarSelect: `${elemIds.grammar}gset${i}`,
-						functionCall: functionCalls.length - 1
+						functionCall: functionCalls.length - 1,
+
+						symbolIds: structuredClone(symbolIds)
 					});
 					functionCalls.push({
 						name: 'highlightLines',
@@ -349,9 +366,11 @@ export function follow(rules, nt, firstSet) {
 				}
 			}
 			functionCalls.push({
-				name: 'selectRSymbol',
-				args: [`${elemIds.grammar}g`, i, j, colors.green, id, false]
+				name: 'selectSymbol',
+				args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 			});
+
+			symbolIds.push(functionCalls.at(-1).args);
 		}
 	}
 	functionCalls.push({
@@ -397,7 +416,8 @@ export function follow(rules, nt, firstSet) {
 			join: structuredClone(joinSet),
 			joinStack: structuredClone(joinStack),
 			grammarSelect: '',
-			functionCall: functionCalls.length - 1
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
 		});
 
 		while (joinStack.length > 0) {
@@ -442,7 +462,8 @@ export function follow(rules, nt, firstSet) {
 					join: structuredClone(joinSet),
 					joinStack: structuredClone(joinStack),
 					grammarSelect: '',
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 
 				functionCalls.push({
@@ -452,9 +473,11 @@ export function follow(rules, nt, firstSet) {
 				continue;
 			}
 			functionCalls.push({
-				name: 'selectRSymbol',
-				args: [elemIds.join, joinIndexes.get(topKey), 0, colors.green, id]
+				name: 'selectSymbol',
+				args: [`${elemIds.join}r${joinIndexes.get(topKey)}-${0}`, colors.green, id]
 			});
+
+			symbolIds.push(functionCalls.at(-1).args);
 			const _followSet = followSet.get(topKey);
 			const setToJoin = /**@type {Set<String>}*/ (followSet.get(topValue));
 			for (let item of setToJoin) {
@@ -481,7 +504,8 @@ export function follow(rules, nt, firstSet) {
 				join: structuredClone(joinSet),
 				joinStack: structuredClone(joinStack),
 				grammarSelect: '',
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 
 			functionCalls.push({
@@ -517,7 +541,8 @@ export function follow(rules, nt, firstSet) {
 					join: structuredClone(joinSet),
 					joinStack: structuredClone(joinStack),
 					grammarSelect: '',
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
 		}
@@ -529,7 +554,8 @@ export function follow(rules, nt, firstSet) {
 		join: structuredClone(joinSet),
 		joinStack: [],
 		grammarSelect: '',
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 
 	return { followSet, id };

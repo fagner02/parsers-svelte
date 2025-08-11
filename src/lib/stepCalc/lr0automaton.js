@@ -1,4 +1,4 @@
-import { colors } from './selectSymbol';
+import { colors } from '../selectSymbol';
 
 export const id = 'lr0automaton';
 export const elemIds = {
@@ -19,10 +19,13 @@ export let functionCalls = [];
  * originState: import('@/types').LR0StateItem[],
  * originStateName: string,
  * stateStack: number[],
+ * symbolIds: any[],
  * automaton: import('@/types').LR0Automaton,
  * functionCall: number}[]}
  * */
 export let saves = [];
+/** @type {any[]}*/
+let symbolIds = [];
 
 /**
  * @param {import('@/types').LR0StateItem[]} state
@@ -80,6 +83,7 @@ export function closure(state, rules, nt) {
 				name: 'selectSymbol',
 				args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
 			});
+			symbolIds.push(functionCalls.at(-1).args);
 
 			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 			functionCalls.push({
@@ -98,16 +102,20 @@ export function closure(state, rules, nt) {
 				originStateName: saves[saves.length - 1].originStateName,
 				stateStack: saves[saves.length - 1].stateStack,
 				automaton: saves[saves.length - 1].automaton,
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 		}
 
 		functionCalls.push({ name: 'hideSelectGrammar', args: [] });
 
+		let symbolId = `state-${elemIds.targetState}-${itemsToCheck[0]}-${item.pos}`;
 		functionCalls.push({
 			name: 'deselectSymbol',
-			args: [`state-${elemIds.targetState}-${itemsToCheck[0]}-${item.pos}`, id]
+			args: [symbolId, id]
 		});
+
+		symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[15]] });
 		itemsToCheck.shift();
 	}
@@ -125,6 +133,7 @@ export function closure(state, rules, nt) {
 export function lr0Automaton(rules, nt, t) {
 	functionCalls = [];
 	saves = [];
+	symbolIds = [];
 	/**@type {import('@/types').LR0Automaton}*/
 	let automaton = { states: [], transitions: new Map() };
 
@@ -135,7 +144,8 @@ export function lr0Automaton(rules, nt, t) {
 		originState: [],
 		originStateName: '',
 		stateStack: [],
-		functionCall: 0
+		functionCall: 0,
+		symbolIds: structuredClone(symbolIds)
 	});
 	functionCalls.push({ name: 'highlightLines', args: [[0]] });
 	functionCalls.push({ name: 'highlightLines', args: [[1]] });
@@ -171,7 +181,8 @@ export function lr0Automaton(rules, nt, t) {
 		originStateName: originStateName,
 		stateStack: structuredClone(stateStack),
 		automaton: structuredClone(automaton),
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	let alphabet = [...t, ...nt].filter((x) => x !== '' && x !== '$');
 	let originStateIndex = 0;
@@ -228,6 +239,8 @@ export function lr0Automaton(rules, nt, t) {
 					name: 'selectSymbol',
 					args: [symbolId, colors.pink, id, false]
 				});
+
+				symbolIds.push(functionCalls.at(-1).args);
 				functionCalls.push({ name: 'highlightLines', args: [[14]] });
 				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) {
 					functionCalls.push({ name: 'highlightLines', args: [[15]] });
@@ -235,14 +248,17 @@ export function lr0Automaton(rules, nt, t) {
 						name: 'deselectSymbol',
 						args: [symbolId, id]
 					});
+					symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 					symbolId = null;
 					continue;
 				}
-				if (symbolId)
+				if (symbolId) {
 					functionCalls.push({
 						name: 'deselectSymbol',
 						args: [symbolId, id]
 					});
+					symbolIds = symbolIds.filter((x) => x[0] != symbolId);
+				}
 
 				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 
@@ -262,7 +278,8 @@ export function lr0Automaton(rules, nt, t) {
 					originStateName: originStateName,
 					stateStack: structuredClone(stateStack),
 					automaton: structuredClone(automaton),
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 			}
 			functionCalls.push({ name: 'hideSelectOrigin', args: [] });
@@ -337,7 +354,8 @@ export function lr0Automaton(rules, nt, t) {
 					originStateName: originStateName,
 					stateStack: structuredClone(stateStack),
 					automaton: structuredClone(automaton),
-					functionCall: functionCalls.length - 1
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
 				});
 				continue;
 			}
@@ -359,7 +377,8 @@ export function lr0Automaton(rules, nt, t) {
 				originStateName: originStateName,
 				stateStack: structuredClone(stateStack),
 				automaton: structuredClone(automaton),
-				functionCall: functionCalls.length - 1
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
 			});
 		}
 		functionCalls.push({ name: 'hideSelectAlphabet', args: [] });
@@ -377,7 +396,8 @@ export function lr0Automaton(rules, nt, t) {
 			originStateName: originStateName,
 			stateStack: structuredClone(stateStack),
 			automaton: structuredClone(automaton),
-			functionCall: functionCalls.length - 1
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
 		});
 	}
 
@@ -391,7 +411,8 @@ export function lr0Automaton(rules, nt, t) {
 		originStateName: originStateName,
 		stateStack: structuredClone(stateStack),
 		automaton: structuredClone(automaton),
-		functionCall: functionCalls.length - 1
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 	return { automaton, id };
 }

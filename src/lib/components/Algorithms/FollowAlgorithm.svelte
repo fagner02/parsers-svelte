@@ -1,8 +1,8 @@
 <script>
 	import { addPause } from '$lib/flowControl';
-	import { elemIds, functionCalls, id, saves } from '$lib/follow';
-	import { stackFloatingWindows } from '$lib/interactiveElem';
-	import { colors, selectRSymbol } from '$lib/selectSymbol';
+	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/follow';
+	import { stackFloatingWindows } from '@/Layout/interactiveElem';
+	import { colors, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -59,11 +59,12 @@
 		followSetElement?.loadSets(save.follow);
 		joinSetElement?.loadSets(save.join);
 		joinStackElement?.loadStack(stackCard(save.joinStack, {}));
+		removeAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {
 		addPause: () => addPause,
-		selectRSymbol: () => selectRSymbol,
+		selectSymbol: () => selectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
 		selectGrammar: () => grammarSelection?.selectFor,
 		hideSelectGrammar: () => grammarSelection?.hideSelect,

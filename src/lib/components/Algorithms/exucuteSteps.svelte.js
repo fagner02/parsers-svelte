@@ -79,6 +79,8 @@ export class StepExecution {
 		try {
 			if (this.inputChangedCallback) this.onInputChanged();
 			let i = 0;
+			let lastI = -1;
+			let count = 0;
 			while (i < this.functionCalls.length || this.stepChanged) {
 				if (this.inputChanged) {
 					this.setStep(0);
@@ -107,6 +109,16 @@ export class StepExecution {
 					if (call.skip !== undefined) this.functionsMap[call.name]()(...call.args);
 					else await this.functionsMap[call.name]()(...call.args);
 				} catch (e) {
+					if (lastI != i) {
+						count = 1;
+						lastI = i;
+					} else {
+						count++;
+					}
+					if (count > 3) {
+						console.error(`${call.name}\n${call.args}`);
+						break;
+					}
 					continue;
 				}
 				if (call.name === 'addPause') {

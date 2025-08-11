@@ -1,6 +1,6 @@
 <script>
 	import { inputChanged } from '$lib/flowControl';
-	import { setInputString } from '$lib/parseString';
+	import { setInputString } from '@/Layout/parseString';
 	import { setContext } from 'svelte';
 	/** @type {{
 	 * tree?: import('svelte').Snippet<[{id: string}]>,
