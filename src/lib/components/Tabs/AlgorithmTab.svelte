@@ -59,9 +59,13 @@
 	let animation = $state(animIn);
 	let parseOn = $state(false);
 	let maxStep = $state(0);
+	let isPlaying = $state(false);
 	let currentStep = $state(0);
 
 	setTab(tabId, {
+		setIsPlaying: (/** @type {boolean} */ value) => {
+			isPlaying = value;
+		},
 		setMaxStep: (step) => {
 			const elem = /**@type {HTMLElement}*/ (document.querySelector(`input#${tabId}-step`));
 			if (elem) {
@@ -72,8 +76,12 @@
 				});
 			}
 			maxStep = step;
+			console.log('ettttttttt');
 		},
-		setCurrentStep: (step) => (currentStep = step)
+		setCurrentStep: (step) => {
+			console.log('settt');
+			currentStep = step;
+		}
 	});
 
 	let currentId = $state(id);
@@ -246,7 +254,11 @@
 					disabled={currentStep >= maxStep}
 					onclick={() => forward(`${id}`)}
 				>
-					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+					{#if isPlaying}
+						<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+					{:else}
+						<PlayIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></PlayIcon>
+					{/if}
 				</button>
 				<button
 					use:setUpTooltip={{ text: 'Pular para o final' }}

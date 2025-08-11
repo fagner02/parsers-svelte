@@ -1,31 +1,36 @@
 import { setInfoComponent } from './infoText';
 import { appendData } from './log';
 
-/** @type {Map<string, Map<number, (reason?: any) => void>>} */
-let pauseResolves = new Map();
-/** @type {Map<string, Map<number, {error: Error,func:(reason?: any) => void}>>} */
-let pauseRejects = new Map();
-/** @type {Map<string, Map<number, (reason?: any) => void>>} */
-let waitRejects = new Map();
-/** @type {Map<string, Map<number, (reason?: any) => void>>} */
-let waitResolves = new Map();
-/**@type {Map<string, number>} */
-let maxStep = new Map();
-/** @typedef {{setMaxStep: (v: number)=>void, setCurrentStep: (v: number)=>void}} Tab*/
+/**
+ * @typedef {{
+ * setMaxStep: (v: number)=>void,
+ * setCurrentStep: (v: number)=>void
+ * setIsPlaying: Function
+ * }} Tab
+ */
+/**
+ * @typedef {{
+ * pauseResolves: Map<number, (reason?: any) => void>,
+ * pauseRejects: Map<number, {error: Error,func:(reason?: any) => void}>,
+ * waitRejects: Map<number, (reason?: any) => void>,
+ * waitResolves: Map<number, (reason?: any) => void>
+ * pauseCount: number,
+ * waitCount: number,
+ * jumpWait: boolean,
+ * jumpPause: boolean,
+ * resetCall?: Function,
+ * onInputChanged?: Function,
+ * getStep?: Function,
+ * maxStep: number
+ * }} Algo
+ * */
+
 /** @type {Map<string, Tab>} */
 let tabs = new Map();
+/** @type {Map<string, Algo>} */
+let algos = new Map();
 /**@type {string} */
 let currentTab = '';
-
-/**@type {Map<string, number>} */
-let waitCount = new Map();
-/**@type {Map<string, number>} */
-let pauseCount = new Map();
-
-/**@type {Map<string, boolean>} */
-let jumpWait = new Map();
-/**@type {Map<string, boolean>} */
-let jumpPause = new Map();
 
 /**
  * @param {string} tabId
@@ -46,7 +51,8 @@ export function setCurrentStep(step) {
  * @param {string} id
  */
 export function setJumpWait(value, id) {
-	jumpWait.set(id, value);
+	const tab = algos.get(id);
+	if (tab) tab.jumpWait = value;
 }
 
 /**
@@ -54,21 +60,22 @@ export function setJumpWait(value, id) {
  * @param {string} id
  */
 export function setJumpPause(value, id) {
-	jumpPause.set(id, value);
+	const tab = algos.get(id);
+	if (tab) tab.jumpPause = value;
 }
 
 /**
  * @param {string} id
  */
 export function getJumpPause(id) {
-	return jumpPause.get(id);
+	return algos.get(id)?.jumpPause;
 }
 
 /**
  * @param {string} id
  */
 export function getJumpWait(id) {
-	return jumpWait.get(id);
+	return algos.get(id)?.jumpWait;
 }
 
 /**
@@ -76,13 +83,14 @@ export function getJumpWait(id) {
  * @param {number} ms
  */
 export async function wait(id, ms) {
-	if (jumpWait.get(id)) return;
+	const algo = algos.get(id);
+	if (!algo || algo.jumpWait) return;
 	let er = Error('wait rejected');
 	return new Promise((resolve, reject) => {
-		const index = waitCount.get(id) ?? 0;
-		waitRejects.get(id)?.set(index, () => reject(er));
-		waitResolves.get(id)?.set(index, resolve);
-		waitCount.set(id, index + 1);
+		const index = algo.waitCount ?? 0;
+		algo.waitRejects?.set(index, () => reject(er));
+		algo.waitResolves?.set(index, resolve);
+		algo.waitCount = index + 1;
 		setTimeout(() => {
 			return resolve(index);
 		}, ms);
@@ -104,61 +112,62 @@ export async function noJumpWait(ms) {
  * @param {string} id
  */
 export function resolvePause(id) {
-	for (let resolve of pauseResolves.get(id)?.values() ?? []) {
+	const algo = algos.get(id);
+	if (!algo) return;
+	for (let resolve of algo.pauseResolves?.values() ?? []) {
 		resolve();
 	}
-	pauseResolves.get(id)?.clear();
-	pauseRejects.get(id)?.clear();
-	pauseCount.set(id, 0);
+	algo.pauseResolves?.clear();
+	algo.pauseRejects?.clear();
+	algo.pauseCount = 0;
 }
 /**
  * @param {string} id
  */
 export function killPause(id) {
-	for (let reject of pauseRejects.get(id)?.values() ?? []) {
+	const algo = algos.get(id);
+	if (!algo) return;
+	for (let reject of algo.pauseRejects?.values() ?? []) {
 		reject.func(reject.error);
 	}
-	pauseResolves.get(id)?.clear();
-	pauseRejects.get(id)?.clear();
-	pauseCount.set(id, 0);
+	algo.pauseResolves?.clear();
+	algo.pauseRejects?.clear();
+	algo.pauseCount = 0;
 }
 
 /**
  * @param {string} id
  */
 export function resolveAllWaits(id) {
-	for (let resolve of waitResolves.get(id)?.values() ?? []) {
+	const algo = algos.get(id);
+	if (!algo) return;
+	for (let resolve of algo.waitResolves?.values() ?? []) {
 		resolve();
 	}
-	waitResolves.get(id)?.clear();
-	waitRejects.get(id)?.clear();
-	waitCount.set(id, 0);
+	algo.waitResolves?.clear();
+	algo.waitRejects?.clear();
+	algo.waitCount = 0;
 }
 /**
  * @param {string} id
  */
 export function killAllWaits(id) {
-	for (let [i, reject] of waitRejects.get(id) ?? []) {
+	const algo = algos.get(id);
+	if (!algo) return;
+	for (let [i, reject] of algo.waitRejects ?? []) {
 		try {
-			reject(waitRejects.get(id)?.get(i));
+			reject(algo.waitRejects?.get(i));
 		} catch (e) {}
 	}
-	waitResolves.get(id)?.clear();
-	waitRejects.get(id)?.clear();
-	waitCount.set(id, 0);
+	algo.waitResolves?.clear();
+	algo.waitRejects?.clear();
+	algo.waitCount = 0;
 }
 
 /** @type {() => Promise<void>} */
 let closeInstruction;
 /** @type {() => Promise<void>} */
 let openInstruction;
-/** @type {Map<string, (step:number) => void>}*/
-let resetCalls = new Map();
-/** @type {Map<string, () => void>}*/
-let onInputChanged = new Map();
-/** @type {Map<string, () => number>}*/
-let getSteps = new Map();
-
 /**
  * @param {() => Promise<void>} _closeInstruction
  */
@@ -180,12 +189,16 @@ export function setOpenInstruction(_openInstruction) {
  * @param {()=> number} getStep
  */
 export function setStepCall(resetCall, lastSaveIndex, id, getStep) {
-	tabs.get(currentTab)?.setMaxStep(lastSaveIndex);
-	jumpWait.set(id, false);
-	jumpPause.set(id, false);
-	maxStep.set(id, lastSaveIndex);
-	getSteps.set(id, getStep);
-	resetCalls.set(id, resetCall);
+	const algo = algos.get(id);
+	const tab = tabs.get(currentTab);
+	if (!tab) return;
+	if (!algo) return;
+	tab.setMaxStep(lastSaveIndex);
+	algo.jumpWait = false;
+	algo.jumpPause = false;
+	algo.maxStep = lastSaveIndex;
+	algo.getStep = getStep;
+	algo.resetCall = resetCall;
 }
 
 /**
@@ -193,9 +206,12 @@ export function setStepCall(resetCall, lastSaveIndex, id, getStep) {
  * @param {string} id
  */
 export function setMaxStep(step, id) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	tabs.get(currentTab)?.setMaxStep(step);
-	setCurrentStep(getSteps.get(id)?.() ?? 0);
-	maxStep.set(id, step);
+	setCurrentStep(algo.getStep?.() ?? 0);
+	algo.maxStep = step;
 }
 
 /**
@@ -209,15 +225,20 @@ export function setCurrentTab(tabId) {
  * @param {string} id
  */
 export async function addPause(id) {
+	const tab = tabs.get(currentTab);
+	const algo = algos.get(id);
+	if (!algo) return;
+	tab?.setIsPlaying(false);
+	algo.jumpWait = false;
 	return new Promise(async (resolve, reject) => {
-		if (jumpPause.get(id)) return resolve(null);
+		if (algo.jumpPause) return resolve(null);
 
-		pauseResolves.get(id)?.set(pauseCount.get(id) ?? 0, resolve);
-		pauseRejects.get(id)?.set(pauseCount.get(id) ?? 0, {
+		algo.pauseResolves?.set(algo.pauseCount ?? 0, resolve);
+		algo.pauseRejects?.set(algo.pauseCount ?? 0, {
 			func: reject,
 			error: Error('pause rejected')
 		});
-		pauseCount.set(id, (pauseCount.get(id) ?? 0) + 1);
+		algo.pauseCount = (algo.pauseCount ?? 0) + 1;
 	});
 }
 
@@ -226,16 +247,22 @@ export async function addPause(id) {
  * @param {string} id
  */
 export function setOnInputChanged(callback, id) {
-	onInputChanged.set(id, callback);
+	const algo = algos.get(id);
+	if (!algo) return;
+
+	algo.onInputChanged = callback;
 }
 
 /**
  * @param {string} id
  */
 export function inputChanged(id) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	killAllWaits(id);
 	killPause(id);
-	onInputChanged.get(id)?.();
+	algo.onInputChanged?.();
 }
 
 /**
@@ -243,27 +270,34 @@ export function inputChanged(id) {
  * @param {number} step
  */
 export function goToStep(id, step) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	killAllWaits(id);
 	killPause(id);
-	jumpPause.set(id, false);
-	jumpWait.set(id, false);
-	resetCalls.get(id)?.(step);
+	algo.jumpPause = false;
+	algo.jumpWait = false;
+	algo.resetCall?.(step);
 }
 
 /**
  * @param {string} id
  */
 export async function forward(id) {
-	appendData(`control flow,forward`);
-	if (maxStep.get(id) === getSteps.get(id)?.()) return;
+	const algo = algos.get(id);
+	if (!algo) return;
 
-	if ((pauseResolves.get(id)?.size ?? 0) > 0) {
+	tabs.get(currentTab)?.setIsPlaying(true);
+	appendData(`control flow,forward`);
+	if (algo.maxStep === algo.getStep?.()) return;
+
+	if ((algo.pauseResolves?.size ?? 0) > 0) {
 		resolvePause(id);
 		openInstruction?.();
 		return;
 	}
 
-	jumpWait.set(id, true);
+	algo.jumpWait = true;
 	resolveAllWaits(id);
 }
 
@@ -271,40 +305,49 @@ export async function forward(id) {
  * @param {string} id
  */
 export async function skipToEnd(id) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	appendData(`control flow,skip to end`);
 
 	killAllWaits(id);
 	killPause(id);
-	jumpPause.set(id, false);
-	jumpWait.set(id, false);
-	resetCalls.get(id)?.(maxStep.get(id) ?? 0);
+	algo.jumpPause = false;
+	algo.jumpWait = false;
+	algo.resetCall?.(algo.maxStep ?? 0);
 }
 
 /**
  * @param {string} id
  */
 export function back(id) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	appendData(`control flow,back`);
-	if ((getSteps.get(id)?.() ?? 0) <= 0) return;
+	if ((algo.getStep?.() ?? 0) <= 0) return;
 	killAllWaits(id);
 	killPause(id);
-	jumpPause.set(id, false);
-	jumpWait.set(id, false);
-	resetCalls.get(id)?.((getSteps.get(id)?.() ?? 1) - 1);
+	algo.jumpPause = false;
+	algo.jumpWait = false;
+	algo.resetCall?.((algo.getStep?.() ?? 1) - 1);
 }
 
 /**
  * @param {string} id
  */
 export function reset(id) {
+	const algo = algos.get(id);
+	if (!algo) return;
+
 	appendData(`control flow,reset`);
 
 	killAllWaits(id);
 	killPause(id);
 	closeInstruction?.();
-	jumpPause.set(id, false);
-	jumpWait.set(id, false);
-	resetCalls.get(id)?.(0);
+	algo.jumpPause = false;
+	algo.jumpWait = false;
+	algo.resetCall?.(0);
 }
 
 /**
@@ -314,36 +357,33 @@ export function reset(id) {
  */
 export function swapAlgorithm(id, infoComp, tabId) {
 	currentTab = tabId;
+	const algo = algos.get(id);
+	const tab = tabs.get(tabId);
+	if (!tab) return;
 
-	tabs.get(tabId)?.setMaxStep(maxStep.get(id) ?? 0);
-	setCurrentStep(getSteps.get(id)?.() ?? 0);
+	tab.setMaxStep(algo?.maxStep ?? 0);
+	setCurrentStep(algo?.getStep?.() ?? 0);
 
 	setInfoComponent(infoComp);
-	if (!pauseResolves.has(id)) {
-		waitCount.set(id, 0);
-		waitResolves.set(id, new Map());
-		waitRejects.set(id, new Map());
-		pauseCount.set(id, 0);
-		pauseResolves.set(id, new Map());
-		pauseRejects.set(id, new Map());
-		maxStep.set(id, -1);
-		jumpWait.set(id, false);
-		jumpPause.set(id, false);
+	if (!algo) {
+		algos.set(id, {
+			waitCount: 0,
+			waitResolves: new Map(),
+			waitRejects: new Map(),
+			pauseCount: 0,
+			pauseResolves: new Map(),
+			pauseRejects: new Map(),
+			maxStep: -1,
+			jumpWait: false,
+			jumpPause: false
+		});
 	}
 }
 
 export function clearControlFlow() {
-	for (let id of resetCalls.keys()) {
+	for (let id of algos.keys()) {
 		killAllWaits(id);
 		killPause(id);
 	}
-	waitCount.clear();
-	waitResolves.clear();
-	waitRejects.clear();
-	pauseCount.clear();
-	pauseResolves.clear();
-	pauseRejects.clear();
-	maxStep.clear();
-	jumpWait.clear();
-	jumpPause.clear();
+	//algos.clear();
 }
