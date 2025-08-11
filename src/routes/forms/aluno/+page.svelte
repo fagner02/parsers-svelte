@@ -17,8 +17,6 @@
 	 */
 	function receiveInput(e) {
 		const elem = /**@type {HTMLInputElement}*/ (e.target);
-		console.log(elem.value);
-
 		if (elem.value.trim().length > 0) {
 			answers.set(elem.name, { value: elem.value, req: !elem.getAttribute('data-optional') });
 		} else {
@@ -45,7 +43,6 @@
 			content += `${k}:${v.value?.replaceAll('\\', '\\\\').replaceAll('\n', '\\n')}\n`;
 		});
 
-		console.log(content);
 		if (import.meta.env.PROD) {
 			supabase.storage.from('logs').upload('form' + crypto.randomUUID(), content);
 		} else {

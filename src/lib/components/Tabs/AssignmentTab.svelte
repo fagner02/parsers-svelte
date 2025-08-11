@@ -28,7 +28,6 @@
 			`form ${name},${value.replaceAll('\\', '\\\\').replaceAll('\n', '\\n').replaceAll(',', '\\c')}`
 		);
 		localStorage.setItem('vansi-' + name, value);
-		console.log('vansi-' + name);
 		if (value.trim().length > 0) {
 			answers.add(name);
 		} else {
@@ -51,7 +50,6 @@
 		inputs?.forEach((x) => {
 			const name = /**@type {HTMLInputElement}*/ (x).name;
 			const item = localStorage.getItem('vansi-' + name);
-			console.log('vansi-' + name, item);
 			if (item) {
 				/**@type {HTMLInputElement}*/ (x).value = item;
 				answers.add(name);

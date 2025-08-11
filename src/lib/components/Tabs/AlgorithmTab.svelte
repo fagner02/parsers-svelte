@@ -76,10 +76,8 @@
 				});
 			}
 			maxStep = step;
-			console.log('ettttttttt');
 		},
 		setCurrentStep: (step) => {
-			console.log('settt');
 			currentStep = step;
 		}
 	});

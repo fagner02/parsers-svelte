@@ -164,7 +164,7 @@
 				<button onclick={() => goto('/login')}> Entrar com Email </button>
 				<button onclick={() => handleOAuthLogin('google')} style="align-items: center">
 					<div class="google-box">
-						<GoogleIcon size={16} color="white"></GoogleIcon>
+						<GoogleIcon size={16}></GoogleIcon>
 					</div>
 					Entrar com Google
 				</button>

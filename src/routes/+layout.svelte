@@ -13,7 +13,6 @@
 
 	(async () => {
 		while (isNavigating) {
-			console.log('wating');
 			await noJumpWait(100);
 		}
 
