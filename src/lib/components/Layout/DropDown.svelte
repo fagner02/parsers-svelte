@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/log';
-	import { removeTooltip, setUpTooltip } from '@/Layout/tooltip';
+	import { removeTooltip, setUpTooltip } from '@/Layout/tooltip.svelte';
 	import GoogleIcon from '@icons/GoogleIcon.svelte';
 	import UserIcon from '@icons/UserIcon.svelte';
 	import { onMount } from 'svelte';
@@ -27,9 +27,10 @@
 		isOpen = !isOpen;
 		if (!dropdownParent) return;
 		console.log(dropdownParent);
-		if (isOpen) removeTooltip(dropdownParent);
+		if (isOpen) removeTooltip(dropdownParent, 0);
 		else
 			setUpTooltip(dropdownParent, {
+				id: 0,
 				text: 'Opções de login',
 				willRemove: true
 			});
@@ -51,6 +52,7 @@
 			isOpen = false;
 			if (dropdownParent)
 				setUpTooltip(dropdownParent, {
+					id: 0,
 					text: 'Opções de login',
 					willRemove: true
 				});
@@ -93,6 +95,7 @@
 		isOpen = false;
 		if (dropdownParent)
 			setUpTooltip(dropdownParent, {
+				id: 0,
 				text: 'Opções de login',
 				willRemove: true
 			});
@@ -134,7 +137,7 @@
 <div
 	class="dropdown"
 	use:setDropDownParent
-	use:setUpTooltip={{ text: 'Opções de login', willRemove: true }}
+	use:setUpTooltip={{ id: 0, text: 'Opções de login', willRemove: true }}
 >
 	<button
 		onclick={toggleDropdown}

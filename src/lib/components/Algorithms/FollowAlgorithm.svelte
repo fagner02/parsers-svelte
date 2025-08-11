@@ -2,7 +2,7 @@
 	import { addPause } from '$lib/flowControl';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/follow';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
-	import { colors, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -14,6 +14,13 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import {
+		hideTooltip,
+		removeTooltip,
+		resetTooltips,
+		setUpTooltip,
+		showTooltip
+	} from '@/Layout/tooltip.svelte';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement = $state();
@@ -59,13 +66,17 @@
 		followSetElement?.loadSets(save.follow);
 		joinSetElement?.loadSets(save.join);
 		joinStackElement?.loadStack(stackCard(save.joinStack, {}));
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
+		resetTooltips(save.functionCall, functionCalls);
 	}
 
 	const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
+		showTooltip: () => showTooltip,
+		setUpTooltip: () => setUpTooltip,
+		hideTooltip: () => hideTooltip,
 		selectGrammar: () => grammarSelection?.selectFor,
 		hideSelectGrammar: () => grammarSelection?.hideSelect,
 		joinSetsFollow: () => followSetElement?.joinSets,

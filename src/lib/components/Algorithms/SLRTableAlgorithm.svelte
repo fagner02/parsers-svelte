@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
@@ -84,7 +84,7 @@
 			console.log(e);
 		}
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {

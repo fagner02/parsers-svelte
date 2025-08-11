@@ -1,8 +1,13 @@
 <script>
 	import { fontSize } from '$lib/globalStyle';
+	import { registerTooltipGroup } from './tooltip.svelte';
+
+	let { groupId } = $props();
+
+	registerTooltipGroup(groupId);
 </script>
 
-<div class="tooltip" style="font-size: {fontSize}px;">
+<div class="tooltip" id="tooltip-{groupId}" style="font-size: {fontSize}px">
 	<span id="tooltip"></span>
 
 	<svg class="arrow" width="54" height="48" viewBox="0 0 54 48" xmlns="http://www.w3.org/2000/svg">

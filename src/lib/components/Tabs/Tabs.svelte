@@ -4,7 +4,7 @@
 	import TextInput from '../Layout/TextInput.svelte';
 	import SLRAnimation from './SLRAnimation.svelte';
 	import CLRAnimation from './CLRAnimation.svelte';
-	import { setUpTooltip } from '@/Layout/tooltip.js';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte.js';
 	import AssignmentTab from './AssignmentTab.svelte';
 	import { appendData } from '$lib/log';
 	import { setGrammarChangeCallback } from '$lib/utils';
@@ -72,7 +72,7 @@
 		<div class="tab-item-list">
 			{#each items as item}
 				<button
-					use:setUpTooltip={{ text: item.desc }}
+					use:setUpTooltip={{ id: 0, text: item.desc }}
 					class="tab-item"
 					style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
 					item.name

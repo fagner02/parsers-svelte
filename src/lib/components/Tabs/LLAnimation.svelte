@@ -13,7 +13,7 @@
 	import { getGrammar, isGrammarLoaded } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { setUpTooltip } from '@/Layout/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 	import { firstToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
 	import { id as parseId } from '$lib/stepCalc/llparse';
@@ -170,7 +170,7 @@
 			<div class="algo-buttons">
 				{#each algos as algo}
 					<button
-						use:setUpTooltip={{ text: algo.desc }}
+						use:setUpTooltip={{ id: 0, text: algo.desc }}
 						disabled={selectedAlgorithm === algo.name}
 						onclick={() => {
 							id = algo.id;

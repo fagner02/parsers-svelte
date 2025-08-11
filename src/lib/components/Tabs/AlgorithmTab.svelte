@@ -26,7 +26,7 @@
 	import ParseView from '@/Tabs/ParseView.svelte';
 	import ForwardIcon from '@icons/ForwardIcon.svelte';
 	import { isGrammarLoaded } from '$lib/utils';
-	import { setUpTooltip } from '@/Layout/tooltip.js';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte.js';
 	import { appendData } from '$lib/log';
 	import { colors } from '$lib/selectSymbol';
 
@@ -72,7 +72,8 @@
 				setUpTooltip(elem, {
 					text: `Digite o número do passo entre ${0} e ${step}`,
 					willRemove: true,
-					hue: colors.blue
+					hue: colors.blue,
+					id: 0
 				});
 			}
 			maxStep = step;
@@ -152,7 +153,7 @@
 		<div class="controls-box">
 			<div class="controls">
 				<!-- <button
-					use:setUpTooltip={{ text: 'Código' }}
+					use:setUpTooltip={{ id: 0,text: 'Código' }}
 					class="popup-button"
 					onclick={() => updateSelected('code')}
 					disabled={selected == 'code'}
@@ -160,7 +161,7 @@
 					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 				</button> -->
 				<button
-					use:setUpTooltip={{ text: 'Copiar resultados como texto' }}
+					use:setUpTooltip={{ id: 0, text: 'Copiar resultados como texto' }}
 					class="popup-button"
 					onclick={() => updateSelected('text')}
 					disabled={selected == 'text'}
@@ -168,7 +169,7 @@
 					<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ text: 'Informações sobre o algoritmo' }}
+					use:setUpTooltip={{ id: 0, text: 'Informações sobre o algoritmo' }}
 					class="popup-button"
 					onclick={() => updateSelected('info')}
 					disabled={selected == 'info'}
@@ -176,7 +177,7 @@
 					<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ text: 'Analisar string de entrada' }}
+					use:setUpTooltip={{ id: 0, text: 'Analisar string de entrada' }}
 					class="view-button"
 					onclick={() => {
 						currentId = id;
@@ -192,7 +193,7 @@
 					<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ text: 'Executar construção do parser' }}
+					use:setUpTooltip={{ id: 0, text: 'Executar construção do parser' }}
 					class="view-button"
 					onclick={() => {
 						parseOn = false;
@@ -210,7 +211,7 @@
 			<div class="flow-controls controls">
 				<div style="display: flex;gap: 10px;">
 					<button
-						use:setUpTooltip={{ text: 'Ir para passo especificado' }}
+						use:setUpTooltip={{ id: 0, text: 'Ir para passo especificado' }}
 						onclick={() => {
 							const elem = /**@type {HTMLInputElement}*/ (
 								document.querySelector(`input#${tabId}-step`)
@@ -241,14 +242,14 @@
 						value={currentStep}
 					/>
 				</div>
-				<button use:setUpTooltip={{ text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
+				<button use:setUpTooltip={{ id: 0, text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
 					<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
 				</button>
-				<button use:setUpTooltip={{ text: 'Reiniciar' }} onclick={() => reset(`${id}`)}>
+				<button use:setUpTooltip={{ id: 0, text: 'Reiniciar' }} onclick={() => reset(`${id}`)}>
 					<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ text: 'Próximo passo' }}
+					use:setUpTooltip={{ id: 0, text: 'Próximo passo' }}
 					disabled={currentStep >= maxStep}
 					onclick={() => forward(`${id}`)}
 				>
@@ -259,7 +260,7 @@
 					{/if}
 				</button>
 				<button
-					use:setUpTooltip={{ text: 'Pular para o final' }}
+					use:setUpTooltip={{ id: 0, text: 'Pular para o final' }}
 					disabled={currentStep >= maxStep}
 					onclick={() => skipToEnd(`${id}`)}
 				>

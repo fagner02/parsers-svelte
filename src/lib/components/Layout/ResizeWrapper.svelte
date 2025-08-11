@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import { appendData } from '$lib/log';
-	import { setUpTooltip } from '@/Layout/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 	import MinimizeIcon from '@icons/MinimizeIcon.svelte';
 	import MoveIcon from '@icons/MoveIcon.svelte';
 	import { onMount } from 'svelte';
@@ -151,11 +151,11 @@
 		{#if title}
 			<p style="height: {minimized ? '0px' : 'auto'}">{title}</p>
 		{/if}
-		<button use:setUpTooltip={{ text: 'Minimizar' }} onclick={close}
+		<button use:setUpTooltip={{ id: 0, text: 'Minimizar' }} onclick={close}
 			><MinimizeIcon></MinimizeIcon></button
 		>
 		<button
-			use:setUpTooltip={{ text: 'Mover janela flutuante' }}
+			use:setUpTooltip={{ id: 0, text: 'Mover janela flutuante' }}
 			style="cursor: move;{selected == 'move' ? 'filter: brightness(0.6);' : ''}"
 			onmousedown={(/**@type {MouseEvent}*/ e) => {
 				appendData(`move float, start;${props.id}`);
@@ -173,7 +173,7 @@
 
 		{#each actions as action}
 			<button
-				use:setUpTooltip={{ text: action.desc }}
+				use:setUpTooltip={{ id: 0, text: action.desc }}
 				disabled={selected === action.name}
 				onclick={() => {
 					removeCallback?.();

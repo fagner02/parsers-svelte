@@ -2,7 +2,7 @@
 	import { addPause } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lr0automaton';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -87,7 +87,7 @@
 		targetStateElem?.loadState(save.targetState, false);
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {

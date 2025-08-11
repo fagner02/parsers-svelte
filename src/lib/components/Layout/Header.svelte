@@ -1,6 +1,6 @@
 <script>
 	import { supabase } from '$lib/log';
-	import { setUpTooltip } from '@/Layout/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 	import { getPlatform, platforms } from '$lib/utils';
 	import DropDown from './DropDown.svelte';
 
@@ -10,7 +10,7 @@
 
 {#if getPlatform() === platforms.web}
 	<header>
-		<a href="/" use:setUpTooltip={{ text: 'Início' }}>
+		<a href="/" use:setUpTooltip={{ id: 0, text: 'Início' }}>
 			<h1>VANSI</h1>
 		</a>
 		<DropDown></DropDown>

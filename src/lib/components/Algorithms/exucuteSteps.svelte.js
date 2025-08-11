@@ -3,7 +3,8 @@ import {
 	setCurrentStep,
 	setMaxStep,
 	setOnInputChanged,
-	setStepCall
+	setStepCall,
+	currentAlgoId
 } from '$lib/flowControl';
 import { colors } from '$lib/selectSymbol';
 

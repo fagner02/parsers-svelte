@@ -2,7 +2,7 @@
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/clr_table';
 	import { addPause, noJumpWait, wait } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -69,7 +69,7 @@
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		stateName = save.stateName;
 		await noJumpWait(5000);
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 
 	const obj = {

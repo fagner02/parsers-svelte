@@ -1,3 +1,4 @@
+import { showTooltip } from '@/Layout/tooltip.svelte';
 import { colors } from '../selectSymbol';
 
 export const id = 'follow';
@@ -10,7 +11,7 @@ export const elemIds = {
 	joinStack: `${id}-joinStack`
 };
 
-/**@type {any} */
+/**@type {{name: string, args: any[], skip?:boolean}[]} */
 export let functionCalls = [];
 /**
  * @type {{
@@ -59,9 +60,20 @@ export function follow(rules, nt, firstSet) {
 	followSet.set(rules[0].left, new Set(['$']));
 	followIndexes.set(rules[0].left, 0);
 	functionCalls.push({
+		name: 'showTooltip',
+		args: [
+			`${elemIds.grammar}gl0`,
+			`Inicia um conjunto follow para o símbolo '${rules[0].left}' e adiciona '$'`,
+			colors.blue,
+			1
+		]
+	});
+
+	functionCalls.push({
 		name: 'addSetRowFollow',
 		args: [rules[0].left, `${elemIds.grammar}gl0`]
 	});
+
 	functionCalls.push({
 		name: 'highlightLines',
 		args: [[2]]
@@ -69,6 +81,22 @@ export function follow(rules, nt, firstSet) {
 	functionCalls.push({
 		name: 'joinSetsFollow',
 		args: [['$'], rules[0].left]
+	});
+	functionCalls.push({
+		name: 'hideTooltip',
+		args: [1]
+	});
+	functionCalls.push({
+		name: 'addPause',
+		args: [id]
+	});
+	saves.push({
+		follow: structuredClone(followSet),
+		join: structuredClone(joinSet),
+		joinStack: [],
+		grammarSelect: '',
+		functionCall: functionCalls.length - 1,
+		symbolIds: structuredClone(symbolIds)
 	});
 
 	for (let i = 0; i < rules.length; i++) {
@@ -98,7 +126,14 @@ export function follow(rules, nt, firstSet) {
 					name: 'selectSymbol',
 					args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 				});
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
+				functionCalls.push({
+					name: 'setUpTooltip',
+					args: [
+						`${elemIds.grammar}gr${i}-${j}`,
+						{ id: 2, text: `Esse símbolo já foi processado`, hue: colors.green, willRemove: true }
+					]
+				});
 				functionCalls.push({
 					name: 'addPause',
 					args: [id]
@@ -122,8 +157,20 @@ export function follow(rules, nt, firstSet) {
 				name: 'selectSymbol',
 				args: [`${elemIds.grammar}gr${i}-${j}`, colors.blue, id, false]
 			});
+			symbolIds.push(functionCalls.at(-1)?.args);
+			functionCalls.push({
+				name: 'setUpTooltip',
+				args: [
+					`${elemIds.grammar}gr${i}-${j}`,
+					{
+						id: 2,
+						text: `'${rules[i].right[j]}' é não terminal então o que vem a seguir é adicionado ao follow desse símbolo`,
+						hue: colors.blue,
+						willRemove: true
+					}
+				]
+			});
 
-			symbolIds.push(functionCalls.at(-1).args);
 			if (!followSet.has(symbol)) {
 				followSet.set(symbol, new Set());
 				followIndexes.set(symbol, followSet.size - 1);
@@ -236,8 +283,19 @@ export function follow(rules, nt, firstSet) {
 					name: 'selectSymbol',
 					args: [`${elemIds.grammar}gr${i}-${j + 1}`, colors.orange, id, false]
 				});
-
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
+				functionCalls.push({
+					name: 'setUpTooltip',
+					args: [
+						`${elemIds.grammar}gr${i}-${j + 1}`,
+						{
+							id: 2,
+							text: `'${rules[i].right[j + 1]}' é um terminal, por isso é adicionado ao follow de '${rules[i].right[j]}'`,
+							hue: colors.orange,
+							willRemove: true
+						}
+					]
+				});
 
 				if (nt.includes(followingSymbol)) {
 					functionCalls.push({
@@ -369,8 +427,14 @@ export function follow(rules, nt, firstSet) {
 				name: 'selectSymbol',
 				args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 			});
-
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
+			functionCalls.push({
+				name: 'setUpTooltip',
+				args: [
+					`${elemIds.grammar}gr${i}-${j}`,
+					{ id: 2, text: `Esse símbolo já foi processado`, hue: colors.green, willRemove: true }
+				]
+			});
 		}
 	}
 	functionCalls.push({
@@ -477,7 +541,7 @@ export function follow(rules, nt, firstSet) {
 				args: [`${elemIds.join}r${joinIndexes.get(topKey)}-${0}`, colors.green, id]
 			});
 
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
 			const _followSet = followSet.get(topKey);
 			const setToJoin = /**@type {Set<String>}*/ (followSet.get(topValue));
 			for (let item of setToJoin) {

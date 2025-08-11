@@ -2,7 +2,7 @@
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
-	import { setUpTooltip } from '@/Layout/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 
 	/** @type {{
 	 * id: string,
@@ -161,6 +161,7 @@
 	export function setConflictTooltip(value) {
 		if (!conflictElem) return;
 		setUpTooltip(conflictElem, {
+			id: 0,
 			text: value,
 			willRemove: true,
 			hue: conflictHue

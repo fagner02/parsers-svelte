@@ -13,7 +13,7 @@
 	import { firstDataOnly } from '$lib/stepCalc/first';
 	import { lr0Automaton } from '$lib/stepCalc/lr0automaton';
 	import { slrTable } from '$lib/stepCalc/slrtable';
-	import { setUpTooltip } from '@/Layout/tooltip';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 	import { onMount } from 'svelte';
 	import { automatonToString, followToString, tableToString } from './dataToString';
 	import { appendData } from '$lib/log';
@@ -141,7 +141,7 @@
 				<div class="algo-buttons">
 					{#each algos as algo}
 						<button
-							use:setUpTooltip={{ text: algo.desc }}
+							use:setUpTooltip={{ id: 0, text: algo.desc }}
 							disabled={selectedAlgorithm === algo.name}
 							onclick={() => {
 								id = algo.id;

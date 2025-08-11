@@ -2,7 +2,7 @@
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/first';
 	import { addPause } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -69,7 +69,7 @@
 		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
 		joinSetElement?.loadSets(save.join);
 		firstSetElement?.loadSets(save.first);
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 	let stepExecution = new StepExecution(
 		saves,

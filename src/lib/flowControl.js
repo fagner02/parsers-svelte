@@ -1,3 +1,4 @@
+import { hideTooltip } from '@/Layout/tooltip.svelte';
 import { setInfoComponent } from './components/Info/infoText';
 import { appendData } from './log';
 
@@ -31,6 +32,8 @@ let tabs = new Map();
 let algos = new Map();
 /**@type {string} */
 let currentTab = '';
+/**@type {string} */
+export let currentAlgoId = '';
 
 /**
  * @param {string} tabId
@@ -359,11 +362,17 @@ export function swapAlgorithm(id, infoComp, tabId) {
 	currentTab = tabId;
 	const algo = algos.get(id);
 	const tab = tabs.get(tabId);
+	const currentAlgo = algos.get(currentAlgoId);
+	if (currentAlgo) currentAlgo.jumpWait = true;
+	resolveAllWaits(currentAlgoId);
+	setTimeout(() => {
+		hideTooltip(1);
+	}, 0);
 	if (!tab) return;
 
 	tab.setMaxStep(algo?.maxStep ?? 0);
 	setCurrentStep(algo?.getStep?.() ?? 0);
-
+	currentAlgoId = id;
 	setInfoComponent(infoComp);
 	if (!algo) {
 		algos.set(id, {

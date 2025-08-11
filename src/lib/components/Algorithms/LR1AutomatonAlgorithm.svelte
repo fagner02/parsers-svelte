@@ -1,7 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getAugGrammar } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -95,7 +95,7 @@
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 
 	export const obj = {

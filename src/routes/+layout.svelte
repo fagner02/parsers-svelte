@@ -37,7 +37,9 @@
 </svelte:head>
 <div id="app">
 	<Header></Header>
-	<Tooltip></Tooltip>
+	<Tooltip groupId={0}></Tooltip>
+	<Tooltip groupId={1}></Tooltip>
+	<Tooltip groupId={2}></Tooltip>
 	<FillSize fillWidth={false} id="app-content" class="grid borders maxWidth">
 		{#snippet content()}
 			{@render children()}

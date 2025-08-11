@@ -13,14 +13,11 @@ let selectedSymbolsMap = new Map();
  * @param {string} id
  * @param {[string, number, string, boolean][]} symbolIds
  */
-export function removeAllSymbols(id, symbolIds) {
-	console.log(selectedSymbolsMap);
+export function resetAllSymbols(id, symbolIds) {
 	for (const symbolId of selectedSymbolsMap.get(id) ?? []) {
 		let symbol = document.querySelector(symbolId);
-
 		symbol?.classList.remove('empty', 'block', 'block-deselect');
 	}
-	console.log(symbolIds);
 	let selectedSymbols = new Set();
 
 	for (const symbolId of symbolIds) {
@@ -28,7 +25,7 @@ export function removeAllSymbols(id, symbolIds) {
 		let symbol = /** @type {HTMLElement} */ (document.querySelector(symbolId[0]));
 		if (!symbol) {
 			console.error(symbolId[0], symbol);
-			return;
+			continue;
 		}
 		selectedSymbols.add(symbolId[0]);
 		symbol.classList.add(symbolId[3] ? 'block' : 'empty');

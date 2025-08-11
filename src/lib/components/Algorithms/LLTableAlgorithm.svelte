@@ -2,7 +2,7 @@
 	import { addPause } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lltable';
-	import { colors, deselectSymbol, removeAllSymbols, selectSymbol } from '$lib/selectSymbol';
+	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { getGrammar } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
@@ -81,7 +81,7 @@
 		}
 		save.firstSelect === '' ? firstFuncs?.hideSelect() : firstFuncs?.selectFor(save.firstSelect);
 
-		removeAllSymbols(id, save.symbolIds);
+		resetAllSymbols(id, save.symbolIds);
 	}
 
 	onMount(async () => {
