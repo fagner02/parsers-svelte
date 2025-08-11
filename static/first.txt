@@ -5,7 +5,7 @@
 <span>    <b>nulo</b> &lt;- verdadeiro</span>
 <span>    para cada símbolo <b>X<sub>k</sub></b> na direita da produção <b>p</b>:</span>
 <span>        se <b>X<sub>k</sub></b> pertence aos não-terminais:</span>
-<span>            para cada regra <b>r</b> da forma <b>X<sub>k</sub></b> -&gt; &alpha;</span>
+<span>            para cada regra <b>r</b> da forma <b>X<sub>k</sub></b> -&gt; &alpha;:</span>
 <span>                se <b>r</b> é diferente <b>p</b>:</span>
 <span>                    adiciona <b>r</b> a <b>união</b>(<b>p</b>)</span>
 <span>        caso contrário:</span>

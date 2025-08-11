@@ -86,7 +86,6 @@ export function first(rules, nt) {
 			args: [`${elemIds.grammar}gset${i}`]
 		});
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
-		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		functionCalls.push({
 			name: 'selectLSymbol',
 			args: [`${elemIds.grammar}g`, i, colors.blue, id]
@@ -104,6 +103,7 @@ export function first(rules, nt) {
 			grammarSelect: `${elemIds.grammar}gset${i}`,
 			functionCall: functionCalls.length - 1
 		});
+		functionCalls.push({ name: 'highlightLines', args: [[4]] });
 		let isNull = true;
 		for (let j = 0; j < rules[i].right.length; j++) {
 			functionCalls.push({ name: 'highlightLines', args: [[5]] });
@@ -111,6 +111,7 @@ export function first(rules, nt) {
 
 			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 			if (nt.includes(symbol)) {
+				functionCalls.push({ name: 'highlightLines', args: [[7]] });
 				if (!joinSet.has(i)) {
 					joinSet.set(i, new Set());
 					functionCalls.push({
@@ -125,7 +126,6 @@ export function first(rules, nt) {
 
 				const matchingRules = rules.filter((x) => x.left === symbol);
 				for (let rule of matchingRules) {
-					functionCalls.push({ name: 'highlightLines', args: [[7]] });
 					functionCalls.push({ name: 'highlightLines', args: [[8]] });
 					if (rule.index !== i) {
 						joinSet.get(i)?.add(rule.index);
@@ -137,16 +137,9 @@ export function first(rules, nt) {
 					}
 				}
 			} else {
-				firstSet.get(i)?.add(symbol);
 				functionCalls.push({ name: 'highlightLines', args: [[10]] });
-				functionCalls.push({ name: 'addPause', args: [id] });
-				saves.push({
-					join: structuredClone(joinSet),
-					first: structuredClone(firstSet),
-					joinStack: [],
-					grammarSelect: `${elemIds.grammar}gset${i}`,
-					functionCall: functionCalls.length - 1
-				});
+				functionCalls.push({ name: 'highlightLines', args: [[11]] });
+				firstSet.get(i)?.add(symbol);
 				functionCalls.push({
 					name: 'selectRSymbol',
 					args: [`${elemIds.grammar}g`, i, j, colors.green, id, false]
@@ -154,6 +147,14 @@ export function first(rules, nt) {
 				functionCalls.push({
 					name: 'joinSets',
 					args: [[symbol], i, `${elemIds.grammar}gr${i}-${j}`]
+				});
+				functionCalls.push({ name: 'addPause', args: [id] });
+				saves.push({
+					join: structuredClone(joinSet),
+					first: structuredClone(firstSet),
+					joinStack: [],
+					grammarSelect: `${elemIds.grammar}gset${i}`,
+					functionCall: functionCalls.length - 1
 				});
 			}
 
