@@ -117,7 +117,8 @@ export class StepExecution {
 						count++;
 					}
 					if (count > 3) {
-						console.error(`${call.name}\n${call.args}`);
+						console.error(e);
+						console.log(`${call.name}\n${call.args}`);
 						break;
 					}
 					continue;

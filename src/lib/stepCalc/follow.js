@@ -62,7 +62,7 @@ export function follow(rules, nt, firstSet) {
 	functionCalls.push({
 		name: 'showTooltip',
 		args: [
-			`${elemIds.grammar}gl0`,
+			`label-${elemIds.follow}`,
 			`Inicia um conjunto follow para o símbolo '${rules[0].left}' e adiciona '$'`,
 			colors.blue,
 			1
@@ -82,10 +82,7 @@ export function follow(rules, nt, firstSet) {
 		name: 'joinSetsFollow',
 		args: [['$'], rules[0].left]
 	});
-	functionCalls.push({
-		name: 'hideTooltip',
-		args: [1]
-	});
+
 	functionCalls.push({
 		name: 'addPause',
 		args: [id]
@@ -98,7 +95,10 @@ export function follow(rules, nt, firstSet) {
 		functionCall: functionCalls.length - 1,
 		symbolIds: structuredClone(symbolIds)
 	});
-
+	functionCalls.push({
+		name: 'hideTooltip',
+		args: [1]
+	});
 	for (let i = 0; i < rules.length; i++) {
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		functionCalls.push({
@@ -153,6 +153,7 @@ export function follow(rules, nt, firstSet) {
 				name: 'highlightLines',
 				args: [[8]]
 			});
+
 			functionCalls.push({
 				name: 'selectSymbol',
 				args: [`${elemIds.grammar}gr${i}-${j}`, colors.blue, id, false]
@@ -172,6 +173,15 @@ export function follow(rules, nt, firstSet) {
 			});
 
 			if (!followSet.has(symbol)) {
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`label-${elemIds.follow}`,
+						`Inicia um conjunto follow vazio para o símbolo '${rules[i].right[j]}'`,
+						colors.blue,
+						1
+					]
+				});
 				followSet.set(symbol, new Set());
 				followIndexes.set(symbol, followSet.size - 1);
 				functionCalls.push({
@@ -186,14 +196,18 @@ export function follow(rules, nt, firstSet) {
 					name: 'addPause',
 					args: [id]
 				});
+
 				saves.push({
 					follow: structuredClone(followSet),
 					join: structuredClone(joinSet),
 					joinStack: [],
 					grammarSelect: `${elemIds.grammar}gset${i}`,
 					functionCall: functionCalls.length - 1,
-
 					symbolIds: structuredClone(symbolIds)
+				});
+				functionCalls.push({
+					name: 'hideTooltip',
+					args: [1]
 				});
 			}
 
@@ -219,6 +233,15 @@ export function follow(rules, nt, firstSet) {
 					});
 
 					if (!joinSet.has(symbol)) {
+						functionCalls.push({
+							name: 'showTooltip',
+							args: [
+								`label-${elemIds.join}`,
+								`Inicia um conjunto join vazio para o símbolo '${symbol}'`,
+								colors.blue,
+								1
+							]
+						});
 						joinSet.set(symbol, new Set());
 						joinIndexes.set(symbol, joinSet.size - 1);
 						functionCalls.push({
@@ -241,12 +264,25 @@ export function follow(rules, nt, firstSet) {
 							functionCall: functionCalls.length - 1,
 							symbolIds: structuredClone(symbolIds)
 						});
+						functionCalls.push({
+							name: 'hideTooltip',
+							args: [1]
+						});
 					}
 					functionCalls.push({
 						name: 'highlightLines',
 						args: [[15]]
 					});
 					if (rules[i].left !== symbol) {
+						functionCalls.push({
+							name: 'showTooltip',
+							args: [
+								`label-${elemIds.join}`,
+								`Já que não há símbolos após '${symbol}', mesclamos o conjunto follow de '${rules[i].left}' com o de '${symbol}'. Para isso adicionamos '${rules[i].left}' ao conjunto join de '${symbol}'`,
+								colors.blue,
+								1
+							]
+						});
 						joinSet.get(symbol)?.add(rules[i].left);
 						functionCalls.push({
 							name: 'highlightLines',
@@ -268,6 +304,10 @@ export function follow(rules, nt, firstSet) {
 							functionCall: functionCalls.length - 1,
 							symbolIds: structuredClone(symbolIds)
 						});
+						functionCalls.push({
+							name: 'hideTooltip',
+							args: [1]
+						});
 					}
 					functionCalls.push({
 						name: 'highlightLines',
@@ -284,18 +324,6 @@ export function follow(rules, nt, firstSet) {
 					args: [`${elemIds.grammar}gr${i}-${j + 1}`, colors.orange, id, false]
 				});
 				symbolIds.push(functionCalls.at(-1)?.args);
-				functionCalls.push({
-					name: 'setUpTooltip',
-					args: [
-						`${elemIds.grammar}gr${i}-${j + 1}`,
-						{
-							id: 2,
-							text: `'${rules[i].right[j + 1]}' é um terminal, por isso é adicionado ao follow de '${rules[i].right[j]}'`,
-							hue: colors.orange,
-							willRemove: true
-						}
-					]
-				});
 
 				if (nt.includes(followingSymbol)) {
 					functionCalls.push({
@@ -337,6 +365,15 @@ export function follow(rules, nt, firstSet) {
 								name: 'highlightLines',
 								args: [[26]]
 							});
+							functionCalls.push({
+								name: 'showTooltip',
+								args: [
+									`label-${elemIds.first}`,
+									`'${followingSymbol}' é um não terminal, por isso adicionamos o seu first ao follow de '${symbol}'`,
+									colors.orange,
+									1
+								]
+							});
 							let union = new Set(/**@type {Set<string>}*/ followSet.get(symbol));
 							for (let item of right) {
 								union.add(item);
@@ -346,7 +383,7 @@ export function follow(rules, nt, firstSet) {
 							followIndexes.set(symbol, followSet.size - 1);
 							functionCalls.push({
 								name: 'joinSetsFollow',
-								args: [[...right], rules[left].left, `${elemIds.first}l${left}`]
+								args: [[...right], symbol, `${elemIds.first}l${left}`]
 							});
 							functionCalls.push({
 								name: 'addPause',
@@ -359,6 +396,10 @@ export function follow(rules, nt, firstSet) {
 								grammarSelect: `${elemIds.grammar}gset${i}`,
 								functionCall: functionCalls.length - 1,
 								symbolIds: structuredClone(symbolIds)
+							});
+							functionCalls.push({
+								name: 'hideTooltip',
+								args: [1]
 							});
 						}
 					}
@@ -390,6 +431,18 @@ export function follow(rules, nt, firstSet) {
 						args: [[31]]
 					});
 				} else {
+					functionCalls.push({
+						name: 'setUpTooltip',
+						args: [
+							`${elemIds.grammar}gr${i}-${j + 1}`,
+							{
+								id: 2,
+								text: `'${followingSymbol}' é um terminal, por isso é adicionado ao follow de '${symbol}'`,
+								hue: colors.orange,
+								willRemove: true
+							}
+						]
+					});
 					functionCalls.push({
 						name: 'highlightLines',
 						args: [[31]]
