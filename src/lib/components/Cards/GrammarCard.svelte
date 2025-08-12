@@ -5,8 +5,8 @@
 	import { getAugGrammar, getGrammar } from '$lib/utils';
 	import CardWrapper from './CardWrapper.svelte';
 
-	/** @type {{isAugmented?: boolean, cardId: string, id: string, loadGrammar?: ()=>Promise<any>}} */
-	let { isAugmented = false, loadGrammar = $bindable(), ...props } = $props();
+	/** @type {{isAugmented?: boolean, cardId: string, labelTooltip?: string, id: string, loadGrammar?: ()=>Promise<any>}} */
+	let { isAugmented = false, labelTooltip = '', loadGrammar = $bindable(), ...props } = $props();
 
 	loadGrammar = async function () {
 		return new Promise(async (resolve, reject) => {
@@ -36,6 +36,7 @@
 </script>
 
 <CardWrapper
+	{labelTooltip}
 	class="card"
 	minHeight={lineHeight}
 	minWidth={charWidth}

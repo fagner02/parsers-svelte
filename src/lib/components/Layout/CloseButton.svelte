@@ -50,7 +50,11 @@
 	>
 		<path id="close-path" {d} fill="#E54949" transform="scale({width / 500} 1)" />
 	</svg>
-	<CloseIcon class="unit xicon" strokeWidth={4} color="white"></CloseIcon>
+	<CloseIcon
+		style="place-self: center end;margin-right: 20px;z-index: 1;grid-area: unit;"
+		strokeWidth={4}
+		color="white"
+	></CloseIcon>
 	<button class="unit" onclick={onClose} aria-label="close"></button>
 </div>
 
@@ -62,11 +66,5 @@
 	}
 	button {
 		background: transparent;
-	}
-
-	:global(.xicon) {
-		place-self: center end;
-		margin-right: 20px;
-		z-index: 1;
 	}
 </style>

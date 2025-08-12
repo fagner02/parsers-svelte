@@ -165,7 +165,7 @@ export function follow(rules, nt, firstSet) {
 					`${elemIds.grammar}gr${i}-${j}`,
 					{
 						id: 2,
-						text: `'${rules[i].right[j]}' é não terminal então o que vem a seguir é adicionado ao follow desse símbolo`,
+						text: `'${rules[i].right[j]}' é não-terminal então o que vem a seguir é adicionado ao follow desse símbolo`,
 						hue: colors.blue,
 						willRemove: true
 					}
@@ -369,7 +369,7 @@ export function follow(rules, nt, firstSet) {
 								name: 'showTooltip',
 								args: [
 									`label-${elemIds.first}`,
-									`'${followingSymbol}' é um não terminal, por isso adicionamos o seu first ao follow de '${symbol}'`,
+									`'${followingSymbol}' é um não-terminal, por isso adicionamos o seu first ao follow de '${symbol}'`,
 									colors.orange,
 									1
 								]
@@ -517,6 +517,7 @@ export function follow(rules, nt, firstSet) {
 			name: 'highlightLines',
 			args: [[38]]
 		});
+
 		/** @type {Array<string>} */
 		let joinStack = [item];
 		addedToStack.push(item);
@@ -535,6 +536,10 @@ export function follow(rules, nt, firstSet) {
 			grammarSelect: '',
 			functionCall: functionCalls.length - 1,
 			symbolIds: structuredClone(symbolIds)
+		});
+		functionCalls.push({
+			name: 'hideTooltip',
+			args: [1]
 		});
 
 		while (joinStack.length > 0) {
@@ -560,6 +565,15 @@ export function follow(rules, nt, firstSet) {
 			});
 			let nextSet = joinSet.get(topValue);
 			if (nextSet !== undefined && !(nextSet.size === 0) && !addedToStack.includes(item)) {
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`label-${elemIds.join}`,
+						`O conjunto join de '${topValue}' ainda não está vazio, é preciso processá-lo antes de mesclar seu follow ao de '${topKey}' por isso adicionamos '${topValue}' à join stack`,
+						colors.blue,
+						1
+					]
+				});
 				joinStack.push(topValue);
 				addedToStack.push(item);
 				functionCalls.push({
@@ -582,7 +596,10 @@ export function follow(rules, nt, firstSet) {
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
 				});
-
+				functionCalls.push({
+					name: 'hideTooltip',
+					args: [1]
+				});
 				functionCalls.push({
 					name: 'highlightLines',
 					args: [[44]]
@@ -609,8 +626,17 @@ export function follow(rules, nt, firstSet) {
 				args: [[46]]
 			});
 			functionCalls.push({
+				name: 'showTooltip',
+				args: [
+					`label-${elemIds.join}`,
+					`O conjunto follow de '${topValue}' já está completo, por isso mesclamos seu follow ao follow de '${topKey}' e removemos '${topValue}' do conjunto join de '${topKey}'`,
+					colors.blue,
+					1
+				]
+			});
+			functionCalls.push({
 				name: 'joinSetsFollow',
-				args: [[...setToJoin], topKey, `${elemIds.follow}gl${followIndexes.get(topKey)}`]
+				args: [[...setToJoin], topKey, `${elemIds.follow}l${followIndexes.get(topKey)}`]
 			});
 			functionCalls.push({
 				name: 'addPause',
@@ -623,6 +649,10 @@ export function follow(rules, nt, firstSet) {
 				grammarSelect: '',
 				functionCall: functionCalls.length - 1,
 				symbolIds: structuredClone(symbolIds)
+			});
+			functionCalls.push({
+				name: 'hideTooltip',
+				args: [1]
 			});
 
 			functionCalls.push({
@@ -640,6 +670,15 @@ export function follow(rules, nt, firstSet) {
 				args: [[48]]
 			});
 			if (top.size === 0) {
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`label-${elemIds.joinStack}`,
+						`Como o conjunto join de '${topKey}' está vazio, removemos '${topKey}' da join stack`,
+						colors.blue,
+						1
+					]
+				});
 				joinStack.pop();
 				functionCalls.push({
 					name: 'highlightLines',
@@ -660,6 +699,10 @@ export function follow(rules, nt, firstSet) {
 					grammarSelect: '',
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
+				});
+				functionCalls.push({
+					name: 'hideTooltip',
+					args: [1]
 				});
 			}
 		}

@@ -2,6 +2,8 @@
 	import { getJumpPause, wait } from '$lib/flowControl';
 	import { fontSize } from '$lib/globalStyle';
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
+	import { setUpTooltip } from '@/Layout/tooltip.svelte';
+	import HelpIcon from '@icons/HelpIcon.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {{
@@ -14,11 +16,12 @@
 	 * maxWidth?: number,
 	 * minWidth?: number,
 	 * hue: number,
+	 * labelTooltip: string,
 	 * style?: string,
 	 * label: string,
 	 * transition?: string,
 	 * selectionFunctions?: import('@/Cards/selectionFunction').SelectionFunctions}} */
-	let { selectionFunctions = $bindable(), ...props } = $props();
+	let { selectionFunctions = $bindable(), labelTooltip = '', ...props } = $props();
 	/**@type {HTMLElement}*/
 	let selection;
 
@@ -100,6 +103,11 @@
 			id="label-{props.cardId}"
 			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}px;"
 		>
+			{#if labelTooltip}
+				<div class="help" use:setUpTooltip={{ text: labelTooltip, id: 0, hue: props.hue }}>
+					<HelpIcon color="white"></HelpIcon>
+				</div>
+			{/if}
 			{props.label}
 		</div>
 	</div>
@@ -112,6 +120,22 @@
 		padding: 5px 10px;
 		margin: 5px;
 		color: white;
+		position: relative;
+	}
+
+	.help {
+		position: absolute;
+		top: 100%;
+		left: 100%;
+		transform: translate(-12px, -11px);
+		display: flex;
+		background: hsl(200, 0%, 40%);
+		border-radius: 5px;
+		opacity: 50%;
+		transition: opacity 0.5s;
+	}
+	.help:hover {
+		opacity: 100%;
 	}
 
 	.card-wrapper {

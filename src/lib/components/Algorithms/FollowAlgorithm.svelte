@@ -136,6 +136,7 @@
 			set={firstSet}
 			hue={colors.blue}
 			label={'first set'}
+			labelTooltip="first set é o conjunto usado para pegar os terminais iniciais gerados por um não-terminal. Dado um símbolo não-terminal seguido de outro não-terminal, o first do não-terminal à frente é adicionado ao follow do não-terminal anterior"
 			bind:svgLines
 		></SetsCard>
 		<SetsCard
@@ -144,11 +145,13 @@
 			set={joinSet}
 			hue={colors.blue}
 			label={'join set'}
+			labelTooltip="join set é o conjunto usado para guardar a informação de quais conjuntos follow devem ser mesclados"
 			bind:this={joinSetElement}
 			bind:svgLines
 		></SetsCard>
 		<StackCard
 			{id}
+			labelTooltip="join stack é a pilha usada para processar os conjuntos join dos símbolos não terminais mesclando os seus conjuntos follow"
 			stack={joinStack}
 			stackId={elemIds.joinStack}
 			label="join stack"

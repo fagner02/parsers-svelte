@@ -34,8 +34,10 @@
 		let srcElem = document.querySelector(srcId);
 		let destElem = document.querySelector(destId);
 
-		if (srcElem === null || destElem === null)
+		if (srcElem === null || destElem === null) {
+			console.error(srcElem, srcId);
 			return { srcPos: null, destPos: null, dirx: 1, diry: 1, d: 1 };
+		}
 
 		let srcElemRect = /**@type {DOMRect}*/ (srcElem.getBoundingClientRect());
 		let destElemRect = /**@type {DOMRect}*/ (destElem.getBoundingClientRect());
@@ -99,6 +101,7 @@
 	export async function showLine(srcId, destId, id) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				if (!srcId || !destId) return resolve(null);
 				if (!srcId.startsWith('#')) {
 					srcId = '#' + srcId;
 				}
@@ -114,7 +117,6 @@
 					if (li && li.animations.length > 0) anime.remove(li.animations[0].animatable.target);
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 				}
-
 				let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
 				if (destPos === null || srcPos === null) return resolve(null);
 
@@ -143,7 +145,7 @@
 				await wait(id, 500);
 
 				inter = setInterval(() => {
-					if (li === null || an === null) return resolve(null);
+					if (li === null || an === null || !srcId || !destId) return resolve(null);
 					let { srcPos, destPos, dirx, diry, d } = calcPos(_srcId, _destId);
 					if (destPos === null || srcPos === null) {
 						if (inter) window.clearInterval(inter);
@@ -194,6 +196,7 @@
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 					window.clearInterval(inter);
 				}
+				if (!_srcId || !_destId) return;
 				const { srcPos, destPos } = calcPos(_srcId, _destId);
 				if (destPos === null || srcPos === null) return resolve(null);
 

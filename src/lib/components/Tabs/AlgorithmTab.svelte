@@ -177,7 +177,7 @@
 					<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ id: 0, text: 'Analisar string de entrada' }}
+					use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Analisar string de entrada' }}
 					class="view-button"
 					onclick={() => {
 						currentId = id;
@@ -193,7 +193,7 @@
 					<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
 				</button>
 				<button
-					use:setUpTooltip={{ id: 0, text: 'Executar construção do parser' }}
+					use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Executar construção do parser' }}
 					class="view-button"
 					onclick={() => {
 						parseOn = false;

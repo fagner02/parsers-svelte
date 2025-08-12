@@ -11,12 +11,22 @@
 	 * svgLines?: import('@/Structures/SvgLines.svelte').default | null,
 	 * hue: any,
 	 * label: any,
+	 * labelTooltip?: string,
 	 * convert?: {
 	 * left?: (value: any)=> string,
 	 * right?: (value: any)=> string,
 	 * noteLeft?: (value: any)=>string,
 	 * noteRight?: (value: any)=> string}}} */
-	let { id, set = $bindable(), setId, svgLines = $bindable(), hue, label, convert = {} } = $props();
+	let {
+		id,
+		set = $bindable(),
+		setId,
+		labelTooltip = '',
+		svgLines = $bindable(),
+		hue,
+		label,
+		convert = {}
+	} = $props();
 
 	if (!convert.left) convert.left = (value) => value;
 	if (!convert.right) convert.right = (value) => value;
@@ -160,6 +170,7 @@
 </script>
 
 <CardWrapper
+	{labelTooltip}
 	{id}
 	minWidth={charWidth}
 	minHeight={lineHeight}

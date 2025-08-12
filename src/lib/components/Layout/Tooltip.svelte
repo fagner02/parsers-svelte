@@ -1,6 +1,7 @@
 <script>
 	import { fontSize } from '$lib/globalStyle';
-	import { registerTooltipGroup } from './tooltip.svelte';
+	import CloseIcon from '@icons/CloseIcon.svelte';
+	import { hideTooltip, registerTooltipGroup } from './tooltip.svelte';
 
 	let { groupId } = $props();
 
@@ -8,6 +9,16 @@
 </script>
 
 <div class="tooltip" id="tooltip-{groupId}" style="font-size: {fontSize}px">
+	{#if groupId === 1}
+		<button
+			style="border-radius: 5px;background: hsl(0,0%,30%);padding: 2px;top:-8px;left:-8px;"
+			onclick={() => {
+				hideTooltip(groupId);
+			}}
+		>
+			<CloseIcon size={12} color="white"></CloseIcon>
+		</button>
+	{/if}
 	<span id="tooltip"></span>
 
 	<svg class="arrow" width="54" height="48" viewBox="0 0 54 48" xmlns="http://www.w3.org/2000/svg">
@@ -32,6 +43,16 @@
 		border: 2px solid hsl(var(--hue), 50%, 30%);
 		max-width: 250px;
 		display: flex;
+	}
+	button {
+		position: absolute;
+		pointer-events: all;
+		display: flex;
+		border-radius: 5px;
+		background: hsl(350, 0%, 35%);
+		padding: 2px;
+		top: -8px;
+		left: -8px;
 	}
 	.tooltip > span {
 		text-align: center;

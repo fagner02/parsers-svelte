@@ -16,6 +16,7 @@
 	 * highlighted?: boolean,
 	 * reversed?: boolean,
 	 * stackId: string,
+	 * labelTooltip?: string,
 	 * svgLines: import('@/Structures/SvgLines.svelte').default
 	 * horizontal?: boolean }}*/
 	let {
@@ -27,7 +28,8 @@
 		highlighted = true,
 		reversed = true,
 		stackId,
-		svgLines = $bindable()
+		svgLines = $bindable(),
+		labelTooltip = ''
 	} = $props();
 	let idCount = 0;
 
@@ -195,6 +197,7 @@
 </script>
 
 <CardWrapper
+	{labelTooltip}
 	style={horizontal ? 'flex-direction: row; gap: 8px' : ''}
 	{id}
 	minHeight={lineHeight}

@@ -7,6 +7,7 @@
 	/** @type {{
 	 * id: string,
 	 * label: any,
+	 * labelTooltip?: string,
 	 * hue: any,
 	 * columns: Array<string>,
 	 * rows: Array<string>,
@@ -17,6 +18,7 @@
 	let {
 		id,
 		label,
+		labelTooltip = '',
 		hue,
 		columns,
 		rows,
@@ -173,6 +175,7 @@
 </script>
 
 <CardWrapper
+	{labelTooltip}
 	minHeight={lineHeight}
 	minWidth={charWidth}
 	{hue}

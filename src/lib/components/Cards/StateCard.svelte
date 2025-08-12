@@ -20,10 +20,20 @@
 	 * state: import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>,
 	 * hue: number,
 	 * label: string,
+	 * labelTooltip?: string,
 	 * stateId: string,
 	 * svgLines: SvgLines | undefined,
 	 * stateName: string}} */
-	let { id, state: cardState, hue, label, stateId, svgLines = $bindable(), ...props } = $props();
+	let {
+		id,
+		state: cardState,
+		hue,
+		label,
+		labelTooltip = '',
+		stateId,
+		svgLines = $bindable(),
+		...props
+	} = $props();
 
 	/**
 	 * @param {number} ruleIndex
@@ -195,6 +205,7 @@
 </script>
 
 <CardWrapper
+	{labelTooltip}
 	bind:selectionFunctions
 	{id}
 	minWidth={charWidth}
