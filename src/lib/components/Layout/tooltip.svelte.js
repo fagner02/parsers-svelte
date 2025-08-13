@@ -33,6 +33,7 @@ export function resetTooltips(step, functionCalls) {
 			setUpTooltip(item.args[0], item.args[1]);
 		}
 	}
+	hideTooltip(1);
 }
 
 /**

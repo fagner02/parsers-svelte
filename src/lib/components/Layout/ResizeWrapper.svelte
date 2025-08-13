@@ -106,6 +106,18 @@
 		interaction.attachMoveListeners();
 	}
 
+	/**@param {MouseEvent | TouchEvent} e*/
+	function onMove(e) {
+		appendData(`move float, start;${props.id}`);
+		selected = 'move';
+		removeCallback?.();
+		interaction.removeTransformListeners();
+		interaction.moveStart(e, () => {
+			selected = 'grab';
+			interaction.attachTransformListeners();
+		});
+	}
+
 	onMount(() => {
 		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
 
@@ -157,16 +169,8 @@
 		<button
 			use:setUpTooltip={{ id: 0, text: 'Mover janela flutuante' }}
 			style="cursor: move;{selected == 'move' ? 'filter: brightness(0.6);' : ''}"
-			onmousedown={(/**@type {MouseEvent}*/ e) => {
-				appendData(`move float, start;${props.id}`);
-				selected = 'move';
-				removeCallback?.();
-				interaction.removeTransformListeners();
-				interaction.moveStart(e, () => {
-					selected = 'grab';
-					interaction.attachTransformListeners();
-				});
-			}}
+			onmousedown={onMove}
+			ontouchstart={onMove}
 		>
 			<MoveIcon></MoveIcon></button
 		>

@@ -124,6 +124,7 @@ export class Interaction {
 		};
 		document.ontouchend = (e) => {
 			this.moveEnd(e);
+			moveEndCallback?.();
 		};
 		document.ontouchcancel = (e) => {
 			this.moveEnd(e);
