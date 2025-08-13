@@ -85,6 +85,9 @@
 		document.onmousemove = null;
 		document.onmouseleave = null;
 		document.onmouseup = null;
+		document.ontouchend = null;
+		document.ontouchcancel = null;
+		document.ontouchmove = null;
 	}
 	export function reset() {
 		nodes = [];
@@ -209,6 +212,9 @@
 				document.onmousemove = move;
 				document.onmouseup = endMove;
 				document.onmouseleave = endMove;
+				document.ontouchmove = move;
+				document.ontouchend = endMove;
+				document.ontouchcancel = endMove;
 			};
 			res.addEventListener('mousedown', startMove);
 			res.addEventListener('touchstart', startMove);
