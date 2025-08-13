@@ -25,15 +25,19 @@
 			answers.set(elem.name, { filled: false, req: !elem.getAttribute('data-optional') });
 		}
 		if (elem.type === 'checkbox' || elem.type === 'radio') {
+			let empty = true;
 			/**@type {NodeListOf<HTMLInputElement>}*/ (
 				document.querySelectorAll(`input[name="${elem.name}"]`)
 			).forEach((x) => {
 				if (x.checked) {
 					localStorage.setItem('vansi-form-prof' + x.id, x.value);
+					empty = false;
 				} else {
 					localStorage.removeItem('vansi-form-prof' + x.id);
 				}
 			});
+			const item = answers.get(elem.name);
+			if (item) item.filled = !empty;
 		} else {
 			localStorage.setItem('vansi-form-prof' + elem.name, elem.value);
 		}
