@@ -15,8 +15,9 @@ import { colors } from '../selectSymbol';
 export let saves = [];
 /**@type {any[]} */
 let symbolsId = [];
-/**@type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/LR1AutomatonAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
+
 export const id = 'lr1automaton';
 export const elemIds = {
 	alphabet: `${id}-alphabet`,
@@ -74,7 +75,7 @@ export function closure(state, rules, nt, firstSet) {
 				name: 'selectSymbol',
 				args: [itemSymbolId, colors.pink, id, false]
 			});
-			symbolsId.push(functionCalls.at(-1).args);
+			symbolsId.push(functionCalls.at(-1)?.args);
 		}
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[4]] });
 		if (!nt.includes(symbol)) {
@@ -129,7 +130,7 @@ export function closure(state, rules, nt, firstSet) {
 					args: [betaId, colors.pink, id, false]
 				});
 
-				symbolsId.push(functionCalls.at(-1).args);
+				symbolsId.push(functionCalls.at(-1)?.args);
 				functionCalls.push({ name: 'highlightLinesClosure', args: [[13]] });
 				if (!nt.includes(beta)) {
 					functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
@@ -251,7 +252,7 @@ export function closure(state, rules, nt, firstSet) {
 				name: 'selectSymbol',
 				args: [ruleId, colors.blue, id, false]
 			});
-			symbolsId.push(functionCalls.at(-1).args);
+			symbolsId.push(functionCalls.at(-1)?.args);
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[27]] });
 			let existent = state.findIndex((x) => x.ruleIndex === rule.index && x.pos === 0);
 
@@ -374,7 +375,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 	let stateStack = [0];
 	functionCalls.push({
 		name: 'addItem',
-		args: [0, 0, new Set(['$']), `${id}gl0`]
+		args: [0, 0, new Set(['$']), `${elemIds.grammar}gl0`]
 	});
 
 	/**@type {import('@/types').LR1StateItem[]} */
@@ -457,7 +458,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.originState}-${prodIndex}-${prod.pos}`, colors.pink, id, false]
 				});
-				symbolsId.push(functionCalls.at(-1).args);
+				symbolsId.push(functionCalls.at(-1)?.args);
 				functionCalls.push({ name: 'highlightLines', args: [[11]] });
 				let existent = state1.findIndex(
 					(x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1

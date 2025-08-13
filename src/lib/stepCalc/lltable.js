@@ -8,8 +8,9 @@ export const elemIds = {
 	followSet: `${id}-followSet`,
 	joinStack: `${id}-joinStack`
 };
-/**@type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/LLTableAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
+
 /**
  * @type {{
  * table: Map<string, Map<string, number>>,
@@ -72,9 +73,9 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 			firstSelected.push(`${elemIds.firstSet}r${left}-0`);
 			functionCalls.push({
 				name: 'selectSymbol',
-				args: [firstSelected.at(-1), colors.green, id, false]
+				args: [firstSelected.at(-1) ?? '', colors.green, id, false]
 			});
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
 			let followIndex = followSet.keys().toArray().indexOf(rules[left].left);
 			let followIndex2 = 0;
 			const followItems = followSet.get(rules[left].left) ?? new Set();
@@ -85,10 +86,10 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 				followSelected.push(`${elemIds.firstSet}r${followIndex}-${followIndex2}`);
 				functionCalls.push({
 					name: 'selectSymbol',
-					args: [followSelected.at(-1), colors.green, id, false]
+					args: [followSelected.at(-1) ?? '', colors.green, id, false]
 				});
 
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				functionCalls.push({ name: 'highlightLines', args: [[5]] });
 
 				let cell = table.get(rules[left].left)?.get(followItem);
@@ -160,9 +161,9 @@ export function lltable(rules, nt, t, firstSet, followSet) {
 			firstSelected.push(`${elemIds.firstSet}r${left}-${j}`);
 			functionCalls.push({
 				name: 'selectSymbol',
-				args: [firstSelected.at(-1), colors.green, id, false]
+				args: [firstSelected.at(-1) ?? '', colors.green, id, false]
 			});
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
 
 			let cell = table.get(rules[left].left)?.get(symbol);
 			if (cell !== undefined && cell !== -1) {

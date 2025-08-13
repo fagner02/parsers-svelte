@@ -41,7 +41,7 @@
 		followSet
 	} = $props();
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
 		deselectSymbol: () => deselectSymbol,

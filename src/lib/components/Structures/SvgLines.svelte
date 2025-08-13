@@ -35,7 +35,7 @@
 		let destElem = document.querySelector(destId);
 
 		if (srcElem === null || destElem === null) {
-			console.error(srcElem, srcId);
+			console.error(`${srcId}, ${destId}, ${srcElem}, ${destElem}`);
 			return { srcPos: null, destPos: null, dirx: 1, diry: 1, d: 1 };
 		}
 

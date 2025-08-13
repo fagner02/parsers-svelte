@@ -46,7 +46,7 @@
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
 		deselectSymbol: () => deselectSymbol,

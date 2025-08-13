@@ -48,7 +48,7 @@
 		tree.loadSyntaxTree(save.tree, startingSymbol);
 	}
 
-	const obj = {
+	export const obj = {
 		highlightLines: () => codeCard?.highlightLines,
 		addToStackSymbols: () => symbolStackElement.addToStack,
 		removeFromStackSymbols: () => symbolStackElement.removeFromStack,

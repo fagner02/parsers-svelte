@@ -53,7 +53,7 @@
 		tree.loadFloatingTree(save.tree);
 	}
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		addFloatingNode: () => tree.addFloatingNode,
 		addParent: () => tree.addParent,

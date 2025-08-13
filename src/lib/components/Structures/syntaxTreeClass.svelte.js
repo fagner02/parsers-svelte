@@ -500,7 +500,7 @@ export class SyntaxTreeClass {
 	 * @param {string} parentData
 	 * @param {boolean} shouldWait
 	 */
-	async addToTree(data, parentData, shouldWait) {
+	async addToTree(data, parentData, shouldWait = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const parent = /**@type {import('@/types').node}*/ (this.findNode(parentData));
@@ -560,7 +560,11 @@ export class SyntaxTreeClass {
 		});
 	}
 
-	async initializeTree(/**@type {string}*/ symbol, /**@type {boolean}*/ shouldWait = true) {
+	/**
+	 * @param {string} symbol
+	 * @param {boolean} shouldWait
+	 */
+	async initializeTree(symbol, shouldWait = true) {
 		await this.addToSvg(
 			{
 				level: -1,

@@ -5,7 +5,7 @@ export const elemIds = {
 	table: `${id}-table`,
 	inputStack: `${id}-inputStack`
 };
-/**@type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/CLRParse.svelte").default>['obj']>[]} */
 export let functionCalls = [];
 
 /**

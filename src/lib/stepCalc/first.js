@@ -8,8 +8,9 @@ export const elemIds = {
 	joinStack: `${id}-joinStack`
 };
 
-/**@type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/FirstAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
+
 /**
  * @type {{
  * join: Map<number, Set<number>>,
@@ -90,7 +91,7 @@ export function first(rules, nt) {
 			name: 'selectSymbol',
 			args: [`#${elemIds.grammar}gl${i}`, colors.blue, id]
 		});
-		symbolIds.push(functionCalls.at(-1).args);
+		symbolIds.push(functionCalls.at(-1)?.args);
 		firstSet.set(i, new Set());
 		functionCalls.push({
 			name: 'addSetRow',
@@ -126,7 +127,7 @@ export function first(rules, nt) {
 					args: [`${elemIds.grammar}gr${i}-${j}`, colors.blue, id, false]
 				});
 
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				const matchingRules = rules.filter((x) => x.left === symbol);
 				for (let rule of matchingRules) {
 					functionCalls.push({ name: 'highlightLines', args: [[8]] });
@@ -147,7 +148,7 @@ export function first(rules, nt) {
 					name: 'selectSymbol',
 					args: [`${elemIds.grammar}gr${i}-${j}`, colors.green, id, false]
 				});
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				functionCalls.push({
 					name: 'joinSets',
 					args: [[symbol], i, `${elemIds.grammar}gr${i}-${j}`]
@@ -181,7 +182,7 @@ export function first(rules, nt) {
 					args: [`${elemIds.grammar}gr${i}-0`, colors.green, id, false]
 				});
 
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 			}
 			functionCalls.push({
 				name: 'joinSets',

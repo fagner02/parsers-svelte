@@ -1,4 +1,3 @@
-import { showTooltip } from '@/Layout/tooltip.svelte';
 import { colors } from '../selectSymbol';
 
 export const id = 'follow';
@@ -11,8 +10,9 @@ export const elemIds = {
 	joinStack: `${id}-joinStack`
 };
 
-/**@type {{name: string, args: any[], skip?:boolean}[]} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/FollowAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
+
 /**
  * @type {{
  * follow: Map<string, Set<string>>,

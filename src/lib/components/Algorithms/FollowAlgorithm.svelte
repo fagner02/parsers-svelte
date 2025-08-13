@@ -14,13 +14,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
-	import {
-		hideTooltip,
-		removeTooltip,
-		resetTooltips,
-		setUpTooltip,
-		showTooltip
-	} from '@/Layout/tooltip.svelte';
+	import { hideTooltip, resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {SetsCard | undefined}*/
 	let followSetElement = $state();
@@ -70,7 +64,7 @@
 		resetTooltips(save.functionCall, functionCalls);
 	}
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		selectSymbol: () => selectSymbol,
 		highlightLines: () => codeCard?.highlightLines,

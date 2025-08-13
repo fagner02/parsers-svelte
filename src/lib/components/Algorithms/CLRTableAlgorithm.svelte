@@ -24,8 +24,7 @@
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
-	/** @type {{
-	 * automaton: import('@/types').LR1Automaton}} */
+	/** @type {{ automaton: import('@/types').LR1Automaton}} */
 	let { automaton } = $props();
 	let { alphabet } = getAugGrammar();
 
@@ -72,7 +71,7 @@
 		resetAllSymbols(id, save.symbolIds);
 	}
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		highlightLines: () => codeCard?.highlightLines,
 		selectForStack: () => stateStackSelection?.selectFor,

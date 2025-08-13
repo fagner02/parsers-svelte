@@ -11,7 +11,7 @@ export const elemIds = {
 	automaton: `${id}-automaton`
 };
 
-/** @type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/LR0AutomatonAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
 /**
  * @type {{
@@ -83,12 +83,12 @@ export function closure(state, rules, nt) {
 				name: 'selectSymbol',
 				args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
 			});
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
 
 			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 			functionCalls.push({
 				name: 'addItemTarget',
-				args: [rule.index, 0, `${elemIds.grammar}gl${rule.index}`]
+				args: [rule.index, 0, null, `${elemIds.grammar}gl${rule.index}`]
 			});
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
 			itemsToCheck.push(state.length - 1);
@@ -152,7 +152,7 @@ export function lr0Automaton(rules, nt, t) {
 	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	functionCalls.push({
 		name: 'addItemTarget',
-		args: [0, 0, null, `${id}gl0`]
+		args: [0, 0, null, `${elemIds.grammar}gl0`]
 	});
 	/**@type {import('@/types').LR0StateItem[]} */
 	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: null }];
@@ -240,7 +240,7 @@ export function lr0Automaton(rules, nt, t) {
 					args: [symbolId, colors.pink, id, false]
 				});
 
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				functionCalls.push({ name: 'highlightLines', args: [[14]] });
 				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) {
 					functionCalls.push({ name: 'highlightLines', args: [[15]] });

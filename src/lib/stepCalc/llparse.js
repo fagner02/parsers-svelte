@@ -5,8 +5,9 @@ export const elemIds = {
 	states: `${id}-states`,
 	table: `${id}-table`
 };
-/**@type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/LLParse.svelte").default>['obj']>[]} */
 export let functionCalls = [];
+
 /**
  * @type {{
  * symbolStack: string[],

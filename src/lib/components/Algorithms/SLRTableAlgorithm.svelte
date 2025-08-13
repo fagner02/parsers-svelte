@@ -87,7 +87,7 @@
 		resetAllSymbols(id, save.symbolIds);
 	}
 
-	const obj = {
+	export const obj = {
 		highlightLines: () => codeCard?.highlightLines,
 		addToTable: () => tableElem?.addToTable,
 		selectForStack: () => stackSelection?.selectFor,

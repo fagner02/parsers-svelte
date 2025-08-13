@@ -7,7 +7,21 @@
  * id: number
  * }} StackItem<T>
  */
+/**
+ * @template {{ [K in keyof any]: () => (...args: any) => any }} T
+ * @typedef {{
+ *   [K in keyof T]: {
+ *     name: K,
+ *     args: Parameters<ReturnType<T[K]>>,
+ * 	   skip?: boolean
+ *   }
+ * }} CommandMap
+ */
 
+/**
+ * @template {{ [K in keyof any]: () => (...args: any) => any }} T
+ * @typedef {CommandMap<T>[keyof CommandMap<T>]} Command<T>
+ */
 /**
  * @typedef {{value: string, note: string, opacity: number, hide: boolean}} SetItem
  */

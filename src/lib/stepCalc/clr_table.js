@@ -9,7 +9,7 @@ export let elemIds = {
 	table: `${id}-table`
 };
 
-/** @type {any} */
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/CLRTableAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
 
 /**
@@ -145,7 +145,7 @@ export function clrTable(automaton, rules, nt, t) {
 				name: 'selectSymbol',
 				args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 			});
-			symbolIds.push(functionCalls.at(-1).args);
+			symbolIds.push(functionCalls.at(-1)?.args);
 			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 
 			let transition = automaton.transitions.get(s.index)?.get(currentSymbol);

@@ -21,7 +21,7 @@ export let elemIds = {
  * functionCall: number }[]}
  * */
 export let saves = [];
-/** @type {any}*/
+/** @type {import("@/types").Command<ReturnType<typeof import("@/Algorithms/SLRTableAlgorithm.svelte").default>['obj']>[]} */
 export let functionCalls = [];
 
 /**
@@ -187,7 +187,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 				});
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				table.get(s.index)?.set(currentSymbol, `g${transition}`);
 				functionCalls.push({
 					name: 'highlightOn',
@@ -221,7 +221,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 					name: 'selectSymbol',
 					args: [`state-${elemIds.state}-${index}-${item.pos}`, colors.pink, id, false]
 				});
-				symbolIds.push(functionCalls.at(-1).args);
+				symbolIds.push(functionCalls.at(-1)?.args);
 				table.get(s.index)?.set(currentSymbol, `s${transition}`);
 				functionCalls.push({
 					name: 'highlightOn',

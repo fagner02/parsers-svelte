@@ -72,9 +72,7 @@
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let grammarSelection;
 
-	/**
-	 * @param {typeof saves[0]} save
-	 */
+	/** @param {typeof saves[0]} save */
 	function setStepCallback(save) {
 		symbolsSelection.hideSelect();
 		originStateSelection.hideSelect();
@@ -90,7 +88,7 @@
 		resetAllSymbols(id, save.symbolIds);
 	}
 
-	const obj = {
+	export const obj = {
 		addPause: () => addPause,
 		highlightLinesClosure: () => closureCodeCard?.highlightLines,
 		highlightLines: () => codeCard?.highlightLines,
