@@ -15,6 +15,18 @@ export function getPlatform() {
 	return platforms.mobile;
 }
 
+export function getDeviceType() {
+	const ua = navigator.userAgent;
+	const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+	const isTablet =
+		/(iPad|Android(?!.*Mobile))/i.test(ua) ||
+		(screen.width <= 1024 && screen.height <= 768 && 'ontouchstart' in window);
+
+	if (isTablet) return 'tablet';
+	if (isMobile) return 'mobile';
+	return 'desktop';
+}
+
 /** @type {Array<import('@/types').GrammarItem>} */
 let rules = [];
 /** @type {Array<string>}*/
