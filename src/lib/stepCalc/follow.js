@@ -546,11 +546,18 @@ export function follow(rules, nt, firstSet) {
 					name: 'showTooltip',
 					args: [
 						`label-${elemIds.join}`,
-						`O conjunto join de '${topValue}' ainda não está vazio, é preciso processá-lo antes de mesclar seu follow ao de '${topKey}' por isso adicionamos '${topValue}' à join stack`,
+						`O conjunto join de '${topValue}' ainda não está vazio, é preciso processá-lo antes de mesclar seu follow ao de '${topKey}', por isso adicionamos '${topValue}' à join stack`,
 						colors.blue,
 						1
 					]
 				});
+
+				functionCalls.push({
+					name: 'selectSymbol',
+					args: [`${elemIds.join}r${joinIndexes.get(topKey)}-${0}`, colors.orange, id]
+				});
+
+				symbolIds.push(functionCalls.at(-1)?.args);
 				joinStack.push(topValue);
 				addedToStack.push(item);
 				functionCalls.push({

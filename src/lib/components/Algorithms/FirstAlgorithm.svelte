@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { removeTooltip, resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -48,6 +49,8 @@
 
 	export const obj = {
 		addPause: () => addPause,
+		showTooltip: () => showTooltip,
+		setUpTooltip: () => setUpTooltip,
 		selectSymbol: () => selectSymbol,
 		deselectSymbol: () => deselectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
@@ -70,6 +73,7 @@
 		joinSetElement?.loadSets(save.join);
 		firstSetElement?.loadSets(save.first);
 		resetAllSymbols(id, save.symbolIds);
+		resetTooltips(save.functionCall, functionCalls);
 	}
 	let stepExecution = new StepExecution(
 		saves,
@@ -105,6 +109,7 @@
 			}}
 			hue={colors.blue}
 			label={'first set'}
+			labelTooltip="first set é o conjunto de terminais iniciais gerados por um não terminal. Como é necessário saber o número da regra da grámatica para a construção da tabela LL(1) o conjunto first aqui é separado pelos números das regras e não pelos símbolos."
 			bind:this={firstSetElement}
 			bind:svgLines
 			{id}

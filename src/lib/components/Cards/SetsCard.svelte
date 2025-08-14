@@ -203,8 +203,10 @@
 							&#x03B5;
 						{:else}
 							{convert.right?.(text)}
-						{/if}{#if ri < item.right.length - 1},{/if}
-					</span>
+						{/if}
+					</span>{#if ri < item.right.length - 1}<span in:setItemIn={{ duration: 500, delay: 0 }}
+							>,</span
+						>{/if}
 				{/each}
 
 				<span in:setItemIn={{ duration: 500, delay: 200 }}>{'}'}</span>

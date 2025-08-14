@@ -71,7 +71,7 @@ export async function showTooltip(e, text, hue, groupId) {
 	if (tooltip.activeTooltip !== id) return;
 
 	tooltipElem.style.opacity = '1';
-	tooltipText.innerText = text;
+	tooltipText.innerHTML = text;
 
 	if (!e) return;
 	if (typeof e === 'string') e = /**@type {HTMLElement}*/ (document.querySelector('#' + e));
