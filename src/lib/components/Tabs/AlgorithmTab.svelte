@@ -137,6 +137,22 @@
 		} catch {}
 	}
 
+	function goToStepSubmit() {
+		const elem = /**@type {HTMLInputElement}*/ (document.querySelector(`input#${tabId}-step`));
+		let step = parseInt(elem.value);
+		if (isNaN(step)) {
+			step = 0;
+		}
+		if (step > maxStep) {
+			step = maxStep;
+		}
+		if (step < 0) {
+			step = 0;
+		}
+		elem.value = step.toString();
+		goToStep(id, step);
+	}
+
 	setCloseInstruction(closeInstruction);
 	setOpenInstruction(openInstruction);
 
@@ -212,26 +228,14 @@
 				<div style="display: flex;gap: 10px;">
 					<button
 						use:setUpTooltip={{ id: 0, text: 'Ir para passo especificado' }}
-						onclick={() => {
-							const elem = /**@type {HTMLInputElement}*/ (
-								document.querySelector(`input#${tabId}-step`)
-							);
-							let step = parseInt(elem.value);
-							if (isNaN(step)) {
-								step = 0;
-							}
-							if (step > maxStep) {
-								step = maxStep;
-							}
-							if (step < 0) {
-								step = 0;
-							}
-							elem.value = step.toString();
-							goToStep(id, step);
-						}}
+						onclick={goToStepSubmit}
 						style="padding: 0 5px;color: white">Ir</button
 					>
 					<input
+						onsubmit={goToStepSubmit}
+						onkeypress={(e) => {
+							if (e.key === 'Enter') goToStepSubmit();
+						}}
 						placeholder="Passo"
 						style="border-radius: 5px; min-width: 50px; padding: 0 5px; outline: none; border: 2px solid hsl(0, 0%, 50%);"
 						type="number"
