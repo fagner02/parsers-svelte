@@ -296,7 +296,7 @@ export async function forward(id) {
 
 	if ((algo.pauseResolves?.size ?? 0) > 0) {
 		resolvePause(id);
-		openInstruction?.();
+		hideTooltip(1);
 		return;
 	}
 

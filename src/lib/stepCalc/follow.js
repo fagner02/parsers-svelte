@@ -95,10 +95,7 @@ export function follow(rules, nt, firstSet) {
 		functionCall: functionCalls.length - 1,
 		symbolIds: structuredClone(symbolIds)
 	});
-	functionCalls.push({
-		name: 'hideTooltip',
-		args: [1]
-	});
+
 	for (let i = 0; i < rules.length; i++) {
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		functionCalls.push({
@@ -205,10 +202,6 @@ export function follow(rules, nt, firstSet) {
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
 				});
-				functionCalls.push({
-					name: 'hideTooltip',
-					args: [1]
-				});
 			}
 
 			functionCalls.push({
@@ -264,10 +257,6 @@ export function follow(rules, nt, firstSet) {
 							functionCall: functionCalls.length - 1,
 							symbolIds: structuredClone(symbolIds)
 						});
-						functionCalls.push({
-							name: 'hideTooltip',
-							args: [1]
-						});
 					}
 					functionCalls.push({
 						name: 'highlightLines',
@@ -303,10 +292,6 @@ export function follow(rules, nt, firstSet) {
 							grammarSelect: `${elemIds.grammar}gset${i}`,
 							functionCall: functionCalls.length - 1,
 							symbolIds: structuredClone(symbolIds)
-						});
-						functionCalls.push({
-							name: 'hideTooltip',
-							args: [1]
 						});
 					}
 					functionCalls.push({
@@ -396,10 +381,6 @@ export function follow(rules, nt, firstSet) {
 								grammarSelect: `${elemIds.grammar}gset${i}`,
 								functionCall: functionCalls.length - 1,
 								symbolIds: structuredClone(symbolIds)
-							});
-							functionCalls.push({
-								name: 'hideTooltip',
-								args: [1]
 							});
 						}
 					}
@@ -537,10 +518,6 @@ export function follow(rules, nt, firstSet) {
 			functionCall: functionCalls.length - 1,
 			symbolIds: structuredClone(symbolIds)
 		});
-		functionCalls.push({
-			name: 'hideTooltip',
-			args: [1]
-		});
 
 		while (joinStack.length > 0) {
 			functionCalls.push({
@@ -596,10 +573,7 @@ export function follow(rules, nt, firstSet) {
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
 				});
-				functionCalls.push({
-					name: 'hideTooltip',
-					args: [1]
-				});
+
 				functionCalls.push({
 					name: 'highlightLines',
 					args: [[44]]
@@ -650,10 +624,6 @@ export function follow(rules, nt, firstSet) {
 				functionCall: functionCalls.length - 1,
 				symbolIds: structuredClone(symbolIds)
 			});
-			functionCalls.push({
-				name: 'hideTooltip',
-				args: [1]
-			});
 
 			functionCalls.push({
 				name: 'highlightLines',
@@ -699,10 +669,6 @@ export function follow(rules, nt, firstSet) {
 					grammarSelect: '',
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
-				});
-				functionCalls.push({
-					name: 'hideTooltip',
-					args: [1]
 				});
 			}
 		}
