@@ -1,4 +1,5 @@
 import { noJumpWait } from '$lib/flowControl';
+import { augStartingSymbol, startingSymbol } from '$lib/utils';
 
 export class Tooltip {
 	/**@type {string?} */
@@ -169,3 +170,6 @@ export function setUpTooltip(elem, { id, text, willRemove = false, hue = 200 }) 
 		});
 	}
 }
+
+export const augmentedGrammarTooltip = (/** @type {string} */ algo) =>
+	`Para a construção do analisador sintático ${algo} é necessário uma versão aumentada da gramática, por isso adicionamos a produção ${augStartingSymbol} -> ${startingSymbol}`;

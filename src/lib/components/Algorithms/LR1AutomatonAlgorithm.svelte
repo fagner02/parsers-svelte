@@ -17,6 +17,7 @@
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
+	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -161,7 +162,12 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
+		<GrammarCard
+			{id}
+			labelTooltip={augmentedGrammarTooltip('LR(1)')}
+			cardId={elemIds.grammar}
+			isAugmented={true}
+		></GrammarCard>
 		<SetsCard {id} set={firstSet} label="first" setId={elemIds.firstSet} hue={colors.blue}
 		></SetsCard>
 		<StateCard

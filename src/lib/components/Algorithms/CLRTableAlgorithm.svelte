@@ -16,6 +16,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
 
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
 	let stateElem = /**@type {StateCard | undefined}*/ ($state());
@@ -126,7 +127,12 @@
 			tableId={elemIds.table}
 			bind:this={tableElem}
 		></TableCard>
-		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
+		<GrammarCard
+			isAugmented={true}
+			labelTooltip={augmentedGrammarTooltip('LR(1)')}
+			{id}
+			cardId={elemIds.grammar}
+		></GrammarCard>
 		<StateCard
 			{id}
 			state={clrState}

@@ -18,6 +18,7 @@
 	import { tableCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
+	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {TableCard | undefined}*/
 	let tableElem = $state();
@@ -127,7 +128,12 @@
 		<Automaton {id} bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
+		<GrammarCard
+			labelTooltip={augmentedGrammarTooltip('SLR')}
+			{id}
+			cardId={elemIds.grammar}
+			isAugmented={true}
+		></GrammarCard>
 		<TableCard
 			{id}
 			{rows}

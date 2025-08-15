@@ -15,7 +15,12 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
-	import { resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
+	import {
+		augmentedGrammarTooltip,
+		resetTooltips,
+		setUpTooltip,
+		showTooltip
+	} from '@/Layout/tooltip.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
@@ -154,7 +159,12 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="unit grid">
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
+		<GrammarCard
+			labelTooltip={augmentedGrammarTooltip('SLR')}
+			{id}
+			cardId={elemIds.grammar}
+			isAugmented={true}
+		></GrammarCard>
 		<StateCard
 			{id}
 			state={targetState}
