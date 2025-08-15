@@ -1,3 +1,4 @@
+import { nt, augRules, t } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 /**
@@ -30,11 +31,9 @@ export const elemIds = {
 };
 /**
  * @param {import('@/types').LR1StateItem[]} state
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
  * @param {Map<string, Set<string>>} firstSet
  */
-export function closure(state, rules, nt, firstSet) {
+export function closure(state, firstSet) {
 	functionCalls.push({ name: 'addPause', args: [id] });
 
 	saves.push({
@@ -65,9 +64,9 @@ export function closure(state, rules, nt, firstSet) {
 			args: [`state-${elemIds.targetState}-${index}`]
 		});
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[3]] });
-		let symbol = rules[item.ruleIndex].right[item.pos];
+		let symbol = augRules[item.ruleIndex].right[item.pos];
 		itemSymbolId =
-			item.pos < rules[item.ruleIndex].right.length
+			item.pos < augRules[item.ruleIndex].right.length
 				? `state-${elemIds.targetState}-${index}-${item.pos}`
 				: null;
 		if (itemSymbolId) {
@@ -87,7 +86,7 @@ export function closure(state, rules, nt, firstSet) {
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
 		let lookahead = new Set();
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
-		if (rules[item.ruleIndex].right.length - 1 === item.pos) {
+		if (augRules[item.ruleIndex].right.length - 1 === item.pos) {
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
 			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
 			for (let l of item.lookahead) {
@@ -121,9 +120,9 @@ export function closure(state, rules, nt, firstSet) {
 			 * @type {string | null}
 			 */
 			let betaId = null;
-			for (let i = 1; item.pos + i < rules[item.ruleIndex].right.length; i++) {
+			for (let i = 1; item.pos + i < augRules[item.ruleIndex].right.length; i++) {
 				functionCalls.push({ name: 'highlightLinesClosure', args: [[12]] });
-				let beta = rules[item.ruleIndex].right[item.pos + i];
+				let beta = augRules[item.ruleIndex].right[item.pos + i];
 				betaId = `state-${elemIds.targetState}-${index}-${item.pos + i}`;
 				functionCalls.push({
 					name: 'selectSymbol',
@@ -161,7 +160,7 @@ export function closure(state, rules, nt, firstSet) {
 					functionCalls.push({ name: 'highlightLinesClosure', args: [[17]] });
 					functionCalls.push({ name: 'highlightLinesClosure', args: [[18]] });
 					functionCalls.push({ name: 'highlightLinesClosure', args: [[19]] });
-					let firstIndex = rules.findIndex((x) => x.left === beta);
+					let firstIndex = augRules.findIndex((x) => x.left === beta);
 					let first = [.../**@type {Set<string>}*/ (firstSet.get(beta))];
 
 					for (let [i, l] of first.filter((x) => x !== '').entries()) {
@@ -236,7 +235,7 @@ export function closure(state, rules, nt, firstSet) {
 				});
 			}
 		}
-		for (let rule of rules) {
+		for (let rule of augRules) {
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[25]] });
 			functionCalls.push({
 				name: 'selectForGrammar',
@@ -345,12 +344,9 @@ export function closure(state, rules, nt, firstSet) {
 }
 
 /**
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
- * @param {string[]} t
  * @param {Map<string,Set<string>>} firstSet
  */
-export function lr1Automaton(rules, nt, t, firstSet) {
+export function lr1Automaton(firstSet) {
 	functionCalls = [];
 	saves = [];
 	symbolsId = [];
@@ -383,7 +379,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 
 	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 
-	closure(state0, rules, nt, firstSet);
+	closure(state0, firstSet);
 
 	functionCalls.push({ name: 'highlightLines', args: [[3]] });
 	functionCalls.push({ name: 'originStateName', args: ['s0'] });
@@ -446,8 +442,8 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 				});
 				functionCalls.push({ name: 'highlightLines', args: [[10]] });
 				if (
-					prod.pos >= rules[prod.ruleIndex].right.length ||
-					rules[prod.ruleIndex].right[prod.pos] !== symbol
+					prod.pos >= augRules[prod.ruleIndex].right.length ||
+					augRules[prod.ruleIndex].right[prod.pos] !== symbol
 				)
 					continue;
 				functionCalls.push({
@@ -504,7 +500,7 @@ export function lr1Automaton(rules, nt, t, firstSet) {
 			functionCalls.push({ name: 'hideSelectOriginal', args: [] });
 			functionCalls.push({ name: 'highlightLines', args: [[12]] });
 			if (state1.length === 0) continue;
-			closure(state1, rules, nt, firstSet);
+			closure(state1, firstSet);
 			let existent = automaton.states.findIndex((x) => {
 				if (x.items.length != state1.length) return false;
 				let eq = true;

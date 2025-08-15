@@ -1,6 +1,6 @@
 <script>
 	import { swapAlgorithm } from '$lib/flowControl';
-	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
+	import { augRules, isGrammarLoaded, nt } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR0AutomatonAlgorithm from '@/Algorithms/LR0AutomatonAlgorithm.svelte';
@@ -62,10 +62,9 @@
 
 	(() => {
 		if (!isGrammarLoaded()) return;
-		const { augRules, nt, t } = getAugGrammar();
-		const _follow = followDataOnly(augRules, nt, firstDataOnly(augRules, nt));
-		const _automaton = lr0Automaton(augRules, nt, t);
-		const _table = slrTable(_automaton.automaton, augRules, nt, t, _follow.followSet);
+		const _follow = followDataOnly(firstDataOnly(augRules, nt), augRules, nt);
+		const _automaton = lr0Automaton();
+		const _table = slrTable(_automaton.automaton, _follow.followSet);
 
 		tableData = _table.table;
 		automaton = _automaton.automaton;
@@ -79,7 +78,7 @@
 		});
 		results.push({
 			title: 'Autômato LR(0)',
-			content: automatonToString(_automaton.automaton.states, augRules)
+			content: automatonToString(_automaton.automaton.states)
 		});
 		results.push({
 			title: 'Tabela SLR(1)',

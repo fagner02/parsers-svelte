@@ -1,5 +1,5 @@
 <script>
-	import { getAugGrammar, isGrammarLoaded } from '$lib/utils';
+	import { augRules, isGrammarLoaded, nt } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import LR1AutomatonAlgorithm from '@/Algorithms/LR1AutomatonAlgorithm.svelte';
@@ -22,7 +22,6 @@
 	import { clrTable } from '$lib/stepCalc/clr_table';
 
 	let code = '';
-	let { augRules, nt, t } = getAugGrammar();
 	/**@type {{tabId: string}}*/
 	let { tabId } = $props();
 	let tableData = $state(new Map());
@@ -65,8 +64,8 @@
 		if (!isGrammarLoaded()) return;
 		const _first = firstDataOnly(augRules, nt);
 		const _mergedFirst = mergedFirst(_first, augRules);
-		const _automaton = lr1Automaton(augRules, nt, t, _mergedFirst);
-		const _table = clrTable(_automaton.automaton, augRules, nt, t);
+		const _automaton = lr1Automaton(_mergedFirst);
+		const _table = clrTable(_automaton.automaton);
 
 		tableData = _table.table;
 		automaton = _automaton.automaton;
@@ -80,7 +79,7 @@
 		});
 		results.push({
 			title: 'Autômato LR(1)',
-			content: automatonToString(automaton.states, augRules)
+			content: automatonToString(automaton.states)
 		});
 		results.push({
 			title: 'Tabela CLR(1)',
@@ -138,35 +137,31 @@
 	bind:id
 >
 	{#snippet steps()}
-		<FillSize style="max-width: inherit; width: 100%;">
+		<div class="algo-buttons">
+			{#each algos as algo}
+				<button
+					use:setUpTooltip={{ id: 0, text: algo.desc }}
+					disabled={selectedAlgorithm === algo.name}
+					onclick={() => {
+						id = algo.id;
+						algo.loaded = true;
+						swapAlgorithm(id, algo.infoComp, tabId);
+						resetSelectionFunctions();
+						appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
+						selectedAlgorithm = algo.name;
+					}}>{algo.name}</button
+				>
+			{/each}
+		</div>
+		<FillSize class="grid">
 			{#snippet content()}
-				<div class="algo-buttons">
-					{#each algos as algo}
-						<button
-							use:setUpTooltip={{ id: 0, text: algo.desc }}
-							disabled={selectedAlgorithm === algo.name}
-							onclick={() => {
-								id = algo.id;
-								algo.loaded = true;
-								swapAlgorithm(id, algo.infoComp, tabId);
-								resetSelectionFunctions();
-								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
-								selectedAlgorithm = algo.name;
-							}}>{algo.name}</button
-						>
-					{/each}
-				</div>
-				<FillSize class="grid">
-					{#snippet content()}
-						{#each algos as algo}
-							{#if algo.loaded}
-								<div class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}">
-									<algo.comp {automaton} {firstSet} />
-								</div>
-							{/if}
-						{/each}
-					{/snippet}
-				</FillSize>
+				{#each algos as algo}
+					{#if algo.loaded}
+						<div class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}">
+							<algo.comp {automaton} {firstSet} />
+						</div>
+					{/if}
+				{/each}
 			{/snippet}
 		</FillSize>
 	{/snippet}

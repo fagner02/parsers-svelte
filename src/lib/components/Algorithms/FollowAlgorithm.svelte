@@ -3,7 +3,7 @@
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/follow';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { colors, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
@@ -27,12 +27,8 @@
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
 
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
-
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
-
-	let { rules } = getGrammar();
 
 	/** @type {import('svelte/store').Writable<Array<import('@/types').SetRow>>}*/
 	let joinSet = writable([]);
@@ -99,18 +95,17 @@
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Follow" bind:this={codeCard} id="follow"></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
 		<SetsCard
 			{id}
 			setId={elemIds.follow}

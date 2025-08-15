@@ -1,3 +1,4 @@
+import { nt, augRules, t } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export const id = 'lr0automaton';
@@ -19,20 +20,29 @@ export let functionCalls = [];
  * originState: import('@/types').LR0StateItem[],
  * originStateName: string,
  * stateStack: number[],
- * symbolIds: any[],
+ * symbolIds: (Parameters<import("../selectSymbol").selectSymbol>)[],
  * automaton: import('@/types').LR0Automaton,
  * functionCall: number}[]}
  * */
 export let saves = [];
-/** @type {any[]}*/
+/** @type {(Parameters<import("../selectSymbol").selectSymbol>)[]}*/
 let symbolIds = [];
 
 /**
+ * @param {import('@/types').LR0StateItem} prod*/
+function prodToString(prod) {
+	let prodStr = `${augRules[prod.ruleIndex].left} -> `;
+	let right = augRules[prod.ruleIndex].right;
+	prodStr +=
+		right.length === 0
+			? '&epsilon;'
+			: right.slice(0, prod.pos).join(' ') + '&bull;' + right.slice(prod.pos).join(' ');
+	return prodStr;
+}
+/**
  * @param {import('@/types').LR0StateItem[]} state
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
  */
-export function closure(state, rules, nt) {
+export function closure(state) {
 	let itemsToCheck = [...state.keys()];
 
 	functionCalls.push({ name: 'highlightLinesClosure', args: [[0]] });
@@ -49,49 +59,18 @@ export function closure(state, rules, nt) {
 		});
 		functionCalls.push({ name: 'highlightLinesClosure', args: [[4]] });
 
-		let symbol = rules[item.ruleIndex].right[item.pos];
-
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[5]] });
-		if (!nt.includes(symbol)) {
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[6]] });
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
+		if (augRules[item.ruleIndex].right.length === item.pos) {
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[5]] });
+			functionCalls.push({
+				name: 'showTooltip',
+				args: [
+					`state-dot-${elemIds.targetState}-${index}`,
+					`O ponto está na última posição da produção ${prodToString(item)} então passamos para a próxima iteração`,
+					colors.pink,
+					1
+				]
+			});
 			itemsToCheck.shift();
-			continue;
-		}
-
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
-		for (let [ruleIndex, rule] of rules.entries()) {
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
-
-			functionCalls.push({
-				name: 'selectForGrammar',
-				args: [`${elemIds.grammar}gset${ruleIndex}`]
-			});
-			if (!(rule.left === symbol)) {
-				functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
-				continue;
-			}
-
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[11]] });
-			if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) {
-				functionCalls.push({ name: 'highlightLinesClosure', args: [[12]] });
-				continue;
-			}
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[13]] });
-			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
-			functionCalls.push({
-				name: 'selectSymbol',
-				args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
-			});
-			symbolIds.push(functionCalls.at(-1)?.args);
-
-			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
-			functionCalls.push({
-				name: 'addItemTarget',
-				args: [rule.index, 0, null, `${elemIds.grammar}gl${rule.index}`]
-			});
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
-			itemsToCheck.push(state.length - 1);
 			functionCalls.push({
 				name: 'addPause',
 				args: [id]
@@ -105,6 +84,126 @@ export function closure(state, rules, nt) {
 				functionCall: functionCalls.length - 1,
 				symbolIds: structuredClone(symbolIds)
 			});
+			continue;
+		}
+		let symbol = augRules[item.ruleIndex].right[item.pos];
+
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[6]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
+		if (!nt.includes(symbol)) {
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
+			itemsToCheck.shift();
+			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
+			functionCalls.push({
+				name: 'selectSymbol',
+				args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
+			});
+			symbolIds.push(functionCalls.at(-1)?.args);
+			functionCalls.push({
+				name: 'showTooltip',
+				args: [
+					`state-${elemIds.targetState}-${index}-${item.pos === augRules[item.ruleIndex].right.length ? item.pos - 1 : item.pos}`,
+					`'${symbol}' é um terminal então passamos para a próxima iteração`,
+					colors.pink,
+					1
+				]
+			});
+			functionCalls.push({
+				name: 'addPause',
+				args: [id]
+			});
+			saves.push({
+				targetState: structuredClone(state),
+				originState: saves[saves.length - 1].originState,
+				originStateName: saves[saves.length - 1].originStateName,
+				stateStack: saves[saves.length - 1].stateStack,
+				automaton: saves[saves.length - 1].automaton,
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
+			});
+			continue;
+		}
+
+		functionCalls.push({ name: 'highlightDotTarget', args: [index] });
+		functionCalls.push({
+			name: 'selectSymbol',
+			args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
+		});
+		symbolIds.push(functionCalls.at(-1)?.args);
+		functionCalls.push({
+			name: 'showTooltip',
+			args: [
+				`label-${elemIds.targetState}`,
+				`'${symbol}' é um não-terminal, por isso adicionamos suas produções ao estado novo`,
+				colors.pink,
+				1
+			]
+		});
+		functionCalls.push({
+			name: 'addPause',
+			args: [id]
+		});
+		saves.push({
+			targetState: structuredClone(state),
+			originState: saves[saves.length - 1].originState,
+			originStateName: saves[saves.length - 1].originStateName,
+			stateStack: saves[saves.length - 1].stateStack,
+			automaton: saves[saves.length - 1].automaton,
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
+		});
+		for (let [ruleIndex, rule] of augRules.entries()) {
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
+
+			functionCalls.push({
+				name: 'selectForGrammar',
+				args: [`${elemIds.grammar}gset${ruleIndex}`]
+			});
+
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[11]] });
+			if (!(rule.left === symbol)) {
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[12]] });
+				continue;
+			}
+
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[13]] });
+			if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) {
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`${elemIds.grammar}gl${ruleIndex}`,
+						`Essa produção da gramática já está no estado novo`,
+						colors.blue,
+						1
+					]
+				});
+				functionCalls.push({
+					name: 'addPause',
+					args: [id]
+				});
+				saves.push({
+					targetState: structuredClone(state),
+					originState: saves[saves.length - 1].originState,
+					originStateName: saves[saves.length - 1].originStateName,
+					stateStack: saves[saves.length - 1].stateStack,
+					automaton: saves[saves.length - 1].automaton,
+					functionCall: functionCalls.length - 1,
+					symbolIds: structuredClone(symbolIds)
+				});
+
+				continue;
+			}
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[15]] });
+
+			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
+			functionCalls.push({
+				name: 'addItemTarget',
+				args: [rule.index, 0, null, `${elemIds.grammar}gl${rule.index}`]
+			});
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[16]] });
+			itemsToCheck.push(state.length - 1);
 		}
 
 		functionCalls.push({ name: 'hideSelectGrammar', args: [] });
@@ -116,7 +215,7 @@ export function closure(state, rules, nt) {
 		});
 
 		symbolIds = symbolIds.filter((x) => x[0] != symbolId);
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[15]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[17]] });
 		itemsToCheck.shift();
 	}
 
@@ -125,12 +224,7 @@ export function closure(state, rules, nt) {
 	return state;
 }
 
-/**
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
- * @param {string[]} t
- */
-export function lr0Automaton(rules, nt, t) {
+export function lr0Automaton() {
 	functionCalls = [];
 	saves = [];
 	symbolIds = [];
@@ -157,7 +251,7 @@ export function lr0Automaton(rules, nt, t) {
 	/**@type {import('@/types').LR0StateItem[]} */
 	let state0 = [{ pos: 0, ruleIndex: 0, lookahead: null }];
 	functionCalls.push({ name: 'highlightLines', args: [[3]] });
-	closure(state0, rules, nt);
+	closure(state0);
 	functionCalls.push({ name: 'highlightLines', args: [[4]] });
 
 	let originStateName = `s${automaton.states.length}`;
@@ -170,6 +264,15 @@ export function lr0Automaton(rules, nt, t) {
 	functionCalls.push({ name: 'highlightLines', args: [[5]] });
 	/**@type {number[]} */
 	let stateStack = [0];
+	functionCalls.push({
+		name: 'showTooltip',
+		args: [
+			`label-${elemIds.stateStack}`,
+			`Não há mais produções para adicionar ao estado novo então o adicionamos a fila de estados novos`,
+			colors.blue,
+			1
+		]
+	});
 	functionCalls.push({
 		name: 'addToStack',
 		args: [0, 's0', '', `state-${elemIds.targetState}-title`]
@@ -190,30 +293,77 @@ export function lr0Automaton(rules, nt, t) {
 		functionCalls.push({ name: 'highlightLines', args: [[6]] });
 		functionCalls.push({
 			name: 'selectForStack',
-			args: [`stack-${elemIds.stateStack}-${stateStack.length - 1}`]
+			args: [`stack-${elemIds.stateStack}-0`]
 		});
 		originStateIndex = stateStack[0];
 		originStateName = `s${automaton.states[stateStack[0]].index}`;
 
 		functionCalls.push({ name: 'resetStateOrigin', args: [true] });
 		functionCalls.push({ name: 'stateName', args: [originStateName] });
+		symbolIds = symbolIds.filter((x) => !x[0].includes(elemIds.originState));
 		functionCalls.push({
 			name: 'loadState',
-			args: [structuredClone(automaton.states[stateStack[0]].items)]
+			args: [
+				structuredClone(automaton.states[stateStack[0]].items),
+				`stack-${elemIds.stateStack}-${stateStack.length - 1}`
+			]
+		});
+		functionCalls.push({
+			name: 'showTooltip',
+			args: [
+				`label-${elemIds.originState}`,
+				`Vamos calcular as possíveis transições para o estado ${originStateName}`,
+				colors.pink,
+				1
+			]
 		});
 		/**@type {string?} */
 		let selectId = null;
+		functionCalls.push({ name: 'addPause', args: [id] });
+		saves.push({
+			targetState: structuredClone(state0),
+			originState: saves[saves.length - 1].originState,
+			originStateName: originStateName,
+			stateStack: structuredClone(stateStack),
+			automaton: structuredClone(automaton),
+			functionCall: functionCalls.length - 1,
+			symbolIds: structuredClone(symbolIds)
+		});
+		/**@type {import('@/types').LR0StateItem[]} */
+		let state1 = [];
 		for (let [symbolIndex, symbol] of alphabet.entries()) {
 			functionCalls.push({ name: 'highlightLines', args: [[7]] });
 
 			selectId = `stack-${elemIds.alphabet}-${symbolIndex}`;
 			functionCalls.push({ name: 'selectForAlphabet', args: [selectId, id] });
+			functionCalls.push({
+				name: 'showTooltip',
+				args: [
+					`label-${elemIds.alphabet}`,
+					`Checamos se há possíveis transições com o símbolo '${symbol}'`,
+					colors.green,
+					1
+				]
+			});
+			functionCalls.push({
+				name: 'addPause',
+				args: [id]
+			});
+			saves.push({
+				targetState: structuredClone(state1),
+				originState: structuredClone(automaton.states[originStateIndex].items),
+				originStateName: originStateName,
+				stateStack: structuredClone(stateStack),
+				automaton: structuredClone(automaton),
+				functionCall: functionCalls.length - 1,
+				symbolIds: structuredClone(symbolIds)
+			});
 			functionCalls.push({ name: 'resetStateTarget', args: [true] });
-			/**@type {import('@/types').LR0StateItem[]} */
-			let state1 = [];
 
+			symbolIds = symbolIds.filter((x) => !x[0].includes(elemIds.targetState));
+			state1 = [];
 			functionCalls.push({ name: 'highlightLines', args: [[8]] });
-			// State transition logic
+
 			for (let [prodIndex, prod] of automaton.states[stateStack[0]].items.entries()) {
 				functionCalls.push({ name: 'highlightLines', args: [[9]] });
 
@@ -223,12 +373,12 @@ export function lr0Automaton(rules, nt, t) {
 				});
 				functionCalls.push({ name: 'highlightLines', args: [[10]] });
 
-				if (rules[prod.ruleIndex].right[prod.pos] !== symbol) {
+				if (augRules[prod.ruleIndex].right[prod.pos] !== symbol) {
 					functionCalls.push({ name: 'highlightLines', args: [[11]] });
 					continue;
 				}
 				functionCalls.push({ name: 'highlightLines', args: [[12]] });
-				if (prod.pos >= rules[prod.ruleIndex].right.length) {
+				if (prod.pos >= augRules[prod.ruleIndex].right.length) {
 					functionCalls.push({ name: 'highlightLines', args: [[13]] });
 					continue;
 				}
@@ -239,10 +389,19 @@ export function lr0Automaton(rules, nt, t) {
 					name: 'selectSymbol',
 					args: [symbolId, colors.pink, id, false]
 				});
-
 				symbolIds.push(functionCalls.at(-1)?.args);
+
 				functionCalls.push({ name: 'highlightLines', args: [[14]] });
 				if (state1.some((x) => x.ruleIndex === prod.ruleIndex && x.pos === prod.pos + 1)) {
+					functionCalls.push({
+						name: 'showTooltip',
+						args: [
+							`state-${elemIds.originState}-${prodIndex}-${prod.pos}`,
+							`Essa produção já existe no estado novo`,
+							colors.pink,
+							1
+						]
+					});
 					functionCalls.push({ name: 'highlightLines', args: [[15]] });
 					functionCalls.push({
 						name: 'deselectSymbol',
@@ -250,8 +409,42 @@ export function lr0Automaton(rules, nt, t) {
 					});
 					symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 					symbolId = null;
+					functionCalls.push({
+						name: 'addPause',
+						args: [id]
+					});
+					saves.push({
+						targetState: structuredClone(state1),
+						originState: structuredClone(automaton.states[originStateIndex].items),
+						originStateName: originStateName,
+						stateStack: structuredClone(stateStack),
+						automaton: structuredClone(automaton),
+						functionCall: functionCalls.length - 1,
+						symbolIds: structuredClone(symbolIds)
+					});
 					continue;
 				}
+
+				functionCalls.push({ name: 'highlightLines', args: [[16]] });
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`label-${elemIds.originState}`,
+						`Adicionamos a produção ${prodToString(prod)} com o ponto movido um passo para frente`,
+						colors.pink,
+						1
+					]
+				});
+				functionCalls.push({
+					name: 'addItemTarget',
+					args: [
+						prod.ruleIndex,
+						prod.pos + 1,
+						null,
+						`state-${elemIds.originState}-${prodIndex}-${prod.pos}`
+					]
+				});
+				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: null });
 				if (symbolId) {
 					functionCalls.push({
 						name: 'deselectSymbol',
@@ -259,15 +452,6 @@ export function lr0Automaton(rules, nt, t) {
 					});
 					symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 				}
-
-				functionCalls.push({ name: 'highlightLines', args: [[16]] });
-
-				functionCalls.push({
-					name: 'addItemTarget',
-					args: [prod.ruleIndex, prod.pos + 1]
-				});
-				state1.push({ ruleIndex: prod.ruleIndex, pos: prod.pos + 1, lookahead: null });
-
 				functionCalls.push({
 					name: 'addPause',
 					args: [id]
@@ -289,7 +473,7 @@ export function lr0Automaton(rules, nt, t) {
 				continue;
 			}
 			functionCalls.push({ name: 'highlightLines', args: [[19]] });
-			closure(state1, rules, nt);
+			closure(state1);
 
 			functionCalls.push({ name: 'highlightLines', args: [[20]] });
 
@@ -329,7 +513,15 @@ export function lr0Automaton(rules, nt, t) {
 				});
 				functionCalls.push({ name: 'highlightLines', args: [[23]] });
 				functionCalls.push({ name: 'highlightLines', args: [[24]] });
-				functionCalls.push({ name: 'hideSelectStack', args: [] });
+				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`label-${elemIds.stateStack}`,
+						`Não há mais produções para adicionar ao estado novo então o adicionamos a fila de estados novos`,
+						colors.blue,
+						1
+					]
+				});
 				functionCalls.push({
 					name: 'addToStack',
 					args: [
@@ -340,10 +532,7 @@ export function lr0Automaton(rules, nt, t) {
 					]
 				});
 				stateStack.push(automaton.states.length - 1);
-				functionCalls.push({
-					name: 'selectForStack',
-					args: [`stack-${elemIds.stateStack}-${stateStack.length - 1}`]
-				});
+
 				automaton.transitions.get(stateStack[0])?.set(symbol, automaton.states.length - 1);
 
 				functionCalls.push({ name: 'highlightLines', args: [[25]] });
@@ -384,8 +573,16 @@ export function lr0Automaton(rules, nt, t) {
 		functionCalls.push({ name: 'hideSelectAlphabet', args: [] });
 
 		functionCalls.push({ name: 'highlightLines', args: [[28]] });
+		functionCalls.push({
+			name: 'showTooltip',
+			args: [
+				`label-${elemIds.stateStack}`,
+				`Todas as transições possíveis para o estado ${originStateName} foram calculadas, por isso retiramos esse estado da pilha de estados novos`,
+				colors.blue,
+				1
+			]
+		});
 		functionCalls.push({ name: 'hideSelectStack', args: [] });
-
 		stateStack.shift();
 		functionCalls.push({ name: 'removeFromStack', args: [0] });
 

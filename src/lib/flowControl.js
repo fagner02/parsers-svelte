@@ -341,7 +341,7 @@ export function back(id) {
  */
 export function reset(id) {
 	const algo = algos.get(id);
-	if (!algo) return;
+	if (!algo || algo.getStep?.() === 0) return;
 
 	appendData(`control flow,reset`);
 

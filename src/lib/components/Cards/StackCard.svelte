@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
 	import CardWrapper from './CardWrapper.svelte';
@@ -58,11 +58,15 @@
 				await wait(id, 10);
 
 				if (srcId) {
-					await svgLines?.showLine(/**@type {string}*/ (srcId), `#stack-${stackId}-0`, id);
+					await svgLines?.showLine(
+						/**@type {string}*/ (srcId),
+						`#stack-${stackId}-${$stack.length - 1}`,
+						id
+					);
 				}
 
 				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(`#stack-${stackId}-${reversed ? 0 : $stack.length - 1}`)
+					document.querySelector(`#stack-${stackId}-${$stack.length - 1}`)
 				);
 				elem.style.height = `${elem.scrollHeight}px`;
 				elem.style.width = `${elem.clientWidth}px`;
@@ -114,11 +118,7 @@
 	export async function removeFromStack(index) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let elem = /**@type {HTMLElement}*/ (
-					document.querySelector(
-						`#stack-${stackId}-${reversed ? $stack.length - 1 - index : index}`
-					)
-				);
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${index}`));
 				elem.style.width = '0px';
 				elem.style.height = '0px';
 				elem.style.opacity = '0';
@@ -139,8 +139,7 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				if ($stack.length === 0) {
-					resolve(null);
-					return;
+					return resolve(null);
 				}
 				let elem = /**@type {HTMLElement?}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 				while (elem) {
@@ -187,18 +186,23 @@
 		let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 		while (elem) {
-			elem.style.height = `${elem.scrollHeight}px`;
-			elem.style.width = `${elem.scrollWidth}px`;
+			// elem.style.height = `${elem.scrollHeight}px`;
+			// elem.style.width = `${elem.scrollWidth}px`;
 			elem.style.opacity = '1';
 			elem.style.top = '0px';
 			elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+			await noJumpWait(0);
 		}
 	});
 </script>
 
 <CardWrapper
 	{labelTooltip}
-	style={horizontal ? 'flex-direction: row; gap: 8px' : ''}
+	style={reversed
+		? 'flex-direction: column-reverse'
+		: horizontal
+			? 'flex-direction: row; gap: 8px'
+			: ''}
 	{id}
 	minHeight={lineHeight}
 	minWidth={charWidth}
@@ -206,7 +210,7 @@
 	{label}
 	cardId={stackId}
 >
-	{#each reversed ? [...$stack].reverse() : $stack as stackItem, index (stackItem.id)}
+	{#each $stack as stackItem, index (stackItem.id)}
 		<p
 			id="stack-{stackId}-{index}"
 			class={`stack-item ${highlighted ? (horizontal ? 'empty' : 'block') : ''}`}

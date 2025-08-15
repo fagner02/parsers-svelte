@@ -1,3 +1,4 @@
+import { nt, rules } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export const id = 'first';
@@ -56,11 +57,7 @@ export function calcNullable(/**@type {import('@/types').GrammarItem[]} */ rules
 	return nullable;
 }
 
-/**
- * @param {Array<import('@/types').GrammarItem>} rules
- * @param {string[]} nt
- */
-export function first(rules, nt) {
+export function first() {
 	/** @type {Map<number, Set<string>>} */
 	let firstSet = new Map();
 	/** @type {Map<number, Set<number>>}*/
@@ -456,7 +453,7 @@ export function first(rules, nt) {
 }
 
 /**
- * @param {Array<import('@/types').GrammarItem>} rules
+ * @param {import("@/types").GrammarItem[]} rules
  * @param {string[]} nt
  */
 export function firstDataOnly(rules, nt) {
@@ -549,7 +546,7 @@ export function firstDataOnly(rules, nt) {
 
 /**
  * @param {Map<number, Set<string>>} first
- * @param {Array<import('@/types').GrammarItem>} rules
+ * @param {import("@/types").GrammarItem[]} rules
  */
 export function mergedFirst(first, rules) {
 	/**@type {Map<string, Set<string>>}*/

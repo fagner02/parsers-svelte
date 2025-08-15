@@ -1,3 +1,5 @@
+import { augRules } from '$lib/utils';
+
 export const id = 'clrparsing';
 export const elemIds = {
 	grammar: `${id}-grammar`,
@@ -21,10 +23,9 @@ export let saves = [];
 
 /**
  * @param {string[]} inputString
- * @param {import('@/types').GrammarItem[]} augRules
  * @param {Map<number, Map<string, string>>} table
  */
-export function clrparsing(inputString, augRules, table) {
+export function clrparsing(inputString, table) {
 	functionCalls = [];
 	saves = [];
 	/**@type {typeof saves[0]['tree']}*/

@@ -11,7 +11,7 @@ let selectedSymbolsMap = new Map();
 
 /**
  * @param {string} id
- * @param {[string, number, string, boolean][]} symbolIds
+ * @param {Parameters<selectSymbol>[]} symbolIds
  */
 export function resetAllSymbols(id, symbolIds) {
 	for (const symbolId of selectedSymbolsMap.get(id) ?? []) {

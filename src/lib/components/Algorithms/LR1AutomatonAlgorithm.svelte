@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getAugGrammar } from '$lib/utils';
+	import { nt, t } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
@@ -39,7 +39,7 @@
 	/** @type {{
 	 * firstSet: import('svelte/store').Writable<import('@/types').SetRow[]>}} */
 	let { firstSet } = $props();
-	let { alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let alphabetStack = writable(
@@ -69,7 +69,6 @@
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let grammarSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
@@ -157,7 +156,6 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
@@ -165,7 +163,7 @@
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 		<SetsCard {id} set={firstSet} label="first" setId={elemIds.firstSet} hue={colors.blue}
 		></SetsCard>
 		<StateCard
@@ -216,7 +214,7 @@
 			horizontal={true}
 		></StackCard>
 	</div>
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode
 			bind:breakpoints={closureBreakpoints}
 			title="Closure LR(1)"

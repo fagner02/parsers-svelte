@@ -43,7 +43,7 @@
 		let destElemRect = /**@type {DOMRect}*/ (destElem.getBoundingClientRect());
 
 		let parentRect = /**@type {DOMRect}*/ (
-			document.querySelector(`#card-box${id}`)?.getBoundingClientRect()
+			document.querySelector(`#card-box${id}`)?.parentElement?.getBoundingClientRect()
 		);
 		let d =
 			Math.sqrt(
@@ -196,7 +196,7 @@
 					if (an && an.animations.length > 0) anime.remove(an.animations[0].animatable.target);
 					window.clearInterval(inter);
 				}
-				if (!_srcId || !_destId) return;
+				if (!_srcId || !_destId) return resolve(null);
 				const { srcPos, destPos } = calcPos(_srcId, _destId);
 				if (destPos === null || srcPos === null) return resolve(null);
 

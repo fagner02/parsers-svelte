@@ -1,3 +1,4 @@
+import { nt, rules, t } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export const id = 'lltable';
@@ -31,13 +32,10 @@ function deselectSymbols(arr) {
 }
 
 /**
- * @param {import('@/types').GrammarItem[]} rules
- * @param {string[]} nt
- * @param {string[]} t
  * @param {Map<number, Set<string>>} firstSet
  * @param {Map<string, Set<string>>} followSet
  */
-export function lltable(rules, nt, t, firstSet, followSet) {
+export function lltable(firstSet, followSet) {
 	functionCalls = [];
 	saves = [];
 	/**@type {Map<string, Map<string, number>>} */

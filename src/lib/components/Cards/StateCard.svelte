@@ -1,13 +1,11 @@
 <script>
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
-	import { getAugGrammar } from '$lib/utils';
+	import { augRules } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import SvgLines from '@/Structures/SvgLines.svelte';
 
-	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = getAugGrammar().augRules;
 	/**@type {HTMLElement}*/
 	let container;
 
@@ -78,7 +76,7 @@
 				elem.style.maxWidth = `fit-content`;
 				elem.style.height = `fit-content`;
 				await svgLines?.hideLine(false, id);
-				resolve(null);
+				return resolve(null);
 			} catch (e) {
 				reject(e);
 			}
@@ -134,9 +132,9 @@
 
 	/**
 	 * @param {import('@/types').LR0StateItem[]} stateToLoad
-	 * @param {boolean} shouldWait
+	 * @param {string?} srcId
 	 */
-	export async function loadState(stateToLoad, shouldWait = true) {
+	export async function loadState(stateToLoad, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				cardState.update(() =>
@@ -150,7 +148,7 @@
 				);
 
 				await noJumpWait(0);
-
+				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-title`, id);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 				while (elem !== null) {
 					elem.style.maxWidth = `${elem.scrollWidth}px`;
@@ -160,8 +158,9 @@
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
 				try {
-					if (shouldWait) await wait(id, 500);
+					await wait(id, 500);
 				} catch (e) {}
+				if (srcId) svgLines?.hideLine(true, id);
 				resolve(null);
 			} catch (e) {
 				reject(e);
@@ -229,10 +228,11 @@
 				style="opacity: 0;font-size: {fontSize}px;min-width: {charWidth}px;max-width: 0px; height: 0px"
 			>
 				<span style="font-size: {subFontSize}px;">{item.ruleIndex}</span>
-				<span>{rules[item.ruleIndex].left} -&gt;&nbsp;</span>
-				{#each rules[item.ruleIndex].right as symbol, index}
+				<span>{augRules[item.ruleIndex].left} -&gt;&nbsp;</span>
+				{#each augRules[item.ruleIndex].right as symbol, index}
 					{#if item.pos === index}
 						<span
+							id="state-dot-{stateId}-{rindex}"
 							style="transform: {dotIndex === rindex
 								? 'translate(5px, 0) scale(2)'
 								: 'translate(0,0) scale(1)'};color: hsl({hue}, 65%,45%)">&bull;</span
@@ -240,8 +240,9 @@
 					{/if}
 					<span style="margin: 0px 3px" id="state-{stateId}-{rindex}-{index}">{symbol}</span>
 				{/each}
-				{#if item.pos === rules[item.ruleIndex].right.length}
+				{#if item.pos === augRules[item.ruleIndex].right.length}
 					<span
+						id="state-dot-{stateId}-{rindex}"
 						style="transform: {dotIndex === rindex
 							? 'translate(5px, 0) scale(2)'
 							: 'translate(0,0) scale(1)'};color: hsl({hue},65%,45%);">&bull;</span

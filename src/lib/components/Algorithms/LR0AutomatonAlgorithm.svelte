@@ -3,7 +3,7 @@
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lr0automaton';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getAugGrammar } from '$lib/utils';
+	import { nt, t } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -35,7 +36,7 @@
 	let originState = writable([]);
 	/** @type {import('svelte/store').Writable<Array<import('@/types').LR0StateItem>>} */
 	let targetState = writable([]);
-	let { alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 	alphabet = alphabet.filter((x) => x !== '$');
 	let {} = $props();
 
@@ -60,7 +61,6 @@
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
 	let symbolsSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions}*/
@@ -81,15 +81,18 @@
 		svgLines?.hideLine(false, id);
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
 		originStateName = save.originStateName;
-		originStateElem?.loadState(save.originState, false);
-		targetStateElem?.loadState(save.targetState, false);
+		originStateElem?.loadState(save.originState);
+		targetStateElem?.loadState(save.targetState);
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
 		resetAllSymbols(id, save.symbolIds);
+		resetTooltips(save.functionCall, functionCalls);
 	}
 
 	export const obj = {
 		addPause: () => addPause,
+		showTooltip: () => showTooltip,
+		setUpTooltip: () => setUpTooltip,
 		highlightLinesClosure: () => closureCodeCard?.highlightLines,
 		highlightLines: () => codeCard?.highlightLines,
 		deselectSymbol: () => deselectSymbol,
@@ -145,15 +148,14 @@
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="unit grid">
-	<div class="cards-box unit" id="card-box{id}" style="max-width: inherit;">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
+	<div class="cards-box unit" id="card-box{id}">
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 		<StateCard
 			{id}
 			state={targetState}
@@ -193,7 +195,7 @@
 			bind:svgLines
 		></StackCard>
 	</div>
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode
 			bind:breakpoints={closureBreakpoints}
 			title={'Closure LR(0)'}

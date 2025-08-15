@@ -1,13 +1,12 @@
 <script>
 	import { getJumpPause } from '$lib/flowControl';
-	import { getAugGrammar } from '$lib/utils';
+	import { augRules } from '$lib/utils';
 	import anime from 'animejs';
 	import { onMount } from 'svelte';
 	import { Interaction } from '@/Layout/interactiveElem';
 	import ResizeWrapper from '../Layout/ResizeWrapper.svelte';
 	import AutomatonIcon from '@icons/AutomatonIcon.svelte';
 
-	let rules = getAugGrammar().augRules;
 	/** @type {{id: string}} */
 	let props = $props();
 
@@ -146,8 +145,8 @@
 
 			for (let [i, item] of data.items.entries()) {
 				let span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-				let right = `${rules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${rules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
-				span.textContent = `${rules[item.ruleIndex].left} -> ${right}`;
+				let right = `${augRules[item.ruleIndex].right.slice(0, item.pos).join(' ')}\u2022${augRules[item.ruleIndex].right.slice(item.pos).join(' ')}`;
+				span.textContent = `${augRules[item.ruleIndex].left} -> ${right}`;
 				if (item.lookahead) {
 					span.textContent += `,{${[...item.lookahead].join(',')}}`;
 				}

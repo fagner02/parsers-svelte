@@ -89,6 +89,7 @@ input[type='number'] {
 	opacity: 0;
 	z-index: -1;
 	pointer-events: none;
+	overflow: hidden;
 }
 .not-hidden {
 	opacity: 1;
@@ -148,9 +149,10 @@ input:focus-within {
 
 .cards-box {
 	display: flex;
-	justify-content: center;
 	align-items: start;
-	flex-wrap: wrap;
+	overflow: auto;
+	margin: 20px auto;
+	max-width: 100%;
 }
 
 .algo-buttons > button:disabled {

@@ -1,3 +1,5 @@
+import { nt, rules } from '$lib/utils';
+
 export const id = 'llparse';
 export const elemIds = {
 	grammar: `${id}-grammar`,
@@ -21,11 +23,9 @@ export let saves = [];
 /**
  * @param {string} startingSymbol
  * @param {string[]} inputString
- * @param {string | any[]} nt
  * @param {Map<string, Map<string, number>>} table
- * @param {import('@/types').GrammarItem[]} rules
  */
-export function llParsing(startingSymbol, inputString, nt, table, rules) {
+export function llParsing(startingSymbol, inputString, table) {
 	functionCalls = [];
 	saves = [];
 	/** @type {typeof saves[0]['tree']} */

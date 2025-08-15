@@ -43,6 +43,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
+		overflow: auto;
 	}
 
 	:global(.parse) > input {
@@ -73,6 +74,7 @@
 		height: inherit;
 		display: flex;
 		gap: 10px;
+		overflow: hidden;
 	}
 
 	input {

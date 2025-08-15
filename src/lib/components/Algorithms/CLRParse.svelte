@@ -5,7 +5,7 @@
 	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
 	import { getTree } from '@/Structures/treeFunctions';
-	import { getAugGrammar } from '$lib/utils';
+	import { t, nt } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
@@ -33,12 +33,11 @@
 	let stateStackElement = /** @type {StackCard}*/ ($state());
 	let inputStackElement = /** @type {StackCard}*/ ($state());
 
-	let { augRules, alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 	let context = getContext('parseView');
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
-	let loadGrammar = /**@type {() => Promise<any>}*/ ($state());
 	let tree = getTree();
 
 	/**@param {typeof saves[0]} save*/
@@ -71,7 +70,7 @@
 		id,
 		setStepCallback,
 		() => {
-			clrparsing(inputString, augRules, tableData);
+			clrparsing(inputString, tableData);
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}
@@ -81,19 +80,18 @@
 		fetch('./clrparse.txt').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"
 		></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 		<TableCard
 			{id}
 			rows={stateList}

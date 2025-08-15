@@ -1,9 +1,9 @@
 <script>
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/clr_table';
-	import { addPause, noJumpWait, wait } from '$lib/flowControl';
+	import { addPause, noJumpWait } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getAugGrammar } from '$lib/utils';
+	import { t, nt } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -26,7 +26,7 @@
 
 	/** @type {{ automaton: import('@/types').LR1Automaton}} */
 	let { automaton } = $props();
-	let { alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<number>>>} */
 	let stateStack = writable(
@@ -51,7 +51,6 @@
 	let columns = [...alphabet];
 	let stateName = $state('');
 	let svgLines = /**@type {SvgLines | undefined}*/ ($state());
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let stateSelection;
@@ -64,7 +63,7 @@
 		svgLines?.hideLine(false, id);
 		stateSelection?.hideSelect();
 		stateStackSelection?.hideSelect();
-		stateElem?.loadState(save.state, false);
+		stateElem?.loadState(save.state);
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		stateName = save.stateName;
 		await noJumpWait(5000);
@@ -111,7 +110,6 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
@@ -130,7 +128,7 @@
 			tableId={elemIds.table}
 			bind:this={tableElem}
 		></TableCard>
-		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
 		<StateCard
 			{id}
 			state={clrState}
@@ -150,7 +148,11 @@
 			bind:svgLines
 		></StackCard>
 	</div>
-	<div use:stackFloatingWindows class="unit" style="padding: 5px; padding-bottom: 10px;flex: 1; ">
+	<div
+		use:stackFloatingWindows
+		class="unit"
+		style="pointer-events:none;padding: 5px; padding-bottom: 10px;flex: 1; "
+	>
 		<PseudoCode bind:breakpoints title="Tabela LR(1)" bind:this={codeCard} id="clrtable"
 		></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>

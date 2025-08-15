@@ -2,13 +2,14 @@
 	import { wait } from '$lib/flowControl';
 	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
 	import { colors } from '$lib/selectSymbol';
-	import { getAugGrammar, getGrammar } from '$lib/utils';
+	import { augRules, rules } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import CardWrapper from './CardWrapper.svelte';
 
-	/** @type {{isAugmented?: boolean, cardId: string, labelTooltip?: string, id: string, loadGrammar?: ()=>Promise<any>}} */
-	let { isAugmented = false, labelTooltip = '', loadGrammar = $bindable(), ...props } = $props();
+	/** @type {{isAugmented?: boolean, cardId: string, labelTooltip?: string, id: string}} */
+	let { isAugmented = false, labelTooltip = '', ...props } = $props();
 
-	loadGrammar = async function () {
+	async function loadGrammar() {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const rulesElem = /**@type {HTMLElement}*/ document.querySelector(`#${props.cardId}rules`);
@@ -24,15 +25,16 @@
 				reject(e);
 			}
 		});
-	};
+	}
 
 	/** @type {Array<import('@/types').GrammarItem>} */
-	let rules = isAugmented ? getAugGrammar().augRules : getGrammar().rules;
+	let grammar = $derived(isAugmented ? augRules : rules);
 	let opacity = $state(0);
 
 	export function getCardId() {
 		return props.cardId;
 	}
+	onMount(loadGrammar);
 </script>
 
 <CardWrapper
@@ -46,7 +48,7 @@
 	id={props.id}
 >
 	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="{props.cardId}rules">
-		{#each rules as rule, rulesIndex}
+		{#each grammar as rule, rulesIndex}
 			<p
 				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
 				id="{props.cardId}gset{rulesIndex}"

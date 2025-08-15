@@ -272,6 +272,7 @@
 		overflow: hidden;
 		opacity: 0;
 		transition: opacity 0.5s;
+		pointer-events: all;
 	}
 	.lb-handle {
 		cursor: sw-resize;

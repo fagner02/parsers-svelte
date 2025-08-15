@@ -28,11 +28,18 @@ export function getDeviceType() {
 }
 
 /** @type {Array<import('@/types').GrammarItem>} */
-let rules = [];
+export let rules = [];
 /** @type {Array<string>}*/
-let nt = [];
+export let nt = [];
 /** @type {Array<string>}*/
-let t = [];
+export let t = [];
+/** @type {string}*/
+export let startingSymbol;
+/** @type {string}*/
+export let augStartingSymbol;
+/** @type {Array<import('@/types').GrammarItem>}*/
+export let augRules;
+
 /**@type {(()=>void)?} */
 let grammarChangeCallback = null;
 /**
@@ -52,6 +59,7 @@ F -> id`;
  */
 export function setGrammarText(text) {
 	grammar = text;
+	loadGrammar();
 	grammarChangeCallback?.();
 }
 
@@ -88,11 +96,7 @@ export function loadGrammar() {
 
 	t = Array.from(tSet).concat(['$']);
 	nt = Array.from(ntSet);
-	return { t, nt, rules };
-}
-
-export function getAugGrammar() {
-	let augRules = [{ index: 0, left: `${rules[0]?.left}'`, right: [`${rules[0]?.left}`] }].concat(
+	augRules = [{ index: 0, left: `${rules[0]?.left}'`, right: [`${rules[0]?.left}`] }].concat(
 		rules.map((x) => {
 			return {
 				index: x.index + 1,
@@ -101,23 +105,10 @@ export function getAugGrammar() {
 			};
 		})
 	);
-	return {
-		t,
-		nt,
-		augRules,
-		alphabet: [...t, ...nt],
-		startingSymbol: augRules[0].left
-	};
-}
 
-export function getGrammar() {
-	return {
-		t,
-		nt,
-		rules,
-		alphabet: [...t, ...nt],
-		startingSymbol: rules.length === 0 ? '' : rules[0].left
-	};
+	augStartingSymbol = augRules[0].left;
+
+	startingSymbol = rules[0].left;
 }
 
 export function isGrammarLoaded() {

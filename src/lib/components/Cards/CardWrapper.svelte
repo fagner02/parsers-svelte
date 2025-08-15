@@ -1,8 +1,12 @@
 <script>
 	import { getJumpPause, wait } from '$lib/flowControl';
 	import { fontSize } from '$lib/globalStyle';
+	import { id } from '$lib/stepCalc/clr_table';
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
+	import { Interaction } from '@/Layout/interactiveElem';
+	import ResizeWrapper from '@/Layout/ResizeWrapper.svelte';
 	import { setUpTooltip } from '@/Layout/tooltip.svelte';
+	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 	import HelpIcon from '@icons/HelpIcon.svelte';
 	import { onMount } from 'svelte';
 

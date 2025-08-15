@@ -5,7 +5,7 @@
 	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
 	import { getTree } from '@/Structures/treeFunctions';
-	import { getGrammar, loadGrammar } from '$lib/utils';
+	import { rules, nt, t, startingSymbol } from '$lib/utils';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
@@ -31,7 +31,6 @@
 
 	let symbolStackElement = /** @type {StackCard}*/ ($state());
 	let inputStackElement = /** @type {StackCard}*/ ($state());
-	let { nt, t, rules, startingSymbol } = getGrammar();
 	let context = getContext('parseView');
 
 	/**@type {number[]}*/
@@ -74,7 +73,7 @@
 		id,
 		setStepCallback,
 		() => {
-			llParsing(startingSymbol, inputString, nt, tableData, rules);
+			llParsing(startingSymbol, inputString, tableData);
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}
@@ -84,14 +83,13 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"
 		></PseudoCode>
 	</div>

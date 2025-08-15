@@ -2,8 +2,10 @@
 <span><b>itens_para_verificar</b> <- cópia de <b>closure</b></span>
 <span>enquanto tamanho de <b>itens_para_verificar</b> > 0:</span>
 <span>    <b>item</b> <- primeiro item de <b>itens_para_verificar</b></span>
+<span>    se a posição do ponto de <b>item</b> for a ultima posição da regra:</span>
+<span>        continua para próxima iteração</span>
 <span>    <b>símbolo</b> <- símbolo após a posição do ponto na produção de <b>item</b></span>
-<span>    se <b>símbolo</b> não pertence aos não-terminais:</span>
+<span>    se <b>símbolo</b> é um terminal:</span>
 <span>        remove <b>item</b> de <b>itens_para_verificar</b></span>
 <span>        continua para próxima iteração</span>
 <span>    para cada produção <b>p</b> na gramática:</span>

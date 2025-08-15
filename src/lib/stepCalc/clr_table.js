@@ -1,3 +1,4 @@
+import { nt, augRules, t } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export let id = 'clrTable';
@@ -24,11 +25,8 @@ export let saves = [];
 
 /**
  * @param {import('@/types').LR1Automaton} automaton
- * @param {Array<import('@/types').GrammarItem>} rules
- * @param {string[]} nt
- * @param {string[]} t
  */
-export function clrTable(automaton, rules, nt, t) {
+export function clrTable(automaton) {
 	functionCalls = [];
 	saves = [];
 	const alphabet = [...t, ...nt];
@@ -74,8 +72,8 @@ export function clrTable(automaton, rules, nt, t) {
 			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 
 			if (
-				item.pos === rules[item.ruleIndex].right.length ||
-				rules[item.ruleIndex].right[0] === ''
+				item.pos === augRules[item.ruleIndex].right.length ||
+				augRules[item.ruleIndex].right[0] === ''
 			) {
 				functionCalls.push({ name: 'highlightLines', args: [[7]] });
 				if (item.ruleIndex === 0) {
@@ -139,7 +137,7 @@ export function clrTable(automaton, rules, nt, t) {
 			}
 
 			functionCalls.push({ name: 'highlightLines', args: [[13]] });
-			const currentSymbol = rules[item.ruleIndex].right[item.pos];
+			const currentSymbol = augRules[item.ruleIndex].right[item.pos];
 			functionCalls.push({ name: 'highlightDot', args: [index] });
 			functionCalls.push({
 				name: 'selectSymbol',
@@ -152,7 +150,7 @@ export function clrTable(automaton, rules, nt, t) {
 			functionCalls.push({ name: 'highlightLines', args: [[15]] });
 
 			if (nt.includes(currentSymbol)) {
-				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `g${transition}`);
+				table.get(s.index)?.set(`${augRules[item.ruleIndex].right[item.pos]}`, `g${transition}`);
 				functionCalls.push({ name: 'highlightLines', args: [[16]] });
 				functionCalls.push({
 					name: 'highlightOn',
@@ -172,7 +170,7 @@ export function clrTable(automaton, rules, nt, t) {
 					symbolIds: structuredClone(symbolIds)
 				});
 			} else {
-				table.get(s.index)?.set(`${rules[item.ruleIndex].right[item.pos]}`, `s${transition}`);
+				table.get(s.index)?.set(`${augRules[item.ruleIndex].right[item.pos]}`, `s${transition}`);
 				functionCalls.push({ name: 'highlightLines', args: [[17]] });
 				functionCalls.push({ name: 'highlightLines', args: [[18]] });
 				functionCalls.push({

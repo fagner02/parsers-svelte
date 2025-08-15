@@ -2,7 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { addPause } from '$lib/flowControl';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getAugGrammar } from '$lib/utils';
+	import { nt, t } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import TableCard from '@/Cards/TableCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
@@ -14,7 +14,7 @@
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
-	import { id, elemIds, saves, functionCalls, slrTable } from '$lib/stepCalc/slrtable';
+	import { id, elemIds, saves, functionCalls } from '$lib/stepCalc/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 
@@ -46,14 +46,13 @@
 			id: index
 		}))
 	]);
-	let { alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 
 	let rows = Array.from({ length: automaton.states.length }, (_, index) => `s${index}`);
 	let columns = [...alphabet];
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
 	let followSelection;
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions?}*/
@@ -128,19 +127,18 @@
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
 		<Automaton {id} bind:this={automatonElem}></Automaton>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 		<TableCard
 			{id}
 			{rows}

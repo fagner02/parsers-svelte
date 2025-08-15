@@ -1,3 +1,4 @@
+import { nt, rules } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export const id = 'follow';
@@ -25,11 +26,9 @@ export let functionCalls = [];
 export let saves = [];
 
 /**
- * @param {Array<import('@/types').GrammarItem>} rules
- * @param {string[]} nt
  * @param {Map<number, Set<string>>} firstSet
  */
-export function follow(rules, nt, firstSet) {
+export function follow(firstSet) {
 	functionCalls = [];
 	saves = [];
 	/** @type {Map<string, Set<string>>}*/
@@ -695,11 +694,11 @@ export function follow(rules, nt, firstSet) {
 }
 
 /**
- * @param {Array<import('@/types').GrammarItem>} rules
- * @param {string[]} nt
  * @param {Map<number, Set<string>>} firstSet
+ * @param {import("@/types").GrammarItem[]} rules
+ * @param {string[]} nt
  */
-export function followDataOnly(rules, nt, firstSet) {
+export function followDataOnly(firstSet, rules, nt) {
 	/** @type {Map<string, Set<string>>}*/
 	let followSet = new Map();
 	/** @type {Map<string, Set<string>>}*/
@@ -715,7 +714,6 @@ export function followDataOnly(rules, nt, firstSet) {
 	for (let i = 0; i < rules.length; i++) {
 		for (let j = 0; j < rules[i].right.length; j++) {
 			const symbol = rules[i].right[j];
-			let followingSymbolIndex = j + 1;
 			let followingSymbol = j + 1 == rules[i].right.length ? null : rules[i].right[j + 1];
 
 			if (!nt.includes(symbol)) {
@@ -764,7 +762,6 @@ export function followDataOnly(rules, nt, firstSet) {
 						break;
 					}
 
-					followingSymbolIndex = j + 1 + pos;
 					followingSymbol =
 						j + 1 + pos == rules[i].right.length ? null : rules[i].right[j + 1 + pos];
 					pos++;

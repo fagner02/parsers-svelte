@@ -3,7 +3,7 @@
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lltable';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { nt, t, rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
@@ -23,11 +23,9 @@
 	let firstFuncs;
 
 	let tableElement = /**@type {TableCard}*/ ($state());
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
-	let { nt, t, rules } = getGrammar();
 
 	/** @type {{
 	 * table?: import('svelte/store').Writable<Map<string, import('@/types').tableCol<any>>>,
@@ -91,19 +89,18 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Tabela LL(1)" bind:this={codeCard} id="lltable"
 		></PseudoCode>
 	</div>
 	<div class="cards-box unit" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
 		<TableCard
 			{id}
 			rows={nt}

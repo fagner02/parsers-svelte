@@ -10,7 +10,7 @@
 	import { lltable } from '$lib/stepCalc/lltable';
 	import { writable } from 'svelte/store';
 	import SyntaxTree from '@/Structures/SyntaxTree.svelte';
-	import { getGrammar, isGrammarLoaded } from '$lib/utils';
+	import { isGrammarLoaded, rules } from '$lib/utils';
 	import { resetSelectionFunctions } from '@/Cards/selectionFunction';
 	import { swapAlgorithm } from '$lib/flowControl';
 	import { setUpTooltip } from '@/Layout/tooltip.svelte';
@@ -44,15 +44,14 @@
 	let code = '';
 	onMount(async () => {
 		if (!isGrammarLoaded()) return;
-		let { rules, nt, t } = getGrammar();
-		const _first = first(rules, nt);
-		const _follow = follow(rules, nt, _first.firstSet);
-		const _table = lltable(rules, nt, t, _first.firstSet, _follow.followSet);
+		const _first = first();
+		const _follow = follow(_first.firstSet);
+		const _table = lltable(_first.firstSet, _follow.followSet);
 		tableData = _table.table;
 
 		results.push({
 			title: 'Conjunto First',
-			content: firstToString(_first.firstSet, rules)
+			content: firstToString(_first.firstSet)
 		});
 
 		results.push({

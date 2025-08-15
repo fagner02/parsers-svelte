@@ -7,7 +7,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { getTree } from '@/Structures/treeFunctions';
 	import { colors } from '$lib/selectSymbol';
-	import { getAugGrammar } from '$lib/utils';
+	import { t, nt } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { inputString } from '@/Layout/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
@@ -37,9 +37,8 @@
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
 
-	let { augRules, alphabet } = getAugGrammar();
+	let alphabet = [...t, ...nt];
 	let context = getContext('parseView');
-	let loadGrammar = /** @type {() => Promise<any>} */ ($state());
 
 	let tree = getTree();
 
@@ -73,7 +72,7 @@
 		id,
 		setStepCallback,
 		() => {
-			slrparsing(inputString, augRules, tableData);
+			slrparsing(inputString, tableData);
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}
@@ -83,18 +82,17 @@
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
 <div class="cards-box unit" id="card-box{id}">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="Análise sintática SLR" bind:this={codeCard} id="slrparse"
 		></PseudoCode>
 	</div>
-	<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true} bind:loadGrammar></GrammarCard>
+	<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 	<TableCard
 		{id}
 		rows={stateList}

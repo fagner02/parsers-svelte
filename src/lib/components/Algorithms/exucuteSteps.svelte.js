@@ -125,6 +125,7 @@ export class StepExecution {
 				}
 				if (call.name === 'addPause') {
 					this.currentStep++;
+
 					setCurrentStep(this.currentStep);
 				}
 				i++;

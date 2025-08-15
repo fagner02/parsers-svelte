@@ -3,7 +3,7 @@
 	import { addPause } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
-	import { getGrammar } from '$lib/utils';
+	import { rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { getSelectionFunctions } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
@@ -14,7 +14,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
-	import { removeTooltip, resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
+	import { resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -25,7 +25,6 @@
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
 
-	let loadGrammar = /**@type {() => Promise<void>}*/ ($state());
 	/**@type {PseudoCode | undefined}*/
 	let codeCard = $state();
 
@@ -41,8 +40,6 @@
 
 	/**@type {import('@/Cards/selectionFunction').SelectionFunctions | undefined}*/
 	let grammarSelection;
-
-	let { rules } = getGrammar();
 
 	/**@type {number[]}*/
 	let breakpoints = $state([]);
@@ -88,18 +85,17 @@
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
 		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
-		loadGrammar();
 		stepExecution.executeSteps();
 	});
 </script>
 
 <SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
 <div class="grid unit">
-	<div class="unit" use:stackFloatingWindows>
+	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
 		<PseudoCode bind:breakpoints title="First" bind:this={codeCard} id="first"></PseudoCode>
 	</div>
 	<div class="unit cards-box" id="card-box{id}">
-		<GrammarCard {id} cardId={elemIds.grammar} bind:loadGrammar></GrammarCard>
+		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
 		<SetsCard
 			setId={elemIds.first}
 			set={firstSet}

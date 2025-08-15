@@ -1,3 +1,4 @@
+import { nt, augRules, t } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export let id = 'slrTable';
@@ -26,12 +27,9 @@ export let functionCalls = [];
 
 /**
  * @param {import('@/types').LR0Automaton} automaton
- * @param {Array<import('@/types').GrammarItem>} rules
- * @param {string[]} nt
- * @param {string[]} t
  * @param {Map<string, Set<string>>} followSet
  */
-export function slrTable(automaton, rules, nt, t, followSet) {
+export function slrTable(automaton, followSet) {
 	/**@type {any[]} */
 	let symbolIds = [];
 	functionCalls = [];
@@ -93,11 +91,11 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 			functionCalls.push({ name: 'highlightLines', args: [[6]] });
 
 			if (
-				item.pos === rules[item.ruleIndex].right.length ||
-				rules[item.ruleIndex].right[0] === ''
+				item.pos === augRules[item.ruleIndex].right.length ||
+				augRules[item.ruleIndex].right[0] === ''
 			) {
-				let followIndex = followSet.keys().toArray().indexOf(rules[item.ruleIndex].left);
-				let follow = followSet.get(rules[item.ruleIndex].left);
+				let followIndex = followSet.keys().toArray().indexOf(augRules[item.ruleIndex].left);
+				let follow = followSet.get(augRules[item.ruleIndex].left);
 
 				if (!follow) continue;
 
@@ -171,7 +169,7 @@ export function slrTable(automaton, rules, nt, t, followSet) {
 			}
 
 			functionCalls.push({ name: 'highlightLines', args: [[13]] });
-			const currentSymbol = rules[item.ruleIndex].right[item.pos];
+			const currentSymbol = augRules[item.ruleIndex].right[item.pos];
 			functionCalls.push({ name: 'highlightLines', args: [[14]] });
 			let transition = automaton.transitions.get(s.index)?.get(currentSymbol);
 

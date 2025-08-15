@@ -255,7 +255,7 @@
 				<button
 					use:setUpTooltip={{ id: 0, text: 'Próximo passo' }}
 					disabled={currentStep >= maxStep}
-					onclick={() => forward(`${id}`)}
+					onclick={() => forward(id)}
 				>
 					{#if isPlaying}
 						<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
@@ -400,7 +400,6 @@
 		height: inherit;
 		border: 1px solid hsl(0, 0%, 0%, 20%);
 		border-radius: 10px;
-		overflow: auto;
 	}
 
 	:global(#wrapper > .grid > div) {

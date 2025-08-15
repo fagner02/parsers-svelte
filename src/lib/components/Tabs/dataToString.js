@@ -1,3 +1,5 @@
+import { augRules, rules } from '$lib/utils';
+
 /**
  * @param {Map<any, Map<any, any>>} data
  * @param {string} title
@@ -53,15 +55,14 @@ export function tableToString(data, title, convert) {
 /**
  *
  * @param {(import("@/types").LR1State|import("@/types").LR0State)[]} states
- * @param {import("@/types").GrammarItem[]} rules
  */
-export function automatonToString(states, rules) {
+export function automatonToString(states) {
 	let content = '';
 	for (let s of states) {
 		content += `s${s.index}: {`;
 		for (let [index, item] of s.items.entries()) {
-			content += `[${rules[item.ruleIndex].left} -> `;
-			let right = rules[item.ruleIndex].right;
+			content += `[${augRules[item.ruleIndex].left} -> `;
+			let right = augRules[item.ruleIndex].right;
 			content += `${right.slice(0, item.pos).join(' ')}.${right.slice(item.pos).join(' ')},`;
 			content += item.lookahead ? `{${[...item.lookahead].join(', ')}}` : '';
 			content += `]`;
@@ -76,12 +77,11 @@ export function automatonToString(states, rules) {
 
 /**
  * @param {Map<number, Set<string>> } set
- * @param {import('@/types').GrammarItem[]} rules
  */
-export function firstToString(set, rules) {
+export function firstToString(set) {
 	return set
 		.entries()
-		.map((x) => `${rules[x[0]].left}: {${[...x[1]].join(', ')}}`)
+		.map((x) => `${x[0]}.${rules[x[0]].left}: {${[...x[1]].join(', ')}}`)
 		.toArray()
 		.join('\n');
 }
