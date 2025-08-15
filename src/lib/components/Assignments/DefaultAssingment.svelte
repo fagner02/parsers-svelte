@@ -80,7 +80,7 @@ A -> b S | c`}</pre>
 </div>
 <hr />
 <div class="field col">
-	<p>7. Dê uma gramática que aceita essas entradas</p>
+	<p>7. Dê uma gramática LR que aceita as seguintes entradas:</p>
 	<pre>{`num
 num + num
 num + num * num

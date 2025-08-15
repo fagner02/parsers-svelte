@@ -14,6 +14,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { resetTooltips, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -45,6 +46,7 @@
 		save.accept === undefined ? context.setAccept(null) : context.setAccept(save.accept);
 		tree.resetTree();
 		tree.loadSyntaxTree(save.tree, startingSymbol);
+		resetTooltips(save.functionCall, functionCalls);
 	}
 
 	export const obj = {
@@ -57,7 +59,8 @@
 		resetTree: () => tree.resetTree,
 		initializeTree: () => tree.initializeTree,
 		addPause: () => addPause,
-		setAccept: () => context.setAccept
+		setAccept: () => context.setAccept,
+		showTooltip: () => showTooltip
 	};
 
 	let stepExecution = new StepExecution(

@@ -22,6 +22,7 @@
 	{@render tree?.({ id: props.id })}
 	<div class="parse">
 		<input
+			id="input-{props.id}"
 			type="text"
 			name="string a ser analisada"
 			oninput={(v) => {

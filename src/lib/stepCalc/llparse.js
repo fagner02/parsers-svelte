@@ -1,3 +1,4 @@
+import { colors } from '$lib/selectSymbol';
 import { nt, rules } from '$lib/utils';
 
 export const id = 'llparse';
@@ -134,9 +135,19 @@ export function llParsing(startingSymbol, inputString, table) {
 			}
 			if (last.input === newLast.input && last.symbol === newLast.symbol) {
 				functionCalls.push({
+					name: 'showTooltip',
+					args: [
+						`input-${id}`,
+						'A entrada processada gera um loop infinito. Provavelmente a gramática dada não é LL.',
+						colors.red,
+						1
+					]
+				});
+				functionCalls.push({
 					name: 'setAccept',
 					args: [false]
 				});
+
 				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
 					symbolStack: structuredClone(symbolStack),
@@ -145,6 +156,7 @@ export function llParsing(startingSymbol, inputString, table) {
 					accept: false,
 					tree: structuredClone(tree)
 				});
+
 				return false;
 			}
 			last = newLast;

@@ -4,7 +4,8 @@ export const colors = {
 	green: 110,
 	orange: 30,
 	pink: 300,
-	cyan: 150
+	cyan: 150,
+	red: 350
 };
 /**@type {Map<string, Set<string>>} */
 let selectedSymbolsMap = new Map();
