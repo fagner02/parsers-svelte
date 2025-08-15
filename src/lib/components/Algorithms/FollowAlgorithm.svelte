@@ -5,7 +5,7 @@
 	import { colors, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import { getSelectionFunctions, resetSelectFor } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
@@ -50,14 +50,12 @@
 	 */
 	function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
-		save.grammarSelect === ''
-			? grammarSelection?.hideSelect()
-			: grammarSelection?.selectFor(save.grammarSelect);
 		followSetElement?.loadSets(save.follow);
 		joinSetElement?.loadSets(save.join);
 		joinStackElement?.loadStack(stackCard(save.joinStack, {}));
 		resetAllSymbols(id, save.symbolIds);
 		resetTooltips(save.functionCall, functionCalls);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 
 	export const obj = {
@@ -67,7 +65,7 @@
 		showTooltip: () => showTooltip,
 		setUpTooltip: () => setUpTooltip,
 		hideTooltip: () => hideTooltip,
-		selectGrammar: () => grammarSelection?.selectFor,
+		selectForGrammar: () => grammarSelection?.selectFor,
 		hideSelectGrammar: () => grammarSelection?.hideSelect,
 		joinSetsFollow: () => followSetElement?.joinSets,
 		addSetRowFollow: () => followSetElement?.addSetRow,

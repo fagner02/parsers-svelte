@@ -1,5 +1,5 @@
 <script>
-	import { addPause } from '$lib/flowControl';
+	import { addPause, noJumpWait } from '$lib/flowControl';
 	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/lr0automaton';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
@@ -16,6 +16,7 @@
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
+	import { resetSelectFor } from '@/Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -74,10 +75,6 @@
 
 	/** @param {typeof saves[0]} save */
 	function setStepCallback(save) {
-		symbolsSelection.hideSelect();
-		originStateSelection.hideSelect();
-		targetStateSelection.hideSelect();
-		grammarSelection.hideSelect();
 		svgLines?.hideLine(false, id);
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
 		originStateName = save.originStateName;
@@ -86,7 +83,9 @@
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
 		resetAllSymbols(id, save.symbolIds);
+
 		resetTooltips(save.functionCall, functionCalls);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 
 	export const obj = {

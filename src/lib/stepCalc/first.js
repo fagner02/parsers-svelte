@@ -82,11 +82,11 @@ export function first() {
 
 	for (let i = 0; i < rules.length; i++) {
 		functionCalls.push({ name: 'highlightLines', args: [[2]] });
-		functionCalls.push({ name: 'selectGrammar', args: [`${elemIds.grammar}gset${i}`] });
+		functionCalls.push({ name: 'selectForGrammar', args: [`${elemIds.grammar}gset${i}`] });
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		functionCalls.push({
 			name: 'selectSymbol',
-			args: [`#${elemIds.grammar}gl${i}`, colors.blue, id]
+			args: [`${elemIds.grammar}gl${i}`, colors.blue, id]
 		});
 		symbolIds.push(functionCalls.at(-1)?.args);
 		firstSet.set(i, new Set());

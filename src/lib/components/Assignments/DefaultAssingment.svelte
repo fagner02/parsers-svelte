@@ -62,9 +62,9 @@ C -> CC CS
 SP -> EC ES
 T -> CO AC
 CC -> cca | ccb
-CP i -> sia | sib
+CS -> sia | sib
 EC -> ccb | ccc
-EP i -> sia | sib | sic
+ES -> sia | sib | sic
 CO -> ca | cb | cc
 AC -> aa`}</pre>
 	<textarea name="q6" id="q6" oninput={receiveInput} rows="4"></textarea>

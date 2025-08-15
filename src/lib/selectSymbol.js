@@ -105,7 +105,7 @@ export async function selectSymbol(symbolId, hue, id, padded = true) {
 	if (getJumpPause(id)) return;
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!symbolId.startsWith('#')) symbolId = '#' + symbolId;
+			symbolId = '#' + symbolId;
 			let symbol = /** @type {HTMLElement} */ (document.querySelector(symbolId));
 			if (symbol === null) {
 				console.error('Symbol not found', symbolId);
@@ -128,7 +128,7 @@ export async function selectSymbol(symbolId, hue, id, padded = true) {
 export function deselectSymbol(symbolId, id) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!symbolId.startsWith('#')) symbolId = '#' + symbolId;
+			symbolId = '#' + symbolId;
 			let symbol = /** @type {HTMLElement} */ (document.querySelector(symbolId));
 			if (symbol === null) {
 				console.error('Symbol not found', symbolId);

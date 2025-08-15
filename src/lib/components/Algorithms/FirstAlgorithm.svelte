@@ -5,7 +5,7 @@
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
-	import { getSelectionFunctions } from '@/Cards/selectionFunction';
+	import { getSelectionFunctions, resetSelectFor } from '@/Cards/selectionFunction';
 	import SetsCard from '@/Cards/SetsCard.svelte';
 	import StackCard from '@/Cards/StackCard.svelte';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
@@ -51,7 +51,7 @@
 		selectSymbol: () => selectSymbol,
 		deselectSymbol: () => deselectSymbol,
 		highlightLines: () => codeCard?.highlightLines,
-		selectGrammar: () => grammarSelection?.selectFor,
+		selectForGrammar: () => grammarSelection?.selectFor,
 		hideSelectGrammar: () => grammarSelection?.hideSelect,
 		addSetRow: () => firstSetElement?.addSetRow,
 		addSetRowJoin: () => joinSetElement?.addSetRow,
@@ -63,14 +63,12 @@
 	};
 	async function setStepCallback(/**@type {typeof saves[0]}*/ save) {
 		svgLines?.hideLine(false, id);
-		save.grammarSelect === ''
-			? grammarSelection?.hideSelect()
-			: grammarSelection?.selectFor(save.grammarSelect);
 		joinStackElement?.loadStack(stackCard(save.joinStack, { key: (a) => rules[a].left }));
 		joinSetElement?.loadSets(save.join);
 		firstSetElement?.loadSets(save.first);
 		resetAllSymbols(id, save.symbolIds);
 		resetTooltips(save.functionCall, functionCalls);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 	let stepExecution = new StepExecution(
 		saves,

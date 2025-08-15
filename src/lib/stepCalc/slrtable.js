@@ -15,9 +15,6 @@ export let elemIds = {
  * state: import('@/types').LR0StateItem[],
  * stateName: string,
  * table: Map<number, Map<string, string>>,
- * followSelect: string,
- * stackSelect: string,
- * stateSelect: string,
  * symbolIds: any[],
  * functionCall: number }[]}
  * */
@@ -47,9 +44,6 @@ export function slrTable(automaton, followSet) {
 		state: [],
 		table: structuredClone(table),
 		stateName: '',
-		followSelect: '',
-		stackSelect: '',
-		stateSelect: '',
 		functionCall: 0,
 		symbolIds: structuredClone(symbolIds)
 	});
@@ -82,9 +76,6 @@ export function slrTable(automaton, followSet) {
 				state: structuredClone(s.items),
 				table: structuredClone(table),
 				stateName: `s${s.index}`,
-				followSelect: '',
-				stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
-				stateSelect: `state-${elemIds.state}-${index}`,
 				functionCall: functionCalls.length - 1,
 				symbolIds: structuredClone(symbolIds)
 			});
@@ -122,9 +113,6 @@ export function slrTable(automaton, followSet) {
 						state: structuredClone(s.items),
 						table: structuredClone(table),
 						stateName: `s${s.index}`,
-						followSelect: '',
-						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
-						stateSelect: `state-${elemIds.state}-${index}`,
 						functionCall: functionCalls.length - 1,
 						symbolIds: structuredClone(symbolIds)
 					});
@@ -156,9 +144,6 @@ export function slrTable(automaton, followSet) {
 						state: structuredClone(s.items),
 						table: structuredClone(table),
 						stateName: `s${s.index}`,
-						followSelect: `${elemIds.follow}set${followIndex}`,
-						stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
-						stateSelect: `state-${elemIds.state}-${index}`,
 						functionCall: functionCalls.length - 1,
 						symbolIds: structuredClone(symbolIds)
 					});
@@ -201,9 +186,6 @@ export function slrTable(automaton, followSet) {
 					state: structuredClone(s.items),
 					table: structuredClone(table),
 					stateName: `s${s.index}`,
-					followSelect: '',
-					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
-					stateSelect: `state-${elemIds.state}-${index}`,
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
 				});
@@ -235,9 +217,6 @@ export function slrTable(automaton, followSet) {
 					state: structuredClone(s.items),
 					table: structuredClone(table),
 					stateName: `s${s.index}`,
-					followSelect: '',
-					stackSelect: `stack-${elemIds.stateStack}-${s.index}`,
-					stateSelect: `state-${elemIds.state}-${index}`,
 					functionCall: functionCalls.length - 1,
 					symbolIds: structuredClone(symbolIds)
 				});
@@ -259,9 +238,6 @@ export function slrTable(automaton, followSet) {
 		state: saves[saves.length - 1].state,
 		table: structuredClone(table),
 		stateName: saves[saves.length - 1].stateName,
-		followSelect: '',
-		stackSelect: '',
-		stateSelect: '',
 		functionCall: functionCalls.length - 1,
 		symbolIds: structuredClone(symbolIds)
 	});

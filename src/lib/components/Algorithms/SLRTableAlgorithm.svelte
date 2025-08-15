@@ -17,6 +17,7 @@
 	import { id, elemIds, saves, functionCalls } from '$lib/stepCalc/slrtable';
 	import { tableCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { resetSelectFor } from '@/Cards/selectionFunction';
 
 	/**@type {TableCard | undefined}*/
 	let tableElem = $state();
@@ -69,21 +70,9 @@
 		stateName = save.stateName;
 		stateElem?.loadState(save.state);
 		svgLines?.hideLine(false, id);
-		try {
-			save.followSelect === ''
-				? followSelection?.hideSelect()
-				: followSelection?.selectFor(save.followSelect);
-			save.stateSelect === ''
-				? stateSelection?.hideSelect()
-				: stateSelection?.selectFor(save.stateSelect);
-			save.stackSelect === ''
-				? stackSelection?.hideSelect()
-				: stackSelection?.selectFor(save.stackSelect);
-		} catch (e) {
-			console.log(e);
-		}
 		table.set(tableCard(save.table, { key: (a) => `s${a}` }));
 		resetAllSymbols(id, save.symbolIds);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 
 	export const obj = {

@@ -98,7 +98,7 @@ export function follow(firstSet) {
 	for (let i = 0; i < rules.length; i++) {
 		functionCalls.push({ name: 'highlightLines', args: [[3]] });
 		functionCalls.push({
-			name: 'selectGrammar',
+			name: 'selectForGrammar',
 			args: [`${elemIds.grammar}gset${i}`]
 		});
 

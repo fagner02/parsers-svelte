@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { resetSelectFor } from '@/Cards/selectionFunction';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -77,9 +78,9 @@
 			await tableElement.showConflict(conflict.row, conflict.col);
 			tableElement.setConflictTooltip(conflict.tooltip);
 		}
-		save.firstSelect === '' ? firstFuncs?.hideSelect() : firstFuncs?.selectFor(save.firstSelect);
 
 		resetAllSymbols(id, save.symbolIds);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 
 	onMount(async () => {

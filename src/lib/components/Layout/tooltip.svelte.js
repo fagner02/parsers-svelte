@@ -3,7 +3,8 @@ import { noJumpWait } from '$lib/flowControl';
 export class Tooltip {
 	/**@type {string?} */
 	activeTooltip = null;
-
+	/**@type {number?} */
+	interval = null;
 	removeCalls = new Map();
 }
 
@@ -18,9 +19,19 @@ export function getTooltipGroups(groupId) {
 }
 /**
  * @param {number} step
- * @param {string | any[]} functionCalls
+ * @param { any[]} functionCalls
  */
 export function resetTooltips(step, functionCalls) {
+	setTimeout(() => {
+		for (let i = step - 1; i > -1; i--) {
+			if (functionCalls[i].name === 'showTooltip') {
+				//@ts-ignore
+				showTooltip(...functionCalls[i].args);
+			} else if (functionCalls[i].name === 'addPause') {
+				break;
+			}
+		}
+	}, 0);
 	for (let i = step; i < functionCalls.length; i++) {
 		const item = functionCalls[i];
 		if (item.name === 'setUpTooltip') {
@@ -46,6 +57,7 @@ export function registerTooltipGroup(groupId) {
 export async function hideTooltip(groupId) {
 	const group = tooltipsGroups.get(groupId);
 	if (!group) return;
+	if (group.interval) window.clearInterval(group.interval);
 	group.activeTooltip = null;
 	let tooltip = /**@type {HTMLElement}*/ (document.querySelector(`#tooltip-${groupId}`));
 	if (!tooltip) return;
@@ -76,26 +88,35 @@ export async function showTooltip(e, text, hue, groupId) {
 	if (!e) return;
 	if (typeof e === 'string') e = /**@type {HTMLElement}*/ (document.querySelector('#' + e));
 
-	let rect = /**@type {HTMLElement}*/ (e).getBoundingClientRect();
-	let tooltipRect = tooltipElem.getBoundingClientRect();
-	let arrowRect = arrow.getBoundingClientRect();
+	const setValues = () => {
+		let rect = /**@type {HTMLElement}*/ (e)?.getBoundingClientRect();
+		let tooltipRect = tooltipElem?.getBoundingClientRect();
+		let arrowRect = arrow?.getBoundingClientRect();
+		if (!rect || !tooltipRect || !arrowRect) {
+			return hideTooltip(groupId);
+		}
 
-	let x = rect.x + rect.width / 2 - tooltipRect.width / 2;
-	let y = rect.y + rect.height + 10;
-	if (x < 0) x = 0;
-	if (y < 0) y = 0;
-	if (x + tooltipRect.width > window.innerWidth) {
-		x = window.innerWidth - tooltipRect.width;
+		let x = rect.x + rect.width / 2 - tooltipRect.width / 2;
+		let y = rect.y + rect.height + 10;
+		if (x < 0) x = 0;
+		if (y < 0) y = 0;
+		if (x + tooltipRect.width > window.innerWidth) {
+			x = window.innerWidth - tooltipRect.width;
+		}
+		if (y + tooltipRect.height > window.innerHeight) {
+			y = window.innerHeight - tooltipRect.height;
+		}
+		tooltipElem.style.left = `${x}px`;
+		tooltipElem.style.top = `${y}px`;
+		let left = tooltipRect.width / 2 - arrowRect.width / 2;
+		arrow.style.left = `${left}px`;
+		arrow.style.top = `${0.1 + (tooltipRect.height / 2 - arrowRect.height / 2)}px`;
+		arrow.style.transform = `translate(${rect.left - x - left + rect.width / 2 - arrowRect.width / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
+	};
+	setValues();
+	if (groupId === 1) {
+		tooltip.interval = window.setInterval(setValues, 100);
 	}
-	if (y + tooltipRect.height > window.innerHeight) {
-		y = window.innerHeight - tooltipRect.height;
-	}
-	tooltipElem.style.left = `${x}px`;
-	tooltipElem.style.top = `${y}px`;
-	let left = tooltipRect.width / 2 - arrowRect.width / 2;
-	arrow.style.left = `${left}px`;
-	arrow.style.top = `${0.1 + (tooltipRect.height / 2 - arrowRect.height / 2)}px`;
-	arrow.style.transform = `translate(${rect.left - x - left + rect.width / 2 - arrowRect.width / 2}px, ${-tooltipRect.height / 2}px) rotate(0deg)`;
 }
 
 /**

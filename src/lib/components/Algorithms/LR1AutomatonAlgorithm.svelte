@@ -16,6 +16,7 @@
 	import { id, saves, elemIds, functionCalls } from '$lib/stepCalc/lr1automaton';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import { resetSelectFor } from '@/Cards/selectionFunction';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -83,10 +84,6 @@
 	 */
 	function setStepCallback(save) {
 		svgLines?.hideLine(false, id);
-		grammarSelection.hideSelect();
-		stateSelection.hideSelect();
-		targetStateSelection.hideSelect();
-		alphabetSelection.hideSelect();
 		originStateName = save.originStateName;
 		targetStateName = save.targetStateName;
 		originStateElem?.loadState(save.originState);
@@ -95,6 +92,7 @@
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
 		resetAllSymbols(id, save.symbolIds);
+		resetSelectFor(obj, functionCalls, save.functionCall);
 	}
 
 	export const obj = {
