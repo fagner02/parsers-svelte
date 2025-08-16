@@ -93,9 +93,6 @@ export class Interaction {
 			this.moveStart(e);
 		};
 		this.moveTarget.style.cursor = 'move';
-		if (this.moveTarget.firstElementChild) {
-			/**@type {HTMLElement}*/ (this.moveTarget.firstElementChild).style.pointerEvents = 'none';
-		}
 	}
 
 	removeMoveListeners() {
@@ -196,8 +193,6 @@ export class Interaction {
 			appendData(`move float, end;${rect.left} ${rect.top};${rect.width} ${rect.height}`);
 		}
 		if (!this.dragPos || !this.moveTarget) return;
-
-		this.moveTarget.style.cursor = 'unset';
 
 		let x, y;
 		if (e instanceof MouseEvent) {
