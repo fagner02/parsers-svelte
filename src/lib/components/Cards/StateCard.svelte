@@ -237,8 +237,12 @@
 				id="state-{stateId}-{rindex}"
 				style="opacity: 0;font-size: {fontSize}px;min-width: {charWidth}px;max-width: 0px; height: 0px"
 			>
-				<span style="font-size: {subFontSize}px;">{item.ruleIndex}</span>
-				<span>{augRules[item.ruleIndex].left} -&gt;&nbsp;</span>
+				<span id="state-{stateId}l{rindex}" style="width: 3px;height:13px;--height:16px;left: -5px"
+				></span>
+				<span>
+					<span style="font-size: {subFontSize}px;">{item.ruleIndex}</span>{augRules[item.ruleIndex]
+						.left}
+				</span><span>-&gt;&nbsp;</span>
 				{#each augRules[item.ruleIndex].right as symbol, index}
 					{#if item.pos === index}
 						<span

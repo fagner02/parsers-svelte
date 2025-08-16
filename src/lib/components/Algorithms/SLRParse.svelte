@@ -78,7 +78,7 @@
 		}
 	);
 	onMount(async () => {
-		fetch('./slrparse.txt').then((data) =>
+		fetch('./slrparse.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 

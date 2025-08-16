@@ -77,7 +77,7 @@
 	);
 
 	onMount(async () => {
-		fetch('./clrparse.txt').then((data) =>
+		fetch('./clrparse.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		stepExecution.executeSteps();

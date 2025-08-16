@@ -91,7 +91,9 @@
 
 	onMount(async () => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
-		fetch('./follow.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
+		fetch('./follow.html').then((data) =>
+			data.text().then((text) => codeCard?.setPseudoCode(text))
+		);
 
 		stepExecution.executeSteps();
 	});

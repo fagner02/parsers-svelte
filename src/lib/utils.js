@@ -26,7 +26,17 @@ export function getDeviceType() {
 	if (isMobile) return 'mobile';
 	return 'desktop';
 }
-
+/**
+ * @param {import('@/types').LR0StateItem} prod*/
+export function prodToString(prod) {
+	let prodStr = `${augRules[prod.ruleIndex].left} -> `;
+	let right = augRules[prod.ruleIndex].right;
+	prodStr +=
+		right.length === 0
+			? '&epsilon;'
+			: right.slice(0, prod.pos).join(' ') + '&bull;' + right.slice(prod.pos).join(' ');
+	return prodStr;
+}
 /** @type {Array<import('@/types').GrammarItem>} */
 export let rules = [];
 /** @type {Array<string>}*/

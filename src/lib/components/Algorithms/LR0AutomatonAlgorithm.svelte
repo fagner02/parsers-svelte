@@ -145,10 +145,10 @@
 		targetStateSelection = getSelectionFunctions(elemIds.targetState);
 		stateStackSelection = getSelectionFunctions(elemIds.stateStack);
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
-		fetch('./lr0automaton.txt').then((data) =>
+		fetch('./lr0automaton.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		fetch('./lr0closure.txt').then((data) =>
+		fetch('./lr0closure.html').then((data) =>
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 

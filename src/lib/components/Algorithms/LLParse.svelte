@@ -82,7 +82,7 @@
 		}
 	);
 	onMount(async () => {
-		fetch('./llparse.txt').then((data) =>
+		fetch('./llparse.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 

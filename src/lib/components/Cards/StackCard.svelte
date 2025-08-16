@@ -149,7 +149,6 @@
 					elem.style.top = `-${lineHeight}px`;
 					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
 				}
-				console.log('remove end');
 				await wait(id, 1000);
 				stack.set([]);
 				resolve(null);

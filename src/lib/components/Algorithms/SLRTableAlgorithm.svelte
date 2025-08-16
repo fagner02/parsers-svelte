@@ -108,7 +108,7 @@
 	);
 
 	onMount(async () => {
-		fetch('./slrtable.txt').then((data) =>
+		fetch('./slrtable.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 		followSelection = getSelectionFunctions(elemIds.follow);

@@ -1,0 +1,14 @@
+<pre>
+<span>para cada <b>item</b> do <b>estado</b>:</span>
+<span>    se a posição do ponto de <b>item</b> for a ultima posição da regra:</span>
+<span>        continua para próxima iteração</span>
+<span>    <b>símbolo</b> &lt;- símbolo após a posição do ponto na produção de <b>item</b></span>
+<span>    se <b>símbolo</b> é um terminal:</span>
+<span>        continua para próxima iteração</span>
+<span>    para cada produção <b>p</b> na gramática:</span>
+<span>        se lado esquerdo de <b>p</b> ≠ <b>símbolo</b>:</span>
+<span>            continua para próxima iteração</span>
+<span>        se existe um item em <b>estado</b> com mesma produção <b>p</b> e posição 0:</span>
+<span>            continua para próxima iteração</span>
+<span>        adiciona novo item { produção: <b>p</b>, posição: 0 } ao <b>estado</b></span>
+</pre>

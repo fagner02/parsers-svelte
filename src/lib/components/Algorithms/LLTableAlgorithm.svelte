@@ -86,7 +86,7 @@
 	onMount(async () => {
 		firstFuncs = getSelectionFunctions(elemIds.firstSet);
 		tableElement?.resetTable();
-		fetch('./lltable.txt').then((data) =>
+		fetch('./lltable.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 

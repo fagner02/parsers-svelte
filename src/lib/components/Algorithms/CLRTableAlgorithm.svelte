@@ -105,7 +105,7 @@
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
-		fetch('./lr1table.txt').then((data) =>
+		fetch('./lr1table.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
 

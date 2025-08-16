@@ -1,0 +1,40 @@
+<pre>
+<span>enquanto haver itens modificados:</span>
+<span>    para cada <b>item</b> do <b>estado</b>:</span>
+<span>        se <b>item</b> não está marcado como modificado:</span>
+<span>            continua para a próxima iteração</span>
+<span>        marca como não modificado</span>
+<span>        se o ponto está na última posição do <b>item</b>:</span>
+<span>            continua para a próxima iteração</span>
+<span>        <b>b</b> &lt;- símbolo na posição do ponto do <b>item</b></span>
+<span>        se <b>b</b> é um terminal:</span>
+<span>            continua para a próxima iteração</span>
+<span>        <b>lookahead</b> &lt;- {}</span>
+<span>        se não há simbolos depois do ponto do <b>item</b>:</span>
+<span>            <b>lookahead</b> &lt;- lookahead do <b>item</b></span>
+<span>        senão:</span>
+<span>            <b>nulo</b> &lt;- verdadeiro</span>
+<span>            para cada símbolo <b>beta</b> na regra, começando do símbolo seguinte ao <b>item</b>:</span>
+<span>                se <b>beta</b> não é um <b>não-terminal</b>:</span>
+<span>                    adiciona <b>beta</b> à <b>lookahead</b></span>
+<span>                    <b>nulo</b> &lt;- falso</span>
+<span>                    sai do loop</span>
+<span>                senão:</span>
+<span>                    <b>first</b> &lt;- cópia do conjunto <b>first</b>(<b>beta</b>)</span>
+<span>                    adiciona elementos de <b>first</b>, exceto &epsilon;, à <b>lookahead</b></span>
+<span>                    se &epsilon; não pertence a <b>first</b>:</span>
+<span>                        <b>nulo</b> &lt;- falso</span>
+<span>                        sai do loop</span>
+<span>            se <b>nulo</b> é verdadeiro:</span>
+<span>                <b>lookahead</b> &lt;- união de <b>lookahead</b> e lookahead do <b>item</b></span>
+<span>        para cada regra <b>r</b> em <b>regras</b>:</span>
+<span>            se lado esquerdo de <b>r</b> é igual a <b>símbolo</b>:</span>n>
+<span>                se um item com a regra <b>r</b> e ponto na posição 0 já existe:</span>
+<span>                    adiciona <b>lookahead</b> ao lookahead do <b>item existente</b></span>
+<span>                    se o lookahead do <b>item existente</b> mudou:</span>
+<span>                        marca <b>item existente</b> como modificado</span>
+<span>                senão:</span>
+<span>                    adiciona item {regra: <b>r</b>, posição: 0, lookahead: <b>lookahead</b>} ao <b>estado</b></span>
+<span>                    marca <b>novo item</b> como modificado</span>
+<span>                    continua para a próxima iteração</span>
+</pre>

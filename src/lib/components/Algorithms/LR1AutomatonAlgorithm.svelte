@@ -17,7 +17,7 @@
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
-	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
+	import { augmentedGrammarTooltip, resetTooltips, showTooltip } from '@/Layout/tooltip.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -45,7 +45,7 @@
 	alphabet = alphabet.filter((x) => x !== '$');
 	/** @type {import("svelte/store").Writable<Array<import('@/types').StackItem<string>>>} */
 	let alphabetStack = writable(
-		alphabet.toReversed().map((x, i) => ({
+		alphabet.map((x, i) => ({
 			data: x,
 			text: x,
 			note: '',
@@ -95,6 +95,7 @@
 		automatonElem?.loadAutomaton(save.automaton);
 		resetAllSymbols(id, save.symbolIds);
 		resetSelectFor(obj, functionCalls, save.functionCall);
+		resetTooltips(save.functionCall, functionCalls);
 	}
 
 	export const obj = {
@@ -128,7 +129,8 @@
 		addToStack: () => stateStackElem?.addToStack,
 		removeFromStack: () => stateStackElem?.removeFromStack,
 		targetStateReset: () => targetStateElem?.resetState,
-		highlightLinesClosure: () => closureCodeCard?.highlightLines
+		highlightLinesClosure: () => closureCodeCard?.highlightLines,
+		showTooltip: () => showTooltip
 	};
 
 	let stepExecution = new StepExecution(
@@ -149,10 +151,10 @@
 		targetStateSelection = getSelectionFunctions(elemIds.targetState);
 		alphabetSelection = getSelectionFunctions(elemIds.alphabet);
 
-		fetch('./lr1automaton.txt').then((data) =>
+		fetch('./lr1automaton.html').then((data) =>
 			data.text().then((text) => codeCard?.setPseudoCode(text))
 		);
-		fetch('./lr1closure.txt').then((data) =>
+		fetch('./lr1closure.html').then((data) =>
 			data.text().then((text) => closureCodeCard?.setPseudoCode(text))
 		);
 
@@ -205,7 +207,7 @@
 			bind:this={lookaheadElem}
 			stack={lookaheadStack}
 			stackId={elemIds.lookahead}
-			label="lookahead"
+			label="novo lookahead"
 			hue={colors.green}
 			bind:svgLines
 		></StackCard>
@@ -216,7 +218,6 @@
 			label="alfabeto"
 			hue={colors.cyan}
 			bind:svgLines
-			horizontal={true}
 		></StackCard>
 	</div>
 	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">

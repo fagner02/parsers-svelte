@@ -1,16 +1,17 @@
-<span>Algoritmo de parsing CLR:</span>
+<pre>
+<span>Algoritmo de parsing SLR:</span>
 <span><b>pilha_estados</b> &lt;- [0]</span>
 <span><b>pilha_entrada</b> &lt;- entrada invertida (sem espaços) + ['$']</span>
 <span>enquanto verdadeiro:</span>
 <span>    <b>estado_atual</b> &lt;- último elemento de <b>pilha_estados</b></span>
 <span>    <b>lookahead</b> &lt;- último elemento de <b>pilha_entrada</b></span>
-<span>    <b>ação</b> &lt;- tabela[<b>estado_atual</b>][<b>lookahead</b>]</span>
+<span>    <b>ação</b> &lt;- tabela[estado <b>s{estado_atual}</b>][<b>lookahead</b>]</span>
 <span>    se <b>ação</b> não existe:</span>
 <span>        retorna falso</span>
 <span>    se <b>ação</b> é de aceito:</span>
 <span>        retorna verdadeiro</span>
 <span>    se <b>ação</b> é de shift:</span>
-<span>        <b>novo_estado</b> &lt;- estado de <b>ação</b></span>
+<span>        <b>novo_estado</b> &lt;- estado da <b>ação</b></span>
 <span>        adiciona <b>lookahead</b> a <b>pilha_estados</b></span>
 <span>        adiciona <b>novo_estado</b> a <b>pilha_estados</b></span>
 <span>        remove <b>lookahead</b> de <b>pilha_entrada</b></span>
@@ -21,9 +22,10 @@
 <span>            para cada <b>i</b> de 0 até <b>comprimento(direita da produção)</b>:</span>
 <span>                remove último elemento de <b>pilha_estados</b> (estado)</span>
 <span>                remove último elemento de <b>pilha_estados</b> (símbolo)</span>
-<span>        <b>estado_base</b> &lt;- último elemento de <b>pilha_estados</b></span>
-<span>        <b>estado_goto</b> &lt;- tabela[<b>estado_base</b>][esquerda de <b>produção</b>]</span>
+<span>        <b>estado_base</b> &lt;- novo topo de <b>pilha_estados</b></span>
+<span>        <b>estado_goto</b> &lt;- tabela[<b>{estado_base}</b>][esquerda de <b>produção</b>]</span>
 <span>        se <b>estado_goto</b> não existe:</span>
 <span>            retorna falso</span>
 <span>        adiciona esquerda de <b>produção</b> a <b>pilha_estados</b></span>
 <span>        adiciona <b>estado_goto</b> a <b>pilha_estados</b></span>
+</pre>

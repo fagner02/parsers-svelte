@@ -1,4 +1,4 @@
-import { nt, augRules, t } from '$lib/utils';
+import { nt, augRules, t, prodToString } from '$lib/utils';
 import { colors } from '../selectSymbol';
 
 export const id = 'lr0automaton';
@@ -29,48 +29,29 @@ export let saves = [];
 let symbolIds = [];
 
 /**
- * @param {import('@/types').LR0StateItem} prod*/
-function prodToString(prod) {
-	let prodStr = `${augRules[prod.ruleIndex].left} -> `;
-	let right = augRules[prod.ruleIndex].right;
-	prodStr +=
-		right.length === 0
-			? '&epsilon;'
-			: right.slice(0, prod.pos).join(' ') + '&bull;' + right.slice(prod.pos).join(' ');
-	return prodStr;
-}
-/**
  * @param {import('@/types').LR0StateItem[]} state
  */
 export function closure(state) {
-	let itemsToCheck = [...state.keys()];
-
-	functionCalls.push({ name: 'highlightLinesClosure', args: [[0]] });
-	functionCalls.push({ name: 'highlightLinesClosure', args: [[1]] });
-
-	functionCalls.push({ name: 'highlightLinesClosure', args: [[2]] });
-	while (itemsToCheck.length > 0) {
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[3]] });
-		let item = state[itemsToCheck[0]];
-		let index = itemsToCheck[0];
+	for (let k = 0; k < state.length; k++) {
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[0]] });
+		let item = state[k];
 		functionCalls.push({
 			name: 'selectForTarget',
-			args: [`state-${elemIds.targetState}-${index}`, colors.pink, id]
+			args: [`state-${elemIds.targetState}-${k}`, colors.pink, id]
 		});
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[4]] });
 
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[1]] });
 		if (augRules[item.ruleIndex].right.length === item.pos) {
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[5]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[2]] });
 			functionCalls.push({
 				name: 'showTooltip',
 				args: [
-					`state-dot-${elemIds.targetState}-${index}`,
+					`state-dot-${elemIds.targetState}-${k}`,
 					`O ponto está na última posição da produção ${prodToString(item)} então passamos para a próxima iteração`,
 					colors.pink,
 					1
 				]
 			});
-			itemsToCheck.shift();
 			functionCalls.push({
 				name: 'addPause',
 				args: [id]
@@ -87,23 +68,22 @@ export function closure(state) {
 			continue;
 		}
 		let symbol = augRules[item.ruleIndex].right[item.pos];
+		let symbolId = `state-${elemIds.targetState}-${k}-${item.pos}`;
 
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[6]] });
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[3]] });
+		functionCalls.push({ name: 'highlightLinesClosure', args: [[4]] });
 		if (!nt.includes(symbol)) {
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
-			itemsToCheck.shift();
-			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[5]] });
+			functionCalls.push({ name: 'highlightDotTarget', args: [k] });
 			functionCalls.push({
 				name: 'selectSymbol',
-				args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
+				args: [symbolId, colors.pink, id, false]
 			});
 			symbolIds.push(functionCalls.at(-1)?.args);
 			functionCalls.push({
 				name: 'showTooltip',
 				args: [
-					`state-${elemIds.targetState}-${index}-${item.pos === augRules[item.ruleIndex].right.length ? item.pos - 1 : item.pos}`,
+					`state-${elemIds.targetState}-${k}-${item.pos === augRules[item.ruleIndex].right.length ? item.pos - 1 : item.pos}`,
 					`'${symbol}' é um terminal então passamos para a próxima iteração`,
 					colors.pink,
 					1
@@ -122,13 +102,19 @@ export function closure(state) {
 				functionCall: functionCalls.length - 1,
 				symbolIds: structuredClone(symbolIds)
 			});
+			functionCalls.push({
+				name: 'deselectSymbol',
+				args: [symbolId, id]
+			});
+
+			symbolIds = symbolIds.filter((x) => x[0] != symbolId);
 			continue;
 		}
 
-		functionCalls.push({ name: 'highlightDotTarget', args: [index] });
+		functionCalls.push({ name: 'highlightDotTarget', args: [k] });
 		functionCalls.push({
 			name: 'selectSymbol',
-			args: [`state-${elemIds.targetState}-${index}-${item.pos}`, colors.pink, id, false]
+			args: [symbolId, colors.pink, id, false]
 		});
 		symbolIds.push(functionCalls.at(-1)?.args);
 		functionCalls.push({
@@ -154,22 +140,22 @@ export function closure(state) {
 			symbolIds: structuredClone(symbolIds)
 		});
 		for (let [ruleIndex, rule] of augRules.entries()) {
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[6]] });
 
 			functionCalls.push({
 				name: 'selectForGrammar',
 				args: [`${elemIds.grammar}gset${ruleIndex}`]
 			});
 
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[11]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[7]] });
 			if (!(rule.left === symbol)) {
-				functionCalls.push({ name: 'highlightLinesClosure', args: [[12]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[8]] });
 				continue;
 			}
 
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[13]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
 			if (state.some((x) => x.ruleIndex === rule.index && x.pos === 0)) {
-				functionCalls.push({ name: 'highlightLinesClosure', args: [[14]] });
+				functionCalls.push({ name: 'highlightLinesClosure', args: [[10]] });
 				functionCalls.push({
 					name: 'showTooltip',
 					args: [
@@ -195,28 +181,22 @@ export function closure(state) {
 
 				continue;
 			}
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[15]] });
+			functionCalls.push({ name: 'highlightLinesClosure', args: [[11]] });
 
 			state.push({ ruleIndex: rule.index, pos: 0, lookahead: null });
 			functionCalls.push({
 				name: 'addItemTarget',
 				args: [rule.index, 0, null, `${elemIds.grammar}gl${rule.index}`]
 			});
-			functionCalls.push({ name: 'highlightLinesClosure', args: [[16]] });
-			itemsToCheck.push(state.length - 1);
 		}
 
 		functionCalls.push({ name: 'hideSelectGrammar', args: [] });
 
-		let symbolId = `state-${elemIds.targetState}-${itemsToCheck[0]}-${item.pos}`;
 		functionCalls.push({
 			name: 'deselectSymbol',
 			args: [symbolId, id]
 		});
-
 		symbolIds = symbolIds.filter((x) => x[0] != symbolId);
-		functionCalls.push({ name: 'highlightLinesClosure', args: [[17]] });
-		itemsToCheck.shift();
 	}
 
 	functionCalls.push({ name: 'hideSelectTarget', args: [] });

@@ -81,7 +81,7 @@
 
 	onMount(async () => {
 		grammarSelection = getSelectionFunctions(elemIds.grammar);
-		fetch('./first.txt').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
+		fetch('./first.html').then((data) => data.text().then((text) => codeCard?.setPseudoCode(text)));
 
 		stepExecution.executeSteps();
 	});

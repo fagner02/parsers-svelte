@@ -77,8 +77,9 @@
 	 * @param {string} pseudoCode
 	 */
 	export function setPseudoCode(pseudoCode) {
-		cardContent.innerHTML = pseudoCode.trim();
-		linesNum = (pseudoCode.match(/\n/g) || []).length;
+		pseudoCode = pseudoCode.trim().slice(6).slice(0, -7);
+		cardContent.innerHTML = pseudoCode;
+		linesNum = (pseudoCode.match(/\n/g) || []).length + 1;
 		card.style.width = `${card.scrollWidth + card.clientWidth - cardContent.clientWidth}px`;
 		setSize();
 	}
