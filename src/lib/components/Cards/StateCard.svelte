@@ -48,7 +48,7 @@
 						ruleIndex: ruleIndex,
 						pos: pos,
 						hide: true,
-						lookahead: lookahead ? new Set(lookahead) : null
+						lookahead: lookahead ? structuredClone(lookahead) : null
 					}
 				]);
 				await wait(id, 0);
@@ -137,25 +137,36 @@
 	export async function loadState(stateToLoad, srcId = null) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				cardState.update(() =>
+				dotIndex = -1;
+				cardState.set(
 					stateToLoad.map((x) => {
+						console.log(x);
 						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,
-							lookahead: x.lookahead
+							lookahead: structuredClone(x.lookahead)
 						});
 					})
 				);
 
-				await noJumpWait(0);
+				await wait(id, 0);
 				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-title`, id);
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 				while (elem !== null) {
-					elem.style.maxWidth = `${elem.scrollWidth}px`;
-					elem.style.height = `${elem.scrollHeight}px`;
+					elem.style.maxWidth = `fit-content`;
+					elem.style.height = `fit-content`;
 					elem.style.opacity = '1';
 
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+				}
+				let lookahead = /**@type {NodeListOf<HTMLElement>}*/ (
+					document.querySelector(`#s-container-${stateId}`)?.querySelectorAll('.look-item')
+				);
+				if (lookahead) {
+					for (const elem of lookahead) {
+						elem.style.maxWidth = `${elem.scrollWidth}px`;
+						elem.style.opacity = '1';
+					}
 				}
 				try {
 					await wait(id, 500);

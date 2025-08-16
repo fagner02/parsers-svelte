@@ -90,6 +90,7 @@
 		originStateElem?.loadState(save.originState);
 		targetStateElem?.loadState(save.targetState);
 		stateStackElem?.loadStack(stackCard(save.stateStack, { key: (a) => `s${a}` }));
+		lookaheadElem?.loadStack(stackCard(save.lookahead.values().toArray(), {}));
 		automatonElem?.reset();
 		automatonElem?.loadAutomaton(save.automaton);
 		resetAllSymbols(id, save.symbolIds);

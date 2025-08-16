@@ -149,6 +149,7 @@
 					elem.style.top = `-${lineHeight}px`;
 					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
 				}
+				console.log('remove end');
 				await wait(id, 1000);
 				stack.set([]);
 				resolve(null);
@@ -171,6 +172,8 @@
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 				while (elem) {
+					elem.style.width = 'unset';
+					elem.style.height = 'unset';
 					elem.style.opacity = '1';
 					elem.style.top = '0px';
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);

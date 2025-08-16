@@ -15,24 +15,26 @@ let selectedSymbolsMap = new Map();
  * @param {Parameters<selectSymbol>[]} symbolIds
  */
 export function resetAllSymbols(id, symbolIds) {
-	for (const symbolId of selectedSymbolsMap.get(id) ?? []) {
-		let symbol = document.querySelector(symbolId);
-		symbol?.classList.remove('empty', 'block', 'block-deselect');
-	}
-	let selectedSymbols = new Set();
-
-	for (const symbolId of symbolIds) {
-		if (!symbolId[0].startsWith('#')) symbolId[0] = '#' + symbolId[0];
-		let symbol = /** @type {HTMLElement} */ (document.querySelector(symbolId[0]));
-		if (!symbol) {
-			console.error(symbolId[0], symbol);
-			continue;
+	setTimeout(() => {
+		for (const symbolId of selectedSymbolsMap.get(id) ?? []) {
+			let symbol = document.querySelector(symbolId);
+			symbol?.classList.remove('empty', 'block', 'block-deselect');
 		}
-		selectedSymbols.add(symbolId[0]);
-		symbol.classList.add(symbolId[3] ? 'block' : 'empty');
-		symbol.style.setProperty('--block-hue', symbolId[1].toString());
-	}
-	selectedSymbolsMap.set(id, selectedSymbols);
+		let selectedSymbols = new Set();
+
+		for (const symbolId of symbolIds) {
+			if (!symbolId[0].startsWith('#')) symbolId[0] = '#' + symbolId[0];
+			let symbol = /** @type {HTMLElement} */ (document.querySelector(symbolId[0]));
+			if (!symbol) {
+				console.error(symbolId[0], symbol);
+				continue;
+			}
+			selectedSymbols.add(symbolId[0]);
+			symbol.classList.add(symbolId[3] ? 'block' : 'empty');
+			symbol.style.setProperty('--block-hue', symbolId[1].toString());
+		}
+		selectedSymbolsMap.set(id, selectedSymbols);
+	}, 0);
 }
 /**
  * @param {string} card

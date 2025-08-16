@@ -37,7 +37,7 @@ export function closure(state, firstSet) {
 	functionCalls.push({ name: 'addPause', args: [id] });
 
 	saves.push({
-		targetState: [...state],
+		targetState: structuredClone(state),
 		lookahead: new Set(),
 		originState: saves[saves.length - 1].originState,
 		stateStack: saves[saves.length - 1].stateStack,
@@ -89,11 +89,11 @@ export function closure(state, firstSet) {
 		if (augRules[item.ruleIndex].right.length - 1 === item.pos) {
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[9]] });
 			functionCalls.push({ name: 'highlightDotTarget', args: [index] });
-			for (let l of item.lookahead) {
+			for (let [i, l] of item.lookahead.values().toArray().entries()) {
 				if (lookahead.has(l)) continue;
 				functionCalls.push({
 					name: 'addLookahead',
-					args: [l, l, '', `look-${elemIds.targetState}-${index}`]
+					args: [l, l, '', `look-${elemIds.targetState}-${index}-${i}`]
 				});
 			}
 			lookahead = new Set(item.lookahead);
@@ -101,8 +101,8 @@ export function closure(state, firstSet) {
 			functionCalls.push({ name: 'addPause', args: [id] });
 
 			saves.push({
-				targetState: [...state],
-				lookahead: new Set(lookahead),
+				targetState: structuredClone(state),
+				lookahead: structuredClone(lookahead),
 				originState: saves[saves.length - 1].originState,
 				stateStack: saves[saves.length - 1].stateStack,
 				automaton: saves[saves.length - 1].automaton,
@@ -144,8 +144,8 @@ export function closure(state, firstSet) {
 					lookahead.add(beta);
 					functionCalls.push({ name: 'addPause', args: [id] });
 					saves.push({
-						targetState: [...state],
-						lookahead: new Set(lookahead),
+						targetState: structuredClone(state),
+						lookahead: structuredClone(lookahead),
 						originState: saves[saves.length - 1].originState,
 						stateStack: saves[saves.length - 1].stateStack,
 						automaton: saves[saves.length - 1].automaton,
@@ -174,8 +174,8 @@ export function closure(state, firstSet) {
 					}
 					functionCalls.push({ name: 'addPause', args: [id] });
 					saves.push({
-						targetState: [...state],
-						lookahead: new Set(lookahead),
+						targetState: structuredClone(state),
+						lookahead: structuredClone(lookahead),
 						originState: saves[saves.length - 1].originState,
 						stateStack: saves[saves.length - 1].stateStack,
 						automaton: saves[saves.length - 1].automaton,
@@ -213,18 +213,18 @@ export function closure(state, firstSet) {
 			functionCalls.push({ name: 'highlightLinesClosure', args: [[23]] });
 			if (nullable) {
 				functionCalls.push({ name: 'highlightLinesClosure', args: [[24]] });
-				for (let l of item.lookahead) {
+				for (let [i, l] of item.lookahead.values().toArray().entries()) {
 					if (lookahead.has(l)) continue;
 					functionCalls.push({
 						name: 'addLookahead',
-						args: [l, l, '', `look-${elemIds.targetState}-${index}`]
+						args: [l, l, '', `look-${elemIds.targetState}-${index}-${i}`]
 					});
 					lookahead.add(l);
 				}
 				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
-					targetState: [...state],
-					lookahead: new Set(lookahead),
+					targetState: structuredClone(state),
+					lookahead: structuredClone(lookahead),
 					originState: saves[saves.length - 1].originState,
 					stateStack: saves[saves.length - 1].stateStack,
 					automaton: saves[saves.length - 1].automaton,
@@ -264,12 +264,12 @@ export function closure(state, firstSet) {
 				});
 				functionCalls.push({ name: 'highlightLinesClosure', args: [[30]] });
 				functionCalls.push({ name: 'highlightLinesClosure', args: [[31]] });
-				state.push({ ruleIndex: rule.index, pos: 0, lookahead: new Set(lookahead) });
+				state.push({ ruleIndex: rule.index, pos: 0, lookahead: structuredClone(lookahead) });
 				itemsToCheck.push(state.length - 1);
 				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
-					targetState: [...state],
-					lookahead: new Set(lookahead),
+					targetState: structuredClone(state),
+					lookahead: structuredClone(lookahead),
 					originState: saves[saves.length - 1].originState,
 					stateStack: saves[saves.length - 1].stateStack,
 					automaton: saves[saves.length - 1].automaton,
@@ -297,8 +297,8 @@ export function closure(state, firstSet) {
 			}
 			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
-				targetState: [...state],
-				lookahead: new Set(state[existent].lookahead),
+				targetState: structuredClone(state),
+				lookahead: structuredClone(state[existent].lookahead),
 				originState: saves[saves.length - 1].originState,
 				stateStack: saves[saves.length - 1].stateStack,
 				automaton: saves[saves.length - 1].automaton,
@@ -585,7 +585,7 @@ export function lr1Automaton(firstSet) {
 	saves.push({
 		targetState: [],
 		lookahead: new Set(),
-		originState: automaton.states[originStateIndex].items,
+		originState: structuredClone(automaton.states[originStateIndex].items),
 		originStateName: `s${originStateIndex}`,
 		targetStateName: 's?',
 		stateStack: structuredClone(stateStack),
