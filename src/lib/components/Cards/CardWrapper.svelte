@@ -139,6 +139,7 @@
 		border-radius: 5px;
 		opacity: 50%;
 		transition: opacity 0.5s;
+		cursor: default;
 	}
 	.help:hover {
 		opacity: 100%;
