@@ -140,7 +140,6 @@
 				dotIndex = -1;
 				cardState.set(
 					stateToLoad.map((x) => {
-						console.log(x);
 						return /**@type {import('@/types').LR0StateItem}*/ ({
 							ruleIndex: x.ruleIndex,
 							pos: x.pos,
