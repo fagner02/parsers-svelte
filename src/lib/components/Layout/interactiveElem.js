@@ -48,6 +48,8 @@ export class Interaction {
 	resizedElem;
 	/**@type {DOMRect | null} */
 	resizeInitial = null;
+	/**@type {any} */
+	touchMoveListener = null;
 	resizePoint = { x: 0, y: 0 };
 	resizeDirLeft = false;
 	resizeDirTop = false;
@@ -67,6 +69,7 @@ export class Interaction {
 		document.onmousemove = null;
 		document.ontouchend = null;
 		document.ontouchmove = null;
+		document.removeEventListener('touchmove', this.touchMoveListener);
 		document.ontouchcancel = null;
 	}
 
@@ -124,12 +127,15 @@ export class Interaction {
 		document.onmouseleave = (e) => {
 			this.moveEnd(e);
 		};
-		document.onmousemove = (e) => {
-			this.moveMove(e);
+		document.onmousemove = (_e) => {
+			_e.preventDefault();
+			this.moveMove(_e);
 		};
-		document.ontouchmove = (e) => {
-			this.moveMove(e);
+		this.touchMoveListener = (/**@type {TouchEvent}*/ _e) => {
+			_e.preventDefault();
+			this.moveMove(_e);
 		};
+		document.addEventListener('touchmove', this.touchMoveListener, { passive: false });
 		document.ontouchend = (e) => {
 			this.moveEnd(e);
 			moveEndCallback?.();
