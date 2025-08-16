@@ -87,12 +87,15 @@ export class StepExecution {
 					this.setStep(0);
 					this.stepChanged = false;
 					this.inputChanged = false;
+					lastI = -1;
+					count = 0;
 					i = 0;
 					continue;
 				}
 				if (this.stepChanged) {
 					this.stepChanged = false;
 					i = this.saves[this.currentStep].functionCall;
+					count = 0;
 					continue;
 				}
 				const call = this.functionCalls[i];
