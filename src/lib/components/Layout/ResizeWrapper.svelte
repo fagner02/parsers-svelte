@@ -55,8 +55,9 @@
 		content.style.height = `${height}px`;
 		content.style.padding = '0px';
 		wrapper.style.overflow = 'unset';
-
-		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '1';
+		const child = /**@type {HTMLElement}*/ (content.firstElementChild);
+		child.style.pointerEvents = 'all';
+		child.style.opacity = '1';
 		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
 			/**@type {HTMLElement}*/ (handle).style.opacity = '1';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'all';
@@ -81,25 +82,30 @@
 		appendData(`close float, ${props.id}`);
 		minimized = true;
 
-		let wrapper = /**@type {HTMLElement}*/ (document.querySelector(`#${props.id}-resize-wrapper`));
-		let content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
+		const wrapper = /**@type {HTMLElement}*/ (
+			document.querySelector(`#${props.id}-resize-wrapper`)
+		);
+		const content = /**@type {HTMLElement}*/ (wrapper.firstElementChild);
 		width = content.scrollWidth;
 		height = content.scrollHeight;
 		content.style.width = `${content.scrollWidth}px`;
 		content.style.height = `${content.scrollHeight}px`;
 		content.style.padding = '5px';
 		await wait(props.id, 0);
-		let openButton = document
+		const openButton = document
 			.querySelector(`#${props.id}-resize-wrapper>.open-window`)
 			?.getBoundingClientRect();
 		content.style.width = `${openButton?.width}px`;
 		content.style.height = `${openButton?.height}px`;
 		content.style.overflow = 'hidden';
-		/**@type {HTMLElement}*/ (content.firstElementChild).style.opacity = '0';
-		for (let handle of wrapper.querySelectorAll('.resize-handle')) {
+		const child = /**@type {HTMLElement}*/ (content.firstElementChild);
+		child.style.pointerEvents = 'none';
+		child.style.opacity = '0';
+		for (const handle of wrapper.querySelectorAll('.resize-handle')) {
 			/**@type {HTMLElement}*/ (handle).style.opacity = '0';
 			/**@type {HTMLElement}*/ (handle).style.pointerEvents = 'none';
 		}
+
 		await wait(props.id, 500);
 		wrapper.style.overflow = 'hidden';
 		interaction.removeTransformListeners();
@@ -261,6 +267,7 @@
 	}
 	:global(.resize-content > *) {
 		opacity: 0;
+		pointer-events: none;
 		transition: opacity 0.5s;
 	}
 	.resize-wrapper {

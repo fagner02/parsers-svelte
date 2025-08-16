@@ -98,7 +98,6 @@ export class Interaction {
 	removeMoveListeners() {
 		if (!this.moveTarget) return;
 		this.moveTarget.style.cursor = 'unset';
-		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'all';
 		this.moveTarget.onmousedown = null;
 		this.moveTarget.ontouchstart = null;
 		this.removeDocumentListeners();
