@@ -33,7 +33,7 @@
 			class={accept === null ? '' : accept ? 'accept' : 'reject'}
 			placeholder="Digite a entrada aqui"
 		/>
-		<div class="parse-view">
+		<div class="parse-view grid">
 			{@render parse?.()}
 		</div>
 	</div>

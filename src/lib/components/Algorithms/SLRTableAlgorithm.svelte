@@ -19,6 +19,7 @@
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
 	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {TableCard | undefined}*/
 	let tableElem = $state();
@@ -113,21 +114,20 @@
 		);
 		followSelection = getSelectionFunctions(elemIds.follow);
 		stateSelection = getSelectionFunctions(elemIds.state);
-		stackSelection = getSelectionFunctions(elemIds.stateStack);
 		tableElem?.resetTable();
 		automatonElem?.loadAutomaton(automaton);
 
 		stepExecution.executeSteps();
+		stackSelection = getSelectionFunctions(elemIds.stateStack);
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
-<div class="grid unit">
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="Tabela SLR" bind:this={codeCard} id="slrtable"></PseudoCode>
 		<Automaton {id} bind:this={automatonElem}></Automaton>
-	</div>
-	<div class="cards-box unit" id="card-box{id}">
+	{/snippet}
+	{#snippet cards()}
 		<GrammarCard
 			labelTooltip={augmentedGrammarTooltip('SLR')}
 			{id}
@@ -164,8 +164,5 @@
 			hue={colors.blue}
 			bind:svgLines
 		></StackCard>
-	</div>
-</div>
-
-<style>
-</style>
+	{/snippet}
+</AlgoLayout>

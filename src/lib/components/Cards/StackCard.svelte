@@ -17,7 +17,7 @@
 	 * reversed?: boolean,
 	 * stackId: string,
 	 * labelTooltip?: string,
-	 * svgLines: import('@/Structures/SvgLines.svelte').default
+	 * svgLines: import('@/Structures/SvgLines.svelte').default|undefined
 	 * horizontal?: boolean }}*/
 	let {
 		horizontal = false,

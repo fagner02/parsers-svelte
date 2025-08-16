@@ -1,12 +1,9 @@
 <script>
 	import { getJumpPause, wait } from '$lib/flowControl';
 	import { fontSize } from '$lib/globalStyle';
-	import { id } from '$lib/stepCalc/clr_table';
 	import { setSelectionFunctions } from '@/Cards/selectionFunction';
 	import { Interaction } from '@/Layout/interactiveElem';
-	import ResizeWrapper from '@/Layout/ResizeWrapper.svelte';
 	import { setUpTooltip } from '@/Layout/tooltip.svelte';
-	import FileCodeIcon from '@icons/FileCodeIcon.svelte';
 	import HelpIcon from '@icons/HelpIcon.svelte';
 	import { onMount } from 'svelte';
 
@@ -78,7 +75,11 @@
 	};
 	setSelectionFunctions(props.cardId, selectionFunctions);
 
+	const interaction = new Interaction();
+
 	onMount(() => {
+		const label = /**@type {HTMLElement}*/ (document.querySelector(`#label-${props.cardId}`));
+		interaction.setMoveInteraction(label, label.parentElement?.parentElement);
 		selection = /**@type {HTMLElement}*/ (document.querySelector(`#select-${props.cardId}`));
 	});
 </script>
@@ -102,10 +103,11 @@
 		>
 			{@render props.children?.()}
 		</div>
-		<div
+		<button
 			class="card-label"
 			id="label-{props.cardId}"
 			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}px;"
+			onmousedown={(e) => interaction.moveStart(e)}
 		>
 			{#if labelTooltip}
 				<div class="help" use:setUpTooltip={{ text: labelTooltip, id: 0, hue: props.hue }}>
@@ -113,7 +115,7 @@
 				</div>
 			{/if}
 			{props.label}
-		</div>
+		</button>
 	</div>
 </div>
 
@@ -150,6 +152,7 @@
 		padding: 5px;
 		width: min-content;
 		z-index: 0;
+		position: relative;
 	}
 
 	.card {

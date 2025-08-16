@@ -153,7 +153,7 @@
 						>
 					{/each}
 				</div>
-				<FillSize class="grid">
+				<FillSize class="grid maxWidth">
 					{#snippet content()}
 						{#each algos as algo}
 							{#if algo.loaded}<div
@@ -172,9 +172,6 @@
 		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
-		<div class="grid" style="place-items: center;">
-			<SlrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}
-			></SlrParse>
-		</div>
+		<SlrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}></SlrParse>
 	{/snippet}
 </AlgorithmTab>

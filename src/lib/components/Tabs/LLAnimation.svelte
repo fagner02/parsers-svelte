@@ -21,6 +21,7 @@
 	import FollowInfo from '@/Info/FollowInfo.svelte';
 	import Ll1TableInfo from '@/Info/LL1TableInfo.svelte';
 	import LlParsingInfo from '@/Info/LL1ParsingInfo.svelte';
+	import FillSize from '@/Layout/FillSize.svelte';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -165,24 +166,24 @@
 	{code}
 >
 	{#snippet steps()}
-		<div style="max-width: inherit; width: 100%;">
-			<div class="algo-buttons">
-				{#each algos as algo}
-					<button
-						use:setUpTooltip={{ id: 0, text: algo.desc }}
-						disabled={selectedAlgorithm === algo.name}
-						onclick={() => {
-							id = algo.id;
-							algo.loaded = true;
-							swapAlgorithm(id, algo.infoComp, tabId);
-							resetSelectionFunctions();
-							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
-							selectedAlgorithm = algo.name;
-						}}>{algo.name}</button
-					>
-				{/each}
-			</div>
-			<div class="grid">
+		<div class="algo-buttons">
+			{#each algos as algo}
+				<button
+					use:setUpTooltip={{ id: 0, text: algo.desc }}
+					disabled={selectedAlgorithm === algo.name}
+					onclick={() => {
+						id = algo.id;
+						algo.loaded = true;
+						swapAlgorithm(id, algo.infoComp, tabId);
+						resetSelectionFunctions();
+						appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
+						selectedAlgorithm = algo.name;
+					}}>{algo.name}</button
+				>
+			{/each}
+		</div>
+		<FillSize class="grid maxWidth">
+			{#snippet content()}
 				{#each algos as algo}
 					{#if algo.loaded}<div
 							class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}"
@@ -191,15 +192,13 @@
 						</div>
 					{/if}
 				{/each}
-			</div>
-		</div>
+			{/snippet}
+		</FillSize>
 	{/snippet}
 	{#snippet tree()}
 		<SyntaxTree id={parseId}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
-		<div class="grid" style="place-items: center;">
-			<LlParse {tableData} {table}></LlParse>
-		</div>
+		<LlParse {tableData} {table}></LlParse>
 	{/snippet}
 </AlgorithmTab>

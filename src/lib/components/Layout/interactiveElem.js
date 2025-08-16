@@ -1,9 +1,12 @@
 import { appendData } from '../../log';
 
-/**@param {HTMLElement} elem*/
-export function stackFloatingWindows(elem) {
+/**
+ * @param {HTMLElement} elem
+ * @param {string} id
+ */
+export function stackFloatingWindows(elem, id) {
 	setTimeout(() => {
-		let boundingBox = document.querySelector('#wrapper>.grid>.not-hidden');
+		let boundingBox = document.querySelector(`#${id}-wrapper`);
 		if (!boundingBox) return;
 		let boundingBoxRect = boundingBox.getBoundingClientRect();
 		const pad = 10;
@@ -15,6 +18,7 @@ export function stackFloatingWindows(elem) {
 			/**@type {HTMLElement}*/ (item).style.top =
 				`${boundingBoxRect.bottom - parseFloat(margin) - rect.height - top - boundingBoxRect.top}px`;
 			/**@type {HTMLElement}*/ (item).style.opacity = '1';
+
 			top += rect.height + pad;
 		}
 	}, 500);
@@ -38,6 +42,8 @@ export class Interaction {
 	transformListener;
 	/**@type {Elem|undefined} */
 	moveTarget;
+	/**@type {Elem?}*/
+	parent = null;
 	/**@type {Elem | undefined}*/
 	resizedElem;
 	/**@type {DOMRect | null} */
@@ -66,9 +72,14 @@ export class Interaction {
 
 	/**
 	 * @param {Elem} target
+	 * @param {Elem?} parent
 	 */
-	setMoveInteraction(target) {
+	setMoveInteraction(target, parent = null) {
 		this.moveTarget = target;
+		this.parent = parent;
+		if (!parent) {
+			this.parent = this.moveTarget.parentElement;
+		}
 		this.attachMoveListeners();
 	}
 
@@ -82,8 +93,9 @@ export class Interaction {
 			this.moveStart(e);
 		};
 		this.moveTarget.style.cursor = 'move';
-
-		/**@type {HTMLElement}*/ (this.moveTarget.firstChild).style.pointerEvents = 'none';
+		if (this.moveTarget.firstElementChild) {
+			/**@type {HTMLElement}*/ (this.moveTarget.firstElementChild).style.pointerEvents = 'none';
+		}
 	}
 
 	removeMoveListeners() {
@@ -142,12 +154,11 @@ export class Interaction {
 
 		this.dragPos = { x: x, y: y };
 
-		let parent = this.moveTarget?.parentElement;
-		if (!parent) return;
+		if (!this.parent) return;
 
 		this.movePos = {
-			x: parseFloat(parent.style.left) || 0,
-			y: parseFloat(parent.style.top) || 0
+			x: parseFloat(this.parent.style.left) || 0,
+			y: parseFloat(this.parent.style.top) || 0
 		};
 	}
 
@@ -170,8 +181,8 @@ export class Interaction {
 		this.dragPos = { x: x, y: y };
 		this.movePos = { x: this.movePos.x + diff.x, y: this.movePos.y + diff.y };
 
-		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.top = `${this.movePos.y}px`;
-		/**@type {HTMLElement}*/ (this.moveTarget.parentElement).style.left = `${this.movePos.x}px`;
+		/**@type {HTMLElement}*/ (this.parent).style.top = `${this.movePos.y}px`;
+		/**@type {HTMLElement}*/ (this.parent).style.left = `${this.movePos.x}px`;
 	}
 
 	/**
@@ -180,8 +191,8 @@ export class Interaction {
 	moveEnd(e) {
 		this.removeDocumentListeners();
 		this.interactingCallback?.(false);
-		if (this?.moveTarget?.parentElement) {
-			const rect = this.moveTarget.parentElement?.getBoundingClientRect();
+		if (this.parent) {
+			const rect = this.parent.getBoundingClientRect();
 			appendData(`move float, end;${rect.left} ${rect.top};${rect.width} ${rect.height}`);
 		}
 		if (!this.dragPos || !this.moveTarget) return;

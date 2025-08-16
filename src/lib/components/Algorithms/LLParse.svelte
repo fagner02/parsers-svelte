@@ -15,6 +15,7 @@
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetTooltips, showTooltip } from '@/Layout/tooltip.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -90,13 +91,12 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
-<div class="grid unit">
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="Análise sintática LL(1)" bind:this={codeCard} id="llparse"
 		></PseudoCode>
-	</div>
-	<div class="cards-box unit" id="card-box{id}">
+	{/snippet}
+	{#snippet cards()}
 		<TableCard
 			{id}
 			rows={nt}
@@ -129,5 +129,5 @@
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>
-	</div>
-</div>
+	{/snippet}
+</AlgoLayout>

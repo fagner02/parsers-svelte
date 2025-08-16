@@ -15,6 +15,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -84,13 +85,12 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
-<div class="grid unit">
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="Análise sintática LR(1)" bind:this={codeCard} id="clrparse"
 		></PseudoCode>
-	</div>
-	<div class="cards-box unit" id="card-box{id}">
+	{/snippet}
+	{#snippet cards()}
 		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
 		<TableCard
 			{id}
@@ -120,5 +120,5 @@
 			hue={colors.green}
 			label="pilha de símbolos"
 		></StackCard>
-	</div>
-</div>
+	{/snippet}
+</AlgoLayout>

@@ -273,7 +273,7 @@
 			</div>
 		</div>
 		{#if isGrammarLoaded()}
-			<FillSize id="wrapper" class="grid maxWidth">
+			<FillSize id="{id}-wrapper" class="grid maxWidth wrapper">
 				{#snippet content()}
 					<div class="grid unit" style="height: inherit;max-width: inherit;z-index: 1">
 						{#if parseLoaded}
@@ -402,7 +402,7 @@
 		border-radius: 10px;
 	}
 
-	:global(#wrapper > .grid > div) {
+	:global(.wrapper > .grid > div) {
 		position: relative;
 	}
 

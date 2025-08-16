@@ -46,7 +46,7 @@
 	}
 	button {
 		position: absolute;
-		pointer-events: all;
+		pointer-events: visible;
 		display: flex;
 		border-radius: 5px;
 		background: hsl(350, 0%, 35%);

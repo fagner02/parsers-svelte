@@ -18,6 +18,7 @@
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
 	import { augmentedGrammarTooltip, resetTooltips, showTooltip } from '@/Layout/tooltip.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let stateStackElem = $state();
@@ -162,9 +163,8 @@
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
-<div class="grid unit" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div class="cards-box unit" id="card-box{id}">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet cards()}
 		<GrammarCard
 			{id}
 			labelTooltip={augmentedGrammarTooltip('LR(1)')}
@@ -219,8 +219,8 @@
 			hue={colors.cyan}
 			bind:svgLines
 		></StackCard>
-	</div>
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+	{/snippet}
+	{#snippet floats()}
 		<PseudoCode
 			bind:breakpoints={closureBreakpoints}
 			title="Closure LR(1)"
@@ -235,8 +235,5 @@
 		></PseudoCode>
 
 		<Automaton id="lr1" bind:this={automatonElem}></Automaton>
-	</div>
-</div>
-
-<style>
-</style>
+	{/snippet}
+</AlgoLayout>

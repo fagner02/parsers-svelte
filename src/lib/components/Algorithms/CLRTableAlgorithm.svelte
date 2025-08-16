@@ -17,6 +17,7 @@
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { augmentedGrammarTooltip } from '@/Layout/tooltip.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	let tableElem = /**@type {TableCard | undefined}*/ ($state());
 	let stateElem = /**@type {StateCard | undefined}*/ ($state());
@@ -113,9 +114,8 @@
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
-<div class="unit grid" style="padding: 0 5px; flex-direction:column;align-items:stretch">
-	<div class="cards-box unit" id="card-box{id}">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet cards()}
 		<TableCard
 			{id}
 			{rows}
@@ -151,17 +151,13 @@
 			hue={colors.blue}
 			bind:svgLines
 		></StackCard>
-	</div>
-	<div
-		use:stackFloatingWindows
-		class="unit"
-		style="pointer-events:none;padding: 5px; padding-bottom: 10px;flex: 1; "
-	>
+	{/snippet}
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="Tabela LR(1)" bind:this={codeCard} id="clrtable"
 		></PseudoCode>
 		<Automaton id="clr" bind:this={automatonElem}></Automaton>
-	</div>
-</div>
+	{/snippet}
+</AlgoLayout>
 
 <style>
 </style>

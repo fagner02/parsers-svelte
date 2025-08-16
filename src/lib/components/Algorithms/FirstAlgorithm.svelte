@@ -15,6 +15,7 @@
 	import { writable } from 'svelte/store';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetTooltips, setUpTooltip, showTooltip } from '@/Layout/tooltip.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {StackCard | undefined}*/
 	let joinStackElement = $state();
@@ -87,12 +88,12 @@
 	});
 </script>
 
-<SvgLines svgId="{id}-svg" {id} bind:this={svgLines}></SvgLines>
-<div class="grid unit">
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="First" bind:this={codeCard} id="first"></PseudoCode>
-	</div>
-	<div class="unit cards-box" id="card-box{id}">
+	{/snippet}
+
+	{#snippet cards()}
 		<GrammarCard {id} cardId={elemIds.grammar}></GrammarCard>
 		<SetsCard
 			setId={elemIds.first}
@@ -132,5 +133,5 @@
 			bind:svgLines
 			{id}
 		></StackCard>
-	</div>
-</div>
+	{/snippet}
+</AlgoLayout>

@@ -15,6 +15,7 @@
 	import { id, elemIds, saves, functionCalls, slrparsing } from '$lib/stepCalc/slrparse';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
+	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {SvgLines | undefined}*/
 	let svgLines = $state();
@@ -86,39 +87,41 @@
 	});
 </script>
 
-<SvgLines bind:this={svgLines} svgId="{id}-svg" {id}></SvgLines>
-<div class="cards-box unit" id="card-box{id}">
-	<div class="unit" use:stackFloatingWindows style="pointer-events:none;">
+<AlgoLayout {id} bind:svgLines>
+	{#snippet floats()}
 		<PseudoCode bind:breakpoints title="Análise sintática SLR" bind:this={codeCard} id="slrparse"
 		></PseudoCode>
-	</div>
-	<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
-	<TableCard
-		{id}
-		rows={stateList}
-		columns={alphabet}
-		{table}
-		bind:svgLines
-		tableId={elemIds.table}
-		label="tabela slr"
-		hue={colors.blue}
-	></TableCard>
-	<StackCard
-		{id}
-		bind:svgLines
-		bind:stack={inputStack}
-		bind:this={inputStackElement}
-		stackId={elemIds.inputStack}
-		hue={colors.green}
-		label="entrada"
-	></StackCard>
-	<StackCard
-		{id}
-		bind:svgLines
-		bind:stack={stateStack}
-		bind:this={stateStackElement}
-		stackId={elemIds.stateStack}
-		hue={colors.green}
-		label="pilha de estados"
-	></StackCard>
-</div>
+	{/snippet}
+
+	{#snippet cards()}
+		<GrammarCard {id} cardId={elemIds.grammar} isAugmented={true}></GrammarCard>
+		<TableCard
+			{id}
+			rows={stateList}
+			columns={alphabet}
+			{table}
+			bind:svgLines
+			tableId={elemIds.table}
+			label="tabela slr"
+			hue={colors.blue}
+		></TableCard>
+		<StackCard
+			{id}
+			bind:svgLines
+			bind:stack={inputStack}
+			bind:this={inputStackElement}
+			stackId={elemIds.inputStack}
+			hue={colors.green}
+			label="entrada"
+		></StackCard>
+		<StackCard
+			{id}
+			bind:svgLines
+			bind:stack={stateStack}
+			bind:this={stateStackElement}
+			stackId={elemIds.stateStack}
+			hue={colors.green}
+			label="pilha de estados"
+		></StackCard>
+	{/snippet}
+</AlgoLayout>
