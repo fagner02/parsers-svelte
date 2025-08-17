@@ -15,7 +15,7 @@
 	 * minimized?: boolean,
 	 * actions?: ResizeWrapperAction[],
 	 * component: any,
-	 * content: import('svelte').Snippet,
+	 * children: import('svelte').Snippet,
 	 * setSize?: () => void,
 	 * style?: string }}*/
 	let {
@@ -24,7 +24,7 @@
 		minimized = $bindable(),
 		setSize = $bindable(),
 		title = null,
-		content,
+		children,
 		interaction = $bindable(),
 		...props
 	} = $props();
@@ -154,7 +154,7 @@
 
 <div class="grid resize-wrapper" style={props.style} id="{props.id}-resize-wrapper">
 	<div class="unit resize-content">
-		{@render content()}
+		{@render children()}
 	</div>
 	<div class="unit resize-handle lb-handle" id="{props.id}-lb-handle"></div>
 	<div class="unit resize-handle lt-handle" id="{props.id}-lt-handle"></div>

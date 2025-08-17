@@ -65,54 +65,50 @@
 </script>
 
 <FillSize class="unit">
-	{#snippet content()}
-		<div class="form">
-			<div class="form-header">
-				<button
-					disabled={started}
-					onclick={() => {
-						createFile();
-						started = true;
-					}}>Iniciar</button
-				>
-				<p style="font-size: 0.9rem;align-content: center">
-					Progresso: {totalAnswers}/{totalQuestions}
-				</p>
-				<button
-					disabled={totalAnswers < totalQuestions || fileSent || !started}
-					onclick={() => {
-						fileSent = true;
-						getFile();
-						goto('/forms/aluno');
-					}}>{fileSent ? 'Finalizado' : 'Finalizar'}</button
-				>
-			</div>
-			<FillSize class="form-content">
-				{#snippet content()}
-					<div
-						class="fields"
-						style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
-					>
-						<hr style="margin-top: 0;" />
-						{#if n === 'true'}
-							<div style="display: flex;flex-wrap:wrap;">
-								<div class="field" style="flex: 1">
-									<p>Nome Completo</p>
-									<input oninput={receiveInput} name="name" id="name" />
-								</div>
-								<div class="field">
-									<p>Matrícula</p>
-									<input oninput={receiveInput} name="matricula" id="matricula" />
-								</div>
-							</div>
-							<hr />
-						{/if}
-						<Assignment {receiveInput}></Assignment>
-					</div>
-				{/snippet}
-			</FillSize>
+	<div class="form">
+		<div class="form-header">
+			<button
+				disabled={started}
+				onclick={() => {
+					createFile();
+					started = true;
+				}}>Iniciar</button
+			>
+			<p style="font-size: 0.9rem;align-content: center">
+				Progresso: {totalAnswers}/{totalQuestions}
+			</p>
+			<button
+				disabled={totalAnswers < totalQuestions || fileSent || !started}
+				onclick={() => {
+					fileSent = true;
+					getFile();
+					goto('/forms/aluno');
+				}}>{fileSent ? 'Finalizado' : 'Finalizar'}</button
+			>
 		</div>
-	{/snippet}
+		<FillSize class="form-content">
+			<div
+				class="fields"
+				style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
+			>
+				<hr style="margin-top: 0;" />
+				{#if n === 'true'}
+					<div style="display: flex;flex-wrap:wrap;">
+						<div class="field" style="flex: 1">
+							<p>Nome Completo</p>
+							<input oninput={receiveInput} name="name" id="name" />
+						</div>
+						<div class="field">
+							<p>Matrícula</p>
+							<input oninput={receiveInput} name="matricula" id="matricula" />
+						</div>
+					</div>
+					<hr />
+				{/if}
+				<Assignment {receiveInput}></Assignment>
+			</div>
+		</FillSize>
+	</div>
 </FillSize>
 
 <style>

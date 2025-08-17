@@ -21,19 +21,17 @@
 	class="maxWidth"
 	fillWidth={false}
 >
-	{#snippet content()}
-		<CloseButton onClose={props.onClose}></CloseButton>
-		<div
-			id={props.id}
-			class="popup-box maxWidth"
-			style="transform: scale({flex}, 1);height: inherit;"
-		>
-			{@render props.children({
-				contentClass: 'popup-content',
-				style: `opacity: ${opacity};transform: translate(0px, ${pos}px)`
-			})}
-		</div>
-	{/snippet}
+	<CloseButton onClose={props.onClose}></CloseButton>
+	<div
+		id={props.id}
+		class="popup-box maxWidth"
+		style="transform: scale({flex}, 1);height: inherit;"
+	>
+		{@render props.children({
+			contentClass: 'popup-content',
+			style: `opacity: ${opacity};transform: translate(0px, ${pos}px)`
+		})}
+	</div>
 </FillSize>
 
 <style>

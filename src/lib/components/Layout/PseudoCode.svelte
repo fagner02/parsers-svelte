@@ -113,19 +113,17 @@
 	id="code-{id}"
 	{interaction}
 >
-	{#snippet content()}
-		<div class="pseudo-code-card" id="code-card-{id}">
-			<div class="line-nums">
-				{#each { length: linesNum }, i}
-					<button
-						class={breakpoints.includes(i) ? 'breakpoint' : ''}
-						onclick={(e) => toggleBreakpoint(i)}>{i}.</button
-					>
-				{/each}
-			</div>
-			<pre class="pseudocode" id="pseudocode-{id}"></pre>
+	<div class="pseudo-code-card" id="code-card-{id}">
+		<div class="line-nums">
+			{#each { length: linesNum }, i}
+				<button
+					class={breakpoints.includes(i) ? 'breakpoint' : ''}
+					onclick={(e) => toggleBreakpoint(i)}>{i}.</button
+				>
+			{/each}
 		</div>
-	{/snippet}
+		<pre class="pseudocode" id="pseudocode-{id}"></pre>
+	</div>
 </ResizeWrapper>
 
 <style>

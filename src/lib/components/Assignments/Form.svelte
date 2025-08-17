@@ -130,36 +130,32 @@
 </script>
 
 <FillSize class="unit" style="margin: 10px">
-	{#snippet content()}
-		<div class="form">
-			<div class="form-header">
-				<p style="align-content: center">
-					Progresso: {totalAnswers}/{totalQuestions}
-				</p>
-				<button
-					disabled={totalAnswers < totalQuestions || fileSent}
-					onclick={() => {
-						fileSent = true;
-						sendForm();
-					}}>{fileSent ? 'Enviado' : 'Finalizar'}</button
-				>
-			</div>
-			<FillSize class="form-content">
-				{#snippet content()}
-					<datalist id="values">
-						<option value="1"></option>
-						<option value="2"></option>
-						<option value="3"></option>
-						<option value="4"></option>
-						<option value="5"></option>
-					</datalist>
-					<div class="fields" style={!fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
-						{@render form()}
-					</div>
-				{/snippet}
-			</FillSize>
+	<div class="form">
+		<div class="form-header">
+			<p style="align-content: center">
+				Progresso: {totalAnswers}/{totalQuestions}
+			</p>
+			<button
+				disabled={totalAnswers < totalQuestions || fileSent}
+				onclick={() => {
+					fileSent = true;
+					sendForm();
+				}}>{fileSent ? 'Enviado' : 'Finalizar'}</button
+			>
 		</div>
-	{/snippet}
+		<FillSize class="form-content">
+			<datalist id="values">
+				<option value="1"></option>
+				<option value="2"></option>
+				<option value="3"></option>
+				<option value="4"></option>
+				<option value="5"></option>
+			</datalist>
+			<div class="fields" style={!fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}>
+				{@render form()}
+			</div>
+		</FillSize>
+	</div>
 </FillSize>
 
 <style>

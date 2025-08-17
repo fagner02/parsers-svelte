@@ -154,15 +154,13 @@
 			{/each}
 		</div>
 		<FillSize class="grid maxWidth">
-			{#snippet content()}
-				{#each algos as algo}
-					{#if algo.loaded}
-						<div class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}">
-							<algo.comp {automaton} {firstSet} />
-						</div>
-					{/if}
-				{/each}
-			{/snippet}
+			{#each algos as algo}
+				{#if algo.loaded}
+					<div class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}">
+						<algo.comp {automaton} {firstSet} />
+					</div>
+				{/if}
+			{/each}
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}

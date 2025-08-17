@@ -68,41 +68,37 @@
 </script>
 
 <FillSize class="tab {props.class ?? ''}">
-	{#snippet content()}
-		<div class="tab-item-list">
-			{#each items as item}
-				<button
-					use:setUpTooltip={{ id: 0, text: item.desc }}
-					class="tab-item"
-					style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
-					item.name
-						? 'hsl(200,50%,50%)'
-						: 'hsl(200,50%,70%)'};"
-					onclick={async () => {
-						item.loaded = true;
-						setCurrentTab(item.tabId);
-						selected = item;
+	<div class="tab-item-list">
+		{#each items as item}
+			<button
+				use:setUpTooltip={{ id: 0, text: item.desc }}
+				class="tab-item"
+				style="padding-top: {selected.name == item.name ? 10 : 0}px;background: {selected.name ==
+				item.name
+					? 'hsl(200,50%,50%)'
+					: 'hsl(200,50%,70%)'};"
+				onclick={async () => {
+					item.loaded = true;
+					setCurrentTab(item.tabId);
+					selected = item;
 
-						appendData(`tab change,${item.name}`);
-					}}>{item.name}</button
-				>
-			{/each}
-		</div>
-		<FillSize class="tab-content grid">
-			{#snippet content()}
-				{#each items as item}
-					<div
-						class="unit {selected.name === item.name ? 'not-hidden' : 'hidden'}"
-						style="height: inherit;"
-					>
-						{#if item.loaded}
-							<item.comp tabId={item.tabId}></item.comp>
-						{/if}
-					</div>
-				{/each}
-			{/snippet}
-		</FillSize>
-	{/snippet}
+					appendData(`tab change,${item.name}`);
+				}}>{item.name}</button
+			>
+		{/each}
+	</div>
+	<FillSize class="tab-content grid">
+		{#each items as item}
+			<div
+				class="unit {selected.name === item.name ? 'not-hidden' : 'hidden'}"
+				style="height: inherit;"
+			>
+				{#if item.loaded}
+					<item.comp tabId={item.tabId}></item.comp>
+				{/if}
+			</div>
+		{/each}
+	</FillSize>
 </FillSize>
 
 <style>

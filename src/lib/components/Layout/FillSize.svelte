@@ -9,7 +9,7 @@
 	const observer = new MutationObserver(setSize);
 	const resize = new ResizeObserver(setSize);
 
-	/**@type {{class?: string, style?: string,id?: string, fillHeight?: boolean, fillWidth?: boolean, content: any}}*/
+	/**@type {{class?: string, style?: string,id?: string, fillHeight?: boolean, fillWidth?: boolean, children: any}}*/
 	let { fillHeight = true, fillWidth = true, id = 'resize-wrapper', ...props } = $props();
 
 	function setHeight() {
@@ -108,7 +108,7 @@
 </script>
 
 <div use:setup class="filled {props.class ?? ''}" style={props.style} {id}>
-	{@render props.content()}
+	{@render props.children()}
 </div>
 
 <style>

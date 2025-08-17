@@ -584,12 +584,10 @@
 	id={props.id}
 	bind:interaction={svgInteraction}
 >
-	{#snippet content()}
-		<svg class="unit border" id="automato-{props.id}-svg">
-			<g id="{props.id}nodes"></g>
-			<g id="{props.id}selected-node"></g>
-		</svg>
-	{/snippet}
+	<svg class="unit border" id="automato-{props.id}-svg">
+		<g id="{props.id}nodes"></g>
+		<g id="{props.id}selected-node"></g>
+	</svg>
 </ResizeWrapper>
 
 <style>

@@ -29,6 +29,7 @@
 	import { setUpTooltip } from '@/Layout/tooltip.svelte.js';
 	import { appendData } from '$lib/log';
 	import { colors } from '$lib/selectSymbol';
+	import Instruction from '@/Layout/Instruction.svelte';
 
 	/**@type {{
 	 * code: string,
@@ -165,10 +166,9 @@
 </script>
 
 <FillSize class="contents unit">
-	{#snippet content()}
-		<div class="controls-box">
-			<div class="controls">
-				<!-- <button
+	<div class="controls-box">
+		<div class="controls">
+			<!-- <button
 					use:setUpTooltip={{ id: 0,text: 'Código' }}
 					class="popup-button"
 					onclick={() => updateSelected('code')}
@@ -176,158 +176,157 @@
 				>
 					<CodeIcon color="hsl(100,50%,100%)" strokeWidth={3}></CodeIcon>
 				</button> -->
-				<button
-					use:setUpTooltip={{ id: 0, text: 'Copiar resultados como texto' }}
-					class="popup-button"
-					onclick={() => updateSelected('text')}
-					disabled={selected == 'text'}
-				>
-					<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
-				</button>
-				<button
-					use:setUpTooltip={{ id: 0, text: 'Informações sobre o algoritmo' }}
-					class="popup-button"
-					onclick={() => updateSelected('info')}
-					disabled={selected == 'info'}
-				>
-					<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
-				</button>
-				<button
-					use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Analisar string de entrada' }}
-					class="view-button"
-					onclick={() => {
-						currentId = id;
-						id = parseId;
-						parseLoaded = true;
-						appendData(`open parse,${id}`);
-						swapAlgorithm(id, props.parseInfo, tabId);
-						parseOn = true;
-						closePopup();
-					}}
-					disabled={parseOn}
-				>
-					<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
-				</button>
-				<button
-					use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Executar construção do parser' }}
-					class="view-button"
-					onclick={() => {
-						parseOn = false;
-						id = currentId;
-						appendData(`close parse,${id}`);
-						swapAlgorithm(id, props.currentInfo, tabId);
-						closePopup();
-					}}
-					disabled={!parseOn}
-				>
-					<PlayIcon color="hsl(100,50%,100%)" strokeWidth={3}></PlayIcon>
-				</button>
-			</div>
-
-			<div class="flow-controls controls">
-				<div style="display: flex;gap: 10px;">
-					<button
-						use:setUpTooltip={{ id: 0, text: 'Ir para passo especificado' }}
-						onclick={goToStepSubmit}
-						style="padding: 0 5px;color: white">Ir</button
-					>
-					<input
-						onsubmit={goToStepSubmit}
-						onkeypress={(e) => {
-							if (e.key === 'Enter') goToStepSubmit();
-						}}
-						placeholder="Passo"
-						style="border-radius: 5px; min-width: 50px; padding: 0 5px; outline: none; border: 2px solid hsl(0, 0%, 50%);"
-						type="number"
-						id="{tabId}-step"
-						name="step"
-						min="0"
-						max={maxStep}
-						value={currentStep}
-					/>
-				</div>
-				<button use:setUpTooltip={{ id: 0, text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
-					<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
-				</button>
-				<button use:setUpTooltip={{ id: 0, text: 'Reiniciar' }} onclick={() => reset(`${id}`)}>
-					<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
-				</button>
-				<button
-					use:setUpTooltip={{ id: 0, text: 'Próximo passo' }}
-					disabled={currentStep >= maxStep}
-					onclick={() => forward(id)}
-				>
-					{#if isPlaying}
-						<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
-					{:else}
-						<PlayIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></PlayIcon>
-					{/if}
-				</button>
-				<button
-					use:setUpTooltip={{ id: 0, text: 'Pular para o final' }}
-					disabled={currentStep >= maxStep}
-					onclick={() => skipToEnd(`${id}`)}
-				>
-					<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
-				</button>
-			</div>
+			<button
+				use:setUpTooltip={{ id: 0, text: 'Copiar resultados como texto' }}
+				class="popup-button"
+				onclick={() => updateSelected('text')}
+				disabled={selected == 'text'}
+			>
+				<ClipboardTextIcon color="hsl(100,50%,100%)" strokeWidth={3}></ClipboardTextIcon>
+			</button>
+			<button
+				use:setUpTooltip={{ id: 0, text: 'Informações sobre o algoritmo' }}
+				class="popup-button"
+				onclick={() => updateSelected('info')}
+				disabled={selected == 'info'}
+			>
+				<DocIcon color="hsl(100,50%,100%)" strokeWidth={3}></DocIcon>
+			</button>
+			<button
+				use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Analisar string de entrada' }}
+				class="view-button"
+				onclick={() => {
+					currentId = id;
+					id = parseId;
+					parseLoaded = true;
+					appendData(`open parse,${id}`);
+					swapAlgorithm(id, props.parseInfo, tabId);
+					parseOn = true;
+					closePopup();
+				}}
+				disabled={parseOn}
+			>
+				<InputStringIcon color="hsl(100,50%,100%)" strokeWidth={3}></InputStringIcon>
+			</button>
+			<button
+				use:setUpTooltip={{ id: 0, hue: colors.green, text: 'Executar construção do parser' }}
+				class="view-button"
+				onclick={() => {
+					parseOn = false;
+					id = currentId;
+					appendData(`close parse,${id}`);
+					swapAlgorithm(id, props.currentInfo, tabId);
+					closePopup();
+				}}
+				disabled={!parseOn}
+			>
+				<PlayIcon color="hsl(100,50%,100%)" strokeWidth={3}></PlayIcon>
+			</button>
 		</div>
-		{#if isGrammarLoaded()}
-			<FillSize id="{id}-wrapper" class="grid maxWidth wrapper">
-				{#snippet content()}
-					<div class="grid unit" style="height: inherit;max-width: inherit;z-index: 1">
-						{#if parseLoaded}
-							<ParseView {id} class="unit {parseOn ? 'not-hidden' : 'hidden'}">
-								{#snippet tree()}
-									{@render props.tree()}
-								{/snippet}
-								{#snippet parse()}
-									{@render props.parse()}
-								{/snippet}
-							</ParseView>
-						{/if}
 
-						<div class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}">
-							{@render props.steps()}
-						</div>
-					</div>
+		<div class="flow-controls controls">
+			<div style="display: flex;gap: 10px;">
+				<button
+					use:setUpTooltip={{ id: 0, text: 'Ir para passo especificado' }}
+					onclick={goToStepSubmit}
+					style="padding: 0 5px;color: white">Ir</button
+				>
+				<input
+					onsubmit={goToStepSubmit}
+					onkeypress={(e) => {
+						if (e.key === 'Enter') goToStepSubmit();
+					}}
+					placeholder="Passo"
+					style="border-radius: 5px; min-width: 50px; padding: 0 5px; outline: none; border: 2px solid hsl(0, 0%, 50%);"
+					type="number"
+					id="{tabId}-step"
+					name="step"
+					min="0"
+					max={maxStep}
+					value={currentStep}
+				/>
+			</div>
+			<button use:setUpTooltip={{ id: 0, text: 'Passo Anterior' }} onclick={() => back(`${id}`)}>
+				<PlaySkipBackIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+			</button>
+			<button use:setUpTooltip={{ id: 0, text: 'Reiniciar' }} onclick={() => reset(`${id}`)}>
+				<RestartIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></RestartIcon>
+			</button>
+			<button
+				use:setUpTooltip={{ id: 0, text: 'Próximo passo' }}
+				disabled={currentStep >= maxStep}
+				onclick={() => forward(id)}
+			>
+				{#if isPlaying}
+					<PlaySkipForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3} />
+				{:else}
+					<PlayIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></PlayIcon>
+				{/if}
+			</button>
+			<button
+				use:setUpTooltip={{ id: 0, text: 'Pular para o final' }}
+				disabled={currentStep >= maxStep}
+				onclick={() => skipToEnd(`${id}`)}
+			>
+				<ForwardIcon color="hsl(200,60%,100%)" size={15} strokeWidth={3}></ForwardIcon>
+			</button>
+		</div>
+	</div>
+	{#if isGrammarLoaded()}
+		<FillSize id="{id}-wrapper" class="grid maxWidth wrapper">
+			<div class="grid unit" style="height: inherit;max-width: inherit;z-index: 1">
+				{#if parseLoaded}
+					<ParseView {id} class="unit {parseOn ? 'not-hidden' : 'hidden'}">
+						{#snippet tree()}
+							{@render props.tree()}
+						{/snippet}
+						{#snippet parse()}
+							{@render props.parse()}
+						{/snippet}
+					</ParseView>
+				{/if}
+
+				<div class="steps unit {parseOn ? 'hidden' : 'not-hidden'} {props.class ?? ''}">
+					{@render props.steps()}
+				</div>
+			</div>
+			<div
+				class="popup unit"
+				style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
+			>
+				{#if selected === 'code'}
+					<Code {code} onClose={closePopup}></Code>
+				{:else if selected === 'text'}
+					<ResultText results={props.results} onClose={closePopup}></ResultText>
+				{:else if selected === 'info'}
+					<Info onClose={closePopup}></Info>
+				{/if}
+			</div>
+			<div class="unit instruction-box">
+				<div
+					class="instruction"
+					style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
+				>
 					<div
-						class="popup unit"
-						style="animation: {animation}; display:{isAnim ? 'none' : 'flex'};height:inherit;"
+						class="instruction-content"
+						style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
 					>
-						{#if selected === 'code'}
-							<Code {code} onClose={closePopup}></Code>
-						{:else if selected === 'text'}
-							<ResultText results={props.results} onClose={closePopup}></ResultText>
-						{:else if selected === 'info'}
-							<Info onClose={closePopup}></Info>
-						{/if}
+						<InfoIcon
+							color="hsl(200, 70%,40%)"
+							strokeWidth={3}
+							size={18}
+							style="top: 4px;position: relative;"
+						></InfoIcon>
+						<span style="height: 18px;">{instruction}</span>
 					</div>
-					<div class="unit instruction-box">
-						<div
-							class="instruction"
-							style="opacity: {opacity};transform: translate(0, {pos}px) scale({scale})"
-						>
-							<div
-								class="instruction-content"
-								style="transform:translate(0, {contentPos}px);opacity: {contentOpacity}"
-							>
-								<InfoIcon
-									color="hsl(200, 70%,40%)"
-									strokeWidth={3}
-									size={18}
-									style="top: 4px;position: relative;"
-								></InfoIcon>
-								<span style="height: 18px;">{instruction}</span>
-							</div>
-						</div>
-					</div>
-				{/snippet}
-			</FillSize>
-		{:else}
-			None
-		{/if}
-	{/snippet}
+				</div>
+			</div>
+		</FillSize>
+	{:else}
+		<FillSize class="maxWidth" style="display: grid; place-items: center">
+			<Instruction>Não foi possível carregar a gramática</Instruction>
+		</FillSize>
+	{/if}
 </FillSize>
 
 <style>

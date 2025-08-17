@@ -136,36 +136,32 @@
 >
 	{#snippet steps()}
 		<FillSize style="max-width: inherit; width: 100%;">
-			{#snippet content()}
-				<div class="algo-buttons">
-					{#each algos as algo}
-						<button
-							use:setUpTooltip={{ id: 0, text: algo.desc }}
-							disabled={selectedAlgorithm === algo.name}
-							onclick={() => {
-								id = algo.id;
-								swapAlgorithm(id, algo.infoComp, tabId);
-								algo.loaded = true;
-								resetSelectionFunctions();
-								appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
-								selectedAlgorithm = algo.name;
-							}}>{algo.name}</button
+			<div class="algo-buttons">
+				{#each algos as algo}
+					<button
+						use:setUpTooltip={{ id: 0, text: algo.desc }}
+						disabled={selectedAlgorithm === algo.name}
+						onclick={() => {
+							id = algo.id;
+							swapAlgorithm(id, algo.infoComp, tabId);
+							algo.loaded = true;
+							resetSelectionFunctions();
+							appendData(`algorithm change,from ${selectedAlgorithm} to ${algo.name}`);
+							selectedAlgorithm = algo.name;
+						}}>{algo.name}</button
+					>
+				{/each}
+			</div>
+			<FillSize class="grid maxWidth">
+				{#each algos as algo}
+					{#if algo.loaded}<div
+							class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}"
 						>
-					{/each}
-				</div>
-				<FillSize class="grid maxWidth">
-					{#snippet content()}
-						{#each algos as algo}
-							{#if algo.loaded}<div
-									class="unit grid {selectedAlgorithm === algo.name ? 'not-hidden' : 'hidden'}"
-								>
-									<algo.comp {automaton} {followSet} />
-								</div>
-							{/if}
-						{/each}
-					{/snippet}
-				</FillSize>
-			{/snippet}
+							<algo.comp {automaton} {followSet} />
+						</div>
+					{/if}
+				{/each}
+			</FillSize>
 		</FillSize>
 	{/snippet}
 	{#snippet tree()}
