@@ -41,9 +41,7 @@
 	<Tooltip groupId={1}></Tooltip>
 	<Tooltip groupId={2}></Tooltip>
 	<FillSize fillWidth={false} id="app-content" class="grid borders maxWidth">
-		{#snippet content()}
-			{@render children()}
-		{/snippet}
+		{@render children()}
 	</FillSize>
 </div>
 
