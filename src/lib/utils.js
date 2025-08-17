@@ -58,67 +58,77 @@ let grammarChangeCallback = null;
 export function setGrammarChangeCallback(value) {
 	grammarChangeCallback = value;
 }
-export let grammar = `E -> E + T
+
+const defaultGrammar = `E -> E + T
 E -> T
 T -> T * F
 T -> F
 F -> id`;
+export let grammar = localStorage.getItem('vansi-grammar') ?? defaultGrammar;
 
 /**
  * @param {string} text
  */
 export function setGrammarText(text) {
+	text = text.trim();
+	if (text === '') {
+		text = defaultGrammar;
+	}
+	localStorage.setItem('vansi-grammar', text);
 	grammar = text;
 	loadGrammar();
 	grammarChangeCallback?.();
 }
 
 export function loadGrammar() {
+	if (grammar === '') return;
 	console.log('Loading grammar', grammar);
 	let ntSet = new Set();
 	let tSet = new Set();
 	let alphSet = new Set();
 	rules = [];
 
-	grammar.split('\n').forEach((r) => {
-		let s = r.split('->');
+	try {
+		grammar.split('\n').forEach((r) => {
+			let s = r.split('->');
 
-		if (s.length > 1) {
-			let right = s[1].split('|');
-			for (let i = 0; i < right.length; i++) {
-				rules.push({
-					left: s[0].trim(),
-					right: right[i].trim().split(' '),
-					index: rules.length
-				});
-				for (let item of new Set(right[i].trim().split(' '))) {
-					alphSet.add(item);
+			if (s.length > 1) {
+				let right = s[1].split('|');
+				for (let i = 0; i < right.length; i++) {
+					rules.push({
+						left: s[0].trim(),
+						right: right[i].trim().split(' '),
+						index: rules.length
+					});
+					for (let item of new Set(right[i].trim().split(' '))) {
+						alphSet.add(item);
+					}
+					ntSet.add(s[0].trim());
 				}
-				ntSet.add(s[0].trim());
 			}
+		});
+
+		alphSet.delete('');
+		for (let v of alphSet) {
+			if (!ntSet.has(v)) tSet.add(v);
 		}
-	});
 
-	alphSet.delete('');
-	for (let v of alphSet) {
-		if (!ntSet.has(v)) tSet.add(v);
-	}
+		t = Array.from(tSet).concat(['$']);
+		nt = Array.from(ntSet);
+		augRules = [{ index: 0, left: `${rules[0]?.left}'`, right: [`${rules[0]?.left}`] }].concat(
+			rules.map((x) => {
+				return {
+					index: x.index + 1,
+					left: x.left,
+					right: x.right
+				};
+			})
+		);
 
-	t = Array.from(tSet).concat(['$']);
-	nt = Array.from(ntSet);
-	augRules = [{ index: 0, left: `${rules[0]?.left}'`, right: [`${rules[0]?.left}`] }].concat(
-		rules.map((x) => {
-			return {
-				index: x.index + 1,
-				left: x.left,
-				right: x.right
-			};
-		})
-	);
+		augStartingSymbol = augRules[0].left;
 
-	augStartingSymbol = augRules[0].left;
-
-	startingSymbol = rules[0].left;
+		startingSymbol = rules[0].left;
+	} catch {}
 }
 
 export function isGrammarLoaded() {
