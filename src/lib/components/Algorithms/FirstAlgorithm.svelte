@@ -1,7 +1,6 @@
 <script>
 	import { elemIds, functionCalls, id, saves } from '$lib/stepCalc/first';
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { colors, deselectSymbol, resetAllSymbols, selectSymbol } from '$lib/selectSymbol';
 	import { rules } from '$lib/utils';
 	import GrammarCard from '@/Cards/GrammarCard.svelte';

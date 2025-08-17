@@ -1,5 +1,5 @@
 <script>
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
 	import { charWidth, fontSize, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
@@ -133,7 +133,7 @@
 						.map((x) => ({ left: x[0], right: x[1].values().toArray() }))
 				)
 			);
-
+			await noJumpWait(0);
 			initialize();
 		} catch (e) {}
 	}
