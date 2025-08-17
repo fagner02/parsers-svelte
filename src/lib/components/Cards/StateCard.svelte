@@ -168,7 +168,6 @@
 				elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
 
 				while (elem) {
-					console.log(elem.scrollHeight);
 					elem.style.maxHeight = `${elem.scrollHeight}px`;
 					elem.style.opacity = '1';
 

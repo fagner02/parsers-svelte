@@ -21,12 +21,10 @@
 	 * @param {Event } e
 	 */
 	function toggleDropdown(e) {
-		console.log('toggle', dropdownElem);
 		e.stopPropagation();
 		e.preventDefault();
 		isOpen = !isOpen;
 		if (!dropdownParent) return;
-		console.log(dropdownParent);
 		if (isOpen) removeTooltip(dropdownParent, 0);
 		else
 			setUpTooltip(dropdownParent, {
