@@ -72,22 +72,22 @@ export async function hideTooltip(groupId) {
  * @param {number} groupId
  */
 export async function showTooltip(e, text, hue, groupId) {
+	if (typeof e === 'string') e = /**@type {HTMLElement}*/ (document.querySelector('#' + e));
+	if (!e) return;
 	const tooltip = tooltipsGroups.get(groupId);
 	let tooltipElem = /**@type {HTMLElement}*/ (document.querySelector(`#tooltip-${groupId}`));
 	let tooltipText = /**@type {HTMLElement}*/ (tooltipElem.querySelector('#tooltip'));
 	let arrow = /**@type {HTMLElement}*/ (tooltipElem.querySelector('.arrow'));
-	tooltipElem.style.setProperty('--hue', `${hue}`);
 	if (!arrow || !tooltipText || !tooltipElem || !tooltip) return;
+
+	tooltipElem.style.setProperty('--hue', `${hue}`);
 	let id = crypto.randomUUID();
 	tooltip.activeTooltip = id;
-	await noJumpWait(0);
 	if (tooltip.activeTooltip !== id) return;
+	await noJumpWait(0);
 
 	tooltipElem.style.opacity = '1';
 	tooltipText.innerHTML = text;
-
-	if (!e) return;
-	if (typeof e === 'string') e = /**@type {HTMLElement}*/ (document.querySelector('#' + e));
 
 	const setValues = () => {
 		let rect = /**@type {HTMLElement}*/ (e)?.getBoundingClientRect();

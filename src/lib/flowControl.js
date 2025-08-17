@@ -221,6 +221,12 @@ export function setMaxStep(step, id) {
  * @param {string} tabId
  */
 export function setCurrentTab(tabId) {
+	const currentAlgo = algos.get(currentAlgoId);
+	if (currentAlgo) currentAlgo.jumpWait = true;
+	resolveAllWaits(currentAlgoId);
+	setTimeout(() => {
+		hideTooltip(1);
+	}, 10);
 	currentTab = tabId;
 }
 
