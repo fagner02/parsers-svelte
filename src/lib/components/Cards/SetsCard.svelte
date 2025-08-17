@@ -1,7 +1,7 @@
 <script>
-	import { noJumpWait, wait } from '$lib/flowControl';
+	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
-	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
 
 	/** @type {{
@@ -133,7 +133,7 @@
 						.map((x) => ({ left: x[0], right: x[1].values().toArray() }))
 				)
 			);
-			await noJumpWait(0);
+
 			initialize();
 		} catch (e) {}
 	}
@@ -166,25 +166,12 @@
 	}
 
 	onMount(initialize);
-	let maxHeight = $derived(lineHeight * Math.max($set?.length ?? 0, 1));
 </script>
 
-<CardWrapper
-	{labelTooltip}
-	{id}
-	minWidth={charWidth}
-	minHeight={lineHeight}
-	{maxHeight}
-	{hue}
-	{label}
-	cardId={setId}
->
+<CardWrapper {labelTooltip} {id} {hue} {label} cardId={setId}>
 	{#key visible}
 		{#each $set as item, index}
-			<p
-				id="{setId}set{index}"
-				style="line-height: {lineHeight}px;font-size:{fontSize}px; padding: 0px; width: fit-content;height: {lineHeight}px"
-			>
+			<p id="{setId}set{index}" style="font-size:{fontSize}px; padding: 0px; width: fit-content;">
 				<span id="{setId}l{index}" class="block" style="--block-hue: {hue};">
 					<span style="font-size: {subFontSize}px;">
 						{convert.noteLeft?.(item.left)}

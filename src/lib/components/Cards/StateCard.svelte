@@ -1,5 +1,5 @@
 <script>
-	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
+	import { charWidth, fontSize, subFontSize } from '$lib/globalStyle';
 	import { augRules } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { noJumpWait, wait } from '$lib/flowControl';
@@ -55,7 +55,6 @@
 				let index = $cardState.length - 1;
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-${index}`));
 				elem.style.maxWidth = '0px';
-				elem.style.height = '0px';
 				let elemWidth = elem.scrollWidth;
 				for (let i = 0; i < (lookahead?.size ?? 0); i++) {
 					let look = /**@type {HTMLElement}*/ (
@@ -70,11 +69,10 @@
 
 				elem.style.opacity = '1';
 				elem.style.maxWidth = `${elemWidth}px`;
-				elem.style.height = `${elem.scrollHeight}px`;
+				elem.style.maxHeight = `${elem.scrollHeight}px`;
 
 				await wait(id, 1500);
 				elem.style.maxWidth = `fit-content`;
-				elem.style.height = `fit-content`;
 				await svgLines?.hideLine(false, id);
 				return resolve(null);
 			} catch (e) {
@@ -148,24 +146,33 @@
 					})
 				);
 
-				await wait(id, 0);
+				await noJumpWait(0);
 				if (srcId) await svgLines?.showLine(srcId, `#state-${stateId}-title`, id);
-				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
-				while (elem !== null) {
-					elem.style.maxWidth = `fit-content`;
-					elem.style.height = `fit-content`;
-					elem.style.opacity = '1';
-
-					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
-				}
 				let lookahead = /**@type {NodeListOf<HTMLElement>}*/ (
 					document.querySelector(`#s-container-${stateId}`)?.querySelectorAll('.look-item')
 				);
 				if (lookahead) {
 					for (const elem of lookahead) {
-						elem.style.maxWidth = `${elem.scrollWidth}px`;
+						elem.style.maxWidth = `${elem.scrollWidth + 10}px`;
+						elem.style.maxHeight = '0px';
 						elem.style.opacity = '1';
 					}
+				}
+				await noJumpWait(0);
+				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
+				while (elem) {
+					elem.style.maxWidth = `${elem.scrollWidth + 100}px`;
+					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
+				}
+				await noJumpWait(0);
+				elem = /**@type {HTMLElement}*/ (document.querySelector(`#state-${stateId}-0`));
+
+				while (elem) {
+					console.log(elem.scrollHeight);
+					elem.style.maxHeight = `${elem.scrollHeight}px`;
+					elem.style.opacity = '1';
+
+					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
 				}
 				try {
 					await wait(id, 500);
@@ -213,16 +220,7 @@
 	});
 </script>
 
-<CardWrapper
-	{labelTooltip}
-	bind:selectionFunctions
-	{id}
-	minWidth={charWidth}
-	minHeight={lineHeight}
-	{hue}
-	{label}
-	cardId={stateId}
->
+<CardWrapper {labelTooltip} bind:selectionFunctions {id} {hue} {label} cardId={stateId}>
 	<div
 		id="s-container-{stateId}"
 		style="transition: max-height 0.5s, max-width 0.5s, opacity 0.5s;"
@@ -235,7 +233,7 @@
 		{#each $cardState as item, rindex}
 			<p
 				id="state-{stateId}-{rindex}"
-				style="opacity: 0;font-size: {fontSize}px;min-width: {charWidth}px;max-width: 0px; height: 0px"
+				style="opacity: 0;max-height: 0px;font-size: {fontSize}px;min-width: {charWidth}px;max-width: 0px;"
 			>
 				<span id="state-{stateId}l{rindex}" style="width: 3px;height:13px;--height:16px;left: -5px"
 				></span>
@@ -281,13 +279,14 @@
 	p {
 		transition:
 			width 0.5s,
-			height 0.5s,
+			max-height 0.5s,
 			max-width 0.5s,
 			opacity 0.5s 0.3s;
 		white-space: pre;
 		display: flex;
 		place-items: baseline;
 		width: fit-content;
+		text-wrap: nowrap;
 	}
 	p > span {
 		margin: 0;

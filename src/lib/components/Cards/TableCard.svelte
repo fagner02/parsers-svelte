@@ -1,7 +1,7 @@
 <script>
 	import { wait } from '$lib/flowControl';
 	import CardWrapper from './CardWrapper.svelte';
-	import { charWidth, fontSize, lineHeight } from '$lib/globalStyle';
+	import { charWidth, fontSize } from '$lib/globalStyle';
 	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 
 	/** @type {{
@@ -174,16 +174,7 @@
 	let conflictElem = $state(null);
 </script>
 
-<CardWrapper
-	{labelTooltip}
-	minHeight={lineHeight}
-	minWidth={charWidth}
-	{hue}
-	{label}
-	cardId={'table'}
-	style="padding: 5px;"
-	{id}
->
+<CardWrapper {labelTooltip} {hue} {label} cardId={'table'} style="padding: 5px;" {id}>
 	<table style="font-size: {fontSize}px;">
 		<thead>
 			<tr>

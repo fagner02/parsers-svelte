@@ -1,6 +1,6 @@
 <script>
 	import { noJumpWait, wait } from '$lib/flowControl';
-	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
+	import { fontSize, subFontSize } from '$lib/globalStyle';
 	import { onMount } from 'svelte';
 	import CardWrapper from './CardWrapper.svelte';
 
@@ -119,10 +119,12 @@
 		return new Promise(async (resolve, reject) => {
 			try {
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${index}`));
-				elem.style.width = '0px';
+				elem.style.height = `${elem.scrollHeight}px`;
+				await wait(id, 0);
+
+				elem.style.top = `-${elem.scrollHeight}px`;
 				elem.style.height = '0px';
 				elem.style.opacity = '0';
-				elem.style.top = `-${lineHeight}px`;
 
 				await wait(id, 1000);
 				stack.update((x) => {
@@ -143,10 +145,15 @@
 				}
 				let elem = /**@type {HTMLElement?}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 				while (elem) {
-					elem.style.width = '0px';
+					elem.style.height = `${elem.scrollHeight}px`;
+					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
+				}
+				await wait(id, 0);
+				elem = /**@type {HTMLElement?}*/ (document.querySelector(`#stack-${stackId}-${0}`));
+				while (elem) {
+					elem.style.top = `-${elem.scrollHeight}px`;
 					elem.style.height = '0px';
 					elem.style.opacity = '0';
-					elem.style.top = `-${lineHeight}px`;
 					elem = /**@type {HTMLElement?}*/ (elem.nextElementSibling);
 				}
 				await wait(id, 1000);
@@ -171,8 +178,8 @@
 				let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 				while (elem) {
-					elem.style.width = 'unset';
-					elem.style.height = 'unset';
+					elem.style.width = 'fit-content';
+					elem.style.height = 'fit-content';
 					elem.style.opacity = '1';
 					elem.style.top = '0px';
 					elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);
@@ -206,8 +213,6 @@
 			? 'flex-direction: row; gap: 8px'
 			: ''}
 	{id}
-	minHeight={lineHeight}
-	minWidth={charWidth}
 	{hue}
 	{label}
 	cardId={stackId}
@@ -216,9 +221,7 @@
 		<p
 			id="stack-{stackId}-{index}"
 			class={`stack-item ${highlighted ? (horizontal ? 'empty' : 'block') : ''}`}
-			style="{horizontal
-				? 'padding: 0 2px'
-				: ''};--block-hue: {hue};top: -{lineHeight}px;line-height: {lineHeight}px;font-size:{fontSize}px;"
+			style="{horizontal ? 'padding: 0 2px' : ''};--block-hue: {hue};font-size:{fontSize}px;"
 		>
 			<span style="font-size: {subFontSize}px;">{stackItem.note}</span>{stackItem.text}
 		</p>
@@ -242,6 +245,7 @@
 		width: fit-content;
 		opacity: 0;
 		padding: 0;
+		top: -20px;
 		transition:
 			width 0.5s,
 			height 0.5s,

@@ -22,7 +22,13 @@
 	 * label: string,
 	 * transition?: string,
 	 * selectionFunctions?: import('@/Cards/selectionFunction').SelectionFunctions}} */
-	let { selectionFunctions = $bindable(), labelTooltip = '', ...props } = $props();
+	let {
+		selectionFunctions = $bindable(),
+		labelTooltip = '',
+		minHeight = 20,
+		minWidth = 10,
+		...props
+	} = $props();
 	/**@type {HTMLElement}*/
 	let selection;
 
@@ -84,20 +90,13 @@
 	});
 </script>
 
-<div
-	class="grid card-wrapper"
-	style="animation: rotA 0.5s;border: 1px solid hsl({props.hue}, 40%, 50%);"
->
-	<div
-		class="border-selection unit"
-		id="select-{props.cardId}"
-		style="border-color: hsl({props.hue}, 40%, 45%);"
-	></div>
-	<div class="unit" style="display: flex;flex-direction: column;">
+<div class="grid card-wrapper" style="animation: rotA 0.5s;--hue:{props.hue};">
+	<div class="border-selection unit" id="select-{props.cardId}"></div>
+	<div class="card-content unit">
 		<div
 			class="card"
 			id={props.id}
-			style="min-height: {props.minHeight}px; min-width:{props.minWidth}px;max-width: {props.maxWidth}px; max-height: {props.maxHeight}px;{props.transition
+			style="gap: 2px;min-height: {minHeight}px; min-width:{minWidth}px;max-width: {props.maxWidth}px; max-height: {props.maxHeight}px;{props.transition
 				? `transition: ${props.transition}`
 				: ''};{props.style}"
 		>
@@ -106,7 +105,7 @@
 		<button
 			class="card-label"
 			id="label-{props.cardId}"
-			style="background: hsl({props.hue},50%,50%);font-size: {fontSize}px;"
+			style="font-size: {fontSize}px;"
 			onmousedown={(e) => interaction.moveStart(e)}
 		>
 			{#if labelTooltip}
@@ -127,6 +126,11 @@
 		margin: 5px;
 		color: white;
 		position: relative;
+		background: hsl(var(--hue), 50%, 50%);
+	}
+	.card-content {
+		display: flex;
+		flex-direction: column;
 	}
 
 	.help {
@@ -154,6 +158,8 @@
 		width: min-content;
 		z-index: 0;
 		position: relative;
+		background: white;
+		border: 1px solid hsl(var(--hue), 40%, 50%);
 	}
 
 	.card {
@@ -176,7 +182,7 @@
 	}
 
 	.border-selection {
-		border: 2px solid hsl(200, 50%, 35%);
+		border: 2px solid hsl(var(--hue), 40%, 45%);
 		outline: 3px solid white;
 		box-shadow: 0px 0px 6px 2px hsl(200, 50%, 0%, 40%);
 		border-radius: 8px;

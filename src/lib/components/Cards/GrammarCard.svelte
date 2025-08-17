@@ -1,6 +1,6 @@
 <script>
 	import { wait } from '$lib/flowControl';
-	import { charWidth, fontSize, lineHeight, subFontSize } from '$lib/globalStyle';
+	import { fontSize, subFontSize } from '$lib/globalStyle';
 	import { colors } from '$lib/selectSymbol';
 	import { augRules, rules } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -40,8 +40,6 @@
 <CardWrapper
 	{labelTooltip}
 	class="card"
-	minHeight={lineHeight}
-	minWidth={charWidth}
 	label={'gramática'}
 	hue={colors.blue}
 	cardId={props.cardId}
@@ -50,7 +48,7 @@
 	<div style="opacity: {opacity}; transition: opacity 0.5s;" id="{props.cardId}rules">
 		{#each grammar as rule, rulesIndex}
 			<p
-				style="line-height: {lineHeight}px; font-size: {fontSize}px; padding: 0px; width: fit-content"
+				style="font-size: {fontSize}px; padding: 0px; width: fit-content"
 				id="{props.cardId}gset{rulesIndex}"
 			>
 				<span id="{props.cardId}gl{rulesIndex}"
