@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getTextWidth } from '$lib/globalStyle';
 	import { grammar, isGrammarLoaded, loadGrammar, setGrammarText } from '$lib/utils';
-	import InfoIcon from '@icons/InfoIcon.svelte';
+	import Instruction from './Instruction.svelte';
 
 	/**@type {number}*/
 	let height = $state(0);
@@ -65,52 +65,32 @@
 <div style="height: inherit;overflow:auto">
 	<div class="input-box unit">
 		<div style="display: flex; flex-direction:column;margin-bottom: 10px;gap: 10px">
-			<div class="instruction">
-				<div class="instruction-icon">
-					<InfoIcon size={18} color="white" strokeWidth={3}></InfoIcon>
-				</div>
-				<p>
-					O lado esquerdo e direito das regras devem ser separados por <kbd>-&gt;</kbd>.
-					<br />Exemplo:
-					<kbd>A -&gt; a B</kbd>.
-				</p>
-			</div>
-			<div class="instruction">
-				<div class="instruction-icon">
-					<InfoIcon size={18} color="white" strokeWidth={3}></InfoIcon>
-				</div>
-				<p>
-					O símbolo <i>&epsilon;</i> é representado como uma regra da gramática sem lado esquerdo.
-					<br />
-					Exemplo: <kbd>A -&gt; </kbd> = <i>A &rightarrow; &epsilon;</i>.
-				</p>
-			</div>
-			<div class="instruction">
-				<div class="instruction-icon">
-					<InfoIcon size={18} color="white" strokeWidth={3}></InfoIcon>
-				</div>
-				<p>
-					Todos os símbolos devem ser separados por espaço. Símbolos juntos são considerados um
-					único símbolo.<br /> Exemplo: <kbd>b B</kbd> = <kbd>&lbrace;b, B&rbrace;</kbd>,
-					<kbd>bB</kbd>
-					=
-					<kbd>&lbrace;bB&rbrace;</kbd>.
-				</p>
-			</div>
-			<div class="instruction">
-				<div class="instruction-icon">
-					<InfoIcon size={18} color="white" strokeWidth={3}></InfoIcon>
-				</div>
-				<p>
-					As regras da gramática podem ser separadas por linha ou usando o símbolo <kbd>|</kbd>.
-					<br />
-					Exemplo: <br />
-					<kbd>A -&gt; a B</kbd> <br />
-					<kbd>A -&gt; c D</kbd><br />
-					É o mesmo que
-					<kbd>A -&gt; a B | c D</kbd>.
-				</p>
-			</div>
+			<Instruction>
+				O lado esquerdo e direito das regras devem ser separados por <kbd>-&gt;</kbd>.
+				<br />Exemplo:
+				<kbd>A -&gt; a B</kbd>.
+			</Instruction>
+			<Instruction>
+				O símbolo <i>&epsilon;</i> é representado como uma regra da gramática sem lado esquerdo.
+				<br />
+				Exemplo: <kbd>A -&gt; </kbd> = <i>A &rightarrow; &epsilon;</i>.
+			</Instruction>
+			<Instruction>
+				Todos os símbolos devem ser separados por espaço. Símbolos juntos são considerados um único
+				símbolo.<br /> Exemplo: <kbd>b B</kbd> = <kbd>&lbrace;b, B&rbrace;</kbd>,
+				<kbd>bB</kbd>
+				=
+				<kbd>&lbrace;bB&rbrace;</kbd>.
+			</Instruction>
+			<Instruction>
+				As regras da gramática podem ser separadas por linha ou usando o símbolo <kbd>|</kbd>.
+				<br />
+				Exemplo: <br />
+				<kbd>A -&gt; a B</kbd> <br />
+				<kbd>A -&gt; c D</kbd><br />
+				É o mesmo que
+				<kbd>A -&gt; a B | c D</kbd>.
+			</Instruction>
 		</div>
 		<!-- <hr /> -->
 		<div class="input unit {props.class ?? ''}" use:setInput>
@@ -133,26 +113,6 @@
 </div>
 
 <style>
-	.instruction {
-		display: flex;
-		border-radius: 5px;
-		background: hsl(215, 15%, 90%);
-		width: fit-content;
-		font-family: 'Courier New', Courier, monospace;
-		/* display: flex; */
-		align-items: stretch;
-		overflow: hidden;
-	}
-	.instruction > p {
-		padding: 8px 10px;
-	}
-	.instruction-icon {
-		background: hsl(0, 0%, 50%);
-		padding: 0px 5px;
-		display: grid;
-		place-items: center;
-	}
-
 	kbd {
 		border-radius: 5px;
 		background: hsl(215, 15%, 80%);
