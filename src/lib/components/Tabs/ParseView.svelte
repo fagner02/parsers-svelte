@@ -75,7 +75,6 @@
 		height: inherit;
 		display: flex;
 		gap: 10px;
-		overflow: hidden;
 	}
 
 	input {
