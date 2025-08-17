@@ -119,6 +119,7 @@ export async function showTooltip(e, text, hue, groupId) {
 	if (groupId === 1) {
 		if (tooltip.interval) window.clearInterval(tooltip.interval);
 		tooltip.interval = window.setInterval(setValues, 100);
+		/**@type {HTMLButtonElement}*/ (tooltipElem.firstElementChild).disabled = false;
 	}
 }
 

@@ -12,7 +12,8 @@
 	{#if groupId === 1}
 		<button
 			style="border-radius: 5px;background: hsl(0,0%,30%);padding: 2px;top:-8px;left:-8px;"
-			onclick={() => {
+			onclick={(e) => {
+				e.currentTarget.disabled = true;
 				hideTooltip(groupId);
 			}}
 		>
@@ -43,6 +44,9 @@
 		border: 2px solid hsl(var(--hue), 50%, 30%);
 		max-width: 250px;
 		display: flex;
+	}
+	button:disabled {
+		pointer-events: none;
 	}
 	button {
 		position: absolute;
