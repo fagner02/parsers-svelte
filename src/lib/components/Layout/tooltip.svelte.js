@@ -107,6 +107,7 @@ export async function showTooltip(e, text, hue, groupId) {
 		if (y + tooltipRect.height > window.innerHeight) {
 			y = window.innerHeight - tooltipRect.height;
 		}
+
 		tooltipElem.style.left = `${x}px`;
 		tooltipElem.style.top = `${y}px`;
 		let left = tooltipRect.width / 2 - arrowRect.width / 2;
@@ -116,6 +117,7 @@ export async function showTooltip(e, text, hue, groupId) {
 	};
 	setValues();
 	if (groupId === 1) {
+		if (tooltip.interval) window.clearInterval(tooltip.interval);
 		tooltip.interval = window.setInterval(setValues, 100);
 	}
 }
