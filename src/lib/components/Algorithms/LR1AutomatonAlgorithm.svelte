@@ -17,7 +17,12 @@
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
 	import { resetSelectFor } from '@/Cards/selectionFunction';
-	import { augmentedGrammarTooltip, resetTooltips, showTooltip } from '@/Layout/tooltip.svelte';
+	import {
+		augmentedGrammarTooltip,
+		resetTooltips,
+		setUpTooltip,
+		showTooltip
+	} from '@/Layout/tooltip.svelte';
 	import AlgoLayout from './AlgoLayout.svelte';
 
 	/**@type {StackCard | undefined}*/
@@ -131,7 +136,8 @@
 		removeFromStack: () => stateStackElem?.removeFromStack,
 		targetStateReset: () => targetStateElem?.resetState,
 		highlightLinesClosure: () => closureCodeCard?.highlightLines,
-		showTooltip: () => showTooltip
+		showTooltip: () => showTooltip,
+		setUpTooltip: () => setUpTooltip
 	};
 
 	let stepExecution = new StepExecution(
