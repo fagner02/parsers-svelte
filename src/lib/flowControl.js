@@ -400,5 +400,6 @@ export function clearControlFlow() {
 		killAllWaits(id);
 		killPause(id);
 	}
-	//algos.clear();
+	tabs.clear();
+	algos.clear();
 }

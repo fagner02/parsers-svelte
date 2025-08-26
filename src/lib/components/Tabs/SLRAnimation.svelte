@@ -60,7 +60,7 @@
 
 	let automaton = /**@type {import('@/types').LR0Automaton}*/ ($state());
 
-	(() => {
+	const initialize = () => {
 		if (!isGrammarLoaded()) return;
 		const _follow = followDataOnly(firstDataOnly(augRules, nt), augRules, nt);
 		const _automaton = lr0Automaton();
@@ -71,7 +71,7 @@
 
 		algos[0].id = _automaton.id;
 		algos[1].id = _table.id;
-
+		results = [];
 		results.push({
 			title: 'Conjunto Follow',
 			content: followToString(_follow.followSet)
@@ -115,7 +115,9 @@
 				)
 			)
 		);
-	})();
+	};
+
+	initialize();
 
 	onMount(() => {
 		id = algos[0].id;

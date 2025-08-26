@@ -136,7 +136,6 @@ export class StepExecution {
 		} catch (e) {
 			console.log(e);
 		}
-		this.executeSteps();
 	}
 
 	onInputChanged() {

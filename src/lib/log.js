@@ -44,6 +44,22 @@ export async function createFile() {
 		localStorage.setItem('vansi-docid', docId);
 		console.log('File created successfully');
 		appendData('tab change,Tarefa');
+		if (browser) {
+			window.addEventListener('click', (event) => {
+				appendData(
+					`w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
+				);
+			});
+			window.addEventListener('mousemove', (event) => {
+				mousePos.x = event.clientX;
+				mousePos.y = event.clientY;
+			});
+			window.setInterval(() => {
+				appendData(
+					`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`
+				);
+			}, 500);
+		}
 	};
 	started = true;
 }
@@ -97,19 +113,6 @@ export async function getFile() {
 		docId = '';
 	};
 }
-if (browser) {
-	window.addEventListener('click', (event) => {
-		appendData(
-			`w click,${event.clientX} ${event.clientY};${window.innerWidth} ${window.innerHeight}`
-		);
-	});
-	window.addEventListener('mousemove', (event) => {
-		mousePos.x = event.clientX;
-		mousePos.y = event.clientY;
-	});
-	window.setInterval(() => {
-		appendData(`mouse pos,${mousePos.x} ${mousePos.y};${window.innerWidth} ${window.innerHeight}`);
-	}, 500);
-}
+
 export const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_SITE_URL } = import.meta.env;
 export const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

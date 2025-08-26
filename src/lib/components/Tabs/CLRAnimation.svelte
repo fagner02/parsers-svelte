@@ -60,7 +60,7 @@
 
 	let currentInfo = $state(algos[0].infoComp);
 
-	(() => {
+	const initialize = () => {
 		if (!isGrammarLoaded()) return;
 		const _first = firstDataOnly(augRules, nt);
 		const _mergedFirst = mergedFirst(_first, augRules);
@@ -72,7 +72,7 @@
 
 		algos[0].id = _automaton.id;
 		algos[1].id = _table.id;
-
+		results = [];
 		results.push({
 			title: 'Conjunto First',
 			content: followToString(_mergedFirst)
@@ -116,7 +116,9 @@
 				)
 			)
 		);
-	})();
+	};
+
+	initialize();
 
 	onMount(() => {
 		id = algos[0].id;

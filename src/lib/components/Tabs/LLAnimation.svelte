@@ -43,13 +43,39 @@
 	/**@type {import('@/types').ResultsTabItem[]} */
 	let results = $state([]);
 	let code = '';
-	onMount(async () => {
+	const algos = $state([
+		{
+			comp: FirstAlgorithm,
+			name: 'First',
+			desc: 'Construção do conjunto first',
+			loaded: false,
+			id: '',
+			infoComp: FirstInfo
+		},
+		{
+			comp: FollowAlgorithm,
+			name: 'Follow',
+			desc: 'Construção do conjunto follow',
+			loaded: false,
+			id: '',
+			infoComp: FollowInfo
+		},
+		{
+			comp: LlAlgorithm,
+			name: 'Tabela',
+			desc: 'Construção da tabela LL(1)',
+			loaded: false,
+			id: '',
+			infoComp: Ll1TableInfo
+		}
+	]);
+	const initialize = () => {
 		if (!isGrammarLoaded()) return;
 		const _first = first();
 		const _follow = follow(_first.firstSet);
 		const _table = lltable(_first.firstSet, _follow.followSet);
 		tableData = _table.table;
-
+		results = [];
 		results.push({
 			title: 'Conjunto First',
 			content: firstToString(_first.firstSet)
@@ -115,34 +141,9 @@
 		algos[0].id = _first.id;
 		algos[1].id = _follow.id;
 		algos[2].id = _table.id;
-	});
+	};
 
-	const algos = $state([
-		{
-			comp: FirstAlgorithm,
-			name: 'First',
-			desc: 'Construção do conjunto first',
-			loaded: false,
-			id: '',
-			infoComp: FirstInfo
-		},
-		{
-			comp: FollowAlgorithm,
-			name: 'Follow',
-			desc: 'Construção do conjunto follow',
-			loaded: false,
-			id: '',
-			infoComp: FollowInfo
-		},
-		{
-			comp: LlAlgorithm,
-			name: 'Tabela',
-			desc: 'Construção da tabela LL(1)',
-			loaded: false,
-			id: '',
-			infoComp: Ll1TableInfo
-		}
-	]);
+	initialize();
 
 	let currentInfo = $state(algos[0].infoComp);
 
