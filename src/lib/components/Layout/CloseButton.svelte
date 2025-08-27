@@ -16,7 +16,7 @@
 	let d = opened;
 	async function resize() {
 		const svg = /**@type {HTMLButtonElement}*/ (document.querySelector(`#close-svg-${tabId}`));
-		console.log(width);
+
 		const parent = /**@type {HTMLElement}*/ (
 			document.querySelector(`#close-svg-${tabId}`)?.parentElement
 		);

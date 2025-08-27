@@ -29,7 +29,6 @@ export async function createFile() {
 	const item = localStorage.getItem('vansi-docid');
 	if (item) {
 		docId = item;
-		console.log(docId);
 		started = true;
 		return;
 	}

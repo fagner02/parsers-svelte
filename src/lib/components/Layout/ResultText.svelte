@@ -12,7 +12,9 @@
 	 */
 	function copy(content, index) {
 		navigator.clipboard.writeText(content).then(async () => {
-			let elem = document.querySelector(`#resbutton${index}`);
+			let elem = document
+				.querySelector(`#result-text-${props.tabId}`)
+				?.querySelector(`#resbutton${index}`);
 			if (!elem) return;
 			elem.classList.add('copied');
 			await wait('', 1000);
