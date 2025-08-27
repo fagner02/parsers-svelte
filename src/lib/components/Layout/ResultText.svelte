@@ -1,7 +1,7 @@
 <script>
 	import CopyIcon from '@icons/CopyIcon.svelte';
 	import Popup from './Popup.svelte';
-	import { wait } from '$lib/flowControl';
+	import { noJumpWait, wait } from '$lib/flowControl';
 
 	/** @type {{onClose: any, tabId: string, results: import("@/types").ResultsTabItem[]}} */
 	let { onClose, ...props } = $props();
@@ -17,7 +17,7 @@
 				?.querySelector(`#resbutton${index}`);
 			if (!elem) return;
 			elem.classList.add('copied');
-			await wait('', 1000);
+			await noJumpWait(1000);
 			elem.classList.remove('copied');
 		});
 	}
