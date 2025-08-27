@@ -91,7 +91,7 @@
 		{#each items as item}
 			<div
 				class="unit {selected.name === item.name ? 'not-hidden' : 'hidden'}"
-				style="height: inherit;"
+				style="height: inherit;max-width:inherit"
 			>
 				{#if item.loaded}
 					<item.comp tabId={item.tabId}></item.comp>

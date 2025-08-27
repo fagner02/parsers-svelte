@@ -10,7 +10,7 @@
 	const resize = new ResizeObserver(setSize);
 
 	/**@type {{class?: string, style?: string,id?: string, fillHeight?: boolean, fillWidth?: boolean, children: any}}*/
-	let { fillHeight = true, fillWidth = true, id = 'resize-wrapper', ...props } = $props();
+	let { fillHeight = true, fillWidth = true, id = 'filled-wrapper', ...props } = $props();
 
 	function setHeight() {
 		parent = /**@type {HTMLElement}*/ (component.parentElement);
