@@ -25,12 +25,34 @@ export let saves = [];
  * @param {string} startingSymbol
  * @param {string[]} inputString
  * @param {Map<string, Map<string, number>>} table
+ * @returns {string}
  */
 export function llParsing(startingSymbol, inputString, table) {
 	functionCalls = [];
 	saves = [];
 	/** @type {typeof saves[0]['tree']} */
 	let tree = [];
+
+	let parseSteps = [];
+	parseSteps.push('Step | Symbol Stack | Input Stack | Action');
+	parseSteps.push('-----|--------------|-------------|-------');
+
+	let stepCount = 0;
+
+	/**
+	 * @param {any[]} symbolStack
+	 * @param {any[]} inputStack
+	 * @param {string} action
+	 */
+	function addStep(symbolStack, inputStack, action) {
+		stepCount++;
+		const symbolStr = symbolStack.join(' ');
+		const inputStr = inputStack.join(' ');
+		parseSteps.push(
+			`${stepCount.toString().padStart(4)} | ${symbolStr.padEnd(12)} | ${inputStr.padEnd(11)} | ${action}`
+		);
+	}
+
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
 		symbolStack: [],
@@ -48,6 +70,8 @@ export function llParsing(startingSymbol, inputString, table) {
 			name: 'addToStackSymbols',
 			args: [i, i, '']
 		});
+
+	addStep(symbolStack, ['$', ...inputString.toReversed()], 'Initialize');
 
 	functionCalls.push({ name: 'highlightLines', args: [[2]] });
 	const inputStack = ['$', ...inputString.toReversed()];
@@ -80,6 +104,11 @@ export function llParsing(startingSymbol, inputString, table) {
 			let newLast = { input: topInput, symbol: topSymbol };
 			if (production === undefined || production === -1) {
 				functionCalls.push({ name: 'highlightLines', args: [[9]] });
+				addStep(
+					symbolStack,
+					inputStack,
+					`ERROR: No production for ${topSymbol} with input ${topInput}`
+				);
 				functionCalls.push({ name: 'setAccept', args: [false] });
 				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
@@ -89,7 +118,7 @@ export function llParsing(startingSymbol, inputString, table) {
 					accept: false,
 					tree: structuredClone(tree)
 				});
-				return false;
+				return parseSteps.join('\n');
 			}
 
 			functionCalls.push({
@@ -124,13 +153,18 @@ export function llParsing(startingSymbol, inputString, table) {
 						args: [i, i, '']
 					});
 				}
+				addStep(
+					symbolStack,
+					inputStack,
+					`REDUCE: ${topSymbol} → ${rules[production].right.join(' ')}`
+				);
 			} else {
 				functionCalls.push({
 					name: 'addToTree',
 					args: [['\u03B5'], topSymbol],
 					skip: true
 				});
-
+				addStep(symbolStack, inputStack, `REDUCE: ${topSymbol} → ε`);
 				tree.push({ data: ['\u03B5'], parentData: topSymbol });
 			}
 			if (last.input === newLast.input && last.symbol === newLast.symbol) {
@@ -157,7 +191,7 @@ export function llParsing(startingSymbol, inputString, table) {
 					tree: structuredClone(tree)
 				});
 
-				return false;
+				return parseSteps.join('\n');
 			}
 			last = newLast;
 		} else {
@@ -171,6 +205,11 @@ export function llParsing(startingSymbol, inputString, table) {
 			});
 			if (topSymbol !== topInput) {
 				functionCalls.push({ name: 'highlightLines', args: [[15]] });
+				addStep(
+					symbolStack,
+					inputStack,
+					`ERROR: Symbol '${topSymbol}' doesn't match input '${topInput}'`
+				);
 				functionCalls.push({ name: 'setAccept', args: [false] });
 				functionCalls.push({ name: 'addPause', args: [id] });
 				saves.push({
@@ -181,7 +220,7 @@ export function llParsing(startingSymbol, inputString, table) {
 					tree: structuredClone(tree)
 				});
 
-				return false;
+				return parseSteps.join('\n');
 			}
 			functionCalls.push({
 				name: 'highlightLines',
@@ -201,6 +240,11 @@ export function llParsing(startingSymbol, inputString, table) {
 				args: [symbolStack.length]
 			});
 			inputStack.pop();
+			addStep(
+				symbolStack,
+				inputStack,
+				`MATCH: Popped '${topSymbol}' and matched input '${topInput}'`
+			);
 		}
 
 		functionCalls.push({
@@ -218,9 +262,10 @@ export function llParsing(startingSymbol, inputString, table) {
 		name: 'highlightLines',
 		args: [[18]]
 	});
+	const accept = symbolStack.length === 0 && inputStack.length === 0;
 	functionCalls.push({
 		name: 'setAccept',
-		args: [symbolStack.length === 0 && inputStack.length === 0]
+		args: [accept]
 	});
 	functionCalls.push({
 		name: 'addPause',
@@ -230,8 +275,15 @@ export function llParsing(startingSymbol, inputString, table) {
 		symbolStack: structuredClone(symbolStack),
 		inputStack: structuredClone(inputStack),
 		functionCall: functionCalls.length - 1,
-		accept: symbolStack.length === 0 && inputStack.length === 0,
+		accept: accept,
 		tree: structuredClone(tree)
 	});
-	return symbolStack.length === 0 && inputStack.length === 0;
+
+	if (accept) {
+		addStep(symbolStack, inputStack, 'ACCEPT: Parsing completed successfully');
+	} else {
+		addStep(symbolStack, inputStack, 'REJECT: Parsing failed');
+	}
+
+	return parseSteps.join('\n');
 }

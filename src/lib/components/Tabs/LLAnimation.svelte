@@ -22,6 +22,7 @@
 	import Ll1TableInfo from '@/Info/LL1TableInfo.svelte';
 	import LlParsingInfo from '@/Info/LL1ParsingInfo.svelte';
 	import FillSize from '@/Layout/FillSize.svelte';
+	import { inputString } from '@/Layout/parseString';
 
 	// ========== Components ====================
 	let instruction = /**@type {string}*/ ($state());
@@ -94,6 +95,10 @@
 					return `${rules[a].left} -> ${rules[a].right[0] === '' ? 'ε' : rules[a].right.join(' ')}`;
 				}
 			})
+		});
+		results.push({
+			title: "Passos da análise da string ''",
+			content: ''
 		});
 
 		firstSet.set(
@@ -198,6 +203,14 @@
 		<SyntaxTree id={parseId}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
-		<LlParse {tableData} {table}></LlParse>
+		<LlParse
+			setParseResult={(content, input) => {
+				const result = results[results.length - 1];
+				result.title = `Passo a passo da análise da string '${input}'`;
+				result.content = content;
+			}}
+			{tableData}
+			{table}
+		></LlParse>
 	{/snippet}
 </AlgorithmTab>

@@ -84,6 +84,10 @@
 			title: 'Tabela SLR(1)',
 			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
 		});
+		results.push({
+			title: "Passos da análise da string ''",
+			content: ''
+		});
 
 		followSet.set(
 			/**@type {import('@/types').SetRow[]}*/ (
@@ -170,6 +174,15 @@
 		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
-		<SlrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}></SlrParse>
+		<SlrParse
+			setParseResult={(content, input) => {
+				const result = results[results.length - 1];
+				result.title = `Passo a passo da análise da string '${input}'`;
+				result.content = content;
+			}}
+			{tableData}
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></SlrParse>
 	{/snippet}
 </AlgorithmTab>

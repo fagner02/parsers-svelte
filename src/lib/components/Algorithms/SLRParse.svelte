@@ -11,7 +11,6 @@
 	import GrammarCard from '@/Cards/GrammarCard.svelte';
 	import { inputString } from '@/Layout/parseString';
 	import PseudoCode from '@/Layout/PseudoCode.svelte';
-	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { id, elemIds, saves, functionCalls, slrparsing } from '$lib/stepCalc/slrparse';
 	import { stackCard } from '@/Tabs/dataToComp';
 	import { StepExecution } from './exucuteSteps.svelte';
@@ -27,8 +26,9 @@
 	/** @type {{
 	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>,
 	 * stateList: any,
-	 * tableData: Map<number, Map<string, string>>}} */
-	let { table, tableData, stateList } = $props();
+	 * tableData: Map<number, Map<string, string>>,
+	 * setParseResult: (result: string, input: string)=> void}} */
+	let { table, tableData, stateList, setParseResult } = $props();
 
 	let codeCard = /**@type {PseudoCode}*/ ($state());
 
@@ -73,7 +73,7 @@
 		id,
 		setStepCallback,
 		() => {
-			slrparsing(inputString, tableData);
+			setParseResult(slrparsing(inputString, tableData), inputString.join(' '));
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}

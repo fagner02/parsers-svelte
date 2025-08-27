@@ -3,7 +3,7 @@
 	import Popup from './Popup.svelte';
 	import { wait } from '$lib/flowControl';
 
-	/** @type {{onClose: any, results: import("@/types").ResultsTabItem[]}} */
+	/** @type {{onClose: any, tabId: string, results: import("@/types").ResultsTabItem[]}} */
 	let { onClose, ...props } = $props();
 
 	/**
@@ -21,7 +21,7 @@
 	}
 </script>
 
-<Popup id="result-text" {onClose}>
+<Popup class="result-text" id="result-text-{props.tabId}" {onClose}>
 	{#snippet children(/**@type {{ style:string, contentClass:string }}*/ params)}
 		<div class="result-text-content {params.contentClass}" style={params.style}>
 			{#each props.results as result, i}
@@ -44,7 +44,7 @@
 </Popup>
 
 <style>
-	:global(#result-text) {
+	:global(.result-text) {
 		background: hsl(200, 60%, 100%);
 		border: 1px solid hsl(200, 60%, 50%);
 		box-shadow: 0px 0px 10px 0px hsl(0, 0%, 0%, 20%);

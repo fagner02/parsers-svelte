@@ -4,7 +4,7 @@
 	import FillSize from './FillSize.svelte';
 	import CloseButton from './CloseButton.svelte';
 
-	/**@type {{flex?: number, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
+	/**@type {{flex?: number, class: string, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
 	let { flex = 0.1, opacity = 0, pos = -50, ...props } = $props();
 
 	onMount(async () => {
@@ -18,13 +18,13 @@
 
 <FillSize
 	style="display: flex;flex-direction: column;justify-content: center;padding-top: 20px;"
-	class="maxWidth"
+	class="maxWidth "
 	fillWidth={false}
 >
-	<CloseButton onClose={props.onClose}></CloseButton>
+	<CloseButton tabId={props.id ?? ''} onClose={props.onClose}></CloseButton>
 	<div
 		id={props.id}
-		class="popup-box maxWidth"
+		class="popup-box maxWidth {props.class}"
 		style="transform: scale({flex}, 1);height: inherit;"
 	>
 		{@render props.children({

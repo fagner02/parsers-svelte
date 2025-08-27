@@ -24,6 +24,7 @@ export let saves = [];
 /**
  * @param {string[]} inputString
  * @param {Map<number, Map<string, string>>} table
+ * @returns {string}
  */
 export function clrparsing(inputString, table) {
 	functionCalls = [];
@@ -34,6 +35,28 @@ export function clrparsing(inputString, table) {
 	const stateStack = [];
 	/** @type {string[]} */
 	const inputStack = [];
+
+	let parseSteps = [];
+	parseSteps.push('Step | State Stack | Input Stack | Action');
+	parseSteps.push('-----|-------------|-------------|-------');
+
+	let stepCount = 0;
+
+	/**
+	 * @param {any[]} stateStack
+	 * @param {any[]} inputStack
+	 * @param {string} action
+	 */
+	function addStep(stateStack, inputStack, action) {
+		stepCount++;
+		const stateStr = stateStack.join(' ');
+		const inputStr = inputStack.join(' ');
+		parseSteps.push(
+			`${stepCount.toString().padStart(4)} | ${stateStr.padEnd(11)} | ${inputStr.padEnd(11)} | ${action}`
+		);
+	}
+
+	addStep(['s0'], ['$'].concat(inputString.toReversed()), 'Initialize');
 
 	functionCalls.push({ name: 'addPause', args: [id] });
 	saves.push({
@@ -57,6 +80,7 @@ export function clrparsing(inputString, table) {
 		});
 	});
 	inputStack.push('$', ...inputString.toReversed());
+	addStep(stateStack, inputStack, 'Input stack initialized');
 
 	let accept = false;
 	while (true) {
@@ -73,6 +97,11 @@ export function clrparsing(inputString, table) {
 
 		if (!action || action === '') {
 			functionCalls.push({ name: 'highlightLines', args: [[8]] });
+			addStep(
+				stateStack,
+				inputStack,
+				`ERROR: No action for state ${currentState} with lookahead '${lookahead}'`
+			);
 			break;
 		}
 
@@ -81,6 +110,7 @@ export function clrparsing(inputString, table) {
 		if (action === 'a') {
 			functionCalls.push({ name: 'highlightLines', args: [[10]] });
 			accept = true;
+			addStep(stateStack, inputStack, 'ACCEPT: Reached final state');
 			break;
 		}
 
@@ -114,6 +144,9 @@ export function clrparsing(inputString, table) {
 				args: [inputStack.length - 1]
 			});
 			inputStack.pop();
+
+			addStep(stateStack, inputStack, `SHIFT: Pushed '${lookahead}' and state 's${newState}'`);
+
 			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				inputStack: structuredClone(inputStack),
@@ -159,6 +192,13 @@ export function clrparsing(inputString, table) {
 				skip: true
 			});
 			tree.push({ parent: production.left, data: children });
+
+			addStep(
+				stateStack,
+				inputStack,
+				`REDUCE: Rule ${ruleIndex}: ${production.left} → ${production.right.join(' ')}`
+			);
+
 			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				inputStack: structuredClone(inputStack),
@@ -174,6 +214,11 @@ export function clrparsing(inputString, table) {
 			functionCalls.push({ name: 'highlightLines', args: [[25]] });
 			if (!gotoState || gotoState === '') {
 				functionCalls.push({ name: 'highlightLines', args: [[26]] });
+				addStep(
+					stateStack,
+					inputStack,
+					`ERROR: No GOTO for state ${stackState} with nonterminal '${production.left}'`
+				);
 				break;
 			}
 
@@ -190,6 +235,9 @@ export function clrparsing(inputString, table) {
 				args: [goto, `s${goto}`, '']
 			});
 			stateStack.push(`s${goto}`);
+
+			addStep(stateStack, inputStack, `GOTO: Pushed '${production.left}' and state 's${goto}'`);
+
 			functionCalls.push({ name: 'addPause', args: [id] });
 			saves.push({
 				inputStack: structuredClone(inputStack),
@@ -209,4 +257,6 @@ export function clrparsing(inputString, table) {
 		accept: accept,
 		functionCall: functionCalls.length - 1
 	});
+
+	return parseSteps.join('\n');
 }

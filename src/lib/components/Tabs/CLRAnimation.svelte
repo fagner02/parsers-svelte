@@ -20,6 +20,7 @@
 	import CLRTableInfo from '@/Info/CLRTableInfo.svelte';
 	import ClrParsingInfo from '@/Info/CLRParsingInfo.svelte';
 	import { clrTable } from '$lib/stepCalc/clr_table';
+	import { inputString } from '@/Layout/parseString';
 
 	let code = '';
 	/**@type {{tabId: string}}*/
@@ -84,6 +85,10 @@
 		results.push({
 			title: 'Tabela CLR(1)',
 			content: tableToString(_table.table, 'estados', { key: (a) => `s${a}` })
+		});
+		results.push({
+			title: "Passos da análise da string ''",
+			content: ''
 		});
 
 		firstSet.set(
@@ -169,6 +174,15 @@
 		<SyntaxTree id={parseId} floating={true}></SyntaxTree>
 	{/snippet}
 	{#snippet parse()}
-		<ClrParse {tableData} stateList={automaton.states.map((x) => `s${x.index}`)} {table}></ClrParse>
+		<ClrParse
+			setParseResult={(content, input) => {
+				const result = results[results.length - 1];
+				result.title = `Passo a passo da análise da string '${input}'`;
+				result.content = content;
+			}}
+			{tableData}
+			stateList={automaton.states.map((x) => `s${x.index}`)}
+			{table}
+		></ClrParse>
 	{/snippet}
 </AlgorithmTab>

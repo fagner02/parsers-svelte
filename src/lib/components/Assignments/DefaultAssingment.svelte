@@ -84,9 +84,9 @@ A -> b S | c`}</pre>
 	<pre>{`num
 num + num
 num + num * num
-(num - num) * num
-num * (num)
-((num + num) * num)
+( num - num ) * num
+num * ( num )
+( ( num + num ) * num )
 `}</pre>
 	<textarea name="q8" id="q8" oninput={receiveInput} rows="4"></textarea>
 </div>

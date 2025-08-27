@@ -297,7 +297,7 @@
 				{#if selected === 'code'}
 					<Code {code} onClose={closePopup}></Code>
 				{:else if selected === 'text'}
-					<ResultText results={props.results} onClose={closePopup}></ResultText>
+					<ResultText tabId={id} results={props.results} onClose={closePopup}></ResultText>
 				{:else if selected === 'info'}
 					<Info onClose={closePopup}></Info>
 				{/if}

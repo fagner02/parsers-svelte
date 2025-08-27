@@ -1,6 +1,5 @@
 <script>
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { elemIds, functionCalls, id, llParsing, saves } from '$lib/stepCalc/llparse';
 	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
@@ -22,8 +21,9 @@
 
 	/** @type {{
 	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<number>>>
-	 * tableData: Map<string, Map<string, number>>}} */
-	let { table, tableData } = $props();
+	 * tableData: Map<string, Map<string, number>>,
+	 * setParseResult: (result: string, input: string)=> void}} */
+	let { table, tableData, setParseResult } = $props();
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
 	let inputStack = $state(writable([]));
 	/**@type {import('svelte/store').Writable<import('@/types').StackItem<any>[]>}*/
@@ -77,7 +77,7 @@
 		id,
 		setStepCallback,
 		() => {
-			llParsing(startingSymbol, inputString, tableData);
+			setParseResult(llParsing(startingSymbol, inputString, tableData), inputString.join(' '));
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}

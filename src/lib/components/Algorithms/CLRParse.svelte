@@ -1,7 +1,6 @@
 <script>
 	import { clrparsing, elemIds, functionCalls, id, saves } from '$lib/stepCalc/clrparse';
 	import { addPause } from '$lib/flowControl';
-	import { stackFloatingWindows } from '@/Layout/interactiveElem';
 	import { inputString } from '@/Layout/parseString';
 	import { colors } from '$lib/selectSymbol';
 	import { getTree } from '@/Structures/treeFunctions';
@@ -27,8 +26,9 @@
 	/** @type {{
 	 * table: import('svelte/store').Writable<Map<string, import('@/types').tableCol<string>>>,
 	 * stateList: any,
-	 * tableData: Map<number, Map<string, string>>}} */
-	let { table, tableData, stateList } = $props();
+	 * tableData: Map<number, Map<string, string>>,
+	 * setParseResult: (result: string, input: string)=> void}} */
+	let { table, tableData, stateList, setParseResult } = $props();
 
 	let codeCard = /**@type {PseudoCode}*/ ($state());
 	let stateStackElement = /** @type {StackCard}*/ ($state());
@@ -71,7 +71,7 @@
 		id,
 		setStepCallback,
 		() => {
-			clrparsing(inputString, tableData);
+			setParseResult(clrparsing(inputString, tableData), inputString.join(' '));
 			stepExecution.saves = saves;
 			stepExecution.functionCalls = functionCalls;
 		}

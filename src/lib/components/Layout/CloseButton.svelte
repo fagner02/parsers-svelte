@@ -3,8 +3,8 @@
 	import CloseIcon from '@icons/CloseIcon.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {{onClose: ()=>void}} */
-	let { onClose } = $props();
+	/** @type {{onClose: ()=>void, tabId: string}} */
+	let { onClose, tabId } = $props();
 	let initialWidth = 500;
 	let initialHeight = 40;
 	let width = $state(initialWidth);
@@ -15,15 +15,21 @@
 
 	let d = opened;
 	async function resize() {
-		const svg = /**@type {HTMLElement}*/ (document.querySelector('#close-svg'));
-		const parent = /**@type {HTMLElement}*/ (document.querySelector('#close-svg')?.parentElement);
+		const svg = /**@type {HTMLButtonElement}*/ (document.querySelector(`#close-svg-${tabId}`));
+		console.log(width);
+		const parent = /**@type {HTMLElement}*/ (
+			document.querySelector(`#close-svg-${tabId}`)?.parentElement
+		);
 		if (!svg || !parent) return;
 		const map = window.getComputedStyle(svg);
 		width = parent.clientWidth - parseFloat(map.marginLeft) - parseFloat(map.marginRight) - 1;
 	}
 
 	onMount(async () => {
-		const parent = /**@type {HTMLElement}*/ (document.querySelector('.svg-box')?.parentElement);
+		const parent = /**@type {HTMLElement}*/ (
+			document.querySelector(`#close-button-${tabId}`)?.parentElement
+		);
+
 		new ResizeObserver(resize).observe(parent);
 		new MutationObserver(resize).observe(parent, {
 			subtree: true,
@@ -34,21 +40,24 @@
 		await noJumpWait(300);
 		opacity = 1;
 		scale = 1;
+		await noJumpWait(10);
+		resize();
 	});
 </script>
 
 <div
+	id="close-button-{tabId}"
 	class="svg-box grid maxWidth"
 	style="transform: scale({scale}, 1);opacity: {opacity};transition: all 0.5s;"
 >
 	<svg
 		class="unit"
-		id="close-svg"
+		id="close-svg-{tabId}"
 		height={initialHeight}
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<path id="close-path" {d} fill="#E54949" transform="scale({width / 500} 1)" />
+		<path id="close-path" {d} fill="#E54949" transform="scale({width / initialWidth} 1)" />
 	</svg>
 	<CloseIcon
 		style="place-self: center end;margin-right: 20px;z-index: 1;grid-area: unit;"
