@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { Capacitor } from '@capacitor/core';
 export const platforms = {
 	web: 0,
@@ -128,7 +127,9 @@ export function loadGrammar() {
 		augStartingSymbol = augRules[0].left;
 
 		startingSymbol = rules[0].left;
-	} catch {}
+	} catch {
+		return;
+	}
 }
 
 export function isGrammarLoaded() {

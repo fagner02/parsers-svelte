@@ -1,11 +1,6 @@
 <script>
-	import { supabase } from '$lib/log';
 	import { setUpTooltip } from '@/Layout/tooltip.svelte';
 	import { getPlatform, platforms } from '$lib/utils';
-	import DropDown from './DropDown.svelte';
-
-	let email = $state('');
-	supabase.auth.getUser().then((v) => (email = v.data.user?.email ?? ''));
 </script>
 
 {#if getPlatform() === platforms.web}
@@ -13,7 +8,6 @@
 		<a href="/" use:setUpTooltip={{ id: 0, text: 'Início' }}>
 			<h1>VANSI</h1>
 		</a>
-		<DropDown></DropDown>
 	</header>
 {/if}
 

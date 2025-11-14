@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 
 export let started = false;
 let mousePos = { x: 0, y: 0 };
@@ -19,7 +19,7 @@ function getIDB() {
 			const db = /**@type {IDBOpenDBRequest}*/ (event?.target)?.result;
 			resolve(db);
 		};
-		request.onerror = (event) => {
+		request.onerror = () => {
 			reject(null);
 		};
 	});
@@ -39,7 +39,7 @@ export async function createFile() {
 	}
 	const transaction = db.transaction('files', 'readwrite');
 	const store = transaction.objectStore('files');
-	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = (event) => {
+	store.add({ name: docId, content: 'timestamp,type,desc' }).onsuccess = () => {
 		localStorage.setItem('vansi-docid', docId);
 		console.log('File created successfully');
 		appendData('tab change,Tarefa');
@@ -104,14 +104,20 @@ export async function getFile() {
 			return;
 		}
 		localStorage.setItem('vansi-file-sent', 'true');
-		if (import.meta.env.PROD) {
-			supabase.storage.from('logs').upload(file.name, file.content);
-		}
+		uploadFile(file.name, file.content);
 		console.log('File content:', file.content);
 		store.delete(docId);
 		docId = '';
 	};
 }
+/**
+ * @param {string} fileName
+ * @param {string} content
+ */
+export function uploadFile(fileName, content) {
+	axios.post('api/upload', { fileName, content });
+}
 
 export const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_SITE_URL } = import.meta.env;
-export const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);
+
+// export const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);

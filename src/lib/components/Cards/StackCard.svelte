@@ -195,8 +195,6 @@
 		let elem = /**@type {HTMLElement}*/ (document.querySelector(`#stack-${stackId}-${0}`));
 
 		while (elem) {
-			// elem.style.height = `${elem.scrollHeight}px`;
-			// elem.style.width = `${elem.scrollWidth}px`;
 			elem.style.opacity = '1';
 			elem.style.top = '0px';
 			elem = /**@type {HTMLElement}*/ (elem.nextElementSibling);

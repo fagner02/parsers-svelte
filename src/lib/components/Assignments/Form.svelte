@@ -1,9 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { supabase } from '$lib/log';
 	import FillSize from '@/Layout/FillSize.svelte';
 	import { onMount } from 'svelte';
 	import '@/Assignments/assignment.css';
+	import { uploadFile } from '$lib/log';
 
 	let { form, receiveInput = $bindable() } = $props();
 	let totalQuestions = $state(0);
@@ -71,7 +71,7 @@
 		});
 
 		if (import.meta.env.PROD) {
-			supabase.storage.from('logs').upload('form-prof' + crypto.randomUUID(), content);
+			uploadFile('form-prof' + crypto.randomUUID(), content);
 		} else {
 			console.log(content);
 		}

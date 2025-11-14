@@ -4,7 +4,7 @@
 	import FillSize from './FillSize.svelte';
 	import CloseButton from './CloseButton.svelte';
 
-	/**@type {{flex?: number, class: string, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
+	/**@type {{flex?: number, class?: string, opacity?: number, pos?: number, id?: string, onClose: any, children: any}}*/
 	let { flex = 0.1, opacity = 0, pos = -50, ...props } = $props();
 
 	onMount(async () => {
