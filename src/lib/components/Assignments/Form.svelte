@@ -71,6 +71,10 @@
 			}
 		});
 
+		content += localStorage.getItem('vansi-name') + '\n';
+		content += localStorage.getItem('vansi-matricula') + '\n';
+		content += localStorage.getItem('vansi-email') + '\n';
+
 		if (import.meta.env.PROD) {
 			uploadFile('form-' + name + crypto.randomUUID(), content);
 		} else {

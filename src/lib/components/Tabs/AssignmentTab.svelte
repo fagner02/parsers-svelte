@@ -92,19 +92,22 @@
 				style={started && !fileSent ? 'opacity: 1' : 'pointer-events:none;opacity: 0.5'}
 			>
 				<hr style="margin-top: 0;" />
-				{#if n === 'true'}
-					<div style="display: flex;flex-wrap:wrap;">
-						<div class="field" style="flex: 1">
-							<p>Nome Completo</p>
-							<input oninput={receiveInput} name="name" id="name" />
-						</div>
-						<div class="field">
-							<p>Matrícula</p>
-							<input oninput={receiveInput} name="matricula" id="matricula" />
-						</div>
+				<div class="field" style="flex: 1">
+					<p>Nome Completo</p>
+					<input oninput={receiveInput} name="name" id="name" />
+				</div>
+				<div style="display: flex;flex-wrap:wrap;">
+					<div class="field">
+						<p>Email</p>
+						<input name="email" id="email" type="email" oninput={receiveInput} />
 					</div>
-					<hr />
-				{/if}
+					<div class="field">
+						<p>Matrícula</p>
+						<input oninput={receiveInput} name="matricula" id="matricula" />
+					</div>
+				</div>
+
+				<hr />
 				<Assignment {receiveInput}></Assignment>
 			</div>
 		</FillSize>
