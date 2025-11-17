@@ -6,7 +6,7 @@
 	let receiveInput = $state(null);
 </script>
 
-<Form bind:receiveInput>
+<Form bind:receiveInput name="prof">
 	{#snippet form()}
 		<div class="field col">
 			1. Em geral, como você avalia a VANSI como ferramenta de ensino de análise sintática?

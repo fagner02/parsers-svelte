@@ -6,7 +6,7 @@
 	let receiveInput = $state(null);
 </script>
 
-<Form bind:receiveInput>
+<Form bind:receiveInput name="aluno">
 	{#snippet form()}
 		<div class="field col">
 			1. Você já havia estudado os algoritmos LL(1), SLR ou CLR antes de usar a ferramenta?

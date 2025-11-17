@@ -5,7 +5,7 @@
 	import '@/Assignments/assignment.css';
 	import { uploadFile } from '$lib/log';
 
-	let { form, receiveInput = $bindable() } = $props();
+	let { form, name, receiveInput = $bindable() } = $props();
 	let totalQuestions = $state(0);
 	let totalAnswers = $state(0);
 	let fileSent = $state(false);
@@ -30,16 +30,16 @@
 				document.querySelectorAll(`input[name="${elem.name}"]`)
 			).forEach((x) => {
 				if (x.checked) {
-					localStorage.setItem('vansi-form-prof' + x.id, x.value);
+					localStorage.setItem('vansi-form-' + name + x.id, x.value);
 					empty = false;
 				} else {
-					localStorage.removeItem('vansi-form-prof' + x.id);
+					localStorage.removeItem('vansi-form-' + name + x.id);
 				}
 			});
 			const item = answers.get(elem.name);
 			if (item) item.filled = !empty;
 		} else {
-			localStorage.setItem('vansi-form-prof' + elem.name, elem.value);
+			localStorage.setItem('vansi-form-' + name + elem.name, elem.value);
 		}
 		totalAnswers = answers
 			.values()
@@ -56,7 +56,7 @@
 	function sendForm() {
 		let content = '';
 		answers.entries().forEach(([k, v]) => {
-			const elem = /**@type {HTMLInputElement}*/ (document.querySelector(k));
+			const elem = /**@type {HTMLInputElement}*/ (document.querySelector(`[name="${k}"]`));
 			if (elem.type === 'checkbox' || elem.type === 'radio') {
 				/**@type {NodeListOf<HTMLInputElement>}*/ (
 					document.querySelectorAll(`input[name="${elem.name}"]`)
@@ -65,13 +65,14 @@
 						content += `${x.id}:${x.value}`;
 					}
 				});
+				content += '\n';
 			} else {
 				content += `${k}:${elem.value?.replaceAll('\\', '\\\\').replaceAll('\n', '\\n')}\n`;
 			}
 		});
 
 		if (import.meta.env.PROD) {
-			uploadFile('form-prof' + crypto.randomUUID(), content);
+			uploadFile('form-' + name + crypto.randomUUID(), content);
 		} else {
 			console.log(content);
 		}
@@ -88,7 +89,7 @@
 				x.onclick = rangeInput;
 			}
 			if (x.type === 'checkbox' || x.type === 'radio') {
-				const item = localStorage.getItem('vansi-form-prof' + x.id);
+				const item = localStorage.getItem('vansi-form-' + name + x.id);
 				if (item) {
 					x.checked = true;
 					answers.set(x.name, {
@@ -102,7 +103,7 @@
 					});
 				}
 			} else {
-				const item = localStorage.getItem('vansi-form-prof' + x.name);
+				const item = localStorage.getItem('vansi-form-' + name + x.name);
 				if (item) {
 					x.value = item;
 
