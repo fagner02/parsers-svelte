@@ -115,7 +115,7 @@ export async function getFile() {
  * @param {string} content
  */
 export function uploadFile(fileName, content) {
-	axios.post('api/upload', { fileName, content });
+	axios.post(window.location.host + '/api/upload', { fileName, content });
 }
 
 export const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_SITE_URL } = import.meta.env;
