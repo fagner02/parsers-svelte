@@ -97,11 +97,11 @@
 					<input oninput={receiveInput} name="name" id="name" />
 				</div>
 				<div style="display: flex;flex-wrap:wrap;">
-					<div class="field">
+					<div class="field" style="flex: 3;">
 						<p>Email</p>
 						<input name="email" id="email" type="email" oninput={receiveInput} />
 					</div>
-					<div class="field">
+					<div class="field" style="flex: 1;">
 						<p>Matrícula</p>
 						<input oninput={receiveInput} name="matricula" id="matricula" />
 					</div>
