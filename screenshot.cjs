@@ -1,11 +1,12 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 function wait(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const args = process.argv.slice(2);
-
+const screenshotsDir = 'screenshots';
 console.log('Arguments passed:', args);
 
 (async () => {
@@ -14,14 +15,19 @@ console.log('Arguments passed:', args);
 
 	await page.setViewport({ width: parseFloat(args[1]), height: parseFloat(args[2]) });
 
-	await page.goto('https://vansi.netlify.app', { waitUntil: 'networkidle2' });
+	await page.goto('https://vansi.netlify.app/?q=true', { waitUntil: 'networkidle2' });
 
 	const [el] = await page.$$(`xpath=//button[text()="${args[0]}"]`);
 	await el.click();
 	await wait(1000);
 
+	if (!fs.existsSync(screenshotsDir)) {
+		fs.mkdirSync(screenshotsDir, { recursive: true });
+		console.log(`Created directory: ${screenshotsDir}`);
+	}
+
 	await page.screenshot({
-		path: `screenshots/${args[0]}-${args[1]}x${args[2]}.png`,
+		path: `${screenshotsDir}/${args[0]}-${args[1]}x${args[2]}.png`,
 		fullPage: true
 	});
 
