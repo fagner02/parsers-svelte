@@ -1,38 +1,40 @@
-# create-svelte
+# VANSI
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+**VANSI** (Visualização de Algoritmos de ANálise SIntática) is an interactive educational tool for teaching and learning compiler parsing algorithms. Developed as a graduation thesis in Computer Science at the Universidade Federal do Ceará — Campus Quixadá.
 
-## Creating a project
+## Live Demo
 
-If you're seeing this, you've probably already done this step. Congrats!
+[vansi.netlify.app](https://vansi.netlify.app)
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Features
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- Step-by-step visualization with animations
+- Interactive automata, parse trees, and parsing tables
+- Pseudocode with breakpoints
+- Grammar input and string analysis
+- Copy results to clipboard
 
-## Developing
+## Algorithms
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- LL(1)
+- SLR
+- LR(1)
 
-```bash
-npm run dev
+## Tech Stack
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- [Svelte](https://svelte.dev/)
+- [Tauri](https://tauri.app/) — Desktop builds
+- [Capacitor](https://capacitorjs.com/) — Mobile builds
 
-## Building
+## Author
 
-To create a production version of your app:
+**Francisco Fagner Ferreira Mesquita**  
+Advisor: Prof. Dr. João Marcelo Uchôa de Alencar
 
-```bash
-npm run build
-```
+## License
 
-You can preview the production build with `npm run preview`.
+[MIT](LICENSE)
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Citation
+
+If you use this tool in academic work, please cite it using the **"Cite this repository"** button on the right sidebar, or refer to the [`CITATION.cff`](CITATION.cff) file.
