@@ -14,3 +14,7 @@ screenshots
 log.*
 .netlify
 logs
+process_feedback.ipynb
+feedback
+reports
+package-lock.json

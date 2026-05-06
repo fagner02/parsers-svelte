@@ -19,7 +19,7 @@
 		"@sveltejs/adapter-netlify": "^5.2.4",
 		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.1.0",
-		"@tauri-apps/cli": "^1.5.14",
+		"@tauri-apps/cli": "^2.11.0",
 		"@types/animejs": "^3.1.12",
 		"@types/eslint": "^8.56.0",
 		"eslint": "^8.56.0",
@@ -40,7 +40,7 @@
 	"dependencies": {
 		"@awesome-cordova-plugins/android-full-screen": "^6.9.0",
 		"@supabase/supabase-js": "^2.49.4",
-		"@tauri-apps/api": "^1.5.5",
+		"@tauri-apps/api": "^2.11.0",
 		"animejs": "^3.2.2",
 		"axios": "^1.13.2",
 		"backblaze-b2": "^1.7.1",
