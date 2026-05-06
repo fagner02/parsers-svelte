@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the thesis."
+type: software
+title: "VANSI: Uma ferramenta para o ensino de algoritmos de análise sintática"
+authors:
+  - family-names: "Ferreira Mesquita"
+    given-names: "Francisco Fagner"
+repository-code: "https://github.com/fagner02/parsers-svelte"
+license: MIT
+version: 0.1.0
+date-released: 2026-05-06
+keywords:
+  - compiler construction
+  - parsing algorithms
+  - algorithm visualization
+  - education
+  - svelte
+
+preferred-citation:
+  type: thesis
+  title: "VANSI: Uma Ferramenta para o Ensino de Algoritmos de Análise Sintática"
+  authors:
+    - family-names: "Ferreira Mesquita"
+      given-names: "Francisco Fagner"
+  institution:
+    name: "Universidade Federal do Ceará, Campus Quixadá"
+  year: 2026
+  thesis-type: "Bacharelado em Ciência da Computação"
