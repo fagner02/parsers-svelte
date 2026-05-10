@@ -1,6 +1,6 @@
 # VANSI
 
-**VANSI** (Visualização de Algoritmos de ANálise SIntática) is an interactive educational tool for teaching and learning compiler parsing algorithms. Developed as a graduation thesis in Computer Science at the Universidade Federal do Ceará — Campus Quixadá.
+**VANSI** (Visualização de Algoritmos de Análise Sintática) is an interactive educational tool for teaching and learning compiler parsing algorithms. Developed as a graduation thesis in Computer Science at the Universidade Federal do Ceará - Campus Quixadá.
 
 ## Live Demo
 
